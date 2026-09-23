@@ -67,7 +67,7 @@
 
 > Lorsque vos [ATQ]**attaques** infligent des dégâts, vous pouvez changer votre [BOU]**bouclier** ou celui d'un adversaire.
 
-**Arbitrage** : « Changer » = relancer 1d8 le bouclier choisi. Soumis à l'autorisation « modifier un bouclier ».
+**Arbitrage** : Si mon attaque fait perdre des PV, je peux (facultatif) relancer 1d8 le bouclier d'un joueur de mon choix (« changer » = relancer). Soumis à l'autorisation « modifier un bouclier ».
 
 **Effets (moteur)** : [`RerollShieldOnHit`](BRICKS.md#rerollshieldonhit)
 
@@ -177,7 +177,7 @@
 
 > Vos [ATQ]**attaques** infligeant des dégats vous permettent de défausser 1 [MOD]**modificateur** de votre cible.
 
-**Arbitrage** : Si les dégâts sont > 0, je défausse 1 modificateur de la cible (à mon choix).
+**Arbitrage** : Si mon attaque fait perdre des PV, je peux (facultatif) défausser 1 modificateur de la cible, à mon choix.
 
 **Effets (moteur)** : [`DiscardTargetModifierOnHit`](BRICKS.md#discardtargetmodifieronhit)
 
@@ -217,7 +217,7 @@
 
 > Vos [ATQ]**attaques** posent 2 jetons de [TOR] tourment sur les [MOD] **modificateurs** de votre cible (au choix).
 
-**Arbitrage** : À chaque attaque, 2 jetons répartis à mon choix sur les modificateurs de la cible.
+**Arbitrage** : À chaque attaque, même sans dégâts (obligatoire) : 2 jetons répartis à mon choix sur les modificateurs de la cible.
 
 **Effets (moteur)** : [`TormentTargetOnAttack(count=2)`](BRICKS.md#tormenttargetonattack)
 
@@ -287,7 +287,7 @@
 
 > Votre prochaine [ATQ] **attaque,** vous permet d'échanger 1 [MOD] modificateur de votre cible avec 1 [MOD] modificateur du [MKT] marché noir correspondant ou d'un autre joueur.
 
-**Arbitrage** : Lors de ma prochaine attaque de ce tour : j'échange 1 modificateur de la cible avec la carte du même emplacement chez un autre joueur ou dans le marché correspondant.
+**Arbitrage** : Après ma prochaine attaque de ce tour, même sans dégâts, je peux (facultatif) échanger 1 modificateur de la cible avec la carte du même emplacement d'un autre joueur (ni la cible, ni moi) ou du marché correspondant.
 
 **Effets (moteur)** : [`SwapOnNextAttack`](BRICKS.md#swaponnextattack)
 
@@ -402,7 +402,7 @@
 
 > Lorsque vous subissez des dégâts, vous choisissez l'action d'équipage du joueur vous [ATQ]**attaquant** pour son prochain tour.
 
-**Arbitrage** : Si je subis des dégâts d'une attaque : je choisis l'action d'équipage de l'attaquant et ses cibles pour son prochain tour. Si c'est impossible, il passe.
+**Arbitrage** : Si une attaque me fait perdre des PV : je choisis l'action d'équipage de l'attaquant pour son prochain tour, et ses cibles (je peux m'imposer comme cible ; « aucune action » n'est pas un choix possible). Si l'action est impossible à ce moment-là, il ne fait aucune action d'équipage.
 
 **Effets (moteur)** : [`DictateAttackerAction`](BRICKS.md#dictateattackeraction)
 
@@ -595,7 +595,7 @@
 > Si le résultat est pair, vous ne perdez pas de points de vie,
 > Si le résultat est impair, vous subissez +3 points de dégats supplémentaires.
 
-**Arbitrage** : Quand je perds des PV (hors `Torment` et `Reflect`) : 1d8. Pair : 0 perte. Impair : +3.
+**Arbitrage** : Quand je perds des PV, hors Tourment, Reflect et pertes que je m'inflige (cause Self) : 1d8. Pair : 0 perte. Impair : +3.
 
 **Effets (moteur)** : [`GambleOnHpLoss(penalty=3)`](BRICKS.md#gambleonhploss)
 

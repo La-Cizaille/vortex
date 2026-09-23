@@ -103,7 +103,7 @@ namespace Vortex.Core.Effects.Bricks
                     p => new HealOnOwnTormentLoss()),
                 new BrickInfo(nameof(TormentAttackerOnLoss), P, "Quand une attaque fait perdre des PV au porteur, il pose `count` jeton(s) sur les modificateurs de l'attaquant.",
                     p => new TormentAttackerOnLoss(p.Int("count", 1, 10, null, "jetons posés"))),
-                new BrickInfo(nameof(GambleOnHpLoss), P, "À chaque perte de PV du porteur (hors Tourment et Reflect), 1 dé : pair, aucune perte ; impair, `penalty` PV de plus.",
+                new BrickInfo(nameof(GambleOnHpLoss), P, "À chaque perte de PV du porteur (hors Tourment, Reflect et pertes qu'il s'inflige), 1 dé : pair, aucune perte ; impair, `penalty` PV de plus.",
                     p => new GambleOnHpLoss(p.Int("penalty", 0, 99, null, "PV perdus en plus sur un impair"))),
                 new BrickInfo(nameof(CopyHighestShieldOnTurnStart), P, "Au début de chaque tour du porteur, son bouclier copie le plus élevé des autres joueurs.",
                     p => new CopyHighestShieldOnTurnStart()),
@@ -133,7 +133,7 @@ namespace Vortex.Core.Effects.Bricks
                     p => new NextAttackOvercharged()),
                 new BrickInfo(nameof(AllInAttack), A, "Défausse les modificateurs du porteur ; sa prochaine attaque de ce tour est surchargée avec `dice` dés dont on garde les `keep` meilleurs.",
                     p => new AllInAttack(p.Int("dice", 1, 10, null, "dés lancés"), p.Int("keep", 1, 10, null, "dés conservés"))),
-                new BrickInfo(nameof(SwapOnNextAttack), A, "Après la prochaine attaque de ce tour, le porteur peut échanger un modificateur de la cible avec la carte du même emplacement d'un autre joueur ou du marché correspondant.",
+                new BrickInfo(nameof(SwapOnNextAttack), A, "Après la prochaine attaque de ce tour, le porteur peut échanger un modificateur de la cible avec la carte du même emplacement d'un autre joueur (ni la cible, ni le porteur) ou du marché correspondant.",
                     p => new SwapOnNextAttack()),
 
                 // Activation: modifiers and markets

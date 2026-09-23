@@ -331,5 +331,14 @@ namespace Vortex.Core.Tests.Bricks
             s.MustAccept(me, Command.RerollShield());
             Assert.That(s.Submit(me, Command.Sabotage(1 - me)).Error!.Code, Is.EqualTo(CommandErrorCode.NoCrewActionLeft));
         }
+
+        [Test]
+        public void SwapOnNextAttack_never_uses_the_attackers_own_card()
+        {
+            (Scenario s, int me, int foe) = Activate(2, B("SwapOnNextAttack"), Answers());
+            CardInstance theirs = s.Equip(foe, "A_902");
+            CardInstance mine = s.Equip(me, "A_903");
+            Assert.Throws<EngineException>(() => s.GameWith(Answers(C(theirs.Uid), C(mine.Uid)), 1).ResolveAttack(me, foe, false), "The attacker's card is not an option.");
+        }
     }
 }
