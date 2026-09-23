@@ -1,62 +1,108 @@
 {
   "$schema": "./schema/events.schema.json",
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "events": [
     {
       "id": "EVT_TEMPETE_ELECTRO_MAGNETIQUE",
       "name": "tempête électro-magnetique",
       "copies": 2,
       "text": "Les **boucliers** sont désactivés pendant ce tour de jeu.",
-      "ruling": "Tous les boucliers sont désactivés pendant la manche."
+      "ruling": "Tous les boucliers sont désactivés pendant la manche.",
+      "effects": [
+        {
+          "brick": "DisableShields"
+        }
+      ]
     },
     {
       "id": "EVT_TROU_NOIR",
       "name": "trou noir",
       "copies": 2,
       "text": "Tous les joueurs perdent leurs modificateurs.",
-      "ruling": "Tous les modificateurs équipés sont défaussés. Les marchés ne changent pas."
+      "ruling": "Tous les modificateurs équipés sont défaussés. Les marchés ne changent pas.",
+      "effects": [
+        {
+          "brick": "DiscardAllEquippedModifiers"
+        }
+      ]
     },
     {
       "id": "EVT_NOUVEL_ARRIVAGE",
       "name": "Nouvel arrivage",
       "copies": 2,
       "text": "Les deux marchés noirs sont entièrement repiochés, tous les joueurs peuvent piocher deux modificateurs pendant ce tour.",
-      "ruling": "Les deux marchés sont recyclés. Pendant la manche, chaque joueur peut prendre 2 cartes, quels que soient les marchés."
+      "ruling": "Les deux marchés sont recyclés. Pendant la manche, chaque joueur peut prendre 2 cartes, quels que soient les marchés.",
+      "effects": [
+        {
+          "brick": "RefreshAllMarkets"
+        },
+        {
+          "brick": "ExtraMarketPicks",
+          "amount": 1
+        }
+      ]
     },
     {
       "id": "EVT_SURCHARGE_IONIQUE",
       "name": "**surcharge** Ionique",
       "copies": 2,
       "text": "Toutes les **attaques** infligent +4 points de dégâts pendant ce tour.",
-      "ruling": "+4 à la valeur de toutes les attaques pendant la manche."
+      "ruling": "+4 à la valeur de toutes les attaques pendant la manche.",
+      "effects": [
+        {
+          "brick": "AttackValueBonus",
+          "amount": 4
+        }
+      ]
     },
     {
       "id": "EVT_NUEE_PARASITAIRE",
       "name": "Nuée parasitaire",
       "copies": 2,
       "text": "Tous les joueurs posent 2 jetons de tourment sur leurs 2 modificateurs.",
-      "ruling": "1 jeton sur chaque modificateur équipé de chaque joueur (1 PV perdu par jeton)."
+      "ruling": "1 jeton sur chaque modificateur équipé de chaque joueur (1 PV perdu par jeton).",
+      "effects": [
+        {
+          "brick": "TormentAllEquipped",
+          "count": 1
+        }
+      ]
     },
     {
       "id": "EVT_ESPACE_ASEPTISE",
       "name": "Espace aseptisé",
       "copies": 2,
       "text": "Tous les joueurs retirent leurs jetons de tourment.",
-      "ruling": "Tous les jetons portés par les joueurs sont retirés."
+      "ruling": "Tous les jetons portés par les joueurs sont retirés.",
+      "effects": [
+        {
+          "brick": "ClearPlayerTorments"
+        }
+      ]
     },
     {
       "id": "EVT_LE_CALME_AVANT_LA_TEMPETE",
       "name": "Le calme avant la tempête",
       "copies": 2,
       "text": "Rien ne se passe.",
-      "ruling": "Aucun effet."
+      "ruling": "Aucun effet.",
+      "effects": []
     },
     {
       "id": "EVT_FIN_DES_TEMPS",
       "name": "Fin des temps",
       "copies": 1,
       "text": "Tous les modificateurs disparaissent, les joueurs n'ont plus de bouclier.",
-      "ruling": "Hors paquet : se déclenche à la place de l'événement de la manche DoomRound[n] (RULES A4). Tous les modificateurs équipés sont défaussés et tous les boucliers passent à 0. Effet ponctuel : les boucliers peuvent ensuite être reconstruits."
+      "ruling": "Hors paquet : se déclenche à la place de l'événement de la manche DoomRound[n] (RULES A4). Tous les modificateurs équipés sont défaussés et tous les boucliers passent à 0. Effet ponctuel : les boucliers peuvent ensuite être reconstruits.",
+      "effects": [
+        {
+          "brick": "DiscardAllEquippedModifiers"
+        },
+        {
+          "brick": "SetAllShields",
+          "value": 0
+        }
+      ]
     }
   ]
 }

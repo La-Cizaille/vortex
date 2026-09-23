@@ -29,7 +29,7 @@
 ## Tests
 - Toute règle et toute carte a **au moins un test**, qui s'appuie sur `ScriptedDice` pour contrôler les dés.
 - Toute commande illégale a un test négatif : erreur attendue, état inchangé.
-- Couverture visée pour `core/` : **≥ 90 %** des lignes.
+- Couverture de `Vortex.Core` : **≥ 90 %** des lignes, bloquant en CI.
 - Pour lancer les tests : `dotnet test dotnet/Vortex.sln`.
 
 ## Ajouter, modifier ou retirer une carte
@@ -44,10 +44,10 @@ La source de vérité est `core/Runtime/Data/` : `cards.json`, `events.json` et 
    ```
    dotnet run --project dotnet/Vortex.ContentTool -- format core/Runtime/Data
    dotnet run --project dotnet/Vortex.ContentTool -- validate core/Runtime/Data
-   dotnet run --project dotnet/Vortex.ContentTool -- docs core/Runtime/Data docs/CARDS.md
+   dotnet run --project dotnet/Vortex.ContentTool -- docs core/Runtime/Data docs
    ```
 4. Si le nombre de cartes change, mettre à jour les quantités attendues dans `GameDataContentTests`. C'est le **seul** test lié au contenu réel.
-5. À partir de M2 : déclarer les briques d'effets de la carte, ou écrire sa classe, avec son test.
+5. Déclarer les **briques d'effets** de la carte dans `effects` (catalogue et paramètres : [`BRICKS.md`](BRICKS.md)). Pour une mécanique qu'aucune brique ne couvre : ajouter une brique **générique** dans `core/Runtime/Effects/Bricks`, l'enregistrer dans `BrickCatalog`, écrire son test sur contenu factice (`dotnet/Vortex.Core.Tests/Bricks`), puis régénérer la documentation.
 6. À partir de M3 : mesurer l'impact avec le simulateur.
 
 Les valeurs globales (PV, bouclier de départ, fréquence des événements…) sont dans `GameConfig`, pas dans les cartes.

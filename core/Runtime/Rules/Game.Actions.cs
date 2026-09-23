@@ -342,6 +342,55 @@ namespace Vortex.Core.Rules
             Equip(player, marketCard, cause);
         }
 
+        /// <summary>Exchanges the same-slot modifiers of two players; tokens follow the cards, per-copy data is reset.</summary>
+        public void SwapModifiers(int a, int b, CardSlot slot, EffectSource? cause)
+        {
+            if (a == b || State.Players[a].Slot(slot) == null || State.Players[b].Slot(slot) == null)
+            {
+                throw new EngineException("Invalid modifier swap.");
+            }
+
+            CardInstance ca = Detach(a, slot)!;
+            CardInstance cb = Detach(b, slot)!;
+            ca.Vars.Clear();
+            cb.Vars.Clear();
+            Emit(new GameEvent { Type = GameEventType.CardStolen, Player = b, Other = a, CardUid = ca.Uid, Id = ca.CardId });
+            Emit(new GameEvent { Type = GameEventType.CardStolen, Player = a, Other = b, CardUid = cb.Uid, Id = cb.CardId });
+            var leftA = new SlotChangeInfo(a, slot, ca);
+            var leftB = new SlotChangeInfo(b, slot, cb);
+            Raise((e, s) => e.OnLeftSlot(this, s, leftA), cause);
+            Raise((e, s) => e.OnLeftSlot(this, s, leftB), cause);
+            Equip(a, cb, cause);
+            Equip(b, ca, cause);
+        }
+
+        /// <summary>The equipped card carrying an effect, or null if it is gone (or the effect is not a card's).</summary>
+        public CardInstance? CardOf(EffectSource self)
+        {
+            if (self.Origin != EffectOrigin.Card || self.Holder < 0)
+            {
+                return null;
+            }
+
+            return State.Players[self.Holder].Modifiers().FirstOrDefault(c => c.Uid == self.CardUid);
+        }
+
+        /// <summary>Discards the card carrying an effect, if it is still equipped ("puis la carte est défaussée").</summary>
+        public void DiscardSource(EffectSource self)
+        {
+            CardInstance? card = CardOf(self);
+            if (card != null)
+            {
+                DiscardModifier(self.Holder, Definition(card).Slot, self);
+            }
+        }
+
+        /// <summary>Face-up cards of both markets, ATK first.</summary>
+        public List<CardInstance> VisibleMarketCards()
+        {
+            return State.AttackMarket.Visible.Concat(State.DefenseMarket.Visible).ToList();
+        }
+
         private CardInstance? Detach(int player, CardSlot slot)
         {
             PlayerState p = State.Players[player];

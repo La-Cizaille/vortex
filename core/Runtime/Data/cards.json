@@ -1,6 +1,6 @@
 {
   "$schema": "./schema/cards.schema.json",
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "cards": [
     {
       "id": "A_001",
@@ -11,7 +11,13 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vos <ATQ>**attaques** volent 2 points de <BOU>**bouclier** (vous ne pouvez pas dépasser 8 points de bouclier) à votre adversaire avant d'infliger vos points de dégats.",
-      "ruling": "Vol de 2 points avant le jet (étape « avant le jet »). Si la cible a moins de 2 points, on vole ce qu'elle a. Mon bouclier reste borné à 8. Le vol est une modification du bouclier de la cible : il est soumis à l'autorisation « modifier un bouclier »."
+      "ruling": "Vol de 2 points avant le jet (étape « avant le jet »). Si la cible a moins de 2 points, on vole ce qu'elle a. Mon bouclier reste borné à 8. Le vol est une modification du bouclier de la cible : il est soumis à l'autorisation « modifier un bouclier ».",
+      "effects": [
+        {
+          "brick": "StealShieldBeforeAttack",
+          "amount": 2
+        }
+      ]
     },
     {
       "id": "A_002",
@@ -22,7 +28,12 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vous désactivez le <BOU>**bouclier** d'un adversaire (au choix) pendant votre tour de jeu.",
-      "ruling": "Cible choisie à l'activation. Son bouclier est désactivé jusqu'à la fin de mon tour."
+      "ruling": "Cible choisie à l'activation. Son bouclier est désactivé jusqu'à la fin de mon tour.",
+      "effects": [
+        {
+          "brick": "DisableOpponentShieldThisTurn"
+        }
+      ]
     },
     {
       "id": "A_003",
@@ -33,7 +44,12 @@
       "copies": 2,
       "needsReview": true,
       "text": "Lorsque vos <ATQ>**attaques** infligent des dégâts, vous pouvez changer votre <BOU>**bouclier** ou celui d'un adversaire.",
-      "ruling": "« Changer » = relancer 1d8 le bouclier choisi. Soumis à l'autorisation « modifier un bouclier »."
+      "ruling": "« Changer » = relancer 1d8 le bouclier choisi. Soumis à l'autorisation « modifier un bouclier ».",
+      "effects": [
+        {
+          "brick": "RerollShieldOnHit"
+        }
+      ]
     },
     {
       "id": "A_004",
@@ -44,7 +60,12 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vous pouvez convertir des points de <BOU>**bouclier** (maximum 8) en points de dégats pour votre prochaine <ATQ>**attaque**.",
-      "ruling": "Je choisis X ≤ mon bouclier. Mon bouclier baisse de X, et ma prochaine attaque de ce tour gagne +X."
+      "ruling": "Je choisis X ≤ mon bouclier. Mon bouclier baisse de X, et ma prochaine attaque de ce tour gagne +X.",
+      "effects": [
+        {
+          "brick": "ConvertShieldToNextAttack"
+        }
+      ]
     },
     {
       "id": "A_005",
@@ -55,7 +76,13 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vos <ATQ> **attaques** infligent +4 points de dégats supplémentaires.",
-      "ruling": "+4 à la valeur d'attaque, avant le bouclier."
+      "ruling": "+4 à la valeur d'attaque, avant le bouclier.",
+      "effects": [
+        {
+          "brick": "AttackValueBonus",
+          "amount": 4
+        }
+      ]
     },
     {
       "id": "A_006",
@@ -66,7 +93,13 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vous pouvez décider d'infliger x2 fois plus dégâts lors de votre prochaine <ATQ>**attaque**.",
-      "ruling": "×2 sur les dégâts de la prochaine attaque de ce tour."
+      "ruling": "×2 sur les dégâts de la prochaine attaque de ce tour.",
+      "effects": [
+        {
+          "brick": "NextAttackDamageMultiplier",
+          "factor": 2
+        }
+      ]
     },
     {
       "id": "A_007",
@@ -77,7 +110,12 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vous pouvez défausser les 2 <MOD>**modificateurs** de votre cible.",
-      "ruling": "Défausse les 2 modificateurs de la cible, avec leurs jetons."
+      "ruling": "Défausse les 2 modificateurs de la cible, avec leurs jetons.",
+      "effects": [
+        {
+          "brick": "DiscardOpponentModifiers"
+        }
+      ]
     },
     {
       "id": "A_008",
@@ -88,7 +126,13 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vous pouvez entièrement re-piocher le <MKT> marché noir de <MOD>**modificateurs** <ATQ> d'**attaque** et choisir 1 nouveau <MOD>**modificateur**, le précédent étant défaussé.",
-      "ruling": "Recycle le marché ATK, puis je prends une carte dans le nouveau marché. Brocante est défaussée."
+      "ruling": "Recycle le marché ATK, puis je prends une carte dans le nouveau marché. Brocante est défaussée.",
+      "effects": [
+        {
+          "brick": "RefreshMarketAndPick",
+          "market": "Attack"
+        }
+      ]
     },
     {
       "id": "A_009",
@@ -99,7 +143,12 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vous pouvez voler les 2 <MOD>**modificateurs** de votre cible. Les votres sont défaussés.",
-      "ruling": "Je récupère les 2 modificateurs de la cible (avec leurs jetons) dans mes emplacements. Mes cartes sont défaussées."
+      "ruling": "Je récupère les 2 modificateurs de la cible (avec leurs jetons) dans mes emplacements. Mes cartes sont défaussées.",
+      "effects": [
+        {
+          "brick": "StealOpponentModifiers"
+        }
+      ]
     },
     {
       "id": "A_010",
@@ -110,7 +159,12 @@
       "copies": 2,
       "needsReview": true,
       "text": "Si vos <ATQ>**attaques** détruisent un vaisseau ennemi, tous les joueurs perdent leurs <MOD>**modificateurs** et leurs <BOU>**boucliers** passent à 0 (sauf vous).",
-      "ruling": "Si mon attaque élimine un vaisseau, tous les autres joueurs perdent leurs modificateurs et leur bouclier passe à 0. La carte est ensuite défaussée."
+      "ruling": "Si mon attaque élimine un vaisseau, tous les autres joueurs perdent leurs modificateurs et leur bouclier passe à 0. La carte est ensuite défaussée.",
+      "effects": [
+        {
+          "brick": "ScorchedEarthOnKill"
+        }
+      ]
     },
     {
       "id": "A_011",
@@ -121,7 +175,13 @@
       "copies": 2,
       "needsReview": false,
       "text": "Si vos <ATQ>**attaques** infligent des dégâts, vous gagnez +4 points de vie.",
-      "ruling": "+4 PV si les dégâts sont > 0."
+      "ruling": "+4 PV si les dégâts sont > 0.",
+      "effects": [
+        {
+          "brick": "HealOnHit",
+          "amount": 4
+        }
+      ]
     },
     {
       "id": "A_012",
@@ -132,7 +192,13 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vous pouvez infliger +1 point de dégât pour chaque <MOD>**modificateur** neutre face visible dans les <MKT>marchés noirs lors de votre prochaine <ATQ>**attaque**.",
-      "ruling": "+1 par carte neutre visible dans les deux marchés, compté à l'attaque."
+      "ruling": "+1 par carte neutre visible dans les deux marchés, compté à l'attaque.",
+      "effects": [
+        {
+          "brick": "NextAttackBonusPerNeutral",
+          "amount": 1
+        }
+      ]
     },
     {
       "id": "A_013",
@@ -143,7 +209,12 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vous pouvez surcharger votre prochaine <ATQ>**attaque**.",
-      "ruling": "La prochaine attaque de ce tour est surchargée, sans consommer de jeton de surcharge."
+      "ruling": "La prochaine attaque de ce tour est surchargée, sans consommer de jeton de surcharge.",
+      "effects": [
+        {
+          "brick": "NextAttackOvercharged"
+        }
+      ]
     },
     {
       "id": "A_014",
@@ -154,7 +225,12 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vos <ATQ>**attaques** infligeant des dégats vous permettent de défausser 1 <MOD>**modificateur** de votre cible.",
-      "ruling": "Si les dégâts sont > 0, je défausse 1 modificateur de la cible (à mon choix)."
+      "ruling": "Si les dégâts sont > 0, je défausse 1 modificateur de la cible (à mon choix).",
+      "effects": [
+        {
+          "brick": "DiscardTargetModifierOnHit"
+        }
+      ]
     },
     {
       "id": "A_015",
@@ -165,7 +241,12 @@
       "copies": 2,
       "needsReview": true,
       "text": "Vous pouvez subtiliser ou de détruire 1 <MOD>**modificateur** de votre choix à votre cible.",
-      "ruling": "Je choisis de voler ou de détruire. Une carte volée remplace la mienne dans l'emplacement correspondant."
+      "ruling": "Je choisis de voler ou de détruire. Une carte volée remplace la mienne dans l'emplacement correspondant.",
+      "effects": [
+        {
+          "brick": "StealOrDestroyOpponentModifier"
+        }
+      ]
     },
     {
       "id": "A_016",
@@ -176,7 +257,13 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vos <ATQ>**attaques** <SUR>**surchargées** ignorent le <BOU>**bouclier** de votre cible.",
-      "ruling": "Mes attaques surchargées ignorent le bouclier."
+      "ruling": "Mes attaques surchargées ignorent le bouclier.",
+      "effects": [
+        {
+          "brick": "IgnoreTargetShield",
+          "when": "Overcharged"
+        }
+      ]
     },
     {
       "id": "A_017",
@@ -187,7 +274,14 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vos <ATQ>**attaques** <SUR>**surchargées** infligent +4 points de dégâts supplémentaires.",
-      "ruling": "+4 sur mes attaques surchargées."
+      "ruling": "+4 sur mes attaques surchargées.",
+      "effects": [
+        {
+          "brick": "AttackValueBonus",
+          "amount": 4,
+          "when": "Overcharged"
+        }
+      ]
     },
     {
       "id": "A_018",
@@ -198,7 +292,13 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vos <ATQ>**attaques** posent 2 jetons de <TOR> tourment sur les <MOD> **modificateurs** de votre cible (au choix).",
-      "ruling": "À chaque attaque, 2 jetons répartis à mon choix sur les modificateurs de la cible."
+      "ruling": "À chaque attaque, 2 jetons répartis à mon choix sur les modificateurs de la cible.",
+      "effects": [
+        {
+          "brick": "TormentTargetOnAttack",
+          "count": 2
+        }
+      ]
     },
     {
       "id": "A_019",
@@ -209,7 +309,14 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vos <ATQ>**attaques** infligent +4 points de dégats supplémentaires si (au moins) 1 des modificateurs de votre cible est atteint par 1 jeton de<TOR> tourment.",
-      "ruling": "+4 si au moins un modificateur de la cible porte un Tourment."
+      "ruling": "+4 si au moins un modificateur de la cible porte un Tourment.",
+      "effects": [
+        {
+          "brick": "AttackValueBonus",
+          "amount": 4,
+          "when": "TargetHasTorment"
+        }
+      ]
     },
     {
       "id": "A_020",
@@ -220,7 +327,13 @@
       "copies": 2,
       "needsReview": false,
       "text": "Si vos <ATQ>**attaques** infligent des dégats, vous posez 5 jetons de <TOR>tourment sur 5 **modificateurs** de votre choix des <MKT> marchés noirs.",
-      "ruling": "Si les dégâts sont > 0, 5 jetons sur 5 cartes différentes des marchés (à mon choix)."
+      "ruling": "Si les dégâts sont > 0, 5 jetons sur 5 cartes différentes des marchés (à mon choix).",
+      "effects": [
+        {
+          "brick": "TormentMarketOnHit",
+          "count": 5
+        }
+      ]
     },
     {
       "id": "A_021",
@@ -231,7 +344,13 @@
       "copies": 2,
       "needsReview": true,
       "text": "Vous pouvez poser 2 jetons de <TOR>tourment sur les 2 **modificateurs** de votre cible et des joueurs adjacents.",
-      "ruling": "1 jeton par modificateur, pour la cible et ses deux voisins de siège (moi exclu)."
+      "ruling": "1 jeton par modificateur, pour la cible et ses deux voisins de siège (moi exclu).",
+      "effects": [
+        {
+          "brick": "TormentOpponentAndNeighbours",
+          "count": 1
+        }
+      ]
     },
     {
       "id": "A_022",
@@ -242,7 +361,12 @@
       "copies": 2,
       "needsReview": true,
       "text": "Vous réactivez les jetons de <TOR>tourment en jeu, ce qui inflige de nouveau les dégats à chaque joueur concerné.",
-      "ruling": "Réactivation des Tourments (RULES A7)."
+      "ruling": "Réactivation des Tourments (RULES A7).",
+      "effects": [
+        {
+          "brick": "ReactivateTorments"
+        }
+      ]
     },
     {
       "id": "A_023",
@@ -253,7 +377,14 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vos prochaines <ATQ>**attaques** infligent +3 points de dégat en cas de tirage au <DIC> dé pair __ou__ infligent -1 points de dégat en cas de tirage au <DIC>dé impair.",
-      "ruling": "Somme des dés conservés paire : +3. Impaire : −1."
+      "ruling": "Somme des dés conservés paire : +3. Impaire : −1.",
+      "effects": [
+        {
+          "brick": "ParityAttackBonus",
+          "even": 3,
+          "odd": -1
+        }
+      ]
     },
     {
       "id": "A_024",
@@ -264,7 +395,13 @@
       "copies": 2,
       "needsReview": false,
       "text": "Pariez sur un <DIC>dé. Si vous visez juste, votre <ATQ> **attaque** inflige x2 fois plus de dégats. Sinon, vous <ATQ> **attaquez** normalement.",
-      "ruling": "Annonce avant le jet. ×2 si un dé conservé est égal à la valeur annoncée."
+      "ruling": "Annonce avant le jet. ×2 si un dé conservé est égal à la valeur annoncée.",
+      "effects": [
+        {
+          "brick": "DieBetMultiplier",
+          "factor": 2
+        }
+      ]
     },
     {
       "id": "A_025",
@@ -275,7 +412,12 @@
       "copies": 2,
       "needsReview": false,
       "text": "Votre prochaine <ATQ> **attaque,** vous permet d'échanger 1 <MOD> modificateur de votre cible avec 1 <MOD> modificateur du <MKT> marché noir correspondant ou d'un autre joueur.",
-      "ruling": "Lors de ma prochaine attaque de ce tour : j'échange 1 modificateur de la cible avec la carte du même emplacement chez un autre joueur ou dans le marché correspondant."
+      "ruling": "Lors de ma prochaine attaque de ce tour : j'échange 1 modificateur de la cible avec la carte du même emplacement chez un autre joueur ou dans le marché correspondant.",
+      "effects": [
+        {
+          "brick": "SwapOnNextAttack"
+        }
+      ]
     },
     {
       "id": "A_026",
@@ -286,7 +428,12 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vos <ATQ>**attaques** se font avec un avantage.\n(Jetez 2 dés et gardez le meilleur résultat)",
-      "ruling": "Avantage sur mes attaques."
+      "ruling": "Avantage sur mes attaques.",
+      "effects": [
+        {
+          "brick": "AttackAdvantage"
+        }
+      ]
     },
     {
       "id": "A_027",
@@ -297,7 +444,14 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vous pouvez décider de défausser vos 2 <MOD>**modificateurs** afin de réaliser 1 <ATQ>**attaque** <SUR>**surchargée** avec avantage. lors de votre prochaine <ATQ>**attaque,** vous lancez 3 <DIC>dés et conservez les 2 meilleurs.",
-      "ruling": "Je défausse mes 2 modificateurs, puis ma prochaine attaque de ce tour est surchargée avec 3d8, dont on garde les 2 meilleurs. Mon jeton n'est pas consommé."
+      "ruling": "Je défausse mes 2 modificateurs, puis ma prochaine attaque de ce tour est surchargée avec 3d8, dont on garde les 2 meilleurs. Mon jeton n'est pas consommé.",
+      "effects": [
+        {
+          "brick": "AllInAttack",
+          "dice": 3,
+          "keep": 2
+        }
+      ]
     },
     {
       "id": "D_001",
@@ -308,7 +462,12 @@
       "copies": 2,
       "needsReview": false,
       "text": "Votre <BOU> **bouclier** ne peut pas être modifié par vos adversaires.",
-      "ruling": "Refuse toute modification de la valeur de mon bouclier dont la source est un adversaire (autorisation « modifier un bouclier »). Désactiver ou ignorer un bouclier n'est pas une modification de sa valeur. Les événements n'ont pas de source joueur : ils ne sont pas bloqués."
+      "ruling": "Refuse toute modification de la valeur de mon bouclier dont la source est un adversaire (autorisation « modifier un bouclier »). Désactiver ou ignorer un bouclier n'est pas une modification de sa valeur. Les événements n'ont pas de source joueur : ils ne sont pas bloqués.",
+      "effects": [
+        {
+          "brick": "DenyShieldChangeByOpponents"
+        }
+      ]
     },
     {
       "id": "D_002",
@@ -319,7 +478,12 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vous pouvez convertir vos points de vie en points de <BOU> **bouclier,** sans dépasser 8 points de <BOU> **bouclier**.",
-      "ruling": "Je convertis X PV en X points de bouclier. On ne peut pas descendre à 0 PV ni dépasser un bouclier de 8. Source `Self`."
+      "ruling": "Je convertis X PV en X points de bouclier. On ne peut pas descendre à 0 PV ni dépasser un bouclier de 8. Source `Self`.",
+      "effects": [
+        {
+          "brick": "ConvertHpToShield"
+        }
+      ]
     },
     {
       "id": "D_003",
@@ -330,7 +494,12 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vous pouvez échanger la valeur des <BOU> **boucliers** de 2 vaisseaux.",
-      "ruling": "Échange les boucliers de 2 vaisseaux au choix. Chaque changement de valeur est soumis à l'autorisation « modifier un bouclier » ; si l'un des deux est refusé, l'échange n'a pas lieu."
+      "ruling": "Échange les boucliers de 2 vaisseaux au choix. Chaque changement de valeur est soumis à l'autorisation « modifier un bouclier » ; si l'un des deux est refusé, l'échange n'a pas lieu.",
+      "effects": [
+        {
+          "brick": "SwapTwoShields"
+        }
+      ]
     },
     {
       "id": "D_004",
@@ -341,7 +510,12 @@
       "copies": 2,
       "needsReview": false,
       "text": "Lorsque vous subissez une <ATQ>**attaque,** le même joueur ne peut pas vous <ATQ>**attaquer** de nouveau au tour suivant.",
-      "ruling": "Après une attaque subie, cet attaquant ne peut pas me cibler à son prochain tour."
+      "ruling": "Après une attaque subie, cet attaquant ne peut pas me cibler à son prochain tour.",
+      "effects": [
+        {
+          "brick": "BlockAttackerNextTurn"
+        }
+      ]
     },
     {
       "id": "D_005",
@@ -352,7 +526,13 @@
       "copies": 2,
       "needsReview": false,
       "text": "Le <BOU> **bouclier** d'un vaisseau ennemi de votre choix ne peut pas dépasser la valeur de votre <BOU>  **bouclier** - 2 (minimum 0).",
-      "ruling": "Ennemi choisi à l'équipement. Ajoute une borne maximale au bouclier de cet ennemi : (mon bouclier − 2), minimum 0, recalculée en continu (calcul « bornes du bouclier »)."
+      "ruling": "Ennemi choisi à l'équipement. Ajoute une borne maximale au bouclier de cet ennemi : (mon bouclier − 2), minimum 0, recalculée en continu (calcul « bornes du bouclier »).",
+      "effects": [
+        {
+          "brick": "CapEnemyShield",
+          "offset": 2
+        }
+      ]
     },
     {
       "id": "D_006",
@@ -363,7 +543,12 @@
       "copies": 1,
       "needsReview": false,
       "text": "Lorsque vous subissez des dégâts, vous choisissez l'action d'équipage du joueur vous <ATQ>**attaquant** pour son prochain tour.",
-      "ruling": "Si je subis des dégâts d'une attaque : je choisis l'action d'équipage de l'attaquant et ses cibles pour son prochain tour. Si c'est impossible, il passe."
+      "ruling": "Si je subis des dégâts d'une attaque : je choisis l'action d'équipage de l'attaquant et ses cibles pour son prochain tour. Si c'est impossible, il passe.",
+      "effects": [
+        {
+          "brick": "DictateAttackerAction"
+        }
+      ]
     },
     {
       "id": "D_007",
@@ -374,7 +559,15 @@
       "copies": 2,
       "needsReview": false,
       "text": "Les <ATQ>**attaques** subies ne peuvent infliger qu'un maximum d'1 point de dégât, sauf s'il s'agit d'une <ATQ>**attaque** <SUR> surchargée. Cette carte est défaussée si vous subissez une **attaque** surchargée.",
-      "ruling": "1 dégât maximum par attaque, sauf attaque surchargée. Une attaque surchargée défausse la carte."
+      "ruling": "1 dégât maximum par attaque, sauf attaque surchargée. Une attaque surchargée défausse la carte.",
+      "effects": [
+        {
+          "brick": "CapIncomingAttackLoss",
+          "discardWhenOvercharged": true,
+          "max": 1,
+          "unlessOvercharged": true
+        }
+      ]
     },
     {
       "id": "D_008",
@@ -385,7 +578,12 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vous ne subissez pas de dégâts lors de la prochaine <ATQ>**attaque** subie.",
-      "ruling": "La prochaine attaque subie inflige 0 dégât. La carte est ensuite défaussée."
+      "ruling": "La prochaine attaque subie inflige 0 dégât. La carte est ensuite défaussée.",
+      "effects": [
+        {
+          "brick": "PreventNextAttackLoss"
+        }
+      ]
     },
     {
       "id": "D_009",
@@ -396,7 +594,13 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vous pouvez entièrement re-piocher le <MKT> marché noir de <MOD> modificateurs de <BOU> défense et choisir 1 nouveau <MOD> modificateur, le précédent étant défaussé.",
-      "ruling": "Recycle le marché DEF, puis je prends une carte dans le nouveau marché. Cette carte-ci est défaussée."
+      "ruling": "Recycle le marché DEF, puis je prends une carte dans le nouveau marché. Cette carte-ci est défaussée.",
+      "effects": [
+        {
+          "brick": "RefreshMarketAndPick",
+          "market": "Defense"
+        }
+      ]
     },
     {
       "id": "D_010",
@@ -407,7 +611,12 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vous êtes protégé contre la prochaine <ATQ>**attaque** fatale subie.",
-      "ruling": "Si une attaque devait m'éliminer, elle inflige 0 dégât. La carte est ensuite défaussée."
+      "ruling": "Si une attaque devait m'éliminer, elle inflige 0 dégât. La carte est ensuite défaussée.",
+      "effects": [
+        {
+          "brick": "PreventFatalAttackLoss"
+        }
+      ]
     },
     {
       "id": "D_011",
@@ -418,7 +627,13 @@
       "copies": 2,
       "needsReview": false,
       "text": "Votre <BOU> **bouclier** passe à 8 points, puis cette carte est défaussée.",
-      "ruling": "Activation manuelle (RULES A5.3) : mon bouclier passe à 8, puis la carte est défaussée."
+      "ruling": "Activation manuelle (RULES A5.3) : mon bouclier passe à 8, puis la carte est défaussée.",
+      "effects": [
+        {
+          "brick": "SetOwnShield",
+          "value": 8
+        }
+      ]
     },
     {
       "id": "D_012",
@@ -429,7 +644,13 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vous pouvez gagner +1 point de vie pour chaque modificateur neutre face visible dans les marchés noirs.",
-      "ruling": "+1 PV par carte neutre visible dans les marchés."
+      "ruling": "+1 PV par carte neutre visible dans les marchés.",
+      "effects": [
+        {
+          "brick": "HealPerNeutral",
+          "amount": 1
+        }
+      ]
     },
     {
       "id": "D_013",
@@ -440,7 +661,13 @@
       "copies": 2,
       "needsReview": false,
       "text": "Dès que des dégats sont infligés par un joueur à un autre, vous gagnez +1 point de vie (hors jetons de <TOR> tourment).",
-      "ruling": "+1 PV pour chaque instance de dégâts d'un joueur à un autre. Pas pour la victime, et pas pour les sources `Torment` ou `Reflect`."
+      "ruling": "+1 PV pour chaque instance de dégâts d'un joueur à un autre. Pas pour la victime, et pas pour les sources `Torment` ou `Reflect`.",
+      "effects": [
+        {
+          "brick": "HealWhenOthersDamaged",
+          "amount": 1
+        }
+      ]
     },
     {
       "id": "D_014",
@@ -451,7 +678,12 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vous ne pouvez pas perdre votre <SUR>**surcharge** jusqu'à votre prochain tour.",
-      "ruling": "Je ne peux pas perdre ma surcharge jusqu'au début de mon prochain tour."
+      "ruling": "Je ne peux pas perdre ma surcharge jusqu'au début de mon prochain tour.",
+      "effects": [
+        {
+          "brick": "KeepOverchargeUntilNextTurn"
+        }
+      ]
     },
     {
       "id": "D_015",
@@ -462,7 +694,15 @@
       "copies": 2,
       "needsReview": false,
       "text": "Si vos points de vie sont en dessous ou égaux à 10, vous ne pouvez pas subir plus d' 1 point de dégat à chaque <ATQ>**attaque,** sauf s'il s'agit d'une <ATQ>**attaque** <SUR> surchargée.",
-      "ruling": "Si PV ≤ 10 : 1 dégât maximum par attaque, sauf attaque surchargée."
+      "ruling": "Si PV ≤ 10 : 1 dégât maximum par attaque, sauf attaque surchargée.",
+      "effects": [
+        {
+          "brick": "CapIncomingAttackLoss",
+          "max": 1,
+          "unlessOvercharged": true,
+          "whenHpAtMost": 10
+        }
+      ]
     },
     {
       "id": "D_016",
@@ -473,7 +713,16 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vous pouvez récupérer +15 points de vie, mais votre <BOU>**bouclier** est désactivé pendant 1 tour.",
-      "ruling": "+15 PV (plafonnés au maximum). Mon bouclier est désactivé jusqu'au début de mon prochain tour."
+      "ruling": "+15 PV (plafonnés au maximum). Mon bouclier est désactivé jusqu'au début de mon prochain tour.",
+      "effects": [
+        {
+          "brick": "Heal",
+          "amount": 15
+        },
+        {
+          "brick": "DisableOwnShieldUntilNextTurn"
+        }
+      ]
     },
     {
       "id": "D_017",
@@ -484,7 +733,12 @@
       "copies": 1,
       "needsReview": false,
       "text": "Lorsque vous perdez des points de vie, le joueur vous <ATQ>**attaquant** perd un nombre équivalent de points de vie (hors jetons de <TOR>tourment).",
-      "ruling": "Si je perds des PV sur une attaque, l'attaquant perd le même nombre de PV (source `Reflect`)."
+      "ruling": "Si je perds des PV sur une attaque, l'attaquant perd le même nombre de PV (source `Reflect`).",
+      "effects": [
+        {
+          "brick": "ReflectAttackLoss"
+        }
+      ]
     },
     {
       "id": "D_018",
@@ -495,7 +749,12 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vous récupérez +1 point de vie par dégât infligé par des jetons de <TOR> tourment.",
-      "ruling": "+1 PV pour chaque PV que je perds à cause d'un Tourment."
+      "ruling": "+1 PV pour chaque PV que je perds à cause d'un Tourment.",
+      "effects": [
+        {
+          "brick": "HealOnOwnTormentLoss"
+        }
+      ]
     },
     {
       "id": "D_019",
@@ -506,7 +765,12 @@
       "copies": 2,
       "needsReview": false,
       "text": "Au début de votre prochain tour et des suivants, vous copiez la valeur du <BOU> **bouclier** le plus élevé en jeu.",
-      "ruling": "À partir de mon prochain tour, à chaque début de tour, mon bouclier copie le plus élevé des autres joueurs."
+      "ruling": "À partir de mon prochain tour, à chaque début de tour, mon bouclier copie le plus élevé des autres joueurs.",
+      "effects": [
+        {
+          "brick": "CopyHighestShieldOnTurnStart"
+        }
+      ]
     },
     {
       "id": "D_020",
@@ -517,7 +781,14 @@
       "copies": 2,
       "needsReview": false,
       "text": "Si vos points de vie sont supérieurs ou égaux à 10, vous perdez -3 points de vie au début de chacun de vos tours de jeu.\nSi vos points de vie sont inférieurs à 10, vous gagnez +3 points de vie au début de chacun de vos tours de jeu.",
-      "ruling": "En début de tour : −3 PV si PV ≥ 10 (source `Self`), +3 PV si PV < 10."
+      "ruling": "En début de tour : −3 PV si PV ≥ 10 (source `Self`), +3 PV si PV < 10.",
+      "effects": [
+        {
+          "brick": "HpBalanceOnTurnStart",
+          "amount": 3,
+          "threshold": 10
+        }
+      ]
     },
     {
       "id": "D_021",
@@ -528,7 +799,13 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vous supprimez tous jetons de <TOR> tourment sur le plateau et gagnez +3 points de vie par tourment retiré.",
-      "ruling": "Retire tous les jetons (joueurs et marchés). +3 PV par jeton retiré."
+      "ruling": "Retire tous les jetons (joueurs et marchés). +3 PV par jeton retiré.",
+      "effects": [
+        {
+          "brick": "ClearAllTormentsHealPer",
+          "amount": 3
+        }
+      ]
     },
     {
       "id": "D_022",
@@ -539,7 +816,13 @@
       "copies": 1,
       "needsReview": false,
       "text": "Lorsque vous subissez des dégâts, le joueur vous <ATQ>attaquant reçoit 1 jeton de <TOR>  tourment sur 1 de ses <MOD> modificateurs (selon votre choix).",
-      "ruling": "Si je subis des dégâts d'une attaque, je pose 1 jeton sur un modificateur de l'attaquant (à mon choix)."
+      "ruling": "Si je subis des dégâts d'une attaque, je pose 1 jeton sur un modificateur de l'attaquant (à mon choix).",
+      "effects": [
+        {
+          "brick": "TormentAttackerOnLoss",
+          "count": 1
+        }
+      ]
     },
     {
       "id": "D_023",
@@ -550,7 +833,12 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vous lancez le <DIC> dé avant de décider quelle sera votre action d'équipage.",
-      "ruling": "Au début de ma phase d'équipage, je lance 1d8. Ce dé sert de premier dé pour l'action choisie (attaque, reparamétrage ou sabotage)."
+      "ruling": "Au début de ma phase d'équipage, je lance 1d8. Ce dé sert de premier dé pour l'action choisie (attaque, reparamétrage ou sabotage).",
+      "effects": [
+        {
+          "brick": "PreRollDie"
+        }
+      ]
     },
     {
       "id": "D_024",
@@ -561,7 +849,12 @@
       "copies": 2,
       "needsReview": false,
       "text": "Vous pouvez échanger les <BOU> **boucliers** entre les joueurs adjacents. Vous décidez du sens.",
-      "ruling": "Tous les boucliers tournent d'un siège, dans le sens que je choisis. Un joueur dont le bouclier ne peut pas être modifié (autorisation refusée) garde le sien et est sauté."
+      "ruling": "Tous les boucliers tournent d'un siège, dans le sens que je choisis. Un joueur dont le bouclier ne peut pas être modifié (autorisation refusée) garde le sien et est sauté.",
+      "effects": [
+        {
+          "brick": "RotateShields"
+        }
+      ]
     },
     {
       "id": "D_025",
@@ -572,7 +865,13 @@
       "copies": 2,
       "needsReview": false,
       "text": "Lorsque vous perdez des points de vie, lancez un dé (hors jetons de <TOR> tourment).\nSi le résultat est pair, vous ne perdez pas de points de vie,\nSi le résultat est impair, vous subissez +3 points de dégats supplémentaires.",
-      "ruling": "Quand je perds des PV (hors `Torment` et `Reflect`) : 1d8. Pair : 0 perte. Impair : +3."
+      "ruling": "Quand je perds des PV (hors `Torment` et `Reflect`) : 1d8. Pair : 0 perte. Impair : +3.",
+      "effects": [
+        {
+          "brick": "GambleOnHpLoss",
+          "penalty": 3
+        }
+      ]
     },
     {
       "id": "D_026",
@@ -583,7 +882,12 @@
       "copies": 2,
       "needsReview": false,
       "text": "Les <ATQ>**attaques** que vous subissez se font avec un désavantage (l'adversaire lance 2 <DIC> dés, et vous subissez le résultat le plus faible).",
-      "ruling": "Désavantage sur les attaques que je subis."
+      "ruling": "Désavantage sur les attaques que je subis.",
+      "effects": [
+        {
+          "brick": "IncomingAttackDisadvantage"
+        }
+      ]
     },
     {
       "id": "D_027",
@@ -594,7 +898,13 @@
       "copies": 1,
       "needsReview": false,
       "text": "Au début de votre prochain tour et des suivants, votre <BOU> **bouclier** augmente de +2 (maximum 8).",
-      "ruling": "À partir de mon prochain tour, à chaque début de tour : bouclier +2 (maximum 8)."
+      "ruling": "À partir de mon prochain tour, à chaque début de tour : bouclier +2 (maximum 8).",
+      "effects": [
+        {
+          "brick": "ShieldChangeOnTurnStart",
+          "amount": 2
+        }
+      ]
     }
   ]
 }

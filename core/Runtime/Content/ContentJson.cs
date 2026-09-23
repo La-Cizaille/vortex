@@ -127,6 +127,8 @@ namespace Vortex.Core.Content
                 throw new GameDataException("Game content failed validation:\n - " + string.Join("\n - ", errors));
             }
 
+            // Compiling the effect bricks validates brick names, parameter types and ranges, and usage rules.
+            Effects.EffectCatalog.Build(data);
             return data;
         }
 

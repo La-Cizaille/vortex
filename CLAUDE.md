@@ -26,4 +26,4 @@ The user is a security professional: security, optimisation, and clean documenta
 ## Commands
 - Tests: `dotnet test dotnet/Vortex.sln`
 - Format check: `dotnet format dotnet/Vortex.sln --verify-no-changes`
-- Content: `dotnet run --project dotnet/Vortex.ContentTool -- validate core/Runtime/Data` (also `format <dir> [--check]`, `docs core/Runtime/Data docs/CARDS.md [--check]`)
+- Content: `dotnet run --project dotnet/Vortex.ContentTool -- validate core/Runtime/Data` (also `format <dir> [--check]`, `docs core/Runtime/Data docs [--check]`)

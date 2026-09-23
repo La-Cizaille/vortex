@@ -97,6 +97,20 @@ namespace Vortex.Core.Tests.Support
             return new Game(State, Data, Config, Catalog, Array.Empty<string>()) { DiceOverride = dice.Length > 0 ? new ScriptedDice(dice) : null };
         }
 
+        /// <summary>Game-level access with pre-recorded decision answers (option keys, in order).</summary>
+        public Game GameWith(IEnumerable<string> answers, params int[] dice)
+        {
+            return new Game(State, Data, Config, Catalog, answers.ToList()) { DiceOverride = dice.Length > 0 ? new ScriptedDice(dice) : null };
+        }
+
+        /// <summary>Compiles a brick from the production catalog, as the content loader would.</summary>
+        public static Effects.Effect Brick(string name, params (string Key, object Value)[] parameters)
+        {
+            var catalog = Effects.Bricks.BrickCatalog.Entries().ToDictionary(b => b.Name, StringComparer.Ordinal);
+            var spec = new EffectSpec(name, parameters.Select(p => new KeyValuePair<string, Newtonsoft.Json.Linq.JToken>(p.Key, Newtonsoft.Json.Linq.JToken.FromObject(p.Value))));
+            return Effects.Bricks.BrickCatalog.Compile(catalog, spec);
+        }
+
         public EngineResult Submit(int seat, Command command)
         {
             EngineResult result = Engine.Submit(State, seat, command);

@@ -19,9 +19,10 @@ namespace Vortex.ContentTool
             Line(sb, "# Catalogue des cartes");
             Line(sb);
             Line(sb, "> **Fichier généré** par `Vortex.ContentTool` depuis `core/Runtime/Data/*.json`. Ne pas le modifier à la main :");
-            Line(sb, "> modifier le JSON puis lancer `dotnet run --project dotnet/Vortex.ContentTool -- docs core/Runtime/Data docs/CARDS.md`.");
+            Line(sb, "> modifier le JSON puis lancer `dotnet run --project dotnet/Vortex.ContentTool -- docs core/Runtime/Data docs`.");
             Line(sb, ">");
             Line(sb, "> Le **texte** est celui imprimé sur la carte. L'**arbitrage** en donne l'interprétation exacte selon le modèle d'effets ([RULES.md, partie B](RULES.md#partie-b--modèle-deffets)).");
+            Line(sb, "> Les **effets (moteur)** sont les briques qui implémentent l'arbitrage ([catalogue des briques](BRICKS.md)).");
             Line(sb, "> Les icônes du jeu apparaissent entre crochets : [ATQ] attaque, [BOU] bouclier, [MOD] modificateur, [TOR] Tourment, [SUR] surcharge, [MKT] marché noir, [DIC] dé.");
             Line(sb);
 
@@ -47,6 +48,8 @@ namespace Vortex.ContentTool
                 Quote(sb, e.Text);
                 Line(sb, "**Arbitrage** : " + Render(e.Ruling));
                 Line(sb);
+                Line(sb, "**Effets (moteur)** : " + Effects(e.Effects));
+                Line(sb);
             }
 
             Line(sb, "## Technologies (combos)");
@@ -59,6 +62,8 @@ namespace Vortex.ContentTool
                 Line(sb);
                 Quote(sb, t.Text);
                 Line(sb, "**Arbitrage** : " + Render(t.Ruling));
+                Line(sb);
+                Line(sb, "**Effets (moteur)** : " + Effects(t.Effects));
                 Line(sb);
             }
 
@@ -91,7 +96,20 @@ namespace Vortex.ContentTool
                 Quote(sb, c.Text);
                 Line(sb, "**Arbitrage** : " + Render(c.Ruling));
                 Line(sb);
+                Line(sb, "**Effets (moteur)** : " + Effects(c.Effects));
+                Line(sb);
             }
+        }
+
+        // Bricks link to their documentation in BRICKS.md.
+        private static string Effects(IReadOnlyList<EffectSpec> effects)
+        {
+            if (effects.Count == 0)
+            {
+                return "aucun";
+            }
+
+            return string.Join(" · ", effects.Select(e => "[`" + e + "`](BRICKS.md#" + e.Brick.ToLowerInvariant() + ")"));
         }
 
         // Icon tags like <ATQ> would be swallowed as HTML by Markdown renderers: show them as [ATQ].
