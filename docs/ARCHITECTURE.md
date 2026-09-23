@@ -20,7 +20,7 @@ flowchart TB
     subgraph Tools["Outils .NET (dotnet/)"]
         T["Tests NUnit"]
         SIM["Simulateur"]
-        IMP["CardImporter"]
+        CT["ContentTool<br/>validate / format / docs"]
         SRV["Serveur (phase 2)"]
     end
     P --> S
@@ -30,13 +30,15 @@ flowchart TB
     T --> E
     SIM --> E
     SRV --> E
-    IMP -. génère .-> J[("core/Runtime/Data/*.json")]
+    J[("core/Runtime/Data/*.json<br/>source de vérité")]
     C --> J
+    CT --> J
+    CT -. génère .-> MD["docs/CARDS.md"]
 ```
 
 - **`core/`** contient toutes les règles, et rien d'autre : pas de `UnityEngine`, pas d'I/O, pas d'horloge, pas d'aléatoire non maîtrisé. C'est un package UPM local, compilé à la fois par Unity et par .NET 10 (ADR-0002).
 - **`unity/`** affiche l'état et envoie les intentions du joueur. Il ne décide d'**aucune** règle.
-- **`dotnet/`** regroupe les tests, le simulateur d'équilibrage, l'import des cartes et, plus tard, le serveur.
+- **`dotnet/`** regroupe les tests, l'outil de contenu, le simulateur d'équilibrage et, plus tard, le serveur.
 
 ## 2. Flux d'une action
 
@@ -48,7 +50,7 @@ sequenceDiagram
     UI->>SE: Attack(target: P3)
     SE->>EN: Submit(P1, AttackCommand)
     EN->>EN: Validate (phase, joueur, cible légale)
-    EN->>EN: Résolution (§6 RULES.md)
+    EN->>EN: Résolution (RULES A6)
     EN-->>SE: events[] + DecisionRequest?(P3: choisir le modificateur détruit)
     SE-->>UI: events[] (animés un par un par l'EventPlayer)
     Note over UI: P3 fait son choix
@@ -65,12 +67,12 @@ sequenceDiagram
 
 | Dossier | Contenu |
 |---|---|
-| `Content/` | Définitions statiques (`CardDefinition`, `EventDefinition`, `TechnologyDefinition`, `GameData`), `GameDataSerializer` (chargement durci) et `GameDataValidator`. **Implémenté en M0.** |
-| `Data/` | `gamedata.json`, **généré** par `Vortex.CardImporter` à partir de `design/Vortex.xlsx`. On ne le modifie jamais à la main : un test et la CI vérifient qu'il correspond au classeur. |
+| `Content/` | Définitions statiques (`CardDefinition`, `EventDefinition`, `TechnologyDefinition`, `GameData`), `ContentJson` et `GameDataLoader` (chargement durci), `GameDataValidator`. **Implémenté en M0.** |
+| `Data/` | **Source de vérité** du contenu : `cards.json`, `events.json`, `technologies.json`, avec leurs JSON Schemas (`schema/`) pour l'édition (ADR-0008). |
 | `Config/` | `GameConfig` et ses presets par nombre de joueurs. Toutes les valeurs d'équilibrage y sont. |
 | `State/` | `GameState`, `PlayerState`, `SlotState`, `MarketState`, `DeckState`, statuts temporaires. Des POCO sérialisables. |
-| `Cards/` | `CardDefinition` (données issues du JSON), `CardRegistry` (id → comportement) et une classe par carte. |
-| `Effects/` | Points d'accroche (`ICardBehaviour`), pipeline d'attaque et modificateurs. |
+| `Cards/` | `CardRegistry` (id → comportement) et les classes des cartes exotiques. **Seul dossier** autorisé à citer un id de carte (test `Engine_code_never_references_a_specific_card`). |
+| `Effects/` | Points d'interception (RULES B2), actions élémentaires (B3), empilement (B4), durées (B5) et catalogue des briques d'effets. |
 | `Commands/`, `Events/`, `Decisions/` | Contrat d'entrée et de sortie du moteur. Ce même contrat servira au réseau. |
 | `Dice/` | `Pcg32`, le générateur déterministe (ADR-0004). |
 | `Engine/` | `GameEngine`, machine à états manche → tour → phases, et file de résolution. |
@@ -78,14 +80,18 @@ sequenceDiagram
 | `Bots/` | `RandomBot` et `HeuristicBot`, pour le simulateur et plus tard pour remplacer un joueur inactif. |
 
 ### Comportement des cartes
-- Les **données** (nom, texte, couleur, emplacement, usage, nombre d'exemplaires, paramètres numériques) viennent du JSON généré depuis `design/Vortex.xlsx`.
-- Le **comportement** est une petite classe C# par carte. Elle redéfinit uniquement les points d'accroche utiles : `ModifyAttackValue`, `OnDamageTaken`, `OnTurnStart`…
+- **Le moteur ne connaît aucune carte** (ADR-0007). Les règles de base exposent des points d'interception (calculs, autorisations, réactions : RULES B2), et les effets agissent par des actions élémentaires (RULES B3), qui appliquent elles-mêmes les autorisations. L'empilement est générique (RULES B4).
+- Les **données** (nom, texte, arbitrage, couleur, emplacement, usage, nombre d'exemplaires et, à partir de M2, briques d'effets) viennent de `core/Runtime/Data/*.json`.
+- Le **comportement** d'une carte courante est déclaré par des **briques d'effets** paramétrées dans le JSON (catalogue fermé, en liste blanche). Pour une carte exotique, c'est une petite classe C#. Elle redéfinit uniquement les points d'accroche utiles : `ModifyAttackValue`, `OnDamageTaken`, `OnTurnStart`…
 - L'enregistrement passe par un **registre statique explicite**, sans réflexion (ADR-0006).
 
 ### Ordre déterministe
-Quand plusieurs effets réagissent au même moment, l'ordre est le suivant :
-1. le joueur actif d'abord, puis les autres dans le sens horaire ;
-2. pour chaque joueur, l'emplacement ATK, puis DEF, puis les statuts temporaires.
+Défini une seule fois, dans RULES B7 :
+1. d'abord les effets globaux ;
+2. puis le joueur actif et les autres dans le sens horaire ;
+3. pour chaque joueur : l'emplacement ATK, puis DEF, puis les effets temporaires.
+
+Les chaînes de réactions sont bornées à 16 niveaux.
 
 ## 4. Client Unity (`unity/`)
 

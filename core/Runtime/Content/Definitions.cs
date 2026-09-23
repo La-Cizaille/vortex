@@ -5,23 +5,24 @@ using Newtonsoft.Json;
 namespace Vortex.Core.Content
 {
     /// <summary>
-    /// Static description of a modifier card, generated from <c>design/Vortex.xlsx</c>.
-    /// Holds data only; behaviour lives in the card's behaviour class (ADR-0006).
+    /// Static description of a modifier card, read from <c>core/Runtime/Data/cards.json</c> (the source of truth, ADR-0008).
+    /// Holds data only; behaviour is built from effect bricks or a card class (ADR-0007).
     /// </summary>
     public sealed class CardDefinition
     {
         /// <summary>Creates a card definition. Values are validated by <see cref="GameDataValidator"/>, not here.</summary>
         [JsonConstructor]
-        public CardDefinition(string id, string name, string text, CardSlot slot, TechColor color, CardUsage usage, int copies, bool needsReview)
+        public CardDefinition(string id, string name, CardSlot slot, TechColor color, CardUsage usage, int copies, bool needsReview, string text, string ruling)
         {
             Id = id;
             Name = name;
-            Text = text;
             Slot = slot;
             Color = color;
             Usage = usage;
             Copies = copies;
             NeedsReview = needsReview;
+            Text = text;
+            Ruling = ruling;
         }
 
         /// <summary>Stable identifier, e.g. <c>A_005</c> or <c>D_012</c>.</summary>
@@ -29,9 +30,6 @@ namespace Vortex.Core.Content
 
         /// <summary>Display name (French).</summary>
         public string Name { get; }
-
-        /// <summary>Rules text as written by the designer, including icon tags such as <c>&lt;ATQ&gt;</c>.</summary>
-        public string Text { get; }
 
         /// <summary>Slot and market of the card.</summary>
         public CardSlot Slot { get; }
@@ -45,47 +43,65 @@ namespace Vortex.Core.Content
         /// <summary>Number of copies in the deck.</summary>
         public int Copies { get; }
 
-        /// <summary>True when the designer flagged the card for rework ("x" column).</summary>
+        /// <summary>True when the designer flagged the card for rework.</summary>
         public bool NeedsReview { get; }
+
+        /// <summary>Rules text printed on the card, including icon tags such as <c>&lt;ATQ&gt;</c>.</summary>
+        public string Text { get; }
+
+        /// <summary>
+        /// Precise interpretation of <see cref="Text"/> in terms of the effect model (docs/RULES.md part B).
+        /// Never names another card.
+        /// </summary>
+        public string Ruling { get; }
     }
 
-    /// <summary>Static description of an event card (RULES.md §4, §10.3).</summary>
+    /// <summary>Static description of an event card (docs/RULES.md A4).</summary>
     public sealed class EventDefinition
     {
         /// <summary>Creates an event definition.</summary>
         [JsonConstructor]
-        public EventDefinition(string id, string name, string text, int copies)
+        public EventDefinition(string id, string name, int copies, string text, string ruling)
         {
             Id = id;
             Name = name;
-            Text = text;
             Copies = copies;
+            Text = text;
+            Ruling = ruling;
         }
 
-        /// <summary>Stable identifier derived from the name, e.g. <c>EVT_TROU_NOIR</c>.</summary>
+        /// <summary>Stable identifier, e.g. <c>EVT_TROU_NOIR</c>.</summary>
         public string Id { get; }
 
         /// <summary>Display name (French).</summary>
         public string Name { get; }
 
+        /// <summary>Number of copies in the event deck.</summary>
+        public int Copies { get; }
+
         /// <summary>Rules text.</summary>
         public string Text { get; }
 
-        /// <summary>Number of copies in the event deck.</summary>
-        public int Copies { get; }
+        /// <summary>Precise interpretation of <see cref="Text"/>.</summary>
+        public string Ruling { get; }
     }
 
-    /// <summary>Static description of a technology combo (RULES.md §8).</summary>
+    /// <summary>Static description of a technology combo (docs/RULES.md A8).</summary>
     public sealed class TechnologyDefinition
     {
         /// <summary>Creates a technology definition.</summary>
         [JsonConstructor]
-        public TechnologyDefinition(TechColor color, string name, string text)
+        public TechnologyDefinition(string id, TechColor color, string name, string text, string ruling)
         {
+            Id = id;
             Color = color;
             Name = name;
             Text = text;
+            Ruling = ruling;
         }
+
+        /// <summary>Stable identifier, e.g. <c>TECH_BLUE</c>.</summary>
+        public string Id { get; }
 
         /// <summary>Colour required on both equipped modifiers.</summary>
         public TechColor Color { get; }
@@ -95,40 +111,26 @@ namespace Vortex.Core.Content
 
         /// <summary>Rules text.</summary>
         public string Text { get; }
+
+        /// <summary>Precise interpretation of <see cref="Text"/>.</summary>
+        public string Ruling { get; }
     }
 
-    /// <summary>All static game content, as loaded from <c>core/Runtime/Data/gamedata.json</c>.</summary>
+    /// <summary>All static game content, assembled from the content files by <see cref="GameDataLoader"/>.</summary>
     public sealed class GameData
     {
-        /// <summary>Schema version this code understands.</summary>
-        public const int CurrentSchemaVersion = 1;
-
         /// <summary>Creates the content set.</summary>
-        [JsonConstructor]
-        public GameData(
-            int schemaVersion,
-            string sourceSha256,
-            IReadOnlyList<CardDefinition> modifiers,
-            IReadOnlyList<EventDefinition> events,
-            IReadOnlyList<TechnologyDefinition> technologies)
+        public GameData(IReadOnlyList<CardDefinition> modifiers, IReadOnlyList<EventDefinition> events, IReadOnlyList<TechnologyDefinition> technologies)
         {
-            SchemaVersion = schemaVersion;
-            SourceSha256 = sourceSha256;
-            Modifiers = modifiers ?? Array.Empty<CardDefinition>();
-            Events = events ?? Array.Empty<EventDefinition>();
-            Technologies = technologies ?? Array.Empty<TechnologyDefinition>();
+            Modifiers = modifiers ?? throw new ArgumentNullException(nameof(modifiers));
+            Events = events ?? throw new ArgumentNullException(nameof(events));
+            Technologies = technologies ?? throw new ArgumentNullException(nameof(technologies));
         }
-
-        /// <summary>Schema version of the file.</summary>
-        public int SchemaVersion { get; }
-
-        /// <summary>SHA-256 of the spreadsheet the file was generated from (traceability).</summary>
-        public string SourceSha256 { get; }
 
         /// <summary>Attack and defense modifiers.</summary>
         public IReadOnlyList<CardDefinition> Modifiers { get; }
 
-        /// <summary>Event cards, including the doom event which the engine removes from the deck.</summary>
+        /// <summary>Event cards, including the doom event which the engine keeps out of the deck.</summary>
         public IReadOnlyList<EventDefinition> Events { get; }
 
         /// <summary>Technology combos, one per non-neutral colour.</summary>

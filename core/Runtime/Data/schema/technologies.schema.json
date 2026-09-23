@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/La-Cizaille/vortex/core/Runtime/Data/schema/technologies.schema.json",
+  "title": "Vortex — technologies",
+  "description": "Source de vérité des combos technologiques (ADR-0008). Aide à l'édition uniquement : le validateur C# fait foi.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "technologies"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 2 },
+    "technologies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "color", "name", "text", "ruling"],
+        "properties": {
+          "id": { "enum": ["TECH_BLUE", "TECH_RED", "TECH_GREEN", "TECH_YELLOW"], "description": "Doit correspondre à la couleur." },
+          "color": { "enum": ["Blue", "Red", "Green", "Yellow"] },
+          "name": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "text": { "type": "string", "minLength": 1, "maxLength": 600 },
+          "ruling": { "type": "string", "minLength": 1, "maxLength": 1000 }
+        }
+      }
+    }
+  }
+}

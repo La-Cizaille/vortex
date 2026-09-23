@@ -9,12 +9,13 @@ The user is a security professional: security, optimisation, and clean documenta
 - `docs/`, PR descriptions, and explanations to the user: **French**.
 
 ## Source of truth
-- Game rules: `docs/RULES.md` (engine behaviour must match it; cite sections like `RULES.md §6` in code).
-- Card data: `design/Vortex.xlsx` → generated JSON in `core/Runtime/Data/` (never hand-edit generated JSON).
+- Game rules: `docs/RULES.md` - part A base rules, part B effect model (engine behaviour must match it; cite sections like `RULES A6` / `RULES B4` in code).
+- Card data: `core/Runtime/Data/{cards,events,technologies}.json` is the **source of truth** (ADR-0008): printed text + ruling per card. `docs/CARDS.md` is generated from it (never hand-edit).
 - Decisions: `docs/adr/`. Add an ADR for any structural decision.
-- Rulings not covered by RULES.md: **ask the user**, do not guess; then record the answer in RULES.md §10/§11.
+- Rulings not covered by RULES.md: **ask the user**, do not guess; then record the answer in the card's `ruling` (card-specific) or RULES.md part A/B (generic).
 
 ## Hard rules
+- Engine is card-agnostic (ADR-0007): base rules and engine code never name a card; cards act only through RULES B2 interception points and B3 elementary actions. A missing hook is added generically, never as a card exception. Rulings never name another card.
 - `core/` : C# 9 / netstandard2.1, no `UnityEngine`, no I/O, no statics with mutable state, no runtime reflection, no `System.Random` (use `Pcg32`).
 - Newtonsoft: `TypeNameHandling.None` only; polymorphism via whitelisted discriminators.
 - Illegal commands return typed errors and leave state untouched; every rule/card gets tests (use `ScriptedDice`).
@@ -25,4 +26,4 @@ The user is a security professional: security, optimisation, and clean documenta
 ## Commands
 - Tests: `dotnet test dotnet/Vortex.sln`
 - Format check: `dotnet format dotnet/Vortex.sln --verify-no-changes`
-- Import cards: `dotnet run --project dotnet/Vortex.CardImporter -- design/Vortex.xlsx core/Runtime/Data`
+- Content: `dotnet run --project dotnet/Vortex.ContentTool -- validate core/Runtime/Data` (also `format <dir> [--check]`, `docs core/Runtime/Data docs/CARDS.md [--check]`)

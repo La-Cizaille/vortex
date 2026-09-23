@@ -19,7 +19,7 @@
 |---|---|---|---|
 | S1 | `Engine.Submit()` | 1 | Commandes venant de l'UI, et en phase 2 du réseau |
 | S2 | Chargement de sauvegardes et de scénarios JSON | 1 | Fichiers sur disque modifiables par l'utilisateur |
-| S3 | Import `Vortex.xlsx` → JSON | 1 | Fichier de design (outil de dev uniquement) |
+| S3 | Fichiers de contenu `core/Runtime/Data/*.json` | 1 | Édités à la main par le designer, chargés par le jeu et les outils |
 | S4 | Dépendances (NuGet, packages Unity, GitHub Actions) | 1 | Chaîne d'approvisionnement |
 | S5 | Serveurs MCP (Unity, Blender) | 1 | Outils avec exécution de code dans l'éditeur |
 | S6 | WebSocket serveur | 2 | Tout le trafic réseau |
@@ -32,8 +32,9 @@
 | **Falsification** d'une commande (action illégale, mauvais joueur, mauvaise phase) | S1, S6 | Validation complète dans `Engine` : identité du joueur, phase, légalité, id de décision attendue. Une commande invalide renvoie une erreur typée, sans modifier l'état. Tests négatifs systématiques. | Prévu M1 |
 | **Falsification** de l'aléatoire | S1, S6 | Le RNG vit uniquement dans le moteur (serveur en phase 2). Le client ne fournit jamais de valeur de dé. | Prévu M1 |
 | **Fuite d'information** (ordre des paquets, graine) | S6 | `StateProjection.ForViewer()` n'expose que la taille des paquets, sans leur contenu. Le client ne travaille que sur la projection dès la phase 1. Tests dédiés. | Prévu M1/M4 |
-| **Exécution de code** par désérialisation | S2, S6 | Newtonsoft avec `TypeNameHandling.None` et `MetadataPropertyHandling.Ignore` (règles d'analyse CA2326–CA2330 en erreur). Membres inconnus et enums numériques rejetés, `MaxDepth` de 16, entrée limitée à 1 Mo. Polymorphisme par discriminateur en liste blanche (M1). | **Fait M0** pour `gamedata.json` (tests dans `GameDataSerializerTests`) |
-| **XXE, bombe zip, traversée de chemin** via le classeur | S3 | Lecteur xlsx sans dépendance : DTD interdite et pas de résolveur XML ; au plus 512 entrées, 20 Mo par partie et un taux de compression maximal de 200 ; copie bornée ; cibles de relations normalisées et confinées à `xl/`. | **Fait M0** (tests dans `CardImporterTests`) |
+| **Exécution de code** par désérialisation | S2, S6 | Newtonsoft avec `TypeNameHandling.None` et `MetadataPropertyHandling.Ignore` (règles d'analyse CA2326–CA2330 en erreur). Membres inconnus et enums numériques rejetés, `MaxDepth` de 16, entrée limitée à 1 Mo. Polymorphisme par discriminateur en liste blanche (M1). | **Fait M0** pour les fichiers de contenu (tests dans `ContentJsonTests`) |
+| **Contenu malformé ou piégé** | S3 | Même chargeur durci que le jeu. Validation (ids, énumérations, bornes, unicité entre fichiers), forme canonique vérifiée en CI. Surface xlsx **supprimée** (ADR-0008) : plus de parseur de classeur, donc plus de risques XXE ni de bombe zip. | **Fait M0** |
+| **Logique arbitraire dans les données** | S3 | Les briques d'effets (M2) forment un catalogue **fermé** : le JSON sélectionne et paramètre une brique existante (discriminateur en liste blanche), il n'exécute jamais de code ni d'expression. | Prévu M2 |
 | **Texte trompeur** (« Trojan Source », caractères invisibles) | S2, S3, S4 | Le validateur rejette les caractères de contrôle et bidi dans les données. L'importeur retire les caractères invisibles. Un test parcourt tout le dépôt (`SourceHygieneTests`). | **Fait M0** |
 | **État incohérent** chargé depuis un fichier | S2 | Validation des invariants (PV, bouclier 0–8, nombre total de cartes conservé, ids connus) avant tout chargement. Rejet en cas d'échec. | Prévu M1 |
 | **Déni de service** (flood, messages géants, salons zombies) | S6 | Limitation de débit par IP et par session, taille maximale des messages, délais de tour et de décision, expiration des salons, nombre maximal de salons. | Phase 2 |

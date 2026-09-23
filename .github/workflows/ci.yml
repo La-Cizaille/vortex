@@ -27,7 +27,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          lfs: true                  # design/Vortex.xlsx is needed for the drift check
           persist-credentials: false
 
       - name: Setup .NET (version from global.json)
@@ -57,8 +56,12 @@ jobs:
             exit 1
           fi
 
-      - name: Generated game data is up to date
-        run: dotnet run -c Release --no-build --project dotnet/Vortex.CardImporter -- design/Vortex.xlsx core/Runtime/Data --check
+      - name: Content is valid and canonical, catalogue is up to date
+        run: |
+          tool="dotnet run -c Release --no-build --project dotnet/Vortex.ContentTool --"
+          $tool validate core/Runtime/Data
+          $tool format core/Runtime/Data --check
+          $tool docs core/Runtime/Data docs/CARDS.md --check
 
       - name: Upload coverage
         if: always()

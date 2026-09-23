@@ -35,6 +35,37 @@ namespace Vortex.Core.Tests
             Assert.That(offenders, Is.Empty);
         }
 
+        [Test]
+        public void Engine_code_never_references_a_specific_card()
+        {
+            // RULES.md B1 / ADR-0007: base rules are card-agnostic. Only card behaviour classes
+            // (core/Runtime/Cards/) may name a card id. Comments are ignored (they may cite examples).
+            var cardId = new System.Text.RegularExpressions.Regex(@"\b(A_[0-9]{3}|D_[0-9]{3}|EVT_[A-Z_]+|TECH_(BLUE|RED|GREEN|YELLOW))\b");
+            string runtime = Path.Combine(TestPaths.RepoRoot, "core", "Runtime");
+            var offenders = new List<string>();
+            foreach (string file in Directory.EnumerateFiles(runtime, "*.cs", SearchOption.AllDirectories))
+            {
+                string relative = Path.GetRelativePath(runtime, file).Replace('\\', '/');
+                if (relative.StartsWith("Cards/", System.StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                string[] lines = File.ReadAllLines(file);
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    int comment = lines[i].IndexOf("//", System.StringComparison.Ordinal);
+                    string code = comment >= 0 ? lines[i].Substring(0, comment) : lines[i];
+                    if (cardId.IsMatch(code))
+                    {
+                        offenders.Add($"core/Runtime/{relative}:{i + 1}");
+                    }
+                }
+            }
+
+            Assert.That(offenders, Is.Empty);
+        }
+
         private static IEnumerable<string> EnumerateSources(string root)
         {
             foreach (string dir in new[] { "core", "dotnet", "docs", ".github" })
