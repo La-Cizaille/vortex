@@ -156,7 +156,7 @@ namespace Vortex.Core.Effects.Statuses
 
     /// <summary>
     /// After the next attack, the holder may exchange one of the target's modifiers with the same-slot card of
-    /// another player or of the matching market.
+    /// another player (neither the target nor the holder) or of the matching market.
     /// </summary>
     internal sealed class SwapOnNextAttackStatus : NextAttackStatus
     {
@@ -180,7 +180,7 @@ namespace Vortex.Core.Effects.Statuses
             var partners = new List<CardInstance>();
             foreach (int seat in game.AliveInTurnOrder())
             {
-                CardInstance? other = seat == attack.Target ? null : game.Player(seat).Slot(slot);
+                CardInstance? other = seat == attack.Target || seat == self.Holder ? null : game.Player(seat).Slot(slot);
                 if (other != null)
                 {
                     partners.Add(other);

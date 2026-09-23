@@ -229,5 +229,25 @@ namespace Vortex.Core.Tests.Bricks
             Assert.That(s.Game(3).ResolveAttack(s.Current, 1 - s.Current, false).EffectiveShield, Is.Zero);
             Assert.That(s.P(1 - s.Current).Shield, Is.EqualTo(4), "Disabled, not modified.");
         }
+
+        [Test]
+        public void GambleOnHpLoss_ignores_losses_the_holder_inflicts_on_themselves()
+        {
+            (Scenario s, int _, int foe) = Setup(2, ("D_901", B("GambleOnHpLoss", ("penalty", 3))));
+            s.Equip(foe, "D_901");
+            s.Game().LoseHp(new HpLossInfo(foe, 2, HpLossCause.Self, foe, null, null));
+            Assert.That(s.P(foe).Hp, Is.EqualTo(28), "No die rolled for a Self loss.");
+        }
+
+        [Test]
+        public void A_fatal_loss_eliminates_at_once_so_the_victims_reactions_do_not_apply()
+        {
+            (Scenario s, int me, int foe) = Setup(3, ("D_901", B("ReflectAttackLoss")));
+            s.Equip(foe, "D_901");
+            s.P(foe).Hp = 2;
+            s.Game(7).ResolveAttack(me, foe, false);
+            Assert.That(s.P(foe).Eliminated, Is.True);
+            Assert.That(s.P(me).Hp, Is.EqualTo(30), "Eliminated at 0 HP: the reflect card is already gone (RULES A9).");
+        }
     }
 }

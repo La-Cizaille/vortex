@@ -276,7 +276,7 @@ Utilisée par : `D_022`
 
 ### GambleOnHpLoss
 
-*Passive*. À chaque perte de PV du porteur (hors Tourment et Reflect), 1 dé : pair, aucune perte ; impair, `penalty` PV de plus.
+*Passive*. À chaque perte de PV du porteur (hors Tourment, Reflect et pertes qu'il s'inflige), 1 dé : pair, aucune perte ; impair, `penalty` PV de plus.
 
 | Paramètre | Type | Plage | Défaut | Rôle |
 |---|---|---|---|---|
@@ -384,7 +384,7 @@ Utilisée par : `A_027`
 
 ### SwapOnNextAttack
 
-*Activation*. Après la prochaine attaque de ce tour, le porteur peut échanger un modificateur de la cible avec la carte du même emplacement d'un autre joueur ou du marché correspondant.
+*Activation*. Après la prochaine attaque de ce tour, le porteur peut échanger un modificateur de la cible avec la carte du même emplacement d'un autre joueur (ni la cible, ni le porteur) ou du marché correspondant.
 
 Utilisée par : `A_025`
 
