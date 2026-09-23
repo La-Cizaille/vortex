@@ -14,6 +14,7 @@ namespace Vortex.ContentTool
             CardsJson = Read(CardsFile.FileName);
             EventsJson = Read(EventsFile.FileName);
             TechnologiesJson = Read(TechnologiesFile.FileName);
+            ConfigJson = Read(Vortex.Core.Config.GameConfig.FileName);
         }
 
         public string Directory { get; }
@@ -24,9 +25,14 @@ namespace Vortex.ContentTool
 
         public string TechnologiesJson { get; }
 
+        public string ConfigJson { get; }
+
+        /// <summary>Loads and validates every content file, including the configuration.</summary>
         public GameData Load()
         {
-            return GameDataLoader.Load(CardsJson, EventsJson, TechnologiesJson);
+            GameData data = GameDataLoader.Load(CardsJson, EventsJson, TechnologiesJson);
+            GameDataLoader.LoadConfig(ConfigJson, data);
+            return data;
         }
 
         public string PathOf(string fileName)

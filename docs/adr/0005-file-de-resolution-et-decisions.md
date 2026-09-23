@@ -1,6 +1,6 @@
 # ADR-0005 : File de résolution explicite et décisions interrompantes
 
-- **Statut** : accepté, 2026-09-23
+- **Statut** : **remplacé** par [ADR-0009](0009-decisions-par-re-execution-deterministe.md), 2026-09-23. Conservé pour l'historique.
 
 ## Contexte
 De nombreux effets demandent un choix **en cours de résolution**, parfois à un joueur autre que le joueur actif :

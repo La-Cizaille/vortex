@@ -4,6 +4,8 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Non publié]
 ### Ajouté
+- M1 : moteur de règles de base. RNG PCG32 déterministe, état sérialisable, mise en place, manches, tours, marchés, activations, technologies, 4 actions d'équipage, pipeline d'attaque (RULES A6), Tourment, statuts, élimination et victoires. Infrastructure d'effets (points d'interception B2, actions élémentaires B3, empilement B4, ordre B7). Décisions par re-exécution déterministe (ADR-0009). Projection publique, validation des invariants, `config.json` et son schéma.
+- M1 : tests du moteur sur contenu factice. Dés imposés, décisions, ordre de résolution, boucles de réactions, parties aléatoires avec contrôle des invariants, déterminisme des rejeux, complétude des clones, absence de fuite dans la vue publique.
 - M0 : solution .NET 10 (`Vortex.Core` en netstandard2.1/C# 9, `Vortex.ContentTool`, `Vortex.Core.Tests`), avec warnings bloquants, analyseurs, versions centralisées et fichiers de verrouillage NuGet, et SDK épinglé (`global.json`).
 - M0 : **le JSON devient la source de vérité** des cartes (ADR-0008) : `cards.json`, `events.json`, `technologies.json` (54 cartes ATK, 50 DEF, 15 événements, 4 technologies), migrés depuis `Vortex.xlsx`, puis classeur retiré. Chaque carte porte son texte et son arbitrage. JSON Schemas pour l'édition dans VS Code.
 - M0 : `Vortex.ContentTool` (validate, format, docs) et `docs/CARDS.md` généré.

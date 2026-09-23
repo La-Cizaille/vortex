@@ -17,6 +17,8 @@ concurrency:
 env:
   DOTNET_NOLOGO: "true"
   DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+  # Minimum line coverage of Vortex.Core (raised to 0.90 once every effect brick is tested, M2).
+  CORE_MIN_LINE_COVERAGE: "0.80"
 
 jobs:
   dotnet:
@@ -44,6 +46,18 @@ jobs:
         run: >
           dotnet test dotnet/Vortex.sln -c Release --no-build
           --collect:"XPlat Code Coverage" --results-directory TestResults
+
+      - name: Coverage gate (Vortex.Core)
+        run: |
+          report=$(find TestResults -name coverage.cobertura.xml | head -1)
+          python3 - "$report" <<'EOF'
+          import os, sys, xml.etree.ElementTree as ET
+          minimum = float(os.environ["CORE_MIN_LINE_COVERAGE"])
+          pkg = next(p for p in ET.parse(sys.argv[1]).getroot().iter("package") if p.get("name") == "Vortex.Core")
+          rate = float(pkg.get("line-rate"))
+          print(f"Vortex.Core line coverage: {rate:.1%} (minimum {minimum:.0%})")
+          sys.exit(0 if rate >= minimum else 1)
+          EOF
 
       - name: Format check
         run: dotnet format dotnet/Vortex.sln --verify-no-changes --no-restore

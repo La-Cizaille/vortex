@@ -84,6 +84,7 @@ namespace Vortex.ContentTool
                 (CardsFile.FileName, folder.CardsJson, ContentJson.Serialize(ContentJson.Parse<CardsFile>(folder.CardsJson, CardsFile.FileName))),
                 (EventsFile.FileName, folder.EventsJson, ContentJson.Serialize(ContentJson.Parse<EventsFile>(folder.EventsJson, EventsFile.FileName))),
                 (TechnologiesFile.FileName, folder.TechnologiesJson, ContentJson.Serialize(ContentJson.Parse<TechnologiesFile>(folder.TechnologiesJson, TechnologiesFile.FileName))),
+                (Vortex.Core.Config.GameConfig.FileName, folder.ConfigJson, ContentJson.Serialize(ContentJson.Parse<Vortex.Core.Config.GameConfig>(folder.ConfigJson, Vortex.Core.Config.GameConfig.FileName))),
             };
 
             int stale = 0;

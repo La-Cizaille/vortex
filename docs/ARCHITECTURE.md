@@ -61,7 +61,7 @@ sequenceDiagram
 
 - **Commande** : c'est une *intention* (« je veux attaquer P3 »). Elle peut être refusée, auquel cas le moteur renvoie une erreur typée, jamais une exception.
 - **Événement** : c'est un *fait accompli* (« P3 perd 4 PV »). La présentation se contente de le jouer.
-- **Décision** : quand la résolution a besoin d'un choix, parfois d'un **autre** joueur que le joueur actif, le moteur se met en pause sur un `DecisionRequest`. Il reprend à la réception de `AnswerDecision`. La file de résolution est une structure de données sérialisable, et non une coroutine, ce qui rend l'état sauvegardable à tout instant (ADR-0005).
+- **Décision** : quand la résolution a besoin d'un choix, parfois d'un **autre** joueur que le joueur actif, le moteur renvoie l'état d'avant la commande avec un `DecisionRequest`. Chaque réponse ré-exécute la commande depuis cet état. C'est déterministe, parce que le hasard vient de l'état lui-même. L'état reste ainsi sérialisable à tout instant (ADR-0009).
 
 ## 3. Moteur (`core/Runtime`)
 
@@ -69,14 +69,14 @@ sequenceDiagram
 |---|---|
 | `Content/` | Définitions statiques (`CardDefinition`, `EventDefinition`, `TechnologyDefinition`, `GameData`), `ContentJson` et `GameDataLoader` (chargement durci), `GameDataValidator`. **Implémenté en M0.** |
 | `Data/` | **Source de vérité** du contenu : `cards.json`, `events.json`, `technologies.json`, avec leurs JSON Schemas (`schema/`) pour l'édition (ADR-0008). |
-| `Config/` | `GameConfig` et ses presets par nombre de joueurs. Toutes les valeurs d'équilibrage y sont. |
-| `State/` | `GameState`, `PlayerState`, `SlotState`, `MarketState`, `DeckState`, statuts temporaires. Des POCO sérialisables. |
+| `Config/` | `GameConfig` (lu depuis `Data/config.json`) : toutes les valeurs ⚙ des règles. **M1.** |
+| `State/` | `GameState`, `PlayerState`, `CardInstance`, `MarketState`, `StatusState`, `PendingState`. Des POCO sérialisables avec des `Clone()` explicites. **M1.** |
 | `Cards/` | `CardRegistry` (id → comportement) et les classes des cartes exotiques. **Seul dossier** autorisé à citer un id de carte (test `Engine_code_never_references_a_specific_card`). |
 | `Effects/` | Points d'interception (RULES B2), actions élémentaires (B3), empilement (B4), durées (B5) et catalogue des briques d'effets. |
-| `Commands/`, `Events/`, `Decisions/` | Contrat d'entrée et de sortie du moteur. Ce même contrat servira au réseau. |
-| `Dice/` | `Pcg32`, le générateur déterministe (ADR-0004). |
-| `Engine/` | `GameEngine`, machine à états manche → tour → phases, et file de résolution. |
-| `Projection/` | `StateProjection.ForViewer()`, la vue publique sans informations cachées (ordre des paquets, état du RNG). |
+| `Commands/`, `Events/`, `Decisions/` | Contrat d'entrée et de sortie du moteur. Ce même contrat servira au réseau. Ce sont des types **plats**, sans polymorphisme, donc sans risque de désérialisation polymorphe. **M1.** |
+| `Dice/` | `Pcg32`, le générateur déterministe (ADR-0004). **M1.** |
+| `Rules/` | `GameEngine` (API publique sans état), `Game` (contexte de résolution, découpé en `Game.Actions`, `Game.Flow`, `Game.Commands` et `Game.Attack`), `GameStateValidator` (invariants). **M1.** |
+| `Projection/` | `GameView.Of(state)`, la vue publique sans informations cachées (ordre des paquets, état du RNG). **M1.** |
 | `Bots/` | `RandomBot` et `HeuristicBot`, pour le simulateur et plus tard pour remplacer un joueur inactif. |
 
 ### Comportement des cartes

@@ -129,6 +129,36 @@ namespace Vortex.Core.Content
 
             return data;
         }
+
+        /// <summary>Parses and validates <c>config.json</c> against already loaded content.</summary>
+        /// <exception cref="GameDataException">The configuration is invalid or inconsistent with the content.</exception>
+        public static Config.GameConfig LoadConfig(string configJson, GameData data)
+        {
+            if (data is null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
+            Config.GameConfig config = ContentJson.Parse<Config.GameConfig>(configJson, Config.GameConfig.FileName);
+            var errors = new System.Collections.Generic.List<string>(config.Validate());
+            bool doomExists = false;
+            foreach (EventDefinition e in data.Events)
+            {
+                doomExists |= e.Id == config.DoomEventId;
+            }
+
+            if (!doomExists)
+            {
+                errors.Add("config: doomEventId '" + config.DoomEventId + "' is not an event of events.json");
+            }
+
+            if (errors.Count > 0)
+            {
+                throw new GameDataException("Configuration failed validation:\n - " + string.Join("\n - ", errors));
+            }
+
+            return config;
+        }
     }
 
     /// <summary>Raised when game content cannot be loaded. Never raised by player commands.</summary>
