@@ -259,7 +259,7 @@ namespace Vortex.Core.Effects.Bricks
     }
 
     /// <summary>
-    /// Every time an HP loss other than torment or reflect hits the covered player, roll a die: even → no loss,
+    /// Every time an HP loss other than torment, reflect or self-inflicted (Self) hits the covered player, roll a die: even → no loss,
     /// odd → +penalty.
     /// </summary>
     internal sealed class GambleOnHpLoss : Effect
@@ -272,7 +272,7 @@ namespace Vortex.Core.Effects.Bricks
 
         public override void ModifyHpLoss(Game game, EffectSource self, HpLossInfo loss, ValueModifiers amount)
         {
-            if (!Scope.Covers(self, loss.Player) || loss.Amount <= 0 || loss.Cause == HpLossCause.Torment || loss.Cause == HpLossCause.Reflect)
+            if (!Scope.Covers(self, loss.Player) || loss.Amount <= 0 || loss.Cause == HpLossCause.Torment || loss.Cause == HpLossCause.Reflect || loss.Cause == HpLossCause.Self)
             {
                 return;
             }

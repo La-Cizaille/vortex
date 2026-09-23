@@ -22,7 +22,6 @@ namespace Vortex.Core.Rules
     internal sealed partial class Game
     {
         private readonly IReadOnlyList<string> _answers;
-        private readonly Dictionary<int, (int Source, HpLossCause Cause)> _lastLoss = new Dictionary<int, (int, HpLossCause)>();
         private int _answerIndex;
         private int _depth;
 

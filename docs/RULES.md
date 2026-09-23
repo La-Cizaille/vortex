@@ -1,6 +1,6 @@
 # Vortex : règles du jeu
 
-> **Statut** : v0.2. **Partie B (modèle d'effets) validée par le game designer le 2026-09-23.** Parties A et C : en attente de validation.
+> **Statut** : v0.2. **Partie B (modèle d'effets) validée par le game designer le 2026-09-23.** Parties A et C : en attente de validation. Arbitrages du 2026-09-24 intégrés.
 > **Rôle** : c'est la **référence du moteur de règles**. Le code renvoie aux sections d'ici (par ex. `RULES A6`).
 
 Le document a trois parties, qui dépendent uniquement vers le bas :
@@ -77,7 +77,7 @@ Les valeurs marquées ⚙ sont **configurables** (`GameConfig`) et seront calibr
 ### A5.3 Fenêtre d'activation
 - Elle s'ouvre après le marché et reste ouverte jusqu'à la fin du tour, avant comme après l'action d'équipage.
 - Le joueur peut y activer, **sans limite de nombre**, tout effet activable qu'il possède : cartes à usage unique, cartes à déclenchement manuel et combos (A8).
-- Toute carte activée (à usage unique ou à déclenchement manuel) est **défaussée après son activation**, si elle est encore dans son emplacement. *(Précision M1, à valider.)*
+- Toute carte activée (à usage unique ou à déclenchement manuel) est **défaussée après son activation**, si elle est encore dans son emplacement.
 
 ### A5.4 Action d'équipage
 Le joueur fait **une** action, ou passe. Le nombre d'actions est un calcul (B2.1), qui vaut 1 par défaut. Plusieurs actions dans un même tour doivent être **différentes**.
@@ -138,11 +138,12 @@ Chaque étape nomme le point d'interception (B2) où les effets peuvent agir.
 ## A9. Victoire et élimination
 
 - **Élimination** : un joueur à 0 PV est éliminé. Ses cartes sont défaussées avec leurs jetons.
-- **Moment de l'élimination** : on vérifie les PV à la **fin de chaque étape de résolution** (fin d'une attaque, d'une activation, d'un début de tour, d'un début de manche). Un joueur ramené à 0 puis soigné dans la même étape survit. *(Précision M1, à valider.)*
-- **Élimination pendant son propre tour** (par exemple par une perte renvoyée) : le tour s'arrête immédiatement et le joueur suivant joue. *(Précision M1.)*
+- **Élimination immédiate** : un joueur est éliminé **dès que ses PV atteignent 0**. Ses cartes sont défaussées à cet instant et ses effets cessent, y compris ses réactions au coup qui l'élimine.
+- **Victoire** : elle est vérifiée à la fin de chaque étape de résolution (fin d'une attaque, d'une activation, d'un début de tour, d'un début de manche).
+- **Élimination pendant son propre tour** (par exemple par une perte renvoyée) : le tour s'arrête immédiatement et le joueur suivant joue.
 - **Domination** : être le dernier joueur vivant.
 - **Élection galactique** : avoir obtenu les 4 technologies. La victoire est immédiate.
-- **Égalité** : tous les joueurs restants sont éliminés au même moment.
+- **Égalité** : tous les joueurs restants sont éliminés au cours de la même étape de résolution.
 
 ---
 
@@ -280,14 +281,7 @@ La version lisible est [`CARDS.md`](CARDS.md). Elle est générée automatiqueme
 
 ## Questions ouvertes (à trancher par le game designer)
 
-- **Précisions apportées pendant l'implémentation du moteur (M1)**, marquées *à valider* ci-dessus : défausse de toute carte activée (A5.3) et moment de l'élimination (A9).
-- **Précisions apportées en implémentant les briques (M2)** :
-  - D_025 (Chance de cocu) s'applique à toute perte de PV hors Tourment et Reflect, donc aussi au coût payé par D_002 et aux pertes causées par un événement. Est-ce voulu ?
-  - A_025 : l'autre carte de l'échange peut appartenir à n'importe quel joueur autre que la cible, y compris l'attaquant lui-même.
-  - A_003 et A_014 (« vous pouvez ») sont **optionnels**. A_018 (« vos attaques posent ») est **obligatoire**.
-  - D_006 : l'attaquant peut se voir imposer une attaque ou un sabotage contre n'importe lequel de ses adversaires, porteur compris, ou bien un reparamétrage ou une surcharge.
-- **D_005 contre D_001** : l'ancien arbitrage disait qu'Intouchable protégeait du plafond de Sabotage électoral. Avec le modèle générique (partie B), un plafond est un *calcul de bornes*, pas une *modification* du bouclier : Intouchable **ne protège donc plus** de D_005. Faut-il garder ce comportement ou ajouter une autorisation dédiée ?
-
+- **Coup fatal** : la victime est éliminée immédiatement, donc ses réactions (D_017, D_022, D_006) ne s'appliquent pas au coup qui l'élimine. À confirmer.
 - Valeurs de `StartShield[n]` et `DoomRound[n]` : elles seront proposées par le simulateur (M3).
 - Fréquence des événements : une par manche, jugée potentiellement excessive. À mesurer au M3.
 - Cartes marquées « à revoir » (A_003, A_010, A_015, A_021, A_022) : implémentées telles quelles.

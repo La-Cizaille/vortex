@@ -111,7 +111,6 @@ namespace Vortex.Core.Rules
             }
 
             p.Hp -= amount;
-            _lastLoss[loss.Player] = (loss.SourcePlayer, loss.Cause);
             Emit(new GameEvent { Type = GameEventType.HpLost, Player = loss.Player, Other = loss.SourcePlayer, Amount = amount, Cause = loss.Cause, Id = loss.CauseEffect?.Id });
 
             bool losesOvercharge = loss.Cause == HpLossCause.Attack || loss.Cause == HpLossCause.Reflect || loss.Cause == HpLossCause.Event;
@@ -119,6 +118,13 @@ namespace Vortex.Core.Rules
             {
                 p.Overcharge = 0;
                 Emit(new GameEvent { Type = GameEventType.OverchargeChanged, Player = loss.Player, Value = 0 });
+            }
+
+            // RULES A9: a ship is eliminated as soon as its HP reach 0. Its effects stop at once, including its
+            // reactions to this very loss; victory is checked at the end of the resolution step.
+            if (p.Hp == 0)
+            {
+                Eliminate(loss.Player, loss.SourcePlayer, loss.Cause);
             }
 
             if (loss.Cause != HpLossCause.Reflect)
@@ -518,8 +524,9 @@ namespace Vortex.Core.Rules
         // ---------------------------------------------------------------- Eliminations and victory (RULES A9)
 
         /// <summary>
-        /// Eliminates every alive player at 0 HP, in resolution order, then checks victory. Called at the end
-        /// of each resolution step, so a player brought to 0 and healed within the same step survives (RULES A9).
+        /// Checks victory at the end of a resolution step (RULES A9). Players are eliminated as soon as their HP
+        /// reach 0 (see <see cref="LoseHp"/>); this also catches any player left at 0 HP by other means.
+        /// If every remaining ship was eliminated during the step, the game is a draw.
         /// </summary>
         public void CheckEliminations()
         {
@@ -528,35 +535,37 @@ namespace Vortex.Core.Rules
                 return;
             }
 
-            bool any = true;
-            while (any && !IsOver)
+            foreach (int seat in AliveInTurnOrder().ToList())
             {
-                any = false;
-                foreach (int seat in AliveInTurnOrder().ToList())
+                if (State.Players[seat].Hp <= 0)
                 {
-                    PlayerState p = State.Players[seat];
-                    if (p.Eliminated || p.Hp > 0)
-                    {
-                        continue;
-                    }
-
-                    any = true;
-                    (int source, HpLossCause cause) = _lastLoss.TryGetValue(seat, out var last) ? last : (-1, HpLossCause.Self);
-                    DiscardAllModifiers(seat, null);
-                    p.Eliminated = true;
-                    p.Overcharge = 0;
-                    foreach (StatusState s in p.Statuses.ToList())
-                    {
-                        RemoveStatus(seat, s);
-                    }
-
-                    Emit(new GameEvent { Type = GameEventType.PlayerEliminated, Player = seat, Other = source, Cause = cause });
-                    var info = new EliminationInfo(seat, source, _lastLoss.ContainsKey(seat) ? cause : (HpLossCause?)null);
-                    Raise((e, s) => e.OnPlayerEliminated(this, s, info));
+                    Eliminate(seat, -1, null);
                 }
-
-                CheckDomination();
             }
+
+            CheckDomination();
+        }
+
+        /// <summary>Eliminates a player: cards discarded, statuses removed, reaction "joueur éliminé" (RULES A9).</summary>
+        public void Eliminate(int seat, int responsible, HpLossCause? cause)
+        {
+            PlayerState p = State.Players[seat];
+            if (p.Eliminated)
+            {
+                return;
+            }
+
+            DiscardAllModifiers(seat, null);
+            p.Eliminated = true;
+            p.Overcharge = 0;
+            foreach (StatusState s in p.Statuses.ToList())
+            {
+                RemoveStatus(seat, s);
+            }
+
+            Emit(new GameEvent { Type = GameEventType.PlayerEliminated, Player = seat, Other = responsible, Cause = cause });
+            var info = new EliminationInfo(seat, responsible, cause);
+            Raise((e, s) => e.OnPlayerEliminated(this, s, info));
         }
 
         private void CheckDomination()
