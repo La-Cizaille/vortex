@@ -53,7 +53,7 @@ Les valeurs marquées ⚙ sont **configurables** (`GameConfig`) et seront calibr
 
 ## A4. Début de manche
 
-1. Si `EventFrequency` ⚙ le prévoit, on révèle un événement. Il reste **actif** jusqu'au début de la manche suivante.
+1. Si `EventFrequency` ⚙ le prévoit (manches 1, 1+N, 1+2N…), on révèle un événement, dès la première manche. Il reste **actif** jusqu'au début de la manche suivante.
 2. À la manche `DoomRound[n]` ⚙, c'est le `DoomEvent` qui est révélé **à la place**.
 3. Un paquet vide se reconstitue en mélangeant sa défausse. Cette règle vaut pour **tous** les paquets.
 4. La manche commence par le premier joueur. S'il est éliminé, elle commence au joueur vivant suivant.
@@ -77,7 +77,7 @@ Les valeurs marquées ⚙ sont **configurables** (`GameConfig`) et seront calibr
 ### A5.3 Fenêtre d'activation
 - Elle s'ouvre après le marché et reste ouverte jusqu'à la fin du tour, avant comme après l'action d'équipage.
 - Le joueur peut y activer, **sans limite de nombre**, tout effet activable qu'il possède : cartes à usage unique, cartes à déclenchement manuel et combos (A8).
-- Une carte à usage unique est défaussée après son activation.
+- Toute carte activée (à usage unique ou à déclenchement manuel) est **défaussée après son activation**, si elle est encore dans son emplacement. *(Précision M1, à valider.)*
 
 ### A5.4 Action d'équipage
 Le joueur fait **une** action, ou passe. Le nombre d'actions est un calcul (B2.1), qui vaut 1 par défaut. Plusieurs actions dans un même tour doivent être **différentes**.
@@ -138,6 +138,8 @@ Chaque étape nomme le point d'interception (B2) où les effets peuvent agir.
 ## A9. Victoire et élimination
 
 - **Élimination** : un joueur à 0 PV est éliminé. Ses cartes sont défaussées avec leurs jetons.
+- **Moment de l'élimination** : on vérifie les PV à la **fin de chaque étape de résolution** (fin d'une attaque, d'une activation, d'un début de tour, d'un début de manche). Un joueur ramené à 0 puis soigné dans la même étape survit. *(Précision M1, à valider.)*
+- **Élimination pendant son propre tour** (par exemple par une perte renvoyée) : le tour s'arrête immédiatement et le joueur suivant joue. *(Précision M1.)*
 - **Domination** : être le dernier joueur vivant.
 - **Élection galactique** : avoir obtenu les 4 technologies. La victoire est immédiate.
 - **Égalité** : tous les joueurs restants sont éliminés au même moment.
@@ -261,6 +263,9 @@ La version lisible est [`CARDS.md`](CARDS.md). Elle est générée automatiqueme
 ---
 
 ## Questions ouvertes (à trancher par le game designer)
+
+- **Précisions apportées pendant l'implémentation du moteur (M1)**, marquées *à valider* ci-dessus : défausse de toute carte activée (A5.3) et moment de l'élimination (A9).
+- **D_005 contre D_001** : l'ancien arbitrage disait qu'Intouchable protégeait du plafond de Sabotage électoral. Avec le modèle générique (partie B), un plafond est un *calcul de bornes*, pas une *modification* du bouclier : Intouchable **ne protège donc plus** de D_005. Faut-il garder ce comportement ou ajouter une autorisation dédiée ?
 
 - Valeurs de `StartShield[n]` et `DoomRound[n]` : elles seront proposées par le simulateur (M3).
 - Fréquence des événements : une par manche, jugée potentiellement excessive. À mesurer au M3.

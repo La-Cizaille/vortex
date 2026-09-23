@@ -16,6 +16,8 @@ namespace Vortex.Core.Tests
 
         public static string TechnologiesJson => File.ReadAllText(Path.Combine(DataDir, TechnologiesFile.FileName));
 
+        public static string ConfigJson => File.ReadAllText(Path.Combine(DataDir, Vortex.Core.Config.GameConfig.FileName));
+
         /// <summary>Repository root, found by walking up to the directory containing CLAUDE.md.</summary>
         public static string RepoRoot
         {
@@ -35,6 +37,11 @@ namespace Vortex.Core.Tests
         public static GameData LoadRealContent()
         {
             return GameDataLoader.Load(CardsJson, EventsJson, TechnologiesJson);
+        }
+
+        public static Vortex.Core.Config.GameConfig LoadRealConfig()
+        {
+            return GameDataLoader.LoadConfig(ConfigJson, LoadRealContent());
         }
     }
 }

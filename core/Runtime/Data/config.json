@@ -1,0 +1,39 @@
+{
+  "$schema": "./schema/config.schema.json",
+  "schemaVersion": 2,
+  "startingHp": 30,
+  "maxHp": 30,
+  "minShield": 0,
+  "maxShield": 8,
+  "dieFaces": 8,
+  "marketSize": 5,
+  "maxOvercharge": 1,
+  "criticalBonusWithoutModifier": 1,
+  "tormentValue": 1,
+  "eventFrequency": 1,
+  "doomEventId": "EVT_FIN_DES_TEMPS",
+  "playerCounts": [
+    {
+      "players": 2,
+      "startShield": 4,
+      "doomRound": 10
+    },
+    {
+      "players": 3,
+      "startShield": 4,
+      "doomRound": 10
+    },
+    {
+      "players": 4,
+      "startShield": 4,
+      "doomRound": 10
+    },
+    {
+      "players": 5,
+      "startShield": 4,
+      "doomRound": 10
+    }
+  ],
+  "reactionDepthLimit": 16,
+  "maxDecisionsPerCommand": 64
+}
