@@ -1,6 +1,6 @@
 namespace Vortex.Core.Content
 {
-    /// <summary>Technology colour of a modifier (RULES.md §1, §8). <see cref="Neutral"/> never forms a combo.</summary>
+    /// <summary>Technology colour of a modifier (RULES A1, A8). <see cref="Neutral"/> never forms a combo.</summary>
     public enum TechColor
     {
         /// <summary>No technology.</summary>
@@ -24,7 +24,7 @@ namespace Vortex.Core.Content
         Defense = 1,
     }
 
-    /// <summary>How a modifier's effect is used (RULES.md §5.3).</summary>
+    /// <summary>How a modifier's effect is used (RULES A5.3).</summary>
     public enum CardUsage
     {
         /// <summary>Effect applies as long as the card is equipped.</summary>

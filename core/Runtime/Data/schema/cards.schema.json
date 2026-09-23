@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/La-Cizaille/vortex/core/Runtime/Data/schema/cards.schema.json",
+  "title": "Vortex — modificateurs",
+  "description": "Source de vérité des cartes modificateurs (ADR-0008). Aide à l'édition uniquement : le validateur C# (GameDataValidator) fait foi.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "cards"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 2 },
+    "cards": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/card" }
+    }
+  },
+  "$defs": {
+    "card": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "slot", "color", "usage", "copies", "needsReview", "text", "ruling"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^(A|D)_[0-9]{3}$",
+          "description": "A_xxx pour une carte d'attaque, D_xxx pour une carte de défense. Stable : ne jamais réutiliser un id retiré."
+        },
+        "name": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "slot": { "enum": ["Attack", "Defense"], "description": "Emplacement sur le vaisseau et marché d'origine." },
+        "color": { "enum": ["Neutral", "Blue", "Red", "Green", "Yellow"], "description": "Technologie. Neutral ne forme jamais de combo." },
+        "usage": { "enum": ["Durable", "SingleUse", "Triggered"] },
+        "copies": { "type": "integer", "minimum": 1, "maximum": 8 },
+        "needsReview": { "type": "boolean", "description": "Carte à retravailler par le game designer." },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600,
+          "description": "Texte imprimé. Icônes : <ATQ> <BOU> <MOD> <TOR> <SUR> <MKT> <DIC>. **gras** autorisé."
+        },
+        "ruling": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000,
+          "description": "Interprétation exacte selon le modèle d'effets (RULES.md partie B). Ne cite jamais une autre carte."
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "slot": { "const": "Attack" } } },
+          "then": { "properties": { "id": { "pattern": "^A_[0-9]{3}$" } } },
+          "else": { "properties": { "id": { "pattern": "^D_[0-9]{3}$" } } }
+        }
+      ]
+    }
+  }
+}

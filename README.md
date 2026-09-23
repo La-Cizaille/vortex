@@ -10,17 +10,16 @@ Adaptation numérique d'un jeu de société. Cibles : **Android** et **Windows**
 
 | Dossier | Contenu |
 |---|---|
-| [`design/`](design/) | `Vortex.xlsx` : cartes, événements et technologies. C'est la **source de vérité** du game design. |
-| [`docs/`](docs/) | [Règles consolidées](docs/RULES.md), [architecture](docs/ARCHITECTURE.md), [sécurité](docs/SECURITY.md), [contribution](docs/CONTRIBUTING.md), [décisions (ADR)](docs/adr/). |
-| `core/` | Moteur de règles en C# pur, partagé entre Unity, les tests, le simulateur et le futur serveur. |
-| `dotnet/` | Solution .NET : tests, import des cartes, simulateur d'équilibrage, serveur (phase 2). |
+| [`docs/`](docs/) | [Règles](docs/RULES.md), [catalogue des cartes](docs/CARDS.md) (généré), [architecture](docs/ARCHITECTURE.md), [sécurité](docs/SECURITY.md), [contribution](docs/CONTRIBUTING.md), [décisions (ADR)](docs/adr/). |
+| `core/` | Moteur de règles en C# pur, partagé entre Unity, les tests, le simulateur et le futur serveur. `core/Runtime/Data/*.json` est la **source de vérité** des cartes. |
+| `dotnet/` | Solution .NET : tests, outil de contenu (validation, format, catalogue), simulateur d'équilibrage (M3), serveur (phase 2). |
 | `unity/` | Client Unity 6.3 LTS (URP). |
 
 ## Pré-requis
 
 - [SDK .NET 10](https://dotnet.microsoft.com/download)
 - [Unity Hub](https://unity.com/download) + **Unity 6.3 LTS**, avec les modules *Android Build Support* et *Windows Build Support (IL2CPP)*
-- Git + Git LFS (`git lfs install`)
+- Git + Git LFS (`git lfs install`), utilisé pour les assets graphiques
 - (Outils IA, optionnel) [uv](https://docs.astral.sh/uv/) pour Unity MCP
 
 ## Démarrage

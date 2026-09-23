@@ -20,12 +20,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Vortex.Core\Vortex.Core.csproj" />
-    <ProjectReference Include="..\Vortex.CardImporter\Vortex.CardImporter.csproj" />
+    <ProjectReference Include="..\Vortex.ContentTool\Vortex.ContentTool.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Tests read the committed generated file and the design workbook from the repo. -->
-    <None Include="..\..\core\Runtime\Data\gamedata.json" Link="TestData\gamedata.json" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="..\..\design\Vortex.xlsx" Link="TestData\Vortex.xlsx" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Tests read the real content files from the repo. -->
+    <None Include="..\..\core\Runtime\Data\*.json" Link="TestData\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

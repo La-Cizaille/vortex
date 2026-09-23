@@ -23,7 +23,7 @@
 - Une classe de carte commence par le **texte exact** de la carte, puis l'arbitrage appliqué, avec un renvoi vers la section de `RULES.md` :
   ```csharp
   /// <summary>A_005 "Rétablir l'ordre" — "Vos attaques infligent +4 points de dégats supplémentaires."</summary>
-  /// <remarks>Ruling (RULES.md §10.1): +4 to attack value, applied before shield.</remarks>
+  /// <remarks>Ruling: see the card entry in core/Runtime/Data/cards.json.</remarks>
   ```
 
 ## Tests
@@ -32,15 +32,25 @@
 - Couverture visée pour `core/` : **≥ 90 %** des lignes.
 - Pour lancer les tests : `dotnet test dotnet/Vortex.sln`.
 
-## Modifier une carte ou les valeurs d'équilibrage
-1. Modifier `design/Vortex.xlsx`, qui est la source de vérité, ou `GameConfig` pour les valeurs globales.
-2. Régénérer les données :
+## Ajouter, modifier ou retirer une carte
+La source de vérité est `core/Runtime/Data/` : `cards.json`, `events.json` et `technologies.json` (ADR-0008). Dans VS Code, le JSON Schema référencé par `$schema` donne l'autocomplétion et signale les erreurs en direct.
+
+1. Éditer l'entrée de la carte :
+   - **`text`** : le texte imprimé.
+   - **`ruling`** : l'interprétation exacte, écrite **uniquement** avec le modèle d'effets (RULES.md partie B). Un arbitrage ne cite **jamais** une autre carte : on écrit « soumis à l'autorisation *modifier un bouclier* », pas « bloqué par Intouchable ».
+   - Un **id retiré n'est jamais réutilisé**.
+2. Si la carte a besoin d'un point d'interception qui n'existe pas, on l'ajoute **de façon générique** à RULES.md B2, avec son test. On ne crée jamais d'exception propre à la carte (ADR-0007).
+3. Mettre en forme, valider et régénérer le catalogue :
    ```
-   dotnet run --project dotnet/Vortex.CardImporter -- design/Vortex.xlsx core/Runtime/Data
+   dotnet run --project dotnet/Vortex.ContentTool -- format core/Runtime/Data
+   dotnet run --project dotnet/Vortex.ContentTool -- validate core/Runtime/Data
+   dotnet run --project dotnet/Vortex.ContentTool -- docs core/Runtime/Data docs/CARDS.md
    ```
-   L'import vérifie que les ids sont uniques, que les couleurs et les usages sont connus et que les nombres d'exemplaires sont cohérents.
-3. Si le **comportement** d'une carte change, mettre à jour sa classe, son test et `RULES.md` §10.
-4. Mesurer l'impact avec le simulateur (`dotnet run --project dotnet/Vortex.Simulator`), à partir du jalon M3.
+4. Si le nombre de cartes change, mettre à jour les quantités attendues dans `GameDataContentTests`. C'est le **seul** test lié au contenu réel.
+5. À partir de M2 : déclarer les briques d'effets de la carte, ou écrire sa classe, avec son test.
+6. À partir de M3 : mesurer l'impact avec le simulateur.
+
+Les valeurs globales (PV, bouclier de départ, fréquence des événements…) sont dans `GameConfig`, pas dans les cartes.
 
 ## Ajouter ou modifier un visuel (à partir du jalon M4)
 - Le code ne référence **jamais** un asset directement : tout passe par les catalogues de `unity/Assets/_Vortex/Theme/`.

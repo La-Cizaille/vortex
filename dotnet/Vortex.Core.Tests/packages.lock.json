@@ -110,7 +110,7 @@
           "Microsoft.TestPlatform.ObjectModel": "18.10.1"
         }
       },
-      "vortex.cardimporter": {
+      "vortex.contenttool": {
         "type": "Project",
         "dependencies": {
           "Vortex.Core": "[1.0.0, )"

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/La-Cizaille/vortex/core/Runtime/Data/schema/events.schema.json",
+  "title": "Vortex — événements",
+  "description": "Source de vérité des cartes événements (ADR-0008). Aide à l'édition uniquement : le validateur C# fait foi.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "events"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 2 },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "copies", "text", "ruling"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^EVT_[A-Z0-9_]{1,48}$" },
+          "name": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "copies": { "type": "integer", "minimum": 1, "maximum": 8 },
+          "text": { "type": "string", "minLength": 1, "maxLength": 600 },
+          "ruling": { "type": "string", "minLength": 1, "maxLength": 1000 }
+        }
+      }
+    }
+  }
+}

@@ -21,13 +21,16 @@ namespace Vortex.Core.Content
         /// <summary>Maximum length of a rules text.</summary>
         public const int MaxTextLength = 600;
 
+        /// <summary>Maximum length of a ruling.</summary>
+        public const int MaxRulingLength = 1000;
+
         /// <summary>Maximum copies of a single card in a deck.</summary>
         public const int MaxCopies = 8;
 
         private static readonly Regex AttackId = new Regex("^A_[0-9]{3}$", RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
         private static readonly Regex DefenseId = new Regex("^D_[0-9]{3}$", RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
         private static readonly Regex EventId = new Regex("^EVT_[A-Z0-9_]{1,48}$", RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
-        private static readonly Regex Sha256Hex = new Regex("^[0-9a-f]{64}$", RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
+        private static readonly Regex TechnologyId = new Regex("^TECH_[A-Z]{1,16}$", RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
 
         /// <summary>Returns every problem found; an empty list means the data is valid.</summary>
         public static IReadOnlyList<string> Validate(GameData data)
@@ -38,16 +41,6 @@ namespace Vortex.Core.Content
             }
 
             var errors = new List<string>();
-
-            if (data.SchemaVersion != GameData.CurrentSchemaVersion)
-            {
-                errors.Add(string.Format(CultureInfo.InvariantCulture, "Unsupported schema version {0} (expected {1}).", data.SchemaVersion, GameData.CurrentSchemaVersion));
-            }
-
-            if (data.SourceSha256 is null || !Sha256Hex.IsMatch(data.SourceSha256))
-            {
-                errors.Add("sourceSha256 must be 64 lowercase hex characters.");
-            }
 
             var ids = new HashSet<string>(StringComparer.Ordinal);
 
@@ -68,6 +61,7 @@ namespace Vortex.Core.Content
                 CheckEnum(card.Usage, where + ".usage", errors);
                 CheckText(card.Name, MaxNameLength, where + ".name", errors);
                 CheckText(card.Text, MaxTextLength, where + ".text", errors);
+                CheckText(card.Ruling, MaxRulingLength, where + ".ruling", errors);
                 CheckCopies(card.Copies, where, errors);
             }
 
@@ -84,6 +78,7 @@ namespace Vortex.Core.Content
                 CheckId(evt.Id, EventId, where, ids, errors);
                 CheckText(evt.Name, MaxNameLength, where + ".name", errors);
                 CheckText(evt.Text, MaxTextLength, where + ".text", errors);
+                CheckText(evt.Ruling, MaxRulingLength, where + ".ruling", errors);
                 CheckCopies(evt.Copies, where, errors);
             }
 
@@ -98,7 +93,13 @@ namespace Vortex.Core.Content
                     continue;
                 }
 
+                CheckId(tech.Id, TechnologyId, where, ids, errors);
                 CheckEnum(tech.Color, where + ".color", errors);
+                if (tech.Id != null && tech.Id != "TECH_" + tech.Color.ToString().ToUpperInvariant())
+                {
+                    errors.Add(where + ": id '" + tech.Id + "' does not match its colour (expected TECH_" + tech.Color.ToString().ToUpperInvariant() + ").");
+                }
+
                 if (tech.Color == TechColor.Neutral)
                 {
                     errors.Add(where + ": a technology cannot be Neutral.");
@@ -110,6 +111,7 @@ namespace Vortex.Core.Content
 
                 CheckText(tech.Name, MaxNameLength, where + ".name", errors);
                 CheckText(tech.Text, MaxTextLength, where + ".text", errors);
+                CheckText(tech.Ruling, MaxRulingLength, where + ".ruling", errors);
             }
 
             if (colors.Count != 4)

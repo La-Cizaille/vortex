@@ -1,262 +1,268 @@
-# Vortex : règles consolidées
+# Vortex : règles du jeu
 
-> **Statut** : v0.1, en attente de validation par le game designer.
-> **Sources** : `design/Vortex.xlsx` (onglets *Déroulement du jeu*, *Modificateurs attaque*, *Modificateurs défense*, *Evènements*, *Technologies*), complété par les arbitrages pris en session.
-> **Rôle de ce document** : c'est la **référence du moteur de règles**. Chaque comportement codé dans `core/` renvoie à une section d'ici (§x.y). Toute modification de règle commence par ce fichier.
+> **Statut** : v0.2, en attente de validation par le game designer.
+> **Rôle** : c'est la **référence du moteur de règles**. Le code renvoie aux sections d'ici (par ex. `RULES A6`).
 
-Les valeurs chiffrées marquées ⚙ sont **configurables** (`GameConfig`) et seront calibrées par le simulateur (jalon M3).
+Le document a trois parties, qui dépendent uniquement vers le bas :
+
+| Partie | Contenu | Où |
+|---|---|---|
+| **A. Règles de base** | Déroulé d'une partie. **Aucune carte n'y est citée.** | Ce fichier |
+| **B. Modèle d'effets** | Comment *n'importe quelle* carte agit sur la partie : points d'interception, actions élémentaires, empilement, durées. | Ce fichier |
+| **C. Cartes** | Texte et arbitrage de chaque carte, exprimés **uniquement** avec la partie B. | [`core/Runtime/Data/*.json`](../core/Runtime/Data/) (source), [`CARDS.md`](CARDS.md) (vue générée) |
+
+Conséquence : ajouter, modifier ou retirer une carte ne touche **jamais** les parties A et B (ADR-0007, ADR-0008).
+
+Les valeurs marquées ⚙ sont **configurables** (`GameConfig`) et seront calibrées par le simulateur (jalon M3).
 
 ---
 
-## 1. Lexique
+# Partie A : règles de base
+
+## A1. Lexique
 
 | Terme | Définition |
 |---|---|
 | **Tour** | Le tour d'**un** joueur. |
-| **Manche** | Un tour de table complet. Dans le texte d'un **événement**, « pendant ce tour » désigne la **manche**. |
-| **Prochain tour / tour suivant** | Dans une carte : le prochain tour **du joueur concerné**. |
-| **Dégâts** | PV perdus à cause d'une attaque ou d'un effet d'attaque. |
-| **Perte de PV** | Tout PV perdu, quelle que soit la cause. Chaque perte porte une **source** : `Attack`, `Reflect` (renvoi, ex. Loi du Talion), `Torment`, `Event`, `Self` (coût payé par le joueur ou effet sur soi, ex. D_002, D_020). |
-| **Bouclier (BOU)** | Valeur de 0 à 8 ⚙. Les cartes peuvent l'amener à 0. |
-| **Bouclier désactivé** | Compte pour 0 dans le calcul des dégâts, mais sa valeur est **conservée**. |
-| **Neutre** | Couleur sans technologie. Une carte neutre ne participe **jamais** à un combo. |
-| **Technologie** | Les couleurs Bleu (Ordre), Jaune (Casino Cosmique), Rouge (Rebelles) et Vert (Abomination organique). |
+| **Manche** | Un tour de table complet. Un effet qui dure « ce tour » dans un **événement** dure la manche. |
+| **Prochain tour** | Pour un effet de carte : le prochain tour **du propriétaire de l'effet**. |
+| **Propriétaire** | Le joueur qui a la carte équipée ou qui a activé l'effet. Un événement n'a pas de propriétaire. |
+| **Source** | Qui cause une action : un joueur (avec l'effet ou l'action d'équipage en cause) ou le jeu (événement, règle de base). |
+| **Adversaire** | Tout autre joueur vivant. |
+| **Dégâts** | Montant calculé par une attaque, avant d'être appliqué comme perte de PV. |
+| **Perte de PV** | Toute diminution de PV. Elle porte une **cause** : `Attack`, `Reflect` (renvoi d'une perte), `Torment`, `Event`, `Self` (coût payé ou effet sur soi). |
+| **Bouclier** | Valeur de 0 à 8 ⚙. |
+| **Désactiver ou ignorer un bouclier** | Le bouclier compte pour 0 dans un calcul d'attaque, **sans que sa valeur change**. Ce n'est pas une *modification* du bouclier. |
+| **Modifier un bouclier** | Changer sa valeur : la fixer, l'augmenter, la diminuer, la relancer ou l'échanger. Toute modification passe par l'autorisation B2.2 « modifier un bouclier ». |
+| **Couleur** | Neutre, Bleu, Rouge, Vert ou Jaune. Neutre n'est pas une technologie et ne forme jamais de combo. |
 
-**Règle anti-boucle** : une perte de PV de source `Reflect` ne déclenche **aucun** effet réactif (Loi du Talion, Chance de cocu, Vautours, etc.).
+## A2. Matériel
 
-**Surcharge et dégâts** : le jeton de surcharge est perdu sur une perte de PV `Attack`, `Reflect` ou `Event`. Il est conservé sur `Torment` et `Self`.
+- De 2 à 5 joueurs, un vaisseau par joueur.
+- Un vaisseau a : des PV, un bouclier, un **emplacement ATK**, un **emplacement DEF**, au plus 1 ⚙ jeton de surcharge, et les technologies déjà obtenues.
+- Un paquet de modificateurs ATK, un paquet de modificateurs DEF et un paquet d'événements. Leur composition est définie dans les données (partie C).
+- Un dé à 8 faces.
 
----
+## A3. Mise en place
 
-## 2. Matériel
-
-| Élément | Quantité |
-|---|---|
-| Joueurs | 2 à 5 |
-| Modificateurs ATK | 27 cartes différentes, **54 exemplaires** |
-| Modificateurs DEF | 27 cartes différentes, **50 exemplaires** (D_006, D_017, D_022 et D_027 en 1 exemplaire) |
-| Événements | 8 cartes différentes, 15 exemplaires, dont 1 « Fin des temps » **retirée du paquet** (§4) |
-| Technologies | 4 combos, un par couleur |
-| Dé | d8 |
-
----
-
-## 3. Mise en place
-
-1. Chaque vaisseau commence avec **30 PV** ⚙ (maximum 30 ⚙).
-2. Tous les joueurs commencent avec le **même bouclier** : `StartShield[n]` ⚙, qui dépend du nombre de joueurs n (valeur provisoire : 4).
-3. On mélange séparément les paquets ATK, DEF et Événements. On révèle **5** ⚙ cartes de chaque paquet de modificateurs : ce sont les deux **marchés noirs**.
+1. Chaque vaisseau commence avec **30 PV** ⚙ (maximum 30 ⚙) et un bouclier égal à `StartShield[n]` ⚙, identique pour tous, où n est le nombre de joueurs.
+2. On mélange chaque paquet. L'événement « fin des temps » (`DoomEvent` ⚙) est tenu **hors du paquet** (A4).
+3. On révèle 5 ⚙ cartes de chaque paquet de modificateurs : ce sont les deux **marchés noirs**.
 4. **Initiative** : chaque joueur lance 1d8. Le plus haut commence. En cas d'égalité, seuls les joueurs à égalité relancent.
-5. On joue ensuite dans le **sens horaire**, selon l'ordre des sièges.
+5. On joue ensuite dans le sens horaire, selon l'ordre des sièges.
 
----
+## A4. Début de manche
 
-## 4. Début de manche
+1. Si `EventFrequency` ⚙ le prévoit, on révèle un événement. Il reste **actif** jusqu'au début de la manche suivante.
+2. À la manche `DoomRound[n]` ⚙, c'est le `DoomEvent` qui est révélé **à la place**.
+3. Un paquet vide se reconstitue en mélangeant sa défausse. Cette règle vaut pour **tous** les paquets.
+4. La manche commence par le premier joueur. S'il est éliminé, elle commence au joueur vivant suivant.
 
-1. Si `EventFrequency` ⚙ le prévoit (valeur provisoire : à chaque manche), on tire **un événement**. Son effet dure jusqu'au début de la manche suivante.
-2. À la manche `DoomRound[n]` ⚙ (valeur provisoire : 10), la **Fin des temps** se déclenche **à la place** de l'événement :
-   - tous les modificateurs **équipés** sont défaussés ;
-   - tous les boucliers passent à 0.
-   C'est un effet ponctuel : les boucliers peuvent ensuite être reconstruits.
-3. Si le paquet d'événements est vide, on mélange sa défausse pour le reconstituer.
-4. Si le premier joueur est éliminé, la manche commence au joueur vivant suivant.
+## A5. Tour d'un joueur
 
----
+### A5.1 Début du tour
+1. Les jetons de Tourment infligent leur perte (A7).
+2. Réaction « début de tour » (B2.3).
+3. Les effets qui duraient « jusqu'au prochain tour » de ce joueur expirent.
 
-## 5. Tour d'un joueur
-
-### 5.1 Début du tour
-1. Le joueur perd **1 PV par jeton de Tourment** posé sur ses modificateurs. Chaque combo Abomination ajoute +1 par jeton (§8). Source : `Torment`.
-2. Les effets « au début de votre tour » s'appliquent, emplacement ATK puis DEF.
-3. Les effets qui duraient « jusqu'à votre prochain tour » expirent.
-
-### 5.2 Marché noir : une seule option parmi
-- **Prendre** 1 carte d'un marché (2 cartes pendant *Nouvel arrivage*).
-  - La carte va dans l'emplacement correspondant (ATK ou DEF).
-  - L'ancienne carte de cet emplacement est défaussée avec ses jetons. Si c'était une carte à usage unique, son effet **n'est pas** déclenché.
+### A5.2 Marché noir : une option parmi trois
+- **Prendre** une carte d'un marché. Le nombre de cartes prenables est un calcul (B2.1), qui vaut 1 par défaut.
+  - La carte va dans l'emplacement de son type.
+  - La carte qui occupait cet emplacement est défaussée avec ses jetons, sans que son effet soit déclenché.
   - Le marché est complété immédiatement.
-  - Les jetons de Tourment présents sur la carte prise **la suivent**, sans perte de PV immédiate.
-- **Recycler** un marché : ses cartes sont défaussées et on en révèle 5 nouvelles.
+  - Les jetons posés sur la carte prise la suivent.
+- **Recycler** un marché : ses cartes sont défaussées et on en révèle autant de nouvelles.
 - **Passer**.
 
-Quand un paquet est vide, on mélange sa défausse. Si le paquet et la défausse sont vides, le marché reste incomplet.
+### A5.3 Fenêtre d'activation
+- Elle s'ouvre après le marché et reste ouverte jusqu'à la fin du tour, avant comme après l'action d'équipage.
+- Le joueur peut y activer, **sans limite de nombre**, tout effet activable qu'il possède : cartes à usage unique, cartes à déclenchement manuel et combos (A8).
+- Une carte à usage unique est défaussée après son activation.
 
-### 5.3 Fenêtre d'activation
-Elle s'ouvre **après** le marché noir et reste ouverte **jusqu'à la fin du tour** (avant comme après l'action d'équipage). Le joueur peut y activer **tout ce qu'il possède et qui est activable**, sans limite de nombre :
-- cartes à usage unique (défaussées après usage) ;
-- cartes à déclenchement manuel (D_011) ;
-- combos (§8).
+### A5.4 Action d'équipage
+Le joueur fait **une** action, ou passe. Le nombre d'actions est un calcul (B2.1), qui vaut 1 par défaut. Plusieurs actions dans un même tour doivent être **différentes**.
 
-Un effet « lors de votre prochaine attaque » est **perdu** à la fin du tour s'il n'y a pas eu d'attaque.
-
-### 5.4 Action d'équipage
-**Une** action au choix, ou passer. Avec *Casino Cosmique*, deux actions **différentes**.
-
-| Action | Effet |
+| Action | Déroulé |
 |---|---|
-| **Attaque** | §6 |
-| **Reparamétrage du bouclier** | Relance 1d8, qui remplace le bouclier actuel. En consommant la surcharge : 2d8, somme plafonnée à 8. |
-| **Sabotage** | Relance 1d8, qui remplace le bouclier d'un adversaire. Impossible contre *Intouchable*. La surcharge ne s'applique pas. |
-| **Surcharge** | Gagne un jeton de surcharge (maximum 1 ⚙). |
+| **Attaque** | A6. |
+| **Reparamétrage** | Je relance mon bouclier avec le lot de dés « bouclier » : 1d8, ou 2d8 additionnés si je consomme ma surcharge. Le résultat est borné (B2.1, « bornes du bouclier »). Si l'autorisation B2.2 « modifier un bouclier » est refusée, l'action n'a pas d'effet. |
+| **Sabotage** | Je relance 1d8 pour le bouclier d'un adversaire. Si l'autorisation B2.2 « modifier un bouclier » est refusée, l'action est **illégale** : on ne peut pas la choisir. La surcharge ne s'applique pas. |
+| **Surcharge** | Je gagne un jeton de surcharge, dans la limite du maximum. |
 
-### 5.5 Fin du tour
-Les effets « pendant votre tour » expirent, puis on vérifie les conditions de victoire (§9).
+**Surcharge** : un jeton se consomme **volontairement** lors d'une attaque ou d'un reparamétrage. Il est perdu si le joueur subit une perte de PV de cause `Attack`, `Reflect` ou `Event`, sauf si l'autorisation B2.2 « perdre la surcharge » est refusée.
 
----
+### A5.5 Fin du tour
+- Les effets qui duraient « ce tour » expirent.
+- Un effet « prochaine attaque » non utilisé expire.
+- On vérifie la victoire (A9).
 
-## 6. Résolution d'une attaque (ordre exact)
+## A6. Attaque
 
-1. **Choix de la cible** : un adversaire vivant.
-   - Interdit si *Favoritisme* protège la cible contre cet attaquant.
-   - Si *Mutinerie* s'applique, l'action et la cible sont imposées.
-2. **Déviation** : si la cible a *Ordre* actif, elle peut rediriger l'attaque vers un autre joueur vivant, qui ne peut être ni l'attaquant ni elle-même. L'attaque est alors résolue entièrement contre la nouvelle cible, sans nouvelle déviation possible.
-3. **Avant le jet** :
-   - *Canon à particules* vole 2 points de bouclier (le bouclier de l'attaquant reste ≤ 8). Bloqué par *Intouchable*.
-   - *Black Jack* : l'attaquant annonce une valeur de 1 à 8.
-4. **Jet** :
-   - Le lot de base est **1d8**. On ajoute **+1d8** si l'attaque est surchargée (jeton consommé ou *On envoie la sauce*).
-   - *Tapis!* : 3d8, on garde les 2 meilleurs.
-   - **Avantage** : on lance le lot deux fois et on garde le meilleur total. **Désavantage** : on garde le pire. Les deux **s'annulent**.
-   - *Main sûre* : le dé lancé à l'avance tient lieu de premier dé.
-5. **Critique** : au moins un dé conservé affiche 8.
-6. **Valeur d'attaque** = somme des dés conservés + bonus. Les bonus s'ajoutent **avant** le bouclier.
-7. **Bouclier effectif** = bouclier de la cible, ramené à 0 s'il est désactivé ou ignoré.
-8. **Dégâts** = max(0, valeur d'attaque − bouclier effectif).
-9. **Multiplicateurs** : ×2 pour chaque effet actif. Ils se cumulent.
-10. **Critique** : si la cible a au moins un modificateur, **elle choisit** celui qui est détruit (avec ses jetons). Sinon, elle subit +1 dégât. Les dégâts normaux s'appliquent dans les deux cas.
-11. **Protections de la cible**, dans cet ordre :
-    - *T'as pas entendu un truc?* ;
-    - *Sous-couche blindée* ;
-    - *Lève la tête* ;
-    - *Chance de cocu* ;
-    - *Niaque*, qui s'applique en dernier, sur le montant final.
-12. **Application** : la cible perd les PV (source `Attack`). Si le montant est > 0, elle perd sa surcharge, sauf *Nothing else matters*.
-13. **Effets d'après-coup**, résolus dans l'ordre des sièges à partir de l'attaquant.
-14. **Éliminations**, puis *Le grand final*, puis vérification de la victoire.
+Chaque étape nomme le point d'interception (B2) où les effets peuvent agir.
 
-**Exemple** :
-- L'attaquant a *Rétablir l'ordre* (+4). Le dé fait 5. Le bouclier de la cible vaut 6.
-- Valeur d'attaque : 5 + 4 = 9. Dégâts : max(0, 9 − 6) = **3**.
-
----
-
-## 7. Tourment
-
-- **Poser un jeton** : il est placé sur un modificateur de la cible, et la cible perd 1 PV (source `Torment`).
-- **Cible sans modificateur** : **aucun** jeton n'est posé et elle ne perd aucun PV.
-- Les jetons se cumulent. Ils disparaissent quand le modificateur est remplacé, détruit ou défaussé. Ils **suivent** la carte si elle est volée ou échangée.
-- **Réactiver les Tourments** : chaque joueur perd de nouveau 1 PV (+ bonus Abomination) par jeton posé sur ses modificateurs. Les jetons posés sur les cartes des marchés n'infligent rien.
-
----
-
-## 8. Technologies (combos)
-
-- **Condition** : le modificateur ATK et le modificateur DEF équipés sont de la **même couleur non neutre**.
-- **Activation** (fenêtre §5.3) : les deux cartes sont défaussées (leurs effets d'usage unique ne sont pas déclenchés). L'effet du combo s'applique, et la technologie est marquée comme **obtenue** par ce joueur.
-
-| Couleur | Nom | Effet |
+| # | Étape | Point d'interception |
 |---|---|---|
-| Bleu | Ordre | Jusqu'au début de votre prochain tour, vous pouvez dévier les attaques subies (§6.2). |
-| Jaune | Casino Cosmique | Ce tour-ci, vous effectuez 2 actions d'équipage **différentes**. |
-| Rouge | Rebelles | Vous gagnez un jeton de surcharge. Votre prochaine attaque surchargée se fait avec avantage. |
-| Vert | Abomination organique | Les Tourments infligent +1 point pour le reste de la partie (cumulable). Puis tous les Tourments en jeu sont réactivés. |
+| 1 | **Déclaration** : l'attaquant choisit un adversaire. | Autorisation « cibler » ; une action imposée peut fixer la cible. |
+| 2 | **Redirection** : chaque effet de la cible qui le permet peut rediriger l'attaque vers un autre joueur vivant (ni l'attaquant, ni la cible). Une attaque ne peut être redirigée **qu'une fois**. | Réaction « attaque déclarée ». |
+| 3 | **Avant le jet** : effets préparatoires, comme un pari sur le dé ou une modification de bouclier. | Réaction « avant le jet ». |
+| 4 | **Jet** : on lance le lot de dés d'attaque. Par défaut 1d8, plus 1d8 si l'attaque est surchargée. | Calcul « lot de dés d'attaque ». |
+| 5 | **Critique** : au moins un dé **conservé** affiche 8. | — |
+| 6 | **Valeur d'attaque** = somme des dés conservés, puis modificateurs. | Calcul « valeur d'attaque ». |
+| 7 | **Bouclier effectif** de la cible. | Calcul « bouclier effectif ». |
+| 8 | **Dégâts** = max(0, valeur d'attaque − bouclier effectif), puis modificateurs. | Calcul « dégâts ». |
+| 9 | **Effet du critique** : si la cible a au moins un modificateur, **elle choisit** celui qui est défaussé (avec ses jetons). Sinon, dégâts +1 ⚙. | — |
+| 10 | **Application** : la cible subit une perte de PV de cause `Attack`. | Calcul « perte de PV », puis réaction « perte de PV subie ». |
+| 11 | **Après l'attaque** : effets de l'attaquant et de la cible. | Réaction « attaque résolue » (avec le montant). |
+| 12 | **Éliminations et victoire** (A9). | Réaction « joueur éliminé ». |
 
-**Synergie technologique** (bonus passif) : **désactivée** dans cette version. Le moteur prévoit un point d'extension.
+**Exemple sans aucune carte** : dé 5, bouclier de la cible 3. Dégâts : max(0, 5 − 3) = **2**.
+
+## A7. Tourment
+
+- **Poser un jeton** : l'action élémentaire « poser un Tourment » le place sur un modificateur **équipé**, et son propriétaire perd immédiatement la valeur d'un Tourment (cause `Torment`).
+- **Pas de modificateur, pas de jeton** : un joueur sans modificateur ne peut pas recevoir de jeton, et il ne perd rien.
+- Les jetons se cumulent. Ils restent sur **la carte** : ils disparaissent avec elle (défausse, remplacement) et la suivent (vol, échange). Une carte au marché peut porter des jetons.
+- **Au début de son tour**, chaque joueur perd la valeur d'un Tourment pour chaque jeton posé sur ses modificateurs.
+- **Réactiver** : on applique de nouveau, immédiatement, la perte de tous les jetons posés sur des modificateurs équipés.
+- **Valeur d'un Tourment** : 1, modifiable par un calcul (B2.1).
+
+## A8. Technologies (combos)
+
+- **Condition** : les modificateurs ATK et DEF équipés ont la **même couleur non neutre**.
+- **Activation** (fenêtre A5.3) :
+  1. les deux modificateurs sont défaussés, sans que leurs effets d'usage unique soient déclenchés ;
+  2. l'effet de la technologie de cette couleur s'applique ;
+  3. la technologie est marquée comme **obtenue** par le joueur.
+- **Synergie** (bonus passif quand deux cartes de même couleur sont équipées) : **non activée** dans cette version. Elle se branchera comme un effet de durée « tant que la condition est vraie » (B5).
+
+## A9. Victoire et élimination
+
+- **Élimination** : un joueur à 0 PV est éliminé. Ses cartes sont défaussées avec leurs jetons.
+- **Domination** : être le dernier joueur vivant.
+- **Élection galactique** : avoir obtenu les 4 technologies. La victoire est immédiate.
+- **Égalité** : tous les joueurs restants sont éliminés au même moment.
 
 ---
 
-## 9. Victoire
+# Partie B : modèle d'effets
 
-- **Domination** : être le dernier vaisseau en vie.
-- **Élection galactique** : avoir obtenu les **4** technologies. La victoire est immédiate.
-- **Égalité** : tous les joueurs restants sont éliminés simultanément.
-- **Élimination** : un vaisseau à 0 PV est éliminé. Ses cartes sont défaussées avec leurs jetons.
+## B1. Principe
 
----
+- Une carte, un événement ou une technologie n'est **qu'un ensemble d'effets**.
+- Un effet intervient **uniquement** à travers les points d'interception définis ci-dessous, et agit **uniquement** au moyen des actions élémentaires (B3).
+- Une règle de base ne cite jamais une carte, et un arbitrage de carte ne cite jamais une autre carte.
+- Deux cartes interagissent donc toujours par l'intermédiaire d'un point d'interception, jamais directement. C'est ce qui rend leurs combinaisons prévisibles, même quand personne ne les avait anticipées.
 
-## 10. Arbitrages carte par carte
+## B2. Points d'interception
 
-Le texte des cartes fait foi. Ce tableau précise uniquement **ce que le texte ne tranche pas**. Chaque ligne est implémentée dans la classe de la carte, avec un commentaire qui renvoie ici.
-
-### 10.1 Modificateurs d'attaque
-| ID | Nom | Arbitrage |
-|---|---|---|
-| A_001 | Canon à particules | Vol de 2 points avant le jet. Si la cible a moins de 2, on vole ce qu'elle a. Bloqué par Intouchable. |
-| A_002 | Langue de bois | Cible choisie à l'activation. Son bouclier est désactivé jusqu'à la fin de mon tour. |
-| A_003 | Épuration | « Changer » = relancer 1d8 le bouclier choisi. Bloqué par Intouchable. |
-| A_004 | La paix a un prix | Je choisis X ≤ mon bouclier. Mon bouclier baisse de X, et ma prochaine attaque de ce tour gagne +X. |
-| A_005 | Rétablir l'ordre | +4 à la valeur d'attaque, avant le bouclier. |
-| A_006 | Grosse Bertha | ×2 sur les dégâts de la prochaine attaque de ce tour. |
-| A_007 | Délestage forcé | Défausse les 2 modificateurs de la cible, avec leurs jetons. |
-| A_008 | Brocante spatiale | Recycle le marché ATK, puis je prends une carte dans le nouveau marché. Brocante est défaussée. |
-| A_009 | Jamais deux sans trois | Je récupère les 2 modificateurs de la cible (avec leurs jetons) dans mes emplacements. Mes cartes sont défaussées. |
-| A_010 | Le grand final | Si mon attaque élimine un vaisseau, tous les autres joueurs perdent leurs modificateurs et leur bouclier passe à 0. La carte est ensuite défaussée. |
-| A_011 | Cruauté | +4 PV si les dégâts sont > 0. |
-| A_012 | Vindicte populaire | +1 par carte **neutre** visible dans les deux marchés, compté à l'attaque. |
-| A_013 | On envoie la sauce | La prochaine attaque de ce tour est surchargée, sans consommer de jeton. |
-| A_014 | Recels en tous genres | Si les dégâts sont > 0, je défausse 1 modificateur de la cible (à mon choix). |
-| A_015 | Racket | Je choisis de voler ou de détruire. Une carte volée remplace la mienne dans l'emplacement correspondant. |
-| A_016 | BLITZKRIEG! | Mes attaques surchargées ignorent le bouclier. |
-| A_017 | Dingo de la surcharge | +4 sur mes attaques surchargées. |
-| A_018 | Appendice laser | À chaque attaque, 2 jetons répartis à mon choix sur les modificateurs de la cible. |
-| A_019 | Agents pathogènes | +4 si au moins un modificateur de la cible porte un Tourment. |
-| A_020 | Spores corrosifs | Si les dégâts sont > 0, 5 jetons sur 5 cartes différentes des marchés (à mon choix). |
-| A_021 | Accident bactériologique | 1 jeton par modificateur, pour la cible et ses deux voisins de siège (moi exclu). |
-| A_022 | Réseau fongique | Réactivation des Tourments (§7). |
-| A_023 | Pile ou face | Somme des dés conservés paire : +3. Impaire : −1. |
-| A_024 | Black Jack | Annonce avant le jet. ×2 si un dé conservé est égal à la valeur annoncée. |
-| A_025 | Corruption du croupier | Lors de ma prochaine attaque de ce tour : j'échange 1 modificateur de la cible avec la carte du même emplacement chez un autre joueur ou dans le marché correspondant. |
-| A_026 | Carte sous l'coude | Avantage sur mes attaques. |
-| A_027 | Tapis! | Je défausse mes 2 modificateurs, puis ma prochaine attaque de ce tour est surchargée avec 3d8, dont on garde les 2 meilleurs. Mon jeton n'est pas consommé. |
-
-### 10.2 Modificateurs de défense
-| ID | Nom | Arbitrage |
-|---|---|---|
-| D_001 | Intouchable | Bloque les modifications de valeur par un adversaire : sabotage, vol, échange, Roulette, Épuration, plafond D_005. Ne bloque **pas** les désactivations, les ignorances ni les événements. |
-| D_002 | Dommage collatéral | Je convertis X PV en X points de bouclier. On ne peut pas descendre à 0 PV ni dépasser un bouclier de 8. Source `Self`. |
-| D_003 | Ni vu ni connu | Échange les boucliers de 2 vaisseaux au choix (Intouchable protège). |
-| D_004 | Favoritisme | Après une attaque subie, cet attaquant ne peut pas me cibler à son prochain tour. |
-| D_005 | Sabotage électoral | Ennemi choisi à l'équipement. Son bouclier est plafonné à (mon bouclier − 2), minimum 0, recalculé en continu. |
-| D_006 | Mutinerie syndicale | Si je subis des dégâts d'une attaque : je choisis l'action d'équipage de l'attaquant et ses cibles pour son prochain tour. Si c'est impossible, il passe. |
-| D_007 | Sous-couche blindée | 1 dégât maximum par attaque, sauf attaque surchargée. Une attaque surchargée défausse la carte. |
-| D_008 | T'as pas entendu un truc? | La prochaine attaque subie inflige 0 dégât. La carte est ensuite défaussée. |
-| D_009 | Les affaires sont les affaires | Comme A_008, sur le marché DEF. |
-| D_010 | Niaque | Si une attaque devait m'éliminer, elle inflige 0 dégât. La carte est ensuite défaussée. |
-| D_011 | Générateur auxiliaire | Activation **manuelle** (§5.3) : mon bouclier passe à 8, puis la carte est défaussée. |
-| D_012 | Vente de pièces détachées | +1 PV par carte neutre visible dans les marchés. |
-| D_013 | Vautours | +1 PV pour chaque instance de dégâts d'un joueur à un autre. Pas pour la victime, et pas pour les sources `Torment` ou `Reflect`. |
-| D_014 | Nothing else matters | Je ne peux pas perdre ma surcharge jusqu'au début de mon prochain tour. |
-| D_015 | Lève la tête, bombe le torse | Si PV ≤ 10 : 1 dégât maximum par attaque, sauf attaque surchargée. |
-| D_016 | Orgueil | +15 PV (plafonnés au maximum). Mon bouclier est désactivé jusqu'au début de mon prochain tour. |
-| D_017 | Loi du Talion | Si je perds des PV sur une attaque, l'attaquant perd le même nombre de PV (source `Reflect`). |
-| D_018 | Régénération parasitaire | +1 PV pour chaque PV que **je** perds à cause d'un Tourment. |
-| D_019 | Mimétisme cellulaire | À partir de mon prochain tour, à chaque début de tour, mon bouclier copie le plus élevé des **autres** joueurs. |
-| D_020 | Tout est une question d'équilibre | En début de tour : −3 PV si PV ≥ 10 (source `Self`), +3 PV si PV < 10. |
-| D_021 | Quarantaine obligatoire | Retire **tous** les jetons (joueurs et marchés). +3 PV par jeton retiré. |
-| D_022 | Je te touche pas avec un bâton | Si je subis des dégâts d'une attaque, je pose 1 jeton sur un modificateur de l'attaquant (à mon choix). |
-| D_023 | Main sûre | Au début de ma phase d'équipage, je lance 1d8. Ce dé sert de premier dé pour l'action choisie (attaque, reparamétrage ou sabotage). |
-| D_024 | Roulette | Tous les boucliers tournent d'un siège, dans le sens que je choisis. Un joueur Intouchable garde le sien, et on le saute. |
-| D_025 | Chance de cocu | Quand je perds des PV (hors `Torment` et `Reflect`) : 1d8. Pair : 0 perte. Impair : +3. |
-| D_026 | Le casino gagne toujours | Désavantage sur les attaques que je subis. |
-| D_027 | La banque | À partir de mon prochain tour, à chaque début de tour : bouclier +2 (maximum 8). |
-
-### 10.3 Événements
-| Nom | Arbitrage |
+### B2.1 Calculs : un effet modifie une valeur
+| Calcul | Valeur de base |
 |---|---|
-| Tempête électromagnétique | Tous les boucliers sont désactivés pendant la manche. |
-| Trou noir | Tous les modificateurs **équipés** sont défaussés. Les marchés ne changent pas. |
-| Nouvel arrivage | Les deux marchés sont recyclés. Pendant la manche, chaque joueur peut prendre 2 cartes, quels que soient les marchés. |
-| Surcharge ionique | +4 à la valeur de toutes les attaques pendant la manche. |
-| Nuée parasitaire | 1 jeton sur chaque modificateur équipé de chaque joueur (1 PV perdu par jeton). |
-| Espace aseptisé | Tous les jetons portés par les joueurs sont retirés. |
-| Le calme avant la tempête | Aucun effet. |
-| Fin des temps | Hors paquet. Voir §4.2. |
+| **Lot de dés d'attaque** : dés lancés, dés conservés, avantage, désavantage, dés imposés | 1d8 (+1d8 si surchargée), tous conservés |
+| **Valeur d'attaque** | somme des dés conservés |
+| **Bouclier effectif** (pour une attaque) | bouclier de la cible |
+| **Dégâts** | max(0, valeur d'attaque − bouclier effectif) |
+| **Perte de PV** : toute perte, avec sa cause | montant reçu |
+| **Gain de PV** | montant reçu, borné au maximum de PV |
+| **Bornes du bouclier** (par joueur) | min 0 ⚙, max 8 ⚙ |
+| **Valeur d'un Tourment** | 1 |
+| **Cartes prenables au marché** | 1 |
+| **Actions d'équipage** | 1 |
+
+### B2.2 Autorisations : un effet peut refuser
+| Autorisation | Question posée |
+|---|---|
+| **Cibler** | Ce joueur peut-il cibler celui-ci avec cette action ? |
+| **Modifier un bouclier** | Cette source peut-elle changer la valeur du bouclier de ce joueur ? |
+| **Perdre la surcharge** | Ce joueur peut-il perdre son jeton de surcharge maintenant ? |
+| **Activer** | Cet effet activable peut-il être activé maintenant ? |
+
+### B2.3 Réactions : un effet agit après un fait
+Les réactions sont : début de manche ; début de tour ; fin du marché ; carte équipée ; carte quittant un emplacement (défausse, destruction, vol) ; attaque déclarée ; avant le jet ; attaque résolue (avec le montant) ; perte de PV subie (avec la cause) ; bouclier modifié ; Tourment posé ; joueur éliminé ; fin de tour.
+
+## B3. Actions élémentaires
+
+Un effet agit **uniquement** au moyen des actions suivantes. Chacune passe **automatiquement** par les calculs et les autorisations qui la concernent : c'est l'action elle-même qui les applique, pas la carte qui l'utilise.
+
+| Action | Passe par |
+|---|---|
+| Infliger une perte de PV (avec cause), soigner | Perte de PV ou gain de PV |
+| Fixer, augmenter, diminuer, relancer ou échanger un bouclier | Autorisation « modifier un bouclier » (pour **chaque** bouclier concerné), puis bornes du bouclier |
+| Désactiver ou ignorer un bouclier (avec durée) | — (ce n'est pas une modification) |
+| Poser, retirer ou réactiver des Tourments | Valeur d'un Tourment ; A7 |
+| Défausser, détruire, voler ou échanger un modificateur | Réaction « carte quittant un emplacement » |
+| Recycler un marché, prendre au marché | — |
+| Gagner ou consommer la surcharge | Autorisation « perdre la surcharge » pour la perte |
+| Accorder avantage ou désavantage, ajouter ou retirer des dés | Lot de dés d'attaque |
+| Imposer l'action d'équipage d'un joueur | Autorisation « cibler » |
+| Rediriger une attaque | A6, étape 2 |
+
+**Exemple** : un sabotage (A5.4), un vol de bouclier et un échange de boucliers utilisent tous une action de modification de bouclier. Une carte qui refuse l'autorisation « modifier un bouclier » les bloque donc **tous**, sans qu'aucune de ces règles ne la connaisse.
+
+## B4. Empilement
+
+Quand plusieurs effets modifient **le même calcul**, on les applique toujours dans cet ordre :
+
+| Ordre | Catégorie | Exemples |
+|---|---|---|
+| 1 | **Remplacer** la valeur | « le bouclier passe à 8 », « compte pour 0 » |
+| 2 | **Ajouter ou retrancher** | +4, −1 |
+| 3 | **Multiplier** | ×2. Les multiplicateurs se multiplient entre eux : deux ×2 donnent ×4. |
+| 4 | **Borner** (plafond, plancher) | « 1 au maximum ». Le plafond le plus bas l'emporte, le plancher le plus haut aussi. |
+| 5 | **Annuler** | « aucun dégât ». L'annulation l'emporte sur tout. |
+
+Règles complémentaires :
+- **Plusieurs remplacements** : le dernier appliqué dans l'ordre de résolution (B7) l'emporte.
+- **Avantage et désavantage** : ils se compensent un pour un ; seul le solde s'applique. Avec avantage, on lance le lot deux fois et on garde le meilleur total ; avec désavantage, le pire.
+- **Autorisations** : un seul refus suffit, et il l'emporte sur toute autorisation.
+- **Résultat final** : une valeur n'est jamais négative, sauf mention contraire, et reste dans les bornes de la règle concernée.
+
+## B5. Durées
+
+Tout effet non instantané déclare une durée parmi :
+- **permanente** ;
+- **tant que la carte est équipée** ;
+- **ce tour** (du propriétaire) ;
+- **jusqu'au prochain tour** (du propriétaire) ;
+- **cette manche** ;
+- **prochaine attaque de ce tour** ;
+- **une fois** : la carte est défaussée après son premier déclenchement.
+
+Quand la carte qui porte un effet quitte son emplacement, tous ses effets « tant que la carte est équipée » cessent immédiatement.
+
+## B6. Choix
+
+- Un choix revient au **propriétaire de l'effet**, sauf si le texte désigne un autre joueur (par exemple « la cible choisit »).
+- Un choix se fait parmi les options **légales** seulement. S'il n'y en a aucune, l'effet ne fait rien.
+- En ligne (phase 2), tout choix a un délai et une option par défaut.
+
+## B7. Ordre de résolution
+
+Quand plusieurs effets interviennent au même point d'interception :
+
+1. d'abord les effets **globaux** : événement actif, puis effets permanents de la partie ;
+2. puis les joueurs, en partant du **joueur actif** et dans le sens horaire ;
+3. pour chaque joueur : l'emplacement ATK, puis l'emplacement DEF, puis ses effets temporaires dans leur ordre de création.
+
+**Réactions en chaîne** :
+- Une réaction peut en provoquer d'autres. Elles se résolvent immédiatement, en profondeur.
+- Un effet ne réagit jamais à un fait qu'il a lui-même provoqué.
+- Une perte de PV de cause `Reflect` ne déclenche **aucune** réaction.
+- Par sécurité, une chaîne ne peut pas dépasser 16 niveaux. Au-delà, le moteur signale une erreur de conception de carte, que les tests doivent détecter.
 
 ---
 
-## 11. Questions ouvertes (à trancher par le game designer)
+# Partie C : cartes
+
+La source de vérité est dans [`core/Runtime/Data/`](../core/Runtime/Data/) : `cards.json`, `events.json` et `technologies.json`. Pour chaque carte, ces fichiers donnent le texte imprimé et son **arbitrage**, rédigé uniquement avec la partie B.
+
+La version lisible est [`CARDS.md`](CARDS.md). Elle est générée automatiquement, et la CI vérifie qu'elle est à jour.
+
+---
+
+## Questions ouvertes (à trancher par le game designer)
 
 - Valeurs de `StartShield[n]` et `DoomRound[n]` : elles seront proposées par le simulateur (M3).
 - Fréquence des événements : une par manche, jugée potentiellement excessive. À mesurer au M3.
-- Cartes marquées « x » dans le fichier (A_003, A_010, A_015, A_021, A_022) : implémentées telles quelles, mais **à revoir**.
+- Cartes marquées « à revoir » (A_003, A_010, A_015, A_021, A_022) : implémentées telles quelles.
 - Effets de la synergie technologique : à définir.
