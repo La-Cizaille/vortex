@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Developer tool: converts design/Vortex.xlsx into core/Runtime/Data/gamedata.json.
+    Reads the xlsx with the BCL only (System.IO.Compression + XmlReader): no third-party parser,
+    smaller supply-chain surface (docs/SECURITY.md S3/S4).
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Vortex.CardImporter</RootNamespace>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vortex.Core\Vortex.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Vortex.Core.Tests" />
+  </ItemGroup>
+</Project>

@@ -65,6 +65,8 @@ sequenceDiagram
 
 | Dossier | Contenu |
 |---|---|
+| `Content/` | Définitions statiques (`CardDefinition`, `EventDefinition`, `TechnologyDefinition`, `GameData`), `GameDataSerializer` (chargement durci) et `GameDataValidator`. **Implémenté en M0.** |
+| `Data/` | `gamedata.json`, **généré** par `Vortex.CardImporter` à partir de `design/Vortex.xlsx`. On ne le modifie jamais à la main : un test et la CI vérifient qu'il correspond au classeur. |
 | `Config/` | `GameConfig` et ses presets par nombre de joueurs. Toutes les valeurs d'équilibrage y sont. |
 | `State/` | `GameState`, `PlayerState`, `SlotState`, `MarketState`, `DeckState`, statuts temporaires. Des POCO sérialisables. |
 | `Cards/` | `CardDefinition` (données issues du JSON), `CardRegistry` (id → comportement) et une classe par carte. |
