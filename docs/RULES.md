@@ -1,6 +1,6 @@
 # Vortex : règles du jeu
 
-> **Statut** : v0.2, en attente de validation par le game designer.
+> **Statut** : v0.2. **Partie B (modèle d'effets) validée par le game designer le 2026-09-23.** Parties A et C : en attente de validation.
 > **Rôle** : c'est la **référence du moteur de règles**. Le code renvoie aux sections d'ici (par ex. `RULES A6`).
 
 Le document a trois parties, qui dépendent uniquement vers le bas :
