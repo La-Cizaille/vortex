@@ -17,8 +17,8 @@ concurrency:
 env:
   DOTNET_NOLOGO: "true"
   DOTNET_CLI_TELEMETRY_OPTOUT: "true"
-  # Minimum line coverage of Vortex.Core (raised to 0.90 once every effect brick is tested, M2).
-  CORE_MIN_LINE_COVERAGE: "0.80"
+  # Minimum line coverage of Vortex.Core (docs/CONTRIBUTING.md).
+  CORE_MIN_LINE_COVERAGE: "0.90"
 
 jobs:
   dotnet:
@@ -75,7 +75,7 @@ jobs:
           tool="dotnet run -c Release --no-build --project dotnet/Vortex.ContentTool --"
           $tool validate core/Runtime/Data
           $tool format core/Runtime/Data --check
-          $tool docs core/Runtime/Data docs/CARDS.md --check
+          $tool docs core/Runtime/Data docs --check
 
       - name: Upload coverage
         if: always()

@@ -10,7 +10,7 @@ namespace Vortex.ContentTool
     /// Usage:
     ///   Vortex.ContentTool validate &lt;data-dir&gt;
     ///   Vortex.ContentTool format   &lt;data-dir&gt; [--check]
-    ///   Vortex.ContentTool docs     &lt;data-dir&gt; &lt;output.md&gt; [--check]
+    ///   Vortex.ContentTool docs     &lt;data-dir&gt; &lt;docs-dir&gt; [--check]   (CARDS.md and BRICKS.md)
     /// Exit codes: 0 ok, 1 check failed (file not canonical / doc stale), 2 invalid content or usage.
     /// </summary>
     internal static class Program
@@ -19,7 +19,7 @@ namespace Vortex.ContentTool
             "Usage:\n" +
             "  Vortex.ContentTool validate <data-dir>\n" +
             "  Vortex.ContentTool format   <data-dir> [--check]\n" +
-            "  Vortex.ContentTool docs     <data-dir> <output.md> [--check]";
+            "  Vortex.ContentTool docs     <data-dir> <docs-dir> [--check]";
 
         private static int Main(string[] args)
         {
@@ -115,25 +115,42 @@ namespace Vortex.ContentTool
             return check && stale > 0 ? 1 : 0;
         }
 
-        private static int Docs(ContentFolder folder, string outputPath, bool check, TextWriter output, TextWriter error)
+        private static int Docs(ContentFolder folder, string docsDir, bool check, TextWriter output, TextWriter error)
         {
-            string markdown = CardsDocGenerator.Generate(folder.Load());
-            if (check)
+            GameData data = folder.Load();
+            var files = new[]
             {
-                string existing = File.Exists(outputPath) ? File.ReadAllText(outputPath) : string.Empty;
-                if (!string.Equals(existing, markdown, StringComparison.Ordinal))
+                (Path.Combine(docsDir, "CARDS.md"), CardsDocGenerator.Generate(data)),
+                (Path.Combine(docsDir, "BRICKS.md"), BricksDocGenerator.Generate(data)),
+            };
+
+            int stale = 0;
+            foreach ((string path, string markdown) in files)
+            {
+                string existing = File.Exists(path) ? File.ReadAllText(path) : string.Empty;
+                if (string.Equals(existing, markdown, StringComparison.Ordinal))
                 {
-                    error.WriteLine(outputPath + " is out of date. Run: dotnet run --project dotnet/Vortex.ContentTool -- docs core/Runtime/Data docs/CARDS.md");
-                    return 1;
+                    continue;
                 }
 
-                output.WriteLine(outputPath + " is up to date.");
-                return 0;
+                stale++;
+                if (check)
+                {
+                    error.WriteLine(path + " is out of date. Run: dotnet run --project dotnet/Vortex.ContentTool -- docs core/Runtime/Data docs");
+                }
+                else
+                {
+                    File.WriteAllText(path, markdown);
+                    output.WriteLine("Wrote " + path);
+                }
             }
 
-            File.WriteAllText(outputPath, markdown);
-            output.WriteLine("Wrote " + outputPath);
-            return 0;
+            if (stale == 0)
+            {
+                output.WriteLine("Generated documentation is up to date.");
+            }
+
+            return check && stale > 0 ? 1 : 0;
         }
     }
 }

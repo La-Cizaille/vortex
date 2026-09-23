@@ -40,14 +40,14 @@ namespace Vortex.Core.Tests.Content
         public void Type_metadata_is_rejected()
         {
             // "$type" must never select a CLR type (deserialization gadget -> RCE).
-            string json = Replace(TestPaths.CardsJson, "\"schemaVersion\": 2,", "\"$type\": \"System.IO.FileInfo, System.IO.FileSystem\", \"schemaVersion\": 2,");
+            string json = Replace(TestPaths.CardsJson, "\"schemaVersion\": 3,", "\"$type\": \"System.IO.FileInfo, System.IO.FileSystem\", \"schemaVersion\": 3,");
             Assert.Throws<GameDataException>(() => LoadWithCards(json));
         }
 
         [Test]
         public void Unknown_members_are_rejected()
         {
-            string json = Replace(TestPaths.CardsJson, "\"schemaVersion\": 2,", "\"schemaVersion\": 2, \"extra\": true,");
+            string json = Replace(TestPaths.CardsJson, "\"schemaVersion\": 3,", "\"schemaVersion\": 3, \"extra\": true,");
             Assert.Throws<GameDataException>(() => LoadWithCards(json));
         }
 
@@ -68,7 +68,7 @@ namespace Vortex.Core.Tests.Content
         [Test]
         public void Excessive_nesting_is_rejected()
         {
-            var sb = new StringBuilder("{\"schemaVersion\": 2, \"cards\": ");
+            var sb = new StringBuilder("{\"schemaVersion\": 3, \"cards\": ");
             sb.Append(string.Concat(Enumerable.Repeat("[", 100))).Append(string.Concat(Enumerable.Repeat("]", 100))).Append('}');
             Assert.Throws<GameDataException>(() => LoadWithCards(sb.ToString()));
         }
@@ -76,7 +76,7 @@ namespace Vortex.Core.Tests.Content
         [Test]
         public void Wrong_schema_version_is_rejected()
         {
-            string json = Replace(TestPaths.CardsJson, "\"schemaVersion\": 2,", "\"schemaVersion\": 1,");
+            string json = Replace(TestPaths.CardsJson, "\"schemaVersion\": 3,", "\"schemaVersion\": 1,");
             Assert.Throws<GameDataException>(() => LoadWithCards(json));
         }
 

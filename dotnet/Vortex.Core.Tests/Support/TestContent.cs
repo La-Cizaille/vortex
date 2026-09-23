@@ -30,18 +30,18 @@ namespace Vortex.Core.Tests.Support
 
             var events = new List<EventDefinition>
             {
-                new EventDefinition(CalmEvent, "Calme", 3, "Rien.", "Rien."),
-                new EventDefinition(DoomEvent, "Fin", 1, "Fin.", "Fin."),
+                new EventDefinition(CalmEvent, "Calme", 3, "Rien.", "Rien.", null),
+                new EventDefinition(DoomEvent, "Fin", 1, "Fin.", "Fin.", null),
             };
             var techs = new[] { TechColor.Blue, TechColor.Red, TechColor.Green, TechColor.Yellow }
-                .Select(c => new TechnologyDefinition("TECH_" + c.ToString().ToUpperInvariant(), c, c.ToString(), "Test.", "Test."))
+                .Select(c => new TechnologyDefinition("TECH_" + c.ToString().ToUpperInvariant(), c, c.ToString(), "Test.", "Test.", null))
                 .ToList();
             return new GameData(cards.OrderBy(c => c.Id, StringComparer.Ordinal).ToList(), events, techs);
         }
 
         public static CardDefinition Card(string id, CardSlot slot, TechColor color, int copies)
         {
-            return new CardDefinition(id, "Test " + id, slot, color, CardUsage.Durable, copies, false, "Test.", "Test.");
+            return new CardDefinition(id, "Test " + id, slot, color, CardUsage.Durable, copies, false, "Test.", "Test.", null);
         }
 
         public static GameConfig Config(int eventFrequency = 1, int doomRound = 50, int startShield = 4, int startingHp = 30)
@@ -57,7 +57,7 @@ namespace Vortex.Core.Tests.Support
         private readonly Dictionary<string, List<Effect>> _cards = new Dictionary<string, List<Effect>>(StringComparer.Ordinal);
         private readonly Dictionary<string, List<Effect>> _events = new Dictionary<string, List<Effect>>(StringComparer.Ordinal);
         private readonly Dictionary<TechColor, List<Effect>> _techs = new Dictionary<TechColor, List<Effect>>();
-        private readonly Dictionary<string, Effect> _statuses = EffectCatalog.EngineStatuses();
+        private readonly Dictionary<string, Effect> _statuses = EffectCatalog.AllStatuses();
 
         public TestCatalog Card(string id, params Effect[] effects)
         {

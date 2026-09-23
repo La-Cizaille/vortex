@@ -71,8 +71,8 @@ sequenceDiagram
 | `Data/` | **Source de vérité** du contenu : `cards.json`, `events.json`, `technologies.json`, avec leurs JSON Schemas (`schema/`) pour l'édition (ADR-0008). |
 | `Config/` | `GameConfig` (lu depuis `Data/config.json`) : toutes les valeurs ⚙ des règles. **M1.** |
 | `State/` | `GameState`, `PlayerState`, `CardInstance`, `MarketState`, `StatusState`, `PendingState`. Des POCO sérialisables avec des `Clone()` explicites. **M1.** |
-| `Cards/` | `CardRegistry` (id → comportement) et les classes des cartes exotiques. **Seul dossier** autorisé à citer un id de carte (test `Engine_code_never_references_a_specific_card`). |
-| `Effects/` | Points d'interception (RULES B2), actions élémentaires (B3), empilement (B4), durées (B5) et catalogue des briques d'effets. |
+| `Cards/` | Réservé aux éventuelles classes de cartes exotiques, que les briques ne peuvent pas exprimer. **Vide à ce jour.** C'est le seul dossier autorisé à citer un id de carte (test `Engine_code_never_references_a_specific_card`). |
+| `Effects/` | Classe de base `Effect` (points d'interception B2), `ValueModifiers` (empilement B4), `EffectCatalog` (compile les effets du contenu). `Bricks/` : le catalogue fermé des briques (`BrickCatalog`) et leurs paramètres typés (`BrickParams`). `Statuses/` : les statuts génériques (B5). **M1-M2.** |
 | `Commands/`, `Events/`, `Decisions/` | Contrat d'entrée et de sortie du moteur. Ce même contrat servira au réseau. Ce sont des types **plats**, sans polymorphisme, donc sans risque de désérialisation polymorphe. **M1.** |
 | `Dice/` | `Pcg32`, le générateur déterministe (ADR-0004). **M1.** |
 | `Rules/` | `GameEngine` (API publique sans état), `Game` (contexte de résolution, découpé en `Game.Actions`, `Game.Flow`, `Game.Commands` et `Game.Attack`), `GameStateValidator` (invariants). **M1.** |
