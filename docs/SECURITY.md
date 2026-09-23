@@ -32,14 +32,16 @@
 | **Falsification** d'une commande (action illégale, mauvais joueur, mauvaise phase) | S1, S6 | Validation complète dans `Engine` : identité du joueur, phase, légalité, id de décision attendue. Une commande invalide renvoie une erreur typée, sans modifier l'état. Tests négatifs systématiques. | Prévu M1 |
 | **Falsification** de l'aléatoire | S1, S6 | Le RNG vit uniquement dans le moteur (serveur en phase 2). Le client ne fournit jamais de valeur de dé. | Prévu M1 |
 | **Fuite d'information** (ordre des paquets, graine) | S6 | `StateProjection.ForViewer()` n'expose que la taille des paquets, sans leur contenu. Le client ne travaille que sur la projection dès la phase 1. Tests dédiés. | Prévu M1/M4 |
-| **Exécution de code** par désérialisation | S2, S6 | Newtonsoft avec `TypeNameHandling.None` imposé (règles d'analyse CA2326–CA2330 en erreur). Polymorphisme par discriminateur en liste blanche, `MaxDepth` limité, taille maximale d'entrée. | Prévu M1 |
+| **Exécution de code** par désérialisation | S2, S6 | Newtonsoft avec `TypeNameHandling.None` et `MetadataPropertyHandling.Ignore` (règles d'analyse CA2326–CA2330 en erreur). Membres inconnus et enums numériques rejetés, `MaxDepth` de 16, entrée limitée à 1 Mo. Polymorphisme par discriminateur en liste blanche (M1). | **Fait M0** pour `gamedata.json` (tests dans `GameDataSerializerTests`) |
+| **XXE, bombe zip, traversée de chemin** via le classeur | S3 | Lecteur xlsx sans dépendance : DTD interdite et pas de résolveur XML ; au plus 512 entrées, 20 Mo par partie et un taux de compression maximal de 200 ; copie bornée ; cibles de relations normalisées et confinées à `xl/`. | **Fait M0** (tests dans `CardImporterTests`) |
+| **Texte trompeur** (« Trojan Source », caractères invisibles) | S2, S3, S4 | Le validateur rejette les caractères de contrôle et bidi dans les données. L'importeur retire les caractères invisibles. Un test parcourt tout le dépôt (`SourceHygieneTests`). | **Fait M0** |
 | **État incohérent** chargé depuis un fichier | S2 | Validation des invariants (PV, bouclier 0–8, nombre total de cartes conservé, ids connus) avant tout chargement. Rejet en cas d'échec. | Prévu M1 |
 | **Déni de service** (flood, messages géants, salons zombies) | S6 | Limitation de débit par IP et par session, taille maximale des messages, délais de tour et de décision, expiration des salons, nombre maximal de salons. | Phase 2 |
 | **Usurpation** de session ou de salon | S6 | Jetons de session de 128 bits (CSPRNG), stockés hachés, avec expiration. Codes de salon non énumérables et limités en tentatives. WSS/TLS obligatoire et vérification de l'Origin. | Phase 2 |
 | **Répudiation** (contestation d'une partie) | S6 | Journal des commandes et graine conservés par partie, donc replay exact possible. Journaux sans données personnelles. | Phase 2 |
-| **Élévation** via une dépendance compromise | S4 | Versions épinglées (lockfiles, `packages-lock.json`, actions épinglées par SHA), Dependabot, `dotnet list package --vulnerable` bloquant en CI, CodeQL. | Prévu M0 |
-| **Élévation** via les outils IA | S5 | Voir §4. | Prévu M0 |
-| **Fuite de secrets** | S4 | `.gitignore` sur les keystores et les `.env`, gitleaks en CI, secret scanning et push protection GitHub. Les secrets de CI sont stockés dans les *GitHub Secrets*. | Prévu M0 |
+| **Élévation** via une dépendance compromise | S4 | Versions épinglées (lockfiles, `packages-lock.json`, actions épinglées par SHA), Dependabot, `dotnet list package --vulnerable` bloquant en CI, CodeQL. | **Fait M0** |
+| **Élévation** via les outils IA | S5 | Voir §4. | Prévu M4 (installation de Unity MCP) |
+| **Fuite de secrets** | S4 | `.gitignore` sur les keystores et les `.env`, gitleaks en CI, secret scanning et push protection GitHub. Les secrets de CI sont stockés dans les *GitHub Secrets*. | **Fait M0** (push protection : réglage GitHub à activer) |
 | **Client modifié** | S7 | Accepté en phase 1 (jeu local). En phase 2, le serveur autoritaire rend la modification du client inutile pour tricher, sauf pour des aides visuelles, car toute l'information est publique. | Accepté |
 
 ## 4. Outils IA : risque à connaître
@@ -67,6 +69,13 @@ Mesures :
 - Permissions minimales du `GITHUB_TOKEN` (`contents: read` par défaut).
 - Branche `main` protégée : PR, CI verte et historique linéaire obligatoires.
 
-## 7. Signaler une vulnérabilité
+## 7. Risques résiduels connus
+
+| Risque | Pourquoi il est accepté | Suivi |
+|---|---|---|
+| gitleaks est vérifié par un fichier de sommes de contrôle publié **dans la même release** que le binaire | Cela protège contre une corruption en transit, pas contre une release compromise. Le secret scanning de GitHub reste en place en parallèle. | Épingler le SHA-256 attendu dans le workflow, ou vérifier la signature cosign. Dependabot ne met pas à jour `GITLEAKS_VERSION` : mise à jour manuelle. |
+| Couverture de code mesurée mais pas encore bloquante | En M0, `core` ne contient presque pas de logique. | Seuil de 90 % rendu bloquant au M1. |
+
+## 8. Signaler une vulnérabilité
 
 Merci d'utiliser les *GitHub Security Advisories* du dépôt (signalement privé) plutôt qu'une issue publique.

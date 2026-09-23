@@ -1,0 +1,618 @@
+{
+  "schemaVersion": 1,
+  "sourceSha256": "76f5cffde2d4072b2034978d6e9788e1757c238716fcf9f99ea17d705aad3a2d",
+  "modifiers": [
+    {
+      "id": "A_001",
+      "name": "Canon à particules",
+      "text": "Vos <ATQ>**attaques** volent 2 points de <BOU>**bouclier** (vous ne pouvez pas dépasser 8 points de bouclier) à votre adversaire avant d'infliger vos points de dégats.",
+      "slot": "Attack",
+      "color": "Blue",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "A_002",
+      "name": "Langue de bois",
+      "text": "Vous désactivez le <BOU>**bouclier** d'un adversaire (au choix) pendant votre tour de jeu.",
+      "slot": "Attack",
+      "color": "Blue",
+      "usage": "SingleUse",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "A_003",
+      "name": "Epuration",
+      "text": "Lorsque vos <ATQ>**attaques** infligent des dégâts, vous pouvez changer votre <BOU>**bouclier** ou celui d'un adversaire.",
+      "slot": "Attack",
+      "color": "Blue",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": true
+    },
+    {
+      "id": "A_004",
+      "name": "La paix a un prix",
+      "text": "Vous pouvez convertir des points de <BOU>**bouclier** (maximum 8) en points de dégats pour votre prochaine <ATQ>**attaque**.",
+      "slot": "Attack",
+      "color": "Blue",
+      "usage": "SingleUse",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "A_005",
+      "name": "Rétablir l'ordre",
+      "text": "Vos <ATQ> **attaques** infligent +4 points de dégats supplémentaires.",
+      "slot": "Attack",
+      "color": "Blue",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "A_006",
+      "name": "Grosse Bertha",
+      "text": "Vous pouvez décider d'infliger x2 fois plus dégâts lors de votre prochaine <ATQ>**attaque**.",
+      "slot": "Attack",
+      "color": "Neutral",
+      "usage": "SingleUse",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "A_007",
+      "name": "Délestage forcé",
+      "text": "Vous pouvez défausser les 2 <MOD>**modificateurs** de votre cible.",
+      "slot": "Attack",
+      "color": "Neutral",
+      "usage": "SingleUse",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "A_008",
+      "name": "Brocante spatiale",
+      "text": "Vous pouvez entièrement re-piocher le <MKT> marché noir de <MOD>**modificateurs** <ATQ> d'**attaque** et choisir 1 nouveau <MOD>**modificateur**, le précédent étant défaussé.",
+      "slot": "Attack",
+      "color": "Neutral",
+      "usage": "SingleUse",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "A_009",
+      "name": "Jamais deux sans trois",
+      "text": "Vous pouvez voler les 2 <MOD>**modificateurs** de votre cible. Les votres sont défaussés.",
+      "slot": "Attack",
+      "color": "Neutral",
+      "usage": "SingleUse",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "A_010",
+      "name": "Le grand final",
+      "text": "Si vos <ATQ>**attaques** détruisent un vaisseau ennemi, tous les joueurs perdent leurs <MOD>**modificateurs** et leurs <BOU>**boucliers** passent à 0 (sauf vous).",
+      "slot": "Attack",
+      "color": "Neutral",
+      "usage": "Triggered",
+      "copies": 2,
+      "needsReview": true
+    },
+    {
+      "id": "A_011",
+      "name": "Cruauté",
+      "text": "Si vos <ATQ>**attaques** infligent des dégâts, vous gagnez +4 points de vie.",
+      "slot": "Attack",
+      "color": "Neutral",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "A_012",
+      "name": "Vindicte populaire",
+      "text": "Vous pouvez infliger +1 point de dégât pour chaque <MOD>**modificateur** neutre face visible dans les <MKT>marchés noirs lors de votre prochaine <ATQ>**attaque**.",
+      "slot": "Attack",
+      "color": "Neutral",
+      "usage": "SingleUse",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "A_013",
+      "name": "On envoie la sauce",
+      "text": "Vous pouvez surcharger votre prochaine <ATQ>**attaque**.",
+      "slot": "Attack",
+      "color": "Red",
+      "usage": "SingleUse",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "A_014",
+      "name": "Recels en tous genres",
+      "text": "Vos <ATQ>**attaques** infligeant des dégats vous permettent de défausser 1 <MOD>**modificateur** de votre cible.",
+      "slot": "Attack",
+      "color": "Red",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "A_015",
+      "name": "Racket",
+      "text": "Vous pouvez subtiliser ou de détruire 1 <MOD>**modificateur** de votre choix à votre cible.",
+      "slot": "Attack",
+      "color": "Red",
+      "usage": "SingleUse",
+      "copies": 2,
+      "needsReview": true
+    },
+    {
+      "id": "A_016",
+      "name": "BLITZKRIEG!",
+      "text": "Vos <ATQ>**attaques** <SUR>**surchargées** ignorent le <BOU>**bouclier** de votre cible.",
+      "slot": "Attack",
+      "color": "Red",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "A_017",
+      "name": "Dingo de la surcharge",
+      "text": "Vos <ATQ>**attaques** <SUR>**surchargées** infligent +4 points de dégâts supplémentaires.",
+      "slot": "Attack",
+      "color": "Red",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "A_018",
+      "name": "Appendice laser",
+      "text": "Vos <ATQ>**attaques** posent 2 jetons de <TOR> tourment sur les <MOD> **modificateurs** de votre cible (au choix).",
+      "slot": "Attack",
+      "color": "Green",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "A_019",
+      "name": "Agents pathogènes",
+      "text": "Vos <ATQ>**attaques** infligent +4 points de dégats supplémentaires si (au moins) 1 des modificateurs de votre cible est atteint par 1 jeton de<TOR> tourment.",
+      "slot": "Attack",
+      "color": "Green",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "A_020",
+      "name": "Spores corrosifs",
+      "text": "Si vos <ATQ>**attaques** infligent des dégats, vous posez 5 jetons de <TOR>tourment sur 5 **modificateurs** de votre choix des <MKT> marchés noirs.",
+      "slot": "Attack",
+      "color": "Green",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "A_021",
+      "name": "Accident bactériologique",
+      "text": "Vous pouvez poser 2 jetons de <TOR>tourment sur les 2 **modificateurs** de votre cible et des joueurs adjacents.",
+      "slot": "Attack",
+      "color": "Green",
+      "usage": "SingleUse",
+      "copies": 2,
+      "needsReview": true
+    },
+    {
+      "id": "A_022",
+      "name": "Réseau fongique",
+      "text": "Vous réactivez les jetons de <TOR>tourment en jeu, ce qui inflige de nouveau les dégats à chaque joueur concerné.",
+      "slot": "Attack",
+      "color": "Green",
+      "usage": "SingleUse",
+      "copies": 2,
+      "needsReview": true
+    },
+    {
+      "id": "A_023",
+      "name": "Pile ou face",
+      "text": "Vos prochaines <ATQ>**attaques** infligent +3 points de dégat en cas de tirage au <DIC> dé pair __ou__ infligent -1 points de dégat en cas de tirage au <DIC>dé impair.",
+      "slot": "Attack",
+      "color": "Yellow",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "A_024",
+      "name": "Black Jack",
+      "text": "Pariez sur un <DIC>dé. Si vous visez juste, votre <ATQ> **attaque** inflige x2 fois plus de dégats. Sinon, vous <ATQ> **attaquez** normalement.",
+      "slot": "Attack",
+      "color": "Yellow",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "A_025",
+      "name": "Corruption du croupier",
+      "text": "Votre prochaine <ATQ> **attaque,** vous permet d'échanger 1 <MOD> modificateur de votre cible avec 1 <MOD> modificateur du <MKT> marché noir correspondant ou d'un autre joueur.",
+      "slot": "Attack",
+      "color": "Yellow",
+      "usage": "SingleUse",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "A_026",
+      "name": "Carte sous l'coude",
+      "text": "Vos <ATQ>**attaques** se font avec un avantage.\n(Jetez 2 dés et gardez le meilleur résultat)",
+      "slot": "Attack",
+      "color": "Yellow",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "A_027",
+      "name": "Tapis!",
+      "text": "Vous pouvez décider de défausser vos 2 <MOD>**modificateurs** afin de réaliser 1 <ATQ>**attaque** <SUR>**surchargée** avec avantage. lors de votre prochaine <ATQ>**attaque,** vous lancez 3 <DIC>dés et conservez les 2 meilleurs.",
+      "slot": "Attack",
+      "color": "Yellow",
+      "usage": "SingleUse",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_001",
+      "name": "Intouchable",
+      "text": "Votre <BOU> **bouclier** ne peut pas être modifié par vos adversaires.",
+      "slot": "Defense",
+      "color": "Blue",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_002",
+      "name": "Dommage collatéral",
+      "text": "Vous pouvez convertir vos points de vie en points de <BOU> **bouclier,** sans dépasser 8 points de <BOU> **bouclier**.",
+      "slot": "Defense",
+      "color": "Blue",
+      "usage": "SingleUse",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_003",
+      "name": "Ni vu ni connu",
+      "text": "Vous pouvez échanger la valeur des <BOU> **boucliers** de 2 vaisseaux.",
+      "slot": "Defense",
+      "color": "Blue",
+      "usage": "SingleUse",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_004",
+      "name": "Favoritisme",
+      "text": "Lorsque vous subissez une <ATQ>**attaque,** le même joueur ne peut pas vous <ATQ>**attaquer** de nouveau au tour suivant.",
+      "slot": "Defense",
+      "color": "Blue",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_005",
+      "name": "Sabotage électoral",
+      "text": "Le <BOU> **bouclier** d'un vaisseau ennemi de votre choix ne peut pas dépasser la valeur de votre <BOU>  **bouclier** - 2 (minimum 0).",
+      "slot": "Defense",
+      "color": "Blue",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_006",
+      "name": "Mutinerie syndicale",
+      "text": "Lorsque vous subissez des dégâts, vous choisissez l'action d'équipage du joueur vous <ATQ>**attaquant** pour son prochain tour.",
+      "slot": "Defense",
+      "color": "Neutral",
+      "usage": "Triggered",
+      "copies": 1,
+      "needsReview": false
+    },
+    {
+      "id": "D_007",
+      "name": "Sous-couche blindée",
+      "text": "Les <ATQ>**attaques** subies ne peuvent infliger qu'un maximum d'1 point de dégât, sauf s'il s'agit d'une <ATQ>**attaque** <SUR> surchargée. Cette carte est défaussée si vous subissez une **attaque** surchargée.",
+      "slot": "Defense",
+      "color": "Neutral",
+      "usage": "Triggered",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_008",
+      "name": "T'as pas entendu un truc?",
+      "text": "Vous ne subissez pas de dégâts lors de la prochaine <ATQ>**attaque** subie.",
+      "slot": "Defense",
+      "color": "Neutral",
+      "usage": "Triggered",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_009",
+      "name": "Les affaires sont les affaires",
+      "text": "Vous pouvez entièrement re-piocher le <MKT> marché noir de <MOD> modificateurs de <BOU> défense et choisir 1 nouveau <MOD> modificateur, le précédent étant défaussé.",
+      "slot": "Defense",
+      "color": "Neutral",
+      "usage": "SingleUse",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_010",
+      "name": "Niaque",
+      "text": "Vous êtes protégé contre la prochaine <ATQ>**attaque** fatale subie.",
+      "slot": "Defense",
+      "color": "Neutral",
+      "usage": "Triggered",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_011",
+      "name": "Générateur auxiliaire",
+      "text": "Votre <BOU> **bouclier** passe à 8 points, puis cette carte est défaussée.",
+      "slot": "Defense",
+      "color": "Neutral",
+      "usage": "Triggered",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_012",
+      "name": "Vente de pièces détachées",
+      "text": "Vous pouvez gagner +1 point de vie pour chaque modificateur neutre face visible dans les marchés noirs.",
+      "slot": "Defense",
+      "color": "Neutral",
+      "usage": "SingleUse",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_013",
+      "name": "Vautours",
+      "text": "Dès que des dégats sont infligés par un joueur à un autre, vous gagnez +1 point de vie (hors jetons de <TOR> tourment).",
+      "slot": "Defense",
+      "color": "Red",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_014",
+      "name": "Nothing else matters",
+      "text": "Vous ne pouvez pas perdre votre <SUR>**surcharge** jusqu'à votre prochain tour.",
+      "slot": "Defense",
+      "color": "Red",
+      "usage": "SingleUse",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_015",
+      "name": "Lève la tête, bombe le torse",
+      "text": "Si vos points de vie sont en dessous ou égaux à 10, vous ne pouvez pas subir plus d' 1 point de dégat à chaque <ATQ>**attaque,** sauf s'il s'agit d'une <ATQ>**attaque** <SUR> surchargée.",
+      "slot": "Defense",
+      "color": "Red",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_016",
+      "name": "Orgueil",
+      "text": "Vous pouvez récupérer +15 points de vie, mais votre <BOU>**bouclier** est désactivé pendant 1 tour.",
+      "slot": "Defense",
+      "color": "Red",
+      "usage": "SingleUse",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_017",
+      "name": "Loi du Talion",
+      "text": "Lorsque vous perdez des points de vie, le joueur vous <ATQ>**attaquant** perd un nombre équivalent de points de vie (hors jetons de <TOR>tourment).",
+      "slot": "Defense",
+      "color": "Red",
+      "usage": "Durable",
+      "copies": 1,
+      "needsReview": false
+    },
+    {
+      "id": "D_018",
+      "name": "Régénération parasitaire",
+      "text": "Vous récupérez +1 point de vie par dégât infligé par des jetons de <TOR> tourment.",
+      "slot": "Defense",
+      "color": "Green",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_019",
+      "name": "Mimétisme cellulaire",
+      "text": "Au début de votre prochain tour et des suivants, vous copiez la valeur du <BOU> **bouclier** le plus élevé en jeu.",
+      "slot": "Defense",
+      "color": "Green",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_020",
+      "name": "Tout est une question d'équilibre",
+      "text": "Si vos points de vie sont supérieurs ou égaux à 10, vous perdez -3 points de vie au début de chacun de vos tours de jeu.\nSi vos points de vie sont inférieurs à 10, vous gagnez +3 points de vie au début de chacun de vos tours de jeu.",
+      "slot": "Defense",
+      "color": "Green",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_021",
+      "name": "Quarantaine obligatoire",
+      "text": "Vous supprimez tous jetons de <TOR> tourment sur le plateau et gagnez +3 points de vie par tourment retiré.",
+      "slot": "Defense",
+      "color": "Green",
+      "usage": "SingleUse",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_022",
+      "name": "Je te touche pas avec un bâton",
+      "text": "Lorsque vous subissez des dégâts, le joueur vous <ATQ>attaquant reçoit 1 jeton de <TOR>  tourment sur 1 de ses <MOD> modificateurs (selon votre choix).",
+      "slot": "Defense",
+      "color": "Green",
+      "usage": "Durable",
+      "copies": 1,
+      "needsReview": false
+    },
+    {
+      "id": "D_023",
+      "name": "Main sûre",
+      "text": "Vous lancez le <DIC> dé avant de décider quelle sera votre action d'équipage.",
+      "slot": "Defense",
+      "color": "Yellow",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_024",
+      "name": "Roulette",
+      "text": "Vous pouvez échanger les <BOU> **boucliers** entre les joueurs adjacents. Vous décidez du sens.",
+      "slot": "Defense",
+      "color": "Yellow",
+      "usage": "SingleUse",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_025",
+      "name": "Chance de cocu",
+      "text": "Lorsque vous perdez des points de vie, lancez un dé (hors jetons de <TOR> tourment).\nSi le résultat est pair, vous ne perdez pas de points de vie,\nSi le résultat est impair, vous subissez +3 points de dégats supplémentaires.",
+      "slot": "Defense",
+      "color": "Yellow",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_026",
+      "name": "Le casino gagne toujours",
+      "text": "Les <ATQ>**attaques** que vous subissez se font avec un désavantage (l'adversaire lance 2 <DIC> dés, et vous subissez le résultat le plus faible).",
+      "slot": "Defense",
+      "color": "Yellow",
+      "usage": "Durable",
+      "copies": 2,
+      "needsReview": false
+    },
+    {
+      "id": "D_027",
+      "name": "La banque",
+      "text": "Au début de votre prochain tour et des suivants, votre <BOU> **bouclier** augmente de +2 (maximum 8).",
+      "slot": "Defense",
+      "color": "Yellow",
+      "usage": "Durable",
+      "copies": 1,
+      "needsReview": false
+    }
+  ],
+  "events": [
+    {
+      "id": "EVT_TEMPETE_ELECTRO_MAGNETIQUE",
+      "name": "tempête électro-magnetique",
+      "text": "Les **boucliers** sont désactivés pendant ce tour de jeu.",
+      "copies": 2
+    },
+    {
+      "id": "EVT_TROU_NOIR",
+      "name": "trou noir",
+      "text": "Tous les joueurs perdent leurs modificateurs.",
+      "copies": 2
+    },
+    {
+      "id": "EVT_NOUVEL_ARRIVAGE",
+      "name": "Nouvel arrivage",
+      "text": "Les deux marchés noirs sont entièrement repiochés, tous les joueurs peuvent piocher deux modificateurs pendant ce tour.",
+      "copies": 2
+    },
+    {
+      "id": "EVT_SURCHARGE_IONIQUE",
+      "name": "**surcharge** Ionique",
+      "text": "Toutes les **attaques** infligent +4 points de dégâts pendant ce tour.",
+      "copies": 2
+    },
+    {
+      "id": "EVT_NUEE_PARASITAIRE",
+      "name": "Nuée parasitaire",
+      "text": "Tous les joueurs posent 2 jetons de tourment sur leurs 2 modificateurs.",
+      "copies": 2
+    },
+    {
+      "id": "EVT_ESPACE_ASEPTISE",
+      "name": "Espace aseptisé",
+      "text": "Tous les joueurs retirent leurs jetons de tourment.",
+      "copies": 2
+    },
+    {
+      "id": "EVT_LE_CALME_AVANT_LA_TEMPETE",
+      "name": "Le calme avant la tempête",
+      "text": "Rien ne se passe.",
+      "copies": 2
+    },
+    {
+      "id": "EVT_FIN_DES_TEMPS",
+      "name": "Fin des temps",
+      "text": "Tous les modificateurs disparaissent, les joueurs n'ont plus de bouclier.",
+      "copies": 1
+    }
+  ],
+  "technologies": [
+    {
+      "color": "Blue",
+      "name": "Ordre",
+      "text": "Vous pouvez dévier les **attaques** subies jusqu'au début de votre prochain tour."
+    },
+    {
+      "color": "Yellow",
+      "name": "Casino Cosmique",
+      "text": "Vous pouvez effectuer 2 actions d'équipage (différentes) consécutives."
+    },
+    {
+      "color": "Red",
+      "name": "Rebelles",
+      "text": "Vous **surcharge.** Votre prochaine **attaque** surchargée est réalisée avec avantage (vous tirez 2 fois 2 dés et gardez le meilleur tirage)."
+    },
+    {
+      "color": "Green",
+      "name": "Abomination organique",
+      "text": "Les jetons de tourment infligent +1 point de dégât supplémentaire pour le reste de la partie. Vous réactivez les jetons de <TOR>  tourment en jeu, ce qui inflige de nouveau les dégats à chaque joueur concerné."
+    }
+  ]
+}

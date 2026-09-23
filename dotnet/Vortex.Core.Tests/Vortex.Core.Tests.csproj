@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <!--
+      Test-only relaxations: CS1591 (XML docs on every test), CA1707 (underscores in test names read as sentences),
+      CA1861 (inline constant arrays in assertions are clearer than static fields).
+    -->
+    <NoWarn>$(NoWarn);CS1591;CA1707;CA1861</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="NUnit" />
+    <PackageReference Include="NUnit3TestAdapter" />
+    <PackageReference Include="NUnit.Analyzers" />
+    <PackageReference Include="coverlet.collector" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vortex.Core\Vortex.Core.csproj" />
+    <ProjectReference Include="..\Vortex.CardImporter\Vortex.CardImporter.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Tests read the committed generated file and the design workbook from the repo. -->
+    <None Include="..\..\core\Runtime\Data\gamedata.json" Link="TestData\gamedata.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\design\Vortex.xlsx" Link="TestData\Vortex.xlsx" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>
