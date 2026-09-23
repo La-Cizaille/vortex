@@ -5,22 +5,150 @@
   "description": "Source de vérité des combos technologiques (ADR-0008). Aide à l'édition uniquement : le validateur C# fait foi.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "technologies"],
+  "required": [
+    "schemaVersion",
+    "technologies"
+  ],
   "properties": {
-    "$schema": { "type": "string" },
-    "schemaVersion": { "const": 2 },
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": 3
+    },
     "technologies": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "color", "name", "text", "ruling"],
+        "required": [
+          "id",
+          "color",
+          "name",
+          "text",
+          "ruling",
+          "effects"
+        ],
         "properties": {
-          "id": { "enum": ["TECH_BLUE", "TECH_RED", "TECH_GREEN", "TECH_YELLOW"], "description": "Doit correspondre à la couleur." },
-          "color": { "enum": ["Blue", "Red", "Green", "Yellow"] },
-          "name": { "type": "string", "minLength": 1, "maxLength": 64 },
-          "text": { "type": "string", "minLength": 1, "maxLength": 600 },
-          "ruling": { "type": "string", "minLength": 1, "maxLength": 1000 }
+          "id": {
+            "enum": [
+              "TECH_BLUE",
+              "TECH_RED",
+              "TECH_GREEN",
+              "TECH_YELLOW"
+            ],
+            "description": "Doit correspondre à la couleur."
+          },
+          "color": {
+            "enum": [
+              "Blue",
+              "Red",
+              "Green",
+              "Yellow"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 600
+          },
+          "ruling": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "effects": {
+            "type": "array",
+            "description": "Briques d'effets (ADR-0007). Catalogue et paramètres : docs/BRICKS.md.",
+            "items": {
+              "type": "object",
+              "required": [
+                "brick"
+              ],
+              "properties": {
+                "brick": {
+                  "enum": [
+                    "AttackValueBonus",
+                    "ParityAttackBonus",
+                    "IgnoreTargetShield",
+                    "AttackAdvantage",
+                    "IncomingAttackDisadvantage",
+                    "HealOnHit",
+                    "StealShieldBeforeAttack",
+                    "DieBetMultiplier",
+                    "RerollShieldOnHit",
+                    "DiscardTargetModifierOnHit",
+                    "TormentTargetOnAttack",
+                    "TormentMarketOnHit",
+                    "ScorchedEarthOnKill",
+                    "DenyShieldChangeByOpponents",
+                    "CapIncomingAttackLoss",
+                    "PreventNextAttackLoss",
+                    "PreventFatalAttackLoss",
+                    "BlockAttackerNextTurn",
+                    "CapEnemyShield",
+                    "DictateAttackerAction",
+                    "HealWhenOthersDamaged",
+                    "ReflectAttackLoss",
+                    "HealOnOwnTormentLoss",
+                    "TormentAttackerOnLoss",
+                    "GambleOnHpLoss",
+                    "CopyHighestShieldOnTurnStart",
+                    "HpBalanceOnTurnStart",
+                    "ShieldChangeOnTurnStart",
+                    "PreRollDie",
+                    "DisableShields",
+                    "ExtraMarketPicks",
+                    "DisableOpponentShieldThisTurn",
+                    "ConvertShieldToNextAttack",
+                    "NextAttackDamageMultiplier",
+                    "NextAttackBonusPerNeutral",
+                    "NextAttackOvercharged",
+                    "AllInAttack",
+                    "SwapOnNextAttack",
+                    "DiscardOpponentModifiers",
+                    "StealOpponentModifiers",
+                    "StealOrDestroyOpponentModifier",
+                    "RefreshMarketAndPick",
+                    "RefreshAllMarkets",
+                    "TormentOpponentAndNeighbours",
+                    "ReactivateTorments",
+                    "ClearAllTormentsHealPer",
+                    "TormentAllEquipped",
+                    "ClearPlayerTorments",
+                    "TormentValueBonus",
+                    "ConvertHpToShield",
+                    "SwapTwoShields",
+                    "SetOwnShield",
+                    "SetAllShields",
+                    "DisableOwnShieldUntilNextTurn",
+                    "RotateShields",
+                    "Heal",
+                    "HealPerNeutral",
+                    "GainOvercharge",
+                    "KeepOverchargeUntilNextTurn",
+                    "NextOverchargedAttackAdvantage",
+                    "DiscardAllEquippedModifiers",
+                    "RedirectAttacksUntilNextTurn",
+                    "ExtraCrewActionsThisTurn"
+                  ],
+                  "description": "Nom de la brique."
+                }
+              },
+              "additionalProperties": {
+                "type": [
+                  "integer",
+                  "boolean",
+                  "string"
+                ]
+              }
+            }
+          }
         }
       }
     }

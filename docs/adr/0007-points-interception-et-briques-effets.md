@@ -1,6 +1,7 @@
 # ADR-0007 : Moteur indépendant des cartes : points d'interception et briques d'effets
 
 - **Statut** : accepté, 2026-09-23. Complète [ADR-0006](0006-une-classe-par-carte.md).
+- **Mise en œuvre (M2)** : 63 briques couvrent les 54 cartes, 8 événements et 4 technologies. **Aucune classe spécifique à une carte n'a été nécessaire.** Le catalogue est généré dans [`docs/BRICKS.md`](../BRICKS.md).
 
 ## Contexte
 Les cartes vont évoluer : ajouts, retraits, changements d'effet. Le game designer veut pouvoir le faire **simplement**, et que les superpositions d'effets restent **propres et prévisibles**, y compris entre cartes que personne n'avait prévu de combiner.

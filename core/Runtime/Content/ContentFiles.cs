@@ -8,7 +8,7 @@ namespace Vortex.Core.Content
     public abstract class ContentFile
     {
         /// <summary>Content file format understood by this code.</summary>
-        public const int CurrentSchemaVersion = 2;
+        public const int CurrentSchemaVersion = 3;
 
         /// <summary>Creates the file header.</summary>
         protected ContentFile(string? schema, int schemaVersion)

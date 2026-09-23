@@ -1,34 +1,63 @@
 {
   "$schema": "./schema/technologies.schema.json",
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "technologies": [
     {
       "id": "TECH_BLUE",
       "color": "Blue",
       "name": "Ordre",
       "text": "Vous pouvez dévier les **attaques** subies jusqu'au début de votre prochain tour.",
-      "ruling": "Jusqu'au début de mon prochain tour, quand je suis la cible d'une attaque, je peux la dévier vers un autre joueur vivant, ni l'attaquant ni moi-même (RULES A6). Une attaque déviée ne peut pas être re-déviée."
+      "ruling": "Jusqu'au début de mon prochain tour, quand je suis la cible d'une attaque, je peux la dévier vers un autre joueur vivant, ni l'attaquant ni moi-même (RULES A6). Une attaque déviée ne peut pas être re-déviée.",
+      "effects": [
+        {
+          "brick": "RedirectAttacksUntilNextTurn"
+        }
+      ]
     },
     {
       "id": "TECH_YELLOW",
       "color": "Yellow",
       "name": "Casino Cosmique",
       "text": "Vous pouvez effectuer 2 actions d'équipage (différentes) consécutives.",
-      "ruling": "Ce tour-ci, je fais 2 actions d'équipage différentes."
+      "ruling": "Ce tour-ci, je fais 2 actions d'équipage différentes.",
+      "effects": [
+        {
+          "brick": "ExtraCrewActionsThisTurn",
+          "amount": 1
+        }
+      ]
     },
     {
       "id": "TECH_RED",
       "color": "Red",
       "name": "Rebelles",
       "text": "Vous **surcharge.** Votre prochaine **attaque** surchargée est réalisée avec avantage (vous tirez 2 fois 2 dés et gardez le meilleur tirage).",
-      "ruling": "Je gagne un jeton de surcharge (dans la limite du maximum). Ma prochaine attaque surchargée se fait avec avantage."
+      "ruling": "Je gagne un jeton de surcharge (dans la limite du maximum). Ma prochaine attaque surchargée se fait avec avantage.",
+      "effects": [
+        {
+          "brick": "GainOvercharge",
+          "amount": 1
+        },
+        {
+          "brick": "NextOverchargedAttackAdvantage"
+        }
+      ]
     },
     {
       "id": "TECH_GREEN",
       "color": "Green",
       "name": "Abomination organique",
       "text": "Les jetons de tourment infligent +1 point de dégât supplémentaire pour le reste de la partie. Vous réactivez les jetons de <TOR>  tourment en jeu, ce qui inflige de nouveau les dégats à chaque joueur concerné.",
-      "ruling": "Les jetons de Tourment infligent +1 pour le reste de la partie (cumulable, effet global). Puis tous les Tourments en jeu sont réactivés (RULES A7)."
+      "ruling": "Les jetons de Tourment infligent +1 pour le reste de la partie (cumulable, effet global). Puis tous les Tourments en jeu sont réactivés (RULES A7).",
+      "effects": [
+        {
+          "brick": "TormentValueBonus",
+          "amount": 1
+        },
+        {
+          "brick": "ReactivateTorments"
+        }
+      ]
     }
   ]
 }

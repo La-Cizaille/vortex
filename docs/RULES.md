@@ -252,11 +252,27 @@ Quand plusieurs effets interviennent au même point d'interception :
 - Une perte de PV de cause `Reflect` ne déclenche **aucune** réaction.
 - Par sécurité, une chaîne ne peut pas dépasser 16 niveaux. Au-delà, le moteur signale une erreur de conception de carte, que les tests doivent détecter.
 
+## B8. Portée des effets
+
+- Un effet porté par une **carte** agit pour le **porteur** de la carte : ses attaques, ses pertes de PV, son bouclier…
+- Un effet porté par un **événement** (effet global) agit pour **tous les joueurs**.
+- Un effet porté par une **technologie** agit pour le joueur qui l'active.
+
+Une même brique sert donc à plusieurs contenus : « +4 à la valeur d'attaque » est un bonus personnel sur une carte, et un bonus pour tout le monde sur un événement.
+
+## B9. Briques d'effets
+
+Chaque carte, événement ou technologie déclare ses effets comme une liste de **briques** paramétrées, dans son champ `effects` (ADR-0007). Les briques s'appuient uniquement sur les points B2 à B7.
+
+Le catalogue des briques, avec leurs paramètres et les cartes qui les utilisent, est généré dans [`BRICKS.md`](BRICKS.md).
+
 ---
 
 # Partie C : cartes
 
 La source de vérité est dans [`core/Runtime/Data/`](../core/Runtime/Data/) : `cards.json`, `events.json` et `technologies.json`. Pour chaque carte, ces fichiers donnent le texte imprimé et son **arbitrage**, rédigé uniquement avec la partie B.
+
+Chaque entrée porte aussi ses **briques d'effets** (B9), qui implémentent l'arbitrage.
 
 La version lisible est [`CARDS.md`](CARDS.md). Elle est générée automatiquement, et la CI vérifie qu'elle est à jour.
 
@@ -265,6 +281,11 @@ La version lisible est [`CARDS.md`](CARDS.md). Elle est générée automatiqueme
 ## Questions ouvertes (à trancher par le game designer)
 
 - **Précisions apportées pendant l'implémentation du moteur (M1)**, marquées *à valider* ci-dessus : défausse de toute carte activée (A5.3) et moment de l'élimination (A9).
+- **Précisions apportées en implémentant les briques (M2)** :
+  - D_025 (Chance de cocu) s'applique à toute perte de PV hors Tourment et Reflect, donc aussi au coût payé par D_002 et aux pertes causées par un événement. Est-ce voulu ?
+  - A_025 : l'autre carte de l'échange peut appartenir à n'importe quel joueur autre que la cible, y compris l'attaquant lui-même.
+  - A_003 et A_014 (« vous pouvez ») sont **optionnels**. A_018 (« vos attaques posent ») est **obligatoire**.
+  - D_006 : l'attaquant peut se voir imposer une attaque ou un sabotage contre n'importe lequel de ses adversaires, porteur compris, ou bien un reparamétrage ou une surcharge.
 - **D_005 contre D_001** : l'ancien arbitrage disait qu'Intouchable protégeait du plafond de Sabotage électoral. Avec le modèle générique (partie B), un plafond est un *calcul de bornes*, pas une *modification* du bouclier : Intouchable **ne protège donc plus** de D_005. Faut-il garder ce comportement ou ajouter une autorisation dédiée ?
 
 - Valeurs de `StartShield[n]` et `DoomRound[n]` : elles seront proposées par le simulateur (M3).

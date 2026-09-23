@@ -11,9 +11,9 @@ namespace Vortex.Core.Tests.ContentToolTests
         [Test]
         public void Generated_catalogue_is_up_to_date()
         {
-            string docPath = Path.Combine(TestPaths.RepoRoot, "docs", "CARDS.md");
-            int code = Program.Run(new[] { "docs", TestPaths.DataDir, docPath, "--check" }, TextWriter.Null, TextWriter.Null);
-            Assert.That(code, Is.Zero, "docs/CARDS.md is stale: run the ContentTool docs command.");
+            string docsDir = Path.Combine(TestPaths.RepoRoot, "docs");
+            int code = Program.Run(new[] { "docs", TestPaths.DataDir, docsDir, "--check" }, TextWriter.Null, TextWriter.Null);
+            Assert.That(code, Is.Zero, "docs/CARDS.md or docs/BRICKS.md is stale: run the ContentTool docs command.");
         }
 
         [Test]

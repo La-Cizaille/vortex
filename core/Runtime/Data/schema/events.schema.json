@@ -5,22 +5,142 @@
   "description": "Source de vérité des cartes événements (ADR-0008). Aide à l'édition uniquement : le validateur C# fait foi.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "events"],
+  "required": [
+    "schemaVersion",
+    "events"
+  ],
   "properties": {
-    "$schema": { "type": "string" },
-    "schemaVersion": { "const": 2 },
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": 3
+    },
     "events": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "name", "copies", "text", "ruling"],
+        "required": [
+          "id",
+          "name",
+          "copies",
+          "text",
+          "ruling",
+          "effects"
+        ],
         "properties": {
-          "id": { "type": "string", "pattern": "^EVT_[A-Z0-9_]{1,48}$" },
-          "name": { "type": "string", "minLength": 1, "maxLength": 64 },
-          "copies": { "type": "integer", "minimum": 1, "maximum": 8 },
-          "text": { "type": "string", "minLength": 1, "maxLength": 600 },
-          "ruling": { "type": "string", "minLength": 1, "maxLength": 1000 }
+          "id": {
+            "type": "string",
+            "pattern": "^EVT_[A-Z0-9_]{1,48}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "copies": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 8
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 600
+          },
+          "ruling": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "effects": {
+            "type": "array",
+            "description": "Briques d'effets (ADR-0007). Catalogue et paramètres : docs/BRICKS.md.",
+            "items": {
+              "type": "object",
+              "required": [
+                "brick"
+              ],
+              "properties": {
+                "brick": {
+                  "enum": [
+                    "AttackValueBonus",
+                    "ParityAttackBonus",
+                    "IgnoreTargetShield",
+                    "AttackAdvantage",
+                    "IncomingAttackDisadvantage",
+                    "HealOnHit",
+                    "StealShieldBeforeAttack",
+                    "DieBetMultiplier",
+                    "RerollShieldOnHit",
+                    "DiscardTargetModifierOnHit",
+                    "TormentTargetOnAttack",
+                    "TormentMarketOnHit",
+                    "ScorchedEarthOnKill",
+                    "DenyShieldChangeByOpponents",
+                    "CapIncomingAttackLoss",
+                    "PreventNextAttackLoss",
+                    "PreventFatalAttackLoss",
+                    "BlockAttackerNextTurn",
+                    "CapEnemyShield",
+                    "DictateAttackerAction",
+                    "HealWhenOthersDamaged",
+                    "ReflectAttackLoss",
+                    "HealOnOwnTormentLoss",
+                    "TormentAttackerOnLoss",
+                    "GambleOnHpLoss",
+                    "CopyHighestShieldOnTurnStart",
+                    "HpBalanceOnTurnStart",
+                    "ShieldChangeOnTurnStart",
+                    "PreRollDie",
+                    "DisableShields",
+                    "ExtraMarketPicks",
+                    "DisableOpponentShieldThisTurn",
+                    "ConvertShieldToNextAttack",
+                    "NextAttackDamageMultiplier",
+                    "NextAttackBonusPerNeutral",
+                    "NextAttackOvercharged",
+                    "AllInAttack",
+                    "SwapOnNextAttack",
+                    "DiscardOpponentModifiers",
+                    "StealOpponentModifiers",
+                    "StealOrDestroyOpponentModifier",
+                    "RefreshMarketAndPick",
+                    "RefreshAllMarkets",
+                    "TormentOpponentAndNeighbours",
+                    "ReactivateTorments",
+                    "ClearAllTormentsHealPer",
+                    "TormentAllEquipped",
+                    "ClearPlayerTorments",
+                    "TormentValueBonus",
+                    "ConvertHpToShield",
+                    "SwapTwoShields",
+                    "SetOwnShield",
+                    "SetAllShields",
+                    "DisableOwnShieldUntilNextTurn",
+                    "RotateShields",
+                    "Heal",
+                    "HealPerNeutral",
+                    "GainOvercharge",
+                    "KeepOverchargeUntilNextTurn",
+                    "NextOverchargedAttackAdvantage",
+                    "DiscardAllEquippedModifiers",
+                    "RedirectAttacksUntilNextTurn",
+                    "ExtraCrewActionsThisTurn"
+                  ],
+                  "description": "Nom de la brique."
+                }
+              },
+              "additionalProperties": {
+                "type": [
+                  "integer",
+                  "boolean",
+                  "string"
+                ]
+              }
+            }
+          }
         }
       }
     }
