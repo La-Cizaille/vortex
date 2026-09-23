@@ -1,0 +1,87 @@
+# ---------------------------------------------------------------
+# Unity (project lives in /unity)
+# ---------------------------------------------------------------
+/unity/[Ll]ibrary/
+/unity/[Tt]emp/
+/unity/[Oo]bj/
+/unity/[Bb]uild/
+/unity/[Bb]uilds/
+/unity/[Ll]ogs/
+/unity/[Uu]ser[Ss]ettings/
+/unity/[Mm]emoryCaptures/
+/unity/[Rr]ecordings/
+/unity/Assets/Plugins/Editor/JetBrains*
+/unity/.vs/
+/unity/.gradle/
+/unity/ExportedObj/
+/unity/.consulo/
+/unity/*.csproj
+/unity/*.unityproj
+/unity/*.sln
+/unity/*.suo
+/unity/*.tmp
+/unity/*.user
+/unity/*.userprefs
+/unity/*.pidb
+/unity/*.booproj
+/unity/*.svd
+/unity/*.pdb
+/unity/*.mdb
+/unity/*.opendb
+/unity/*.VC.db
+/unity/*.pidb.meta
+/unity/*.pdb.meta
+/unity/*.mdb.meta
+/unity/sysinfo.txt
+/unity/crashlytics-build.properties
+/unity/Assets/StreamingAssets/aa/*
+# Build outputs
+*.apk
+*.aab
+*.unitypackage
+*.app
+
+# ---------------------------------------------------------------
+# .NET (solution lives in /dotnet)
+# ---------------------------------------------------------------
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+.vs/
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+BenchmarkDotNet.Artifacts/
+/dotnet/**/reports/
+
+# ---------------------------------------------------------------
+# Secrets — never committed (see docs/SECURITY.md)
+# ---------------------------------------------------------------
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.pem
+*.key
+.env
+.env.*
+secrets.*
+
+# ---------------------------------------------------------------
+# Art sources: heavy .blend files are kept out of the repo for now
+# (GitHub free LFS quota is 1 GiB). Decision to revisit at M5.
+# ---------------------------------------------------------------
+/art-src/**/*.blend1
+/art-src/**/*.blend
+
+# ---------------------------------------------------------------
+# OS / editors
+# ---------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+*.swp
+~$*

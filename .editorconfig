@@ -1,0 +1,43 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{json,yml,yaml,asmdef,asmref,csproj,props,targets,xml}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.cs]
+# --- Style ---
+csharp_style_namespace_declarations = block_scoped:suggestion  # Unity C# 9: no file-scoped namespaces
+csharp_prefer_braces = true:warning
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_new_line_before_open_brace = all
+dotnet_sort_system_directives_first = true
+
+# --- Naming ---
+dotnet_naming_rule.private_fields_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_underscore.style = underscore_camel
+dotnet_naming_rule.private_fields_underscore.severity = warning
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_style.underscore_camel.required_prefix = _
+dotnet_naming_style.underscore_camel.capitalization = camel_case
+
+# --- Analyzers: security-relevant rules are errors ---
+dotnet_diagnostic.CA2326.severity = error   # Do not use TypeNameHandling values other than None
+dotnet_diagnostic.CA2327.severity = error   # Insecure JsonSerializerSettings
+dotnet_diagnostic.CA2328.severity = error
+dotnet_diagnostic.CA2329.severity = error   # Insecure deserializer settings
+dotnet_diagnostic.CA2330.severity = error
+dotnet_diagnostic.CA5394.severity = none    # System.Random insecure: N/A, game RNG is our own PCG32 (ADR-0004)
+dotnet_diagnostic.CA1062.severity = warning # Validate public arguments
+dotnet_diagnostic.CA1303.severity = none    # Localized literals: not relevant for core
