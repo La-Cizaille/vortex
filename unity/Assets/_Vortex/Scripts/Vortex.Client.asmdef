@@ -2,7 +2,9 @@
   "name": "Vortex.Client",
   "rootNamespace": "Vortex.Client",
   "references": [
-    "Vortex.Core"
+    "Vortex.Core",
+    "Unity.TextMeshPro",
+    "UnityEngine.UI"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

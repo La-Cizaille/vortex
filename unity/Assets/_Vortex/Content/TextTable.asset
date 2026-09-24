@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb4a6a1f070acab4698d5773ef0b9103, type: 3}
+  m_Name: TextTable
+  m_EditorClassIdentifier: Vortex.Client::Vortex.Client.Content.TextTable
+  entries:
+  - Key: card.slot.attack
+    Text: ATK
+  - Key: card.slot.defense
+    Text: DEF
+  - Key: card.usage.durable
+    Text: Durable
+  - Key: card.usage.single-use
+    Text: Usage unique
+  - Key: card.usage.triggered
+    Text: "D\xE9clenchement"
+  - Key: card.kind.event
+    Text: "\xC9v\xE9nement"
+  - Key: card.kind.technology
+    Text: Technologie
+  - Key: gallery.attack
+    Text: Modificateurs d'attaque
+  - Key: gallery.defense
+    Text: "Modificateurs de d\xE9fense"
+  - Key: gallery.events
+    Text: "\xC9v\xE9nements"
+  - Key: gallery.technologies
+    Text: Technologies
