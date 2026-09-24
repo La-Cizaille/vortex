@@ -1,0 +1,35 @@
+{
+  "name": "Rythme à 5 joueurs, affiné",
+  "description": "Étape 2.2, second passage : la première grille place ses meilleures combinaisons au bord (bouclier de départ 6, Fin des temps à la manche 14). Celle-ci prolonge ces deux axes et garde les deux meilleures valeurs de PV. Mêmes cibles.",
+  "axes": [
+    {
+      "name": "PV",
+      "values": {
+        "25": { "config": { "startingHp": 25, "maxHp": 25 } },
+        "30": { "config": { "startingHp": 30, "maxHp": 30 } }
+      }
+    },
+    {
+      "name": "Bouclier de départ",
+      "values": {
+        "6": { "config": { "playerCounts": { "5": { "startShield": 6 } } } },
+        "7": { "config": { "playerCounts": { "5": { "startShield": 7 } } } }
+      }
+    },
+    {
+      "name": "Fin des temps",
+      "values": {
+        "14": { "config": { "playerCounts": { "5": { "doomRound": 14 } } } },
+        "16": { "config": { "playerCounts": { "5": { "doomRound": 16 } } } },
+        "18": { "config": { "playerCounts": { "5": { "doomRound": 18 } } } }
+      }
+    }
+  ],
+  "targets": {
+    "durationMinutes": { "min": 20, "max": 25 },
+    "doomReached": { "max": 0.3 },
+    "electionShare": { "min": 0.05, "max": 0.15 },
+    "firstEliminationRound": { "min": 6 },
+    "positionGapPoints": { "max": 3 }
+  }
+}

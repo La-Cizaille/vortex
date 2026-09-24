@@ -1,0 +1,37 @@
+{
+  "name": "Rythme à 5 joueurs",
+  "description": "Étape 2.2 (ARB-43) : PV de départ et maximum, bouclier de départ et manche de Fin des temps, sur le mode standard à 5 joueurs (ARB-52). Cibles d'ARB-40 et ARB-53 ; la cible de première élimination, fixée pour 4 joueurs, est transposée à 5 en attendant la confirmation du game designer.",
+  "axes": [
+    {
+      "name": "PV",
+      "values": {
+        "25": { "config": { "startingHp": 25, "maxHp": 25 } },
+        "30": { "config": { "startingHp": 30, "maxHp": 30 } },
+        "35": { "config": { "startingHp": 35, "maxHp": 35 } }
+      }
+    },
+    {
+      "name": "Bouclier de départ",
+      "values": {
+        "4": { "config": { "playerCounts": { "5": { "startShield": 4 } } } },
+        "5": { "config": { "playerCounts": { "5": { "startShield": 5 } } } },
+        "6": { "config": { "playerCounts": { "5": { "startShield": 6 } } } }
+      }
+    },
+    {
+      "name": "Fin des temps",
+      "values": {
+        "10": { "config": { "playerCounts": { "5": { "doomRound": 10 } } } },
+        "12": { "config": { "playerCounts": { "5": { "doomRound": 12 } } } },
+        "14": { "config": { "playerCounts": { "5": { "doomRound": 14 } } } }
+      }
+    }
+  ],
+  "targets": {
+    "durationMinutes": { "min": 20, "max": 25 },
+    "doomReached": { "max": 0.3 },
+    "electionShare": { "min": 0.05, "max": 0.15 },
+    "firstEliminationRound": { "min": 6 },
+    "positionGapPoints": { "max": 3 }
+  }
+}

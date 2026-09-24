@@ -35,7 +35,7 @@ Validés par le game designer (ARB-40), puis recentrés sur le **mode standard �
 | **0** | Objectifs chiffrés | Validée (ARB-40) |
 | **1** | Instruments de mesure : variantes et comparaison, niveaux de bot, nouvelles mesures, options de règles | Faite (ARB-41, ADR-0011) |
 | **2.1** | Avantage du premier joueur : premier joueur tournant, sens horaire ou anti-horaire (ARB-42) | **Adoptée** : rotation horaire (ARB-50) |
-| **2.2** | Grille PV × bouclier de départ × manche de Fin des temps, par nombre de joueurs (ARB-43) | À faire |
+| **2.2** | Grille PV × bouclier de départ × manche de Fin des temps, à 5 joueurs (ARB-43, ARB-52) | Mesurée, décision attendue |
 | **2.3** | Nouvelles mécaniques (ARB-44, ARB-45) : relance d'un dé par la surcharge, reparamétrage à 2 dés dont on garde 1, coût du recyclage, posture défensive, événement annoncé, prime sur le leader, pillage, fantômes, défausse tactique | À faire |
 | **2.4** | Fréquence des événements (une par manche, toutes les 2 ou 3 manches) et effet de chaque événement (ARB-46) | À faire |
 | **2.5** | Élection galactique à 3 technologies au lieu de 4 (ARB-47) | **Adoptée** : 3 technologies (ARB-51). Fréquence de l'Élection à revoir avec 2.2 |
@@ -70,17 +70,46 @@ La référence (le contenu du dépôt) et chaque variante jouent **les mêmes pa
 - Un rapport contient des dizaines d'indicateurs : au seuil de 95 %, environ **un sur vingt** peut être marqué `*` par hasard. On ne conclut que sur des écarts attendus, nets, et confirmés par une autre graine (`--seed 2`) ou un autre niveau de bot.
 - Avec 2 000 parties par taille de table, la marge sur un taux de victoire est d'environ ±3 pts. Il faut 4 fois plus de parties pour la diviser par 2.
 
+### Explorer une grille : `grid`
+
+```bash
+dotnet run -c Release --project dotnet/Vortex.Simulator -- grid --grid docs/balance/grids/rythme-5-joueurs.json --games 1000 --seed 1 --out docs/balance/<date>-<sujet>.md
+```
+
+Une grille croise quelques réglages (au plus 4 axes, 8 valeurs par axe et 64 combinaisons) et simule chaque combinaison sur les mêmes graines, à une seule taille de table (5 joueurs par défaut). Le rapport **classe** les combinaisons :
+1. d'abord celles qui atteignent le plus de cibles ;
+2. puis celles dont l'**écart** est le plus petit : la somme des écarts relatifs aux bornes manquées. Par exemple, une Fin des temps atteinte dans 60 % des parties pour une cible de 30 % au plus compte pour (60 − 30) / 30 = 1.
+
+Les valeurs dans la cible sont en gras, et la combinaison identique au contenu du dépôt est marquée « (réf.) ». Une grille sert à **trier** : avec 1 000 parties, un pourcentage n'est connu qu'à ±3 pts environ. On confirme ensuite les meilleures combinaisons avec `compare`, sur plus de parties.
+
+Format d'un fichier de grille ([`grids/`](grids/)) : chaque valeur d'un axe est un correctif, écrit comme une variante mais sans `name` ni `description`. Deux axes ne peuvent pas modifier le même réglage : sinon l'un écraserait l'autre en silence.
+
+```json
+{
+  "name": "Rythme à 5 joueurs",
+  "description": "…",
+  "axes": [
+    { "name": "PV", "values": { "25": { "config": { "startingHp": 25, "maxHp": 25 } }, "30": { "config": { "startingHp": 30, "maxHp": 30 } } } },
+    { "name": "Fin des temps", "values": { "10": { "config": { "playerCounts": { "5": { "doomRound": 10 } } } } } }
+  ],
+  "targets": { "durationMinutes": { "min": 20, "max": 25 }, "doomReached": { "max": 0.3 } }
+}
+```
+
+Indicateurs disponibles pour les cibles : `durationMinutes` (durée estimée en minutes), `doomReached` (part des parties qui atteignent la Fin des temps, de 0 à 1), `electionShare` (part des victoires par Élection, de 0 à 1), `firstEliminationRound` (manche moyenne de la première élimination), `positionGapPoints` (écart maximal de position, en points).
+
 ### Options
 
 | Option | Rôle | Défaut |
 |---|---|---|
-| `run` ou `compare` | Commande (premier argument) | `run` |
+| `run`, `compare` ou `grid` | Commande (premier argument) | `run` |
 | `--players` | Tailles de table simulées, par exemple `2,3,4,5` | `5`, le mode standard (ARB-52) |
 | `--games` | Parties par taille de table (et par scénario) | `200` |
 | `--seed` | Graine : même commande et même contenu donnent les mêmes chiffres | `1` |
 | `--bot` | Niveau des bots du scénario principal : `random`, `naive`, `normal`, `strong` | `normal` |
 | `--skill` | `run` seulement : niveaux du scénario « écart de niveau », `hero,others` | `normal,random` |
-| `--variant` | Fichier de variante. Au plus 1 avec `run`, de 1 à 8 avec `compare` | — |
+| `--variant` | Fichier de variante. Au plus 1 avec `run`, de 1 à 8 avec `compare`, aucun avec `grid` | — |
+| `--grid` | `grid` seulement : fichier de grille. `grid` n'accepte qu'une taille de table | — |
 | `--data` | Dossier du contenu de référence | `core/Runtime/Data` |
 | `--out` | Fichier du rapport (sinon, sortie standard) | — |
 
@@ -110,6 +139,8 @@ Une variante est un petit fichier JSON dans [`variants/`](variants/). Il ne cont
 ```
 
 - `name` est obligatoire. `description`, `config` (voir [`variants/rotation-antihoraire.json`](variants/rotation-antihoraire.json)), `cards`, `events` et `technologies` sont facultatifs. Les cartes, événements et technologies sont désignés par leur id.
+- Les réglages par taille de table se désignent par le nombre de joueurs : `"config": { "playerCounts": { "5": { "startShield": 5 } } }` ne change que la table à 5 joueurs.
+- `name` et `description` suivent la même règle que les textes des cartes : aucun caractère de contrôle ni d'inversion de sens d'écriture, et tout sur une ligne. Un nom affiché dans un tableau ne peut pas contenir `|`.
 - Les objets se fusionnent. Toute autre valeur, **tableaux compris**, est remplacée : pour changer une brique, on redonne la liste `effects` complète.
 - Sont refusés : une clé ou un id inconnu, un changement d'id, une valeur `null`, une clé répétée, un changement de version de format.
 - Le résultat est validé par **le même chargeur que le jeu**. Une variante invalide est refusée avec le message du chargeur.
@@ -122,6 +153,36 @@ Une variante est un petit fichier JSON dans [`variants/`](variants/). Il ne cont
 3. Joindre le rapport de comparaison à la PR.
 
 ## Constats
+
+### Étape 2.2 : rythme à 5 joueurs (2026-09-24)
+
+Trois rapports, tous sans erreur du moteur :
+1. [`2026-09-24-grille-rythme-5-joueurs.md`](2026-09-24-grille-rythme-5-joueurs.md) : PV (25, 30, 35) × bouclier de départ (4, 5, 6) × Fin des temps (manche 10, 12, 14), soit 27 combinaisons de 1 000 parties ;
+2. [`2026-09-24-grille-rythme-5-joueurs-affine.md`](2026-09-24-grille-rythme-5-joueurs-affine.md) : les meilleures valeurs étaient au bord de la grille (bouclier 6, manche 14), donc second passage avec PV (25, 30) × bouclier (6, 7) × Fin des temps (14, 16, 18) ;
+3. [`2026-09-24-rythme-confirmation.md`](2026-09-24-rythme-confirmation.md) : les cinq meilleurs candidats, 3 000 parties chacun, avec **une autre graine** (2).
+
+**Confirmation à 5 joueurs** (durée estimée à 30 s par tour, d'après les grilles) :
+
+| Candidat | Fin des temps atteinte | Élection | Première élimination | Attaques sans dégâts | Durée |
+|---|---|---|---|---|---|
+| Aujourd'hui : 30 PV, bouclier 4, manche 10 | 88,5 % | 4,4 % | manche 4,3 | 21,7 % | environ 21 min |
+| 30 PV, bouclier 4, manche 16 | **17,0 %** | **5,4 %** (à la limite) | 4,3 | 23,7 % | environ 22 min |
+| **30 PV, bouclier 5, manche 16** | **20,3 %** | **6,9 %** | 4,6 | 27,4 % | environ 22 min |
+| 30 PV, bouclier 6, manche 16 | **23,3 %** | **6,8 %** | 4,8 | 29,7 % | environ 23 min |
+| 30 PV, bouclier 7, manche 16 | **24,9 %** | **7,7 %** | 4,9 | 29,9 % | environ 23,5 min |
+| 25 PV, bouclier 6, manche 16 | **9,0 %** | **5,1 %** (à la limite) | 4,1 | 30,2 % | environ 20,5 min |
+
+1. **La Fin des temps à la manche 16 règle le problème principal.** Elle n'est plus atteinte que dans 9 à 25 % des parties, au lieu de 88 %. Les parties se terminent par élimination vers la manche 13, et leur durée bouge à peine : la Fin des temps redevient un **filet de sécurité**, son rôle voulu. Au-delà de la manche 16, rien ne change, sauf la part de parties qui l'atteignent.
+2. **L'Élection entre dans sa cible** (5 à 15 %), grâce aux parties un peu plus longues. Elle est au plus haut avec un bouclier de départ élevé.
+3. **Un bouclier de départ plus haut retarde un peu la première élimination** (+0,3 à +0,6 manche), mais il a un coût : davantage d'attaques sans dégâts, jusqu'à près d'une sur trois avec un bouclier de 6 ou 7. C'est un risque de frustration. Effet secondaire utile : Générateur auxiliaire (D_011, bouclier à 8), trop fort aujourd'hui, revient près de la moyenne.
+4. **Aucun réglage de rythme ne place la première élimination à la manche 6.** Le maximum mesuré est la manche 5,6, avec 35 PV et un bouclier de 6, et les parties dépassent alors 25 minutes. À 5 joueurs, 4 adversaires peuvent viser le plus faible dès le début. Ce point relève soit des mécaniques de l'étape 2.3 (posture défensive, prime sur le leader, fantômes), soit d'une cible adaptée au mode à 5 joueurs.
+
+**Recommandation : 30 PV, bouclier de départ 5, Fin des temps à la manche 16** (à 5 joueurs). C'est le meilleur compromis :
+- toutes les cibles de rythme sont atteintes avec de la marge ;
+- la première élimination recule un peu ;
+- le coût en attaques sans dégâts reste modéré (27 % au lieu de 22 %).
+
+Si l'on veut toucher le moins de choses possible, **30 PV, bouclier 4, manche 16** ne change que la Fin des temps, mais l'Élection est alors à la limite de sa cible. **Décision attendue du game designer.**
 
 ### Référence v2 : règles adoptées (2026-09-24)
 
