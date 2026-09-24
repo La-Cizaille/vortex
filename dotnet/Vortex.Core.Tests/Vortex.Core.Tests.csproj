@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Vortex.Core\Vortex.Core.csproj" />
     <ProjectReference Include="..\Vortex.ContentTool\Vortex.ContentTool.csproj" />
+    <ProjectReference Include="..\Vortex.Simulator\Vortex.Simulator.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -4,7 +4,7 @@ Jeu de combat de vaisseaux spatiaux au tour par tour, en chacun pour soi, de 2 �
 
 Adaptation numérique d'un jeu de société. Cibles : **Android** et **Windows**. Style 3D simple, pensé pour le mobile.
 
-> État : **M0, socle du projet**. La feuille de route est plus bas.
+> État : **M3, simulateur d'équilibrage**. M0 à M2 sont terminés. La feuille de route est plus bas.
 
 ## Structure du dépôt
 

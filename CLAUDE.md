@@ -26,4 +26,5 @@ The user is a security professional: security, optimisation, and clean documenta
 ## Commands
 - Tests: `dotnet test dotnet/Vortex.sln`
 - Format check: `dotnet format dotnet/Vortex.sln --verify-no-changes`
+- Balance: `dotnet run -c Release --project dotnet/Vortex.Simulator -- --games 1000 --seed 1 --out docs/balance/<date>-<topic>.md` (reports are generated, never hand-edited; bots never name a card, ADR-0010)
 - Content: `dotnet run --project dotnet/Vortex.ContentTool -- validate core/Runtime/Data` (also `format <dir> [--check]`, `docs core/Runtime/Data docs [--check]`)
