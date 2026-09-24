@@ -16,17 +16,17 @@ Les bots ne jouent pas comme des humains (ADR-0010). Un écart mesuré est un **
 
 ## Objectifs (étape 0)
 
-Validés par le game designer (ARB-40).
+Validés par le game designer (ARB-40). Les réglages sont optimisés en priorité pour **4 joueurs** (ARB-52) : les réglages communs à toutes les tables sont choisis sur les parties à 4, et on vérifie que les autres tailles ne se dégradent pas.
 
-| Critère | Cible | Référence du 2026-09-24 |
-|---|---|---|
-| Avantage de position | Chaque position à ±3 pts de la part équitable (±5 pts en duel) | Premier joueur à +14 à +21 pts |
-| Durée à 4 joueurs | 15 à 20 min | Environ 18 min (estimation à 30 s par tour) |
-| Rôle de la Fin des temps | Filet de sécurité : atteinte dans moins de 30 % des parties | 38 à 90 % |
-| Élection galactique | 5 à 15 % des victoires | Moins de 0,5 % |
-| Puissance des cartes | Chaque carte à ±5 pts de la moyenne, aucune carte « morte » | Écarts de −7 à +12 pts |
-| Part des choix face au hasard | À définir avec les niveaux de bot (étape 1) | Mal mesurée |
-| Première élimination | Pas avant la manche 6 à 4 joueurs | Manche 5,0 en moyenne (mesurée à l'étape 1) |
+| Critère | Cible | Référence initiale | Aujourd'hui ([référence v2](2026-09-24-reference-v2.md)) |
+|---|---|---|---|
+| Avantage de position | Chaque position à ±3 pts de la part équitable (±5 pts en duel) | Premier joueur à +14 à +21 pts | **Atteint** à 4 joueurs (1,8 pts), 2 et 5 joueurs ; 3,5 pts à 3 joueurs |
+| Durée à 4 joueurs | 15 à 20 min | Environ 18 min | **Atteint** : environ 17 min (estimation à 30 s par tour) |
+| Rôle de la Fin des temps | Filet de sécurité : atteinte dans moins de 30 % des parties | 38 à 90 % | Non atteint : 80 % à 4 joueurs (33 à 89 % selon la table) |
+| Élection galactique | 5 à 15 % des victoires | Moins de 0,5 % | Non atteint : 2,4 % à 4 joueurs (0,8 à 3,7 %) |
+| Puissance des cartes | Chaque carte à ±5 pts de la moyenne, aucune carte « morte » | Écarts de −7 à +12 pts | Non atteint : de −7,0 à +16,7 pts ; une quinzaine de cartes à +5 pts ou plus, 2 sous −5 pts |
+| Part des choix face au hasard | À définir avec les niveaux de bot (étape 1) | Mal mesurée | À définir |
+| Première élimination | Pas avant la manche 6 à 4 joueurs | Non mesurée | Non atteint : manche 4,9 à 4 joueurs |
 
 ## Plan et avancement
 
@@ -34,11 +34,11 @@ Validés par le game designer (ARB-40).
 |---|---|---|
 | **0** | Objectifs chiffrés | Validée (ARB-40) |
 | **1** | Instruments de mesure : variantes et comparaison, niveaux de bot, nouvelles mesures, options de règles | Faite (ARB-41, ADR-0011) |
-| **2.1** | Avantage du premier joueur : premier joueur tournant, sens horaire ou anti-horaire (ARB-42) | Mesurée, décision attendue |
+| **2.1** | Avantage du premier joueur : premier joueur tournant, sens horaire ou anti-horaire (ARB-42) | **Adoptée** : rotation horaire (ARB-50) |
 | **2.2** | Grille PV × bouclier de départ × manche de Fin des temps, par nombre de joueurs (ARB-43) | À faire |
 | **2.3** | Nouvelles mécaniques (ARB-44, ARB-45) : relance d'un dé par la surcharge, reparamétrage à 2 dés dont on garde 1, coût du recyclage, posture défensive, événement annoncé, prime sur le leader, pillage, fantômes, défausse tactique | À faire |
 | **2.4** | Fréquence des événements (une par manche, toutes les 2 ou 3 manches) et effet de chaque événement (ARB-46) | À faire |
-| **2.5** | Élection galactique à 3 technologies au lieu de 4 (ARB-47) | Mesurée, décision attendue |
+| **2.5** | Élection galactique à 3 technologies au lieu de 4 (ARB-47) | **Adoptée** : 3 technologies (ARB-51). Fréquence de l'Élection à revoir avec 2.2 |
 | **3** | Revue des cartes : tri, ajustement par famille, cartes de hasard, équilibre des couleurs. Outil visuel à construire au début de l'étape (ARB-48) | À faire |
 | **4** | Validation humaine sur un prototype Unity (ARB-49) | Après l'étape 3 |
 
@@ -59,7 +59,7 @@ Avec `--variant <fichier>`, le rapport porte sur la variante au lieu de la réf�
 ### Comparer des variantes : `compare`
 
 ```bash
-dotnet run -c Release --project dotnet/Vortex.Simulator -- compare --games 2000 --seed 1 --variant docs/balance/variants/rotation-horaire.json --variant docs/balance/variants/rotation-antihoraire.json --out docs/balance/<date>-<sujet>.md
+dotnet run -c Release --project dotnet/Vortex.Simulator -- compare --games 2000 --seed 1 --variant docs/balance/variants/<variante-a>.json --variant docs/balance/variants/<variante-b>.json --out docs/balance/<date>-<sujet>.md
 ```
 
 La référence (le contenu du dépôt) et chaque variante jouent **les mêmes parties** : mêmes graines, donc mêmes mélanges et mêmes dés au départ. Le rapport donne, pour chaque taille de table, les indicateurs de chaque variante et leur écart avec la référence.
@@ -109,7 +109,7 @@ Une variante est un petit fichier JSON dans [`variants/`](variants/). Il ne cont
 }
 ```
 
-- `name` est obligatoire. `description`, `config` (voir [`variants/election-3-technologies.json`](variants/election-3-technologies.json)), `cards`, `events` et `technologies` sont facultatifs. Les cartes, événements et technologies sont désignés par leur id.
+- `name` est obligatoire. `description`, `config` (voir [`variants/rotation-antihoraire.json`](variants/rotation-antihoraire.json)), `cards`, `events` et `technologies` sont facultatifs. Les cartes, événements et technologies sont désignés par leur id.
 - Les objets se fusionnent. Toute autre valeur, **tableaux compris**, est remplacée : pour changer une brique, on redonne la liste `effects` complète.
 - Sont refusés : une clé ou un id inconnu, un changement d'id, une valeur `null`, une clé répétée, un changement de version de format.
 - Le résultat est validé par **le même chargeur que le jeu**. Une variante invalide est refusée avec le message du chargeur.
@@ -122,6 +122,17 @@ Une variante est un petit fichier JSON dans [`variants/`](variants/). Il ne cont
 3. Joindre le rapport de comparaison à la PR.
 
 ## Constats
+
+### Référence v2 : règles adoptées (2026-09-24)
+
+Rapport : [`2026-09-24-reference-v2.md`](2026-09-24-reference-v2.md). 2 000 parties par taille de table et par scénario, bots `normal`, aucune erreur du moteur. Règles : rotation horaire du premier joueur (ARB-50) et Élection à 3 technologies (ARB-51). Lecture en priorité à 4 joueurs (ARB-52).
+
+1. **Position et durée sont dans les cibles** à 4 joueurs : écart maximal de 1,8 pts, environ 17 minutes par partie.
+2. **La Fin des temps décide encore de la plupart des parties** (80 % à 4 joueurs), alors que la **première élimination arrive trop tôt** (manche 4,9). Ces deux cibles tirent en sens opposés : il faut un début de partie plus sûr et une fin plus rapide. C'est l'objet de la grille de l'étape 2.2 (PV, bouclier de départ et manche de Fin des temps).
+3. **L'Élection recule un peu avec la rotation** : 2,4 % à 4 joueurs, contre 3,6 % avec 3 technologies et l'ordre fixe. Les parties sont un peu plus courtes, donc on réunit moins de combos. Elle reste un objectif de l'étape 2.2.
+4. **Cartes** : une quinzaine de cartes sont à +5 pts ou plus, et deux sous −5 pts. Les cartes à **usage unique** occupent presque tout le haut du classement. Deux explications possibles, à départager à l'étape 3 : elles sont réellement trop fortes, ou les bots les prennent surtout quand ils sont déjà en position de force (biais de sélection). Orgueil (D_016) reste en tête (+16,7 pts). Tout est une question d'équilibre (D_020, −7,0 pts) et Le grand final (A_010, −5,6 pts) restent en bas.
+5. **Couleurs** : les joueurs à dominante **bleue** gagnent 33,4 % de leurs parties, contre 27,5 % pour le jaune. Un point à examiner à l'étape 3.
+6. **Événements** : Tempête électro-magnétique et Surcharge ionique rebattent le plus les cartes (le meneur garde la tête dans 72 % des cas, contre 83 % pour l'événement témoin sans effet). Trou noir semble plutôt protéger le meneur (87 %). À approfondir à l'étape 2.4.
 
 ### Étapes 2.1 et 2.5 : ordre de jeu et Élection (2026-09-24)
 
@@ -144,7 +155,7 @@ Rapport : [`2026-09-24-ordre-et-election.md`](2026-09-24-ordre-et-election.md). 
 4. **Effets secondaires faibles** : à 2 et 3 joueurs, les parties sont un peu plus courtes (−0,4 à −0,5 manche) et la Fin des temps est un peu moins souvent atteinte (−3 à −6 pts). Rien de mesurable à 4 et 5 joueurs.
 5. **Cartes** : la rotation change réellement la valeur de certaines cartes. On compte 32 mouvements au-delà du bruit pour les deux sens, là où le hasard seul en produirait environ 5. Chaque ligne prise isolément reste toutefois incertaine. Le signal le plus solide est Orgueil (D_016), déjà la carte la plus forte : elle passe de +11,7 à +16,8 pts, avec le même mouvement dans les deux sens. L'Élection à 3 technologies ne déplace aucune carte.
 
-**Recommandation** : adopter la rotation **horaire**. Elle atteint les mêmes cibles, et elle ne crée pas de double tour, qui avance la première élimination alors que celle-ci est déjà trop précoce (voir plus bas). Le sens anti-horaire reste un bon choix si l'on veut des parties plus nerveuses. **Décision attendue du game designer.**
+**Recommandation** : adopter la rotation **horaire**. Elle atteint les mêmes cibles, et elle ne crée pas de double tour, qui avance la première élimination alors que celle-ci est déjà trop précoce (voir plus bas). Le sens anti-horaire reste un bon choix si l'on veut des parties plus nerveuses. **Décision : rotation horaire adoptée (ARB-50).**
 
 **Élection à 3 technologies (2.5, ARB-47).** Part des victoires par Élection galactique :
 
@@ -159,7 +170,7 @@ Rapport : [`2026-09-24-ordre-et-election.md`](2026-09-24-ordre-et-election.md). 
 2. **Aucun effet secondaire mesurable** : durée, avantage de position et combats sont inchangés.
 3. **Limite des bots** : ils valorisent chaque technologie, mais ils ne planifient pas une collection. Un joueur humain qui vise l'Élection l'obtiendra plus souvent. La mesure est donc un **minimum**.
 
-**Recommandation** : adopter 3 technologies, qui va dans le bon sens sans rien dégrader, puis revoir l'Élection avec la grille de l'étape 2.2 : des parties plus longues laissent plus de temps pour réunir des combos. **Décision attendue du game designer.**
+**Recommandation** : adopter 3 technologies, qui va dans le bon sens sans rien dégrader, puis revoir l'Élection avec la grille de l'étape 2.2 : des parties plus longues laissent plus de temps pour réunir des combos. **Décision : 3 technologies adoptées (ARB-51).**
 
 **Nouvelles mesures de l'étape 1, sur la référence**
 

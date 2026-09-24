@@ -40,12 +40,12 @@ namespace Vortex.Core.Tests.Bots
         public void A_config_patch_changes_only_what_it_names()
         {
             ContentSet reference = Variants.LoadReference(TestPaths.DataDir);
-            ContentSet v = Load("{ \"name\": \"Rotation\", \"description\": \"d\", \"config\": { \"roundStartRotation\": \"CounterClockwise\", \"technologiesToWin\": 3 } }");
+            ContentSet v = Load("{ \"name\": \"Rotation\", \"description\": \"d\", \"config\": { \"roundStartRotation\": \"CounterClockwise\", \"technologiesToWin\": 2 } }");
 
             Assert.That(v.Name, Is.EqualTo("Rotation"));
             Assert.That(v.Description, Is.EqualTo("d"));
             Assert.That(v.Config.RoundStartRotation, Is.EqualTo(RoundStartRotation.CounterClockwise));
-            Assert.That(v.Config.TechnologiesToWin, Is.EqualTo(3));
+            Assert.That(v.Config.TechnologiesToWin, Is.EqualTo(2));
             Assert.That(v.Config.StartingHp, Is.EqualTo(reference.Config.StartingHp));
             Assert.That(v.ContentSha256, Is.Not.EqualTo(reference.ContentSha256));
         }

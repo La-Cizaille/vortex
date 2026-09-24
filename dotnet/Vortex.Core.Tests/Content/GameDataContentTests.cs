@@ -1,12 +1,13 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
+using Vortex.Core.Config;
 using Vortex.Core.Content;
 
 namespace Vortex.Core.Tests.Content
 {
     /// <summary>
-    /// Asserts the committed content matches the design as agreed (docs/RULES.md A2).
+    /// Asserts the committed content matches the design as agreed (docs/RULES.md A2, docs/ARBITRAGES.md).
     /// These are the only tests tied to the real card list: when the designer adds or removes
     /// cards on purpose, update the expected counts here in the same PR. Engine tests use test cards.
     /// </summary>
@@ -51,6 +52,15 @@ namespace Vortex.Core.Tests.Content
             Assert.That(
                 _data.Technologies.Select(t => t.Id),
                 Is.EquivalentTo(new[] { "TECH_BLUE", "TECH_RED", "TECH_GREEN", "TECH_YELLOW" }));
+        }
+
+        [Test]
+        public void Rule_options_match_the_designer_rulings()
+        {
+            // docs/ARBITRAGES.md ARB-50 (clockwise rotation of the first player) and ARB-51 (election with 3 technologies).
+            GameConfig config = TestPaths.LoadRealConfig();
+            Assert.That(config.RoundStartRotation, Is.EqualTo(RoundStartRotation.Clockwise));
+            Assert.That(config.TechnologiesToWin, Is.EqualTo(3));
         }
 
         [Test]
