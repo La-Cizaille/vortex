@@ -1,0 +1,7 @@
+{
+  "name": "Prime sur le leader (+2)",
+  "description": "Étape 2.3 (ARB-44) : comme la prime +1, en plus fort.",
+  "config": {
+    "leaderBounty": 2
+  }
+}

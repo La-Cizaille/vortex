@@ -261,6 +261,7 @@ namespace Vortex.Core.Rules
             yield return Command.RerollShield(false);
             yield return Command.RerollShield(true);
             yield return Command.Overcharge();
+            yield return Command.DefensivePosture();
             yield return Command.EndTurn();
         }
     }

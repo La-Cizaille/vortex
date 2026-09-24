@@ -1,0 +1,9 @@
+{
+  "name": "Posture, prime +1 et fantômes",
+  "description": "Étape 2.3 : les trois mécaniques ensemble.",
+  "config": {
+    "defensivePostureBonus": 2,
+    "leaderBounty": 1,
+    "ghostsChooseEvent": true
+  }
+}

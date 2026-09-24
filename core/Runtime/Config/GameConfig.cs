@@ -34,7 +34,10 @@ namespace Vortex.Core.Config
             int technologiesToWin,
             IReadOnlyList<PlayerCountSettings> playerCounts,
             int reactionDepthLimit,
-            int maxDecisionsPerCommand)
+            int maxDecisionsPerCommand,
+            int defensivePostureBonus = 0,
+            int leaderBounty = 0,
+            bool ghostsChooseEvent = false)
             : base(schema, schemaVersion)
         {
             StartingHp = startingHp;
@@ -53,6 +56,9 @@ namespace Vortex.Core.Config
             PlayerCounts = playerCounts ?? Array.Empty<PlayerCountSettings>();
             ReactionDepthLimit = reactionDepthLimit;
             MaxDecisionsPerCommand = maxDecisionsPerCommand;
+            DefensivePostureBonus = defensivePostureBonus;
+            LeaderBounty = leaderBounty;
+            GhostsChooseEvent = ghostsChooseEvent;
         }
 
         /// <summary>HP of every ship at setup (RULES A3).</summary>
@@ -93,6 +99,24 @@ namespace Vortex.Core.Config
 
         /// <summary>Distinct technologies needed to win the galactic election (RULES A9).</summary>
         public int TechnologiesToWin { get; }
+
+        /// <summary>
+        /// Optional crew action "defensive posture" (RULES A5.4): bonus to the player's effective shield until the start
+        /// of their next turn. 0 disables the action. Rule option under study (ADR-0011).
+        /// </summary>
+        public int DefensivePostureBonus { get; }
+
+        /// <summary>
+        /// Bonus to the attack value against the sole HP leader (RULES A6 step 6). 0 disables the bounty.
+        /// Rule option under study (ADR-0011).
+        /// </summary>
+        public int LeaderBounty { get; }
+
+        /// <summary>
+        /// When true, an eliminated player chooses the round's event between two (RULES A4.1). Rule option under
+        /// study (ADR-0011).
+        /// </summary>
+        public bool GhostsChooseEvent { get; }
 
         /// <summary>Settings that depend on the number of players.</summary>
         public IReadOnlyList<PlayerCountSettings> PlayerCounts { get; }
@@ -142,6 +166,8 @@ namespace Vortex.Core.Config
             Check(!string.IsNullOrEmpty(DoomEventId), "doomEventId is required");
             Check(Enum.IsDefined(typeof(RoundStartRotation), RoundStartRotation), "roundStartRotation is not a known value");
             Check(TechnologiesToWin >= 1 && TechnologiesToWin <= 4, "technologiesToWin must be in 1..4");
+            Check(DefensivePostureBonus >= 0 && DefensivePostureBonus <= MaxShield, "defensivePostureBonus must be in 0..maxShield");
+            Check(LeaderBounty >= 0 && LeaderBounty <= 99, "leaderBounty must be in 0..99");
             Check(ReactionDepthLimit >= 4 && ReactionDepthLimit <= 64, "reactionDepthLimit must be in 4..64");
             Check(MaxDecisionsPerCommand >= 8 && MaxDecisionsPerCommand <= 512, "maxDecisionsPerCommand must be in 8..512");
 

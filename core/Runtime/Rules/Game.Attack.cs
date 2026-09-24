@@ -48,8 +48,14 @@ namespace Vortex.Core.Rules
             RollAttackDice(attack, pool);
             attack.Critical = attack.Kept.Contains(Config.DieFaces);
 
-            // 6. Attack value.
-            attack.Value = Math.Max(0, Calculate(attack.KeptSum, (e, s, m) => e.ModifyAttackValue(this, s, attack, m)));
+            // 6. Attack value, with the bounty on the sole HP leader when the rule option is on.
+            int bounty = Config.LeaderBounty > 0 && attack.Target == SoleHpLeader() ? Config.LeaderBounty : 0;
+            if (bounty > 0)
+            {
+                Emit(new GameEvent { Type = GameEventType.LeaderBountyApplied, Player = attacker, Other = attack.Target, Amount = bounty });
+            }
+
+            attack.Value = Math.Max(0, Calculate(attack.KeptSum, (e, s, m) => e.ModifyAttackValue(this, s, attack, m), m => m.Add(bounty)));
 
             // 7. Effective shield.
             attack.EffectiveShield = Math.Max(0, Calculate(ShieldOf(attack.Target), (e, s, m) => e.ModifyEffectiveShield(this, s, attack, m)));

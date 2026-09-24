@@ -27,6 +27,9 @@
     "doomEventId": { "type": "string", "pattern": "^EVT_[A-Z0-9_]+$", "description": "Événement hors paquet, révélé à la manche doomRound." },
     "roundStartRotation": { "enum": ["None", "Clockwise", "CounterClockwise"], "description": "Déplacement du premier joueur à chaque manche (RULES A4.4). Le tour de table reste horaire." },
     "technologiesToWin": { "type": "integer", "minimum": 1, "maximum": 4, "description": "Technologies différentes nécessaires pour l'Élection galactique (RULES A9)." },
+    "defensivePostureBonus": { "type": "integer", "minimum": 0, "maximum": 8, "description": "Option à l'étude : action d'équipage « posture défensive », bonus au bouclier effectif jusqu'au prochain tour (RULES A5.4). 0 = désactivée." },
+    "leaderBounty": { "type": "integer", "minimum": 0, "maximum": 99, "description": "Option à l'étude : bonus à la valeur d'attaque contre le seul joueur qui a le plus de PV (RULES A6). 0 = désactivée." },
+    "ghostsChooseEvent": { "type": "boolean", "description": "Option à l'étude : un joueur éliminé choisit l'événement de la manche entre deux (RULES A4.1)." },
     "playerCounts": {
       "type": "array",
       "minItems": 1,

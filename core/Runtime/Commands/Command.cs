@@ -27,6 +27,8 @@ namespace Vortex.Core.Commands
         EndTurn = 9,
         /// <summary>Answer the pending decision <see cref="Command.DecisionId"/> with <see cref="Command.Option"/>.</summary>
         AnswerDecision = 10,
+        /// <summary>Crew action: defensive posture, when the rule option is enabled (RULES A5.4).</summary>
+        DefensivePosture = 11,
     }
 
     /// <summary>Crew actions (RULES A5.4).</summary>
@@ -40,6 +42,8 @@ namespace Vortex.Core.Commands
         Sabotage = 2,
         /// <summary>Gain an overcharge token.</summary>
         Overcharge = 3,
+        /// <summary>Raise one's effective shield until one's next turn (rule option).</summary>
+        DefensivePosture = 4,
     }
 
     /// <summary>
@@ -98,6 +102,9 @@ namespace Vortex.Core.Commands
 
         /// <summary>Gain an overcharge token.</summary>
         public static Command Overcharge() => new Command { Type = CommandType.Overcharge };
+
+        /// <summary>Take a defensive posture.</summary>
+        public static Command DefensivePosture() => new Command { Type = CommandType.DefensivePosture };
 
         /// <summary>End the turn.</summary>
         public static Command EndTurn() => new Command { Type = CommandType.EndTurn };

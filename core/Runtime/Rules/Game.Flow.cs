@@ -121,6 +121,12 @@ namespace Vortex.Core.Rules
             else if (Config.EventFrequency > 0 && (State.Round - 1) % Config.EventFrequency == 0)
             {
                 eventId = DrawEvent();
+                int ghost = Config.GhostsChooseEvent ? GhostChoosingEvent() : -1;
+                string? other = eventId != null && ghost >= 0 ? DrawEvent() : null;
+                if (other != null)
+                {
+                    eventId = GhostChoosesEvent(ghost, eventId!, other);
+                }
             }
 
             if (eventId != null)
@@ -139,6 +145,29 @@ namespace Vortex.Core.Rules
 
             Raise((e, s) => e.OnRoundStart(this, s));
             CheckEliminations();
+        }
+
+        // Eliminated players take turns, in seat order, to choose the event (RULES A4.1); -1 if nobody is eliminated.
+        private int GhostChoosingEvent()
+        {
+            List<int> ghosts = State.Players.Where(p => p.Eliminated).Select(p => p.Seat).ToList();
+            return ghosts.Count == 0 ? -1 : ghosts[State.Round % ghosts.Count];
+        }
+
+        // The ghost keeps one of the two drawn events; the other goes to the event discard pile.
+        private string GhostChoosesEvent(int ghost, string first, string second)
+        {
+            var options = new List<Decisions.DecisionOption>
+            {
+                new Decisions.DecisionOption { Key = "first", ContentId = first },
+                new Decisions.DecisionOption { Key = "second", ContentId = second },
+            };
+            string key = Ask(ghost, Decisions.DecisionKind.ChooseOption, "ghost.event", null, options);
+            string kept = key == "first" ? first : second;
+            string aside = key == "first" ? second : first;
+            State.EventDiscard.Add(aside);
+            Emit(new GameEvent { Type = GameEventType.EventSetAside, Player = ghost, Id = aside });
+            return kept;
         }
 
         private string? DrawEvent()

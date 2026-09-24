@@ -72,7 +72,17 @@ namespace Vortex.Simulator
                 RowMean(sb, "Première élimination (manche)", columns, s => s.FirstElimination);
                 RowProportion(sb, "Le meneur à mi-partie gagne", columns, s => s.MidGameLeaderWins);
                 RowProportion(sb, "Attaques sur le meneur", columns, s => s.AttacksOnLeader);
+                RowProportion(sb, "Attaques sur le plus faible", columns, s => s.AttacksOnWeakest);
                 RowProportion(sb, "Attaques sans dégâts", columns, s => s.Harmless);
+                for (int action = 0; action < GameRecord.CrewActionCount; action++)
+                {
+                    int a = action;
+                    if (columns.Any(s => s.CrewActions[a].Successes > 0))
+                    {
+                        RowProportion(sb, "Action d'équipage : " + CrewActionFr(a), columns, s => s.CrewActions[a]);
+                    }
+                }
+
                 Row(sb, "PV retirés par attaque", columns, s => s.HpPerAttack);
                 Row(sb, "Attaques par tour", columns, s => s.AttacksPerTurn);
             }

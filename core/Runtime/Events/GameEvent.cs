@@ -75,6 +75,10 @@ namespace Vortex.Core.Events
         DieRolled = 33,
         /// <summary>An effect did something noteworthy: Player, Id = source, Text = key.</summary>
         EffectTriggered = 34,
+        /// <summary>Bounty on the HP leader added to an attack: Player = attacker, Other = leader, Amount = bonus.</summary>
+        LeaderBountyApplied = 35,
+        /// <summary>An event drawn for an eliminated player's choice was set aside: Player = chooser, Id = event.</summary>
+        EventSetAside = 36,
     }
 
     /// <summary>

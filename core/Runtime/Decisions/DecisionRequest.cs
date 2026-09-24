@@ -84,10 +84,13 @@ namespace Vortex.Core.Decisions
         /// <summary>Referenced number (value, index), if relevant.</summary>
         public int Number { get; set; }
 
+        /// <summary>Referenced content id (e.g. an event), or null.</summary>
+        public string? ContentId { get; set; }
+
         /// <summary>Copy.</summary>
         public DecisionOption Clone()
         {
-            return new DecisionOption { Key = Key, Player = Player, CardUid = CardUid, Number = Number };
+            return new DecisionOption { Key = Key, Player = Player, CardUid = CardUid, Number = Number, ContentId = ContentId };
         }
     }
 }

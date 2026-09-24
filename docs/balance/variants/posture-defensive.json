@@ -1,0 +1,7 @@
+{
+  "name": "Posture défensive (+2)",
+  "description": "Étape 2.3 (ARB-44) : nouvelle action d'équipage, +2 au bouclier effectif jusqu'au prochain tour du joueur (RULES A5.4).",
+  "config": {
+    "defensivePostureBonus": 2
+  }
+}

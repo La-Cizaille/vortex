@@ -14,6 +14,9 @@
   "doomEventId": "EVT_FIN_DES_TEMPS",
   "roundStartRotation": "Clockwise",
   "technologiesToWin": 3,
+  "defensivePostureBonus": 0,
+  "leaderBounty": 0,
+  "ghostsChooseEvent": false,
   "playerCounts": [
     {
       "players": 2,

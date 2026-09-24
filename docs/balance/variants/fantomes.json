@@ -1,0 +1,7 @@
+{
+  "name": "Fantômes",
+  "description": "Étape 2.3 (ARB-44) : un joueur éliminé choisit l'événement de la manche entre deux (RULES A4.1).",
+  "config": {
+    "ghostsChooseEvent": true
+  }
+}
