@@ -120,6 +120,10 @@ namespace Vortex.Tests.EditMode
             string[] scenes = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray();
             Assert.That(scenes, Does.Contain(GameScene.ScenePath));
             Assert.That(scenes, Does.Not.Contain(GalleryScene.ScenePath), "The gallery is a design tool, not part of the game.");
+            foreach (EditorBuildSettingsScene listed in EditorBuildSettings.scenes)
+            {
+                Assert.That(AssetDatabase.GUIDToAssetPath(listed.guid.ToString()), Is.EqualTo(listed.path), "Listed under its current id: " + listed.path);
+            }
         }
     }
 }
