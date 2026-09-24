@@ -18,15 +18,15 @@ Les bots ne jouent pas comme des humains (ADR-0010). Un écart mesuré est un **
 
 Validés par le game designer (ARB-40), puis recentrés sur le **mode standard à 5 joueurs**, seule table équilibrée (ARB-52, ARB-53). De 2 à 4 joueurs, le jeu reste jouable, sans objectif d'équilibrage.
 
-| Critère (5 joueurs) | Cible | Référence initiale | Aujourd'hui ([référence v2](2026-09-24-reference-v2.md)) |
+| Critère (5 joueurs) | Cible | Référence initiale | Aujourd'hui ([référence v3](2026-09-24-reference-v3.md)) |
 |---|---|---|---|
-| Avantage de position | Chaque position à ±3 pts de la part équitable | Premier joueur à +10 pts | **Atteint** : 2,9 pts |
-| Durée | 20 à 25 min (ARB-53) | Environ 22 min | **Atteint** : environ 21 min (estimation à 30 s par tour) |
-| Rôle de la Fin des temps | Filet de sécurité : atteinte dans moins de 30 % des parties | 90 % | Non atteint : 89 % |
-| Élection galactique | 5 à 15 % des victoires | 0,2 % | Non atteint : 3,7 % |
-| Puissance des cartes | Chaque carte à ±5 pts de la moyenne, aucune carte « morte » | Écarts de −7 à +12 pts | Non atteint : de −7,0 à +16,7 pts (toutes tables confondues) |
+| Avantage de position | Chaque position à ±3 pts de la part équitable | Premier joueur à +10 pts | **Atteint** : 2,5 pts |
+| Durée | 20 à 25 min (ARB-53) | Environ 22 min | **Atteint** : environ 23 min (estimation à 30 s par tour) |
+| Rôle de la Fin des temps | Filet de sécurité : atteinte dans moins de 30 % des parties | 90 % | **Atteint** : 20 % |
+| Élection galactique | 5 à 15 % des victoires | 0,2 % | **Atteint** : 6,4 % |
+| Puissance des cartes | Chaque carte à ±5 pts de la moyenne, aucune carte « morte » | Écarts de −7 à +12 pts | Non atteint : de −5,2 à +9,2 pts ; 9 cartes à +5 pts ou plus, 2 à −5 pts ou moins |
 | Part des choix face au hasard | À définir avec les niveaux de bot (étape 1) | Mal mesurée | À définir |
-| Première élimination | Pas avant la manche 6 (cible fixée pour 4 joueurs, transposée à 5 : **à confirmer**) | Non mesurée | Non atteint : manche 4,3 |
+| Première élimination | Pas avant la manche 6 : un joueur ne devrait pas sortir avant d'avoir joué environ 6 tours (cible fixée pour 4 joueurs, **à confirmer** à 5) | Non mesurée | Non atteint : manche 4,6 |
 
 ## Plan et avancement
 
@@ -35,7 +35,7 @@ Validés par le game designer (ARB-40), puis recentrés sur le **mode standard �
 | **0** | Objectifs chiffrés | Validée (ARB-40) |
 | **1** | Instruments de mesure : variantes et comparaison, niveaux de bot, nouvelles mesures, options de règles | Faite (ARB-41, ADR-0011) |
 | **2.1** | Avantage du premier joueur : premier joueur tournant, sens horaire ou anti-horaire (ARB-42) | **Adoptée** : rotation horaire (ARB-50) |
-| **2.2** | Grille PV × bouclier de départ × manche de Fin des temps, à 5 joueurs (ARB-43, ARB-52) | Mesurée, décision attendue |
+| **2.2** | Grille PV × bouclier de départ × manche de Fin des temps, à 5 joueurs (ARB-43, ARB-52) | **Adoptée** : 30 PV, bouclier 5, Fin des temps à la manche 16 (ARB-54) |
 | **2.3** | Nouvelles mécaniques (ARB-44, ARB-45) : relance d'un dé par la surcharge, reparamétrage à 2 dés dont on garde 1, coût du recyclage, posture défensive, événement annoncé, prime sur le leader, pillage, fantômes, défausse tactique | À faire |
 | **2.4** | Fréquence des événements (une par manche, toutes les 2 ou 3 manches) et effet de chaque événement (ARB-46) | À faire |
 | **2.5** | Élection galactique à 3 technologies au lieu de 4 (ARB-47) | **Adoptée** : 3 technologies (ARB-51). Fréquence de l'Élection à revoir avec 2.2 |
@@ -154,6 +154,16 @@ Une variante est un petit fichier JSON dans [`variants/`](variants/). Il ne cont
 
 ## Constats
 
+### Référence v3 : rythme adopté (2026-09-24)
+
+Rapport : [`2026-09-24-reference-v3.md`](2026-09-24-reference-v3.md). 3 000 parties à 5 joueurs par scénario, bots `normal`, aucune erreur du moteur. Règles : rotation horaire (ARB-50), Élection à 3 technologies (ARB-51), bouclier de départ 5 et Fin des temps à la manche 16 (ARB-54).
+
+1. **Quatre objectifs sur cinq sont atteints** : position (2,5 pts), durée (environ 23 min), Fin des temps (20 %) et Élection (6,4 %).
+2. **La première élimination reste précoce** (manche 4,6). Le premier éliminé attend environ 14 minutes. C'est la question ouverte de l'étape 2.3.
+3. **L'écart entre les cartes s'est resserré** : de −5,2 à +9,2 pts, contre −7 à +16,7 avant. Orgueil (D_016) descend de +16,7 à +6,0 pts. Restent au-dessus de +5 pts : Quarantaine obligatoire (D_021), Accident bactériologique (A_021), Vente de pièces détachées (D_012), Roulette (D_024), Ni vu ni connu (D_003), Nothing else matters (D_014), Dommage collatéral (D_002), Orgueil (D_016) et, à la limite, T'as pas entendu un truc? (D_008). Les deux cartes des joueurs adjacents (A_021, D_024) sont fortes à 5 joueurs : ce mode leur donne bien leur sens. C'est la matière de la revue des cartes (étape 3).
+4. **Les couleurs se sont rapprochées** : de 20,2 % (jaune) à 23,5 % (bleu) de victoires pour les joueurs à dominante, pour une part équitable de 20 %.
+5. **Événements** : Tempête électro-magnétique et Surcharge ionique rebattent toujours le plus les cartes (le meneur garde la tête dans 71 à 74 % des cas, contre 85 % pour l'événement témoin). Trou noir semble toujours protéger le meneur (89 %). À examiner à l'étape 2.4.
+
 ### Étape 2.2 : rythme à 5 joueurs (2026-09-24)
 
 Trois rapports, tous sans erreur du moteur :
@@ -182,7 +192,7 @@ Trois rapports, tous sans erreur du moteur :
 - la première élimination recule un peu ;
 - le coût en attaques sans dégâts reste modéré (27 % au lieu de 22 %).
 
-Si l'on veut toucher le moins de choses possible, **30 PV, bouclier 4, manche 16** ne change que la Fin des temps, mais l'Élection est alors à la limite de sa cible. **Décision attendue du game designer.**
+Si l'on veut toucher le moins de choses possible, **30 PV, bouclier 4, manche 16** ne change que la Fin des temps, mais l'Élection est alors à la limite de sa cible. **Décision : la recommandation est adoptée (ARB-54).**
 
 ### Référence v2 : règles adoptées (2026-09-24)
 
