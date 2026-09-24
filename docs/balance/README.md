@@ -1,50 +1,190 @@
 # Équilibrage
 
-Ce dossier contient les **rapports du simulateur** (`Vortex.Simulator`) et leur analyse. Un rapport est généré, reproductible (graine et empreinte du contenu indiquées en tête), et n'est jamais modifié à la main.
+Ce dossier contient le **plan d'équilibrage**, les **variantes** à tester et les **rapports du simulateur** (`Vortex.Simulator`), avec leur analyse. Un rapport est généré et reproductible : la commande complète et l'empreinte du contenu simulé figurent en tête. Il n'est jamais modifié à la main.
 
-## Lancer une simulation
+Les décisions du game designer sont consignées dans le [journal des arbitrages](../ARBITRAGES.md) (ARB-40 et suivants). Les choix d'outillage sont justifiés dans l'[ADR-0011](../adr/0011-options-de-regles-et-variantes.md).
 
+## Démarche
+
+On équilibre **d'abord les règles de base, puis les cartes**. La valeur d'une carte dépend des chiffres de base : un « +4 » n'a pas le même poids si une attaque retire 3,5 PV ou 6 PV.
+
+Chaque changement suit la même boucle :
+
+**hypothèse → variante → comparaison simulée → décision du game designer → PR avec le rapport.**
+
+Les bots ne jouent pas comme des humains (ADR-0010). Un écart mesuré est un **signal à confirmer en partie réelle**, pas un verdict.
+
+## Objectifs (étape 0)
+
+Validés par le game designer (ARB-40).
+
+| Critère | Cible | Référence du 2026-09-24 |
+|---|---|---|
+| Avantage de position | Chaque position à ±3 pts de la part équitable (±5 pts en duel) | Premier joueur à +14 à +21 pts |
+| Durée à 4 joueurs | 15 à 20 min | Environ 18 min (estimation à 30 s par tour) |
+| Rôle de la Fin des temps | Filet de sécurité : atteinte dans moins de 30 % des parties | 38 à 90 % |
+| Élection galactique | 5 à 15 % des victoires | Moins de 0,5 % |
+| Puissance des cartes | Chaque carte à ±5 pts de la moyenne, aucune carte « morte » | Écarts de −7 à +12 pts |
+| Part des choix face au hasard | À définir avec les niveaux de bot (étape 1) | Mal mesurée |
+| Première élimination | Pas avant la manche 6 à 4 joueurs | Manche 5,0 en moyenne (mesurée à l'étape 1) |
+
+## Plan et avancement
+
+| Étape | Contenu | État |
+|---|---|---|
+| **0** | Objectifs chiffrés | Validée (ARB-40) |
+| **1** | Instruments de mesure : variantes et comparaison, niveaux de bot, nouvelles mesures, options de règles | Faite (ARB-41, ADR-0011) |
+| **2.1** | Avantage du premier joueur : premier joueur tournant, sens horaire ou anti-horaire (ARB-42) | Mesurée, décision attendue |
+| **2.2** | Grille PV × bouclier de départ × manche de Fin des temps, par nombre de joueurs (ARB-43) | À faire |
+| **2.3** | Nouvelles mécaniques (ARB-44, ARB-45) : relance d'un dé par la surcharge, reparamétrage à 2 dés dont on garde 1, coût du recyclage, posture défensive, événement annoncé, prime sur le leader, pillage, fantômes, défausse tactique | À faire |
+| **2.4** | Fréquence des événements (une par manche, toutes les 2 ou 3 manches) et effet de chaque événement (ARB-46) | À faire |
+| **2.5** | Élection galactique à 3 technologies au lieu de 4 (ARB-47) | Mesurée, décision attendue |
+| **3** | Revue des cartes : tri, ajustement par famille, cartes de hasard, équilibre des couleurs. Outil visuel à construire au début de l'étape (ARB-48) | À faire |
+| **4** | Validation humaine sur un prototype Unity (ARB-49) | Après l'étape 3 |
+
+## Outils
+
+### Rapport complet : `run`
+
+```bash
+dotnet run -c Release --project dotnet/Vortex.Simulator -- run --games 1000 --seed 1 --out docs/balance/<date>-<sujet>.md
 ```
-dotnet run -c Release --project dotnet/Vortex.Simulator -- --players 2,3,4,5 --games 1000 --seed 1 --out docs/balance/<date>-<sujet>.md
+
+Pour chaque taille de table, deux scénarios :
+- **scénario principal** : tous les bots au niveau `--bot`. Il sert à mesurer la durée, l'avantage de position, les combats, les cartes, les couleurs et les événements ;
+- **écart de niveau** : un bot `hero` contre des bots `others` (`--skill hero,others`), pour mesurer le poids des choix.
+
+Avec `--variant <fichier>`, le rapport porte sur la variante au lieu de la référence.
+
+### Comparer des variantes : `compare`
+
+```bash
+dotnet run -c Release --project dotnet/Vortex.Simulator -- compare --games 2000 --seed 1 --variant docs/balance/variants/rotation-horaire.json --variant docs/balance/variants/rotation-antihoraire.json --out docs/balance/<date>-<sujet>.md
 ```
+
+La référence (le contenu du dépôt) et chaque variante jouent **les mêmes parties** : mêmes graines, donc mêmes mélanges et mêmes dés au départ. Le rapport donne, pour chaque taille de table, les indicateurs de chaque variante et leur écart avec la référence.
+
+**Lire une comparaison**
+- `+4,2 (… ± 2,9 pts *)` : la variante fait 4,2 points de plus que la référence. La marge d'erreur à 95 % est de 2,9 points, et le `*` indique que l'écart la dépasse.
+- La marge suppose des échantillons indépendants. Comme les parties sont jumelles, elle est **prudente**.
+- Un rapport contient des dizaines d'indicateurs : au seuil de 95 %, environ **un sur vingt** peut être marqué `*` par hasard. On ne conclut que sur des écarts attendus, nets, et confirmés par une autre graine (`--seed 2`) ou un autre niveau de bot.
+- Avec 2 000 parties par taille de table, la marge sur un taux de victoire est d'environ ±3 pts. Il faut 4 fois plus de parties pour la diviser par 2.
+
+### Options
 
 | Option | Rôle | Défaut |
 |---|---|---|
+| `run` ou `compare` | Commande (premier argument) | `run` |
 | `--players` | Tailles de table simulées | `2,3,4,5` |
-| `--games` | Parties par scénario et par taille de table | `200` |
-| `--seed` | Graine : même graine et même contenu donnent les mêmes chiffres | `1` |
-| `--samples` | Simulations par coup candidat du bot heuristique (plus = plus fort et plus lent) | `2` |
-| `--data` | Dossier du contenu | `core/Runtime/Data` |
+| `--games` | Parties par taille de table (et par scénario) | `200` |
+| `--seed` | Graine : même commande et même contenu donnent les mêmes chiffres | `1` |
+| `--bot` | Niveau des bots du scénario principal : `random`, `naive`, `normal`, `strong` | `normal` |
+| `--skill` | `run` seulement : niveaux du scénario « écart de niveau », `hero,others` | `normal,random` |
+| `--variant` | Fichier de variante. Au plus 1 avec `run`, de 1 à 8 avec `compare` | — |
+| `--data` | Dossier du contenu de référence | `core/Runtime/Data` |
 | `--out` | Fichier du rapport (sinon, sortie standard) | — |
 
-Pour chaque taille de table, le simulateur joue deux scénarios :
-- **tous heuristiques**, pour la durée des parties, l'avantage de position, les combats, les cartes et les événements ;
-- **écart de niveau**, avec un bot heuristique contre des bots aléatoires.
+Niveaux de bot (ADR-0010) :
 
-Il renvoie le code 1 si le moteur a rencontré une erreur. Dans ce cas, le rapport liste les graines pour rejouer les parties concernées.
+| Niveau | Jeu |
+|---|---|
+| `random` | Coups légaux au hasard : aucune compétence |
+| `naive` | Essaie chaque coup une fois, sans simuler la fin de son tour |
+| `normal` | Essaie chaque coup sur 2 tirages et simule la fin de son tour |
+| `strong` | Comme `normal`, sur 6 tirages : plus fort, mais nettement plus lent |
+
+Un déséquilibre qu'on retrouve avec plusieurs niveaux est réel. S'il n'apparaît qu'avec un seul niveau, c'est probablement un artefact du bot.
+
+Codes de sortie : 0 si tout va bien ; 1 si le moteur a rencontré une erreur (le rapport liste alors les graines pour rejouer les parties) ; 2 pour une option ou un contenu invalide.
+
+### Écrire une variante
+
+Une variante est un petit fichier JSON dans [`variants/`](variants/). Il ne contient **que ce qui change** :
+
+```json
+{
+  "name": "Canon renforcé",
+  "description": "A_001 vole 3 points de bouclier au lieu de 2.",
+  "cards": { "A_001": { "effects": [ { "brick": "StealShieldBeforeAttack", "amount": 3 } ] } }
+}
+```
+
+- `name` est obligatoire. `description`, `config` (voir [`variants/election-3-technologies.json`](variants/election-3-technologies.json)), `cards`, `events` et `technologies` sont facultatifs. Les cartes, événements et technologies sont désignés par leur id.
+- Les objets se fusionnent. Toute autre valeur, **tableaux compris**, est remplacée : pour changer une brique, on redonne la liste `effects` complète.
+- Sont refusés : une clé ou un id inconnu, un changement d'id, une valeur `null`, une clé répétée, un changement de version de format.
+- Le résultat est validé par **le même chargeur que le jeu**. Une variante invalide est refusée avec le message du chargeur.
+- Les fichiers de contenu ne sont **jamais** modifiés. Un test vérifie que toutes les variantes du dossier restent valides.
 
 ## Évaluer une modification de carte
-1. Lancer une simulation de référence avec la graine habituelle, **avant** la modification.
-2. Modifier le JSON de la carte, puis valider le contenu (`Vortex.ContentTool validate`).
-3. Relancer la simulation avec **la même graine**, et comparer les deux rapports : durée, écart de la carte, avantage de position.
-4. Joindre les deux rapports à la PR.
 
-Les bots ne jouent pas comme des humains (voir ADR-0010). Un écart de quelques points est un **signal à confirmer en partie réelle**, pas un verdict.
+1. Décrire la modification dans une variante, puis la comparer à la référence avec `compare`, sur au moins 2 000 parties.
+2. Si le changement est adopté par le game designer : modifier le JSON de la carte, valider le contenu (`Vortex.ContentTool validate`), consigner l'arbitrage dans le [journal](../ARBITRAGES.md), puis supprimer la variante devenue inutile.
+3. Joindre le rapport de comparaison à la PR.
 
-## Premiers constats : référence du 2026-09-24
+## Constats
 
-Rapport : [`2026-09-24-reference.md`](2026-09-24-reference.md), 8 000 parties, aucune erreur du moteur.
+### Étapes 2.1 et 2.5 : ordre de jeu et Élection (2026-09-24)
 
-1. **Fort avantage au premier joueur.** Le joueur qui gagne l'initiative remporte 71 % des duels (au lieu de 50 %), 46 % des parties à 3 (au lieu de 33 %) et 38 % à 4 (au lieu de 25 %). Le taux de victoire décroît avec la position dans le tour. C'est le déséquilibre le plus net, et il est structurel. Pistes à simuler :
-   - le premier joueur ne peut pas attaquer à la première manche ;
-   - un bonus de bouclier ou de PV de départ pour les derniers joueurs ;
-   - un premier joueur qui tourne à chaque manche.
-2. **La Fin des temps rythme les parties.** Elle est atteinte dans 38 % des duels, 67 % des parties à 3, 82 % à 4 et 90 % à 5. Les parties durent en moyenne 9 à 13 manches, soit environ 9 à 22 minutes à 30 s par tour de joueur (hypothèse). C'est cohérent pour du mobile ; le réglage de `DoomRound[n]` sera le levier principal de la durée.
-3. **L'Élection galactique n'arrive presque jamais** (0 à 0,4 % des victoires). Réunir 4 paires de couleurs en sacrifiant ses cartes semble irréaliste dans la durée d'une partie. C'est à discuter : soit c'est voulu (une victoire rare et spectaculaire), soit la condition doit baisser (3 technologies ?).
-4. **Les choix comptent face au hasard pur.** Un bot heuristique bat des bots aléatoires dans 77 à 99 % des parties. C'est rassurant, mais la référence aléatoire est faible (voir ADR-0010). La mesure fine de la part du hasard viendra d'une comparaison entre deux niveaux de bot.
+Rapport : [`2026-09-24-ordre-et-election.md`](2026-09-24-ordre-et-election.md). 2 000 parties par taille de table et par variante (32 000 parties au total), bots `normal`, aucune erreur du moteur.
+
+**Premier joueur tournant (2.1, ARB-42).** Écart maximal d'une position à la part équitable, en points :
+
+| Joueurs | Cible | Référence | Rotation horaire | Rotation anti-horaire |
+|---|---|---|---|---|
+| 2 | ±5 | 21,0 | **1,4** | **1,4** |
+| 3 | ±3 | 14,9 | 3,5 | 3,7 |
+| 4 | ±3 | 11,4 | **1,7** | **1,4** |
+| 5 | ±3 | 9,8 | **2,8** | **2,3** |
+
+1. **La rotation supprime presque tout l'avantage du premier joueur**, dans les deux sens. La cible est atteinte à 2, 4 et 5 joueurs, et presque atteinte à 3 joueurs (3,5 pts pour ±3).
+2. **En duel, les deux sens donnent exactement le même ordre** (A B, B A, A B…) : les chiffres sont identiques, ce qui confirme la cohérence de l'outil.
+3. **Les deux sens se valent sur l'équité.** Ils diffèrent sur le rythme :
+   - en **horaire**, le joueur qui vient d'ouvrir la manche joue en dernier à la suivante : il attend deux fois plus longtemps que les autres ;
+   - en **anti-horaire**, le dernier joueur d'une manche ouvre la suivante : il joue **deux tours d'affilée**. Les attaques deviennent plus efficaces (à 3 joueurs : 18,5 % d'attaques sans dégâts au lieu de 21,1 %, 4,2 PV retirés par attaque au lieu de 3,7), et la première élimination arrive un peu plus tôt (−0,2 manche).
+4. **Effets secondaires faibles** : à 2 et 3 joueurs, les parties sont un peu plus courtes (−0,4 à −0,5 manche) et la Fin des temps est un peu moins souvent atteinte (−3 à −6 pts). Rien de mesurable à 4 et 5 joueurs.
+5. **Cartes** : la rotation change réellement la valeur de certaines cartes. On compte 32 mouvements au-delà du bruit pour les deux sens, là où le hasard seul en produirait environ 5. Chaque ligne prise isolément reste toutefois incertaine. Le signal le plus solide est Orgueil (D_016), déjà la carte la plus forte : elle passe de +11,7 à +16,8 pts, avec le même mouvement dans les deux sens. L'Élection à 3 technologies ne déplace aucune carte.
+
+**Recommandation** : adopter la rotation **horaire**. Elle atteint les mêmes cibles, et elle ne crée pas de double tour, qui avance la première élimination alors que celle-ci est déjà trop précoce (voir plus bas). Le sens anti-horaire reste un bon choix si l'on veut des parties plus nerveuses. **Décision attendue du game designer.**
+
+**Élection à 3 technologies (2.5, ARB-47).** Part des victoires par Élection galactique :
+
+| Joueurs | Référence (4 technologies) | 3 technologies | Cible |
+|---|---|---|---|
+| 2 | 0,0 % | 2,4 % | 5 à 15 % |
+| 3 | 0,2 % | 2,6 % | 5 à 15 % |
+| 4 | 0,1 % | 3,6 % | 5 à 15 % |
+| 5 | 0,2 % | 5,0 % | 5 à 15 % |
+
+1. **Trois technologies rendent l'Élection possible, mais pas encore assez fréquente** : la cible n'est atteinte qu'à 5 joueurs.
+2. **Aucun effet secondaire mesurable** : durée, avantage de position et combats sont inchangés.
+3. **Limite des bots** : ils valorisent chaque technologie, mais ils ne planifient pas une collection. Un joueur humain qui vise l'Élection l'obtiendra plus souvent. La mesure est donc un **minimum**.
+
+**Recommandation** : adopter 3 technologies, qui va dans le bon sens sans rien dégrader, puis revoir l'Élection avec la grille de l'étape 2.2 : des parties plus longues laissent plus de temps pour réunir des combos. **Décision attendue du game designer.**
+
+**Nouvelles mesures de l'étape 1, sur la référence**
+
+| Joueurs | Première élimination (manche) | Le meneur à mi-partie gagne | Attaques sur le meneur |
+|---|---|---|---|
+| 2 | 8,9 | 69 % | — |
+| 3 | 6,1 | 65 % | 52 % |
+| 4 | **5,0** | 60 % | 41 % |
+| 5 | 4,3 | 56 % | 36 % |
+
+- **La première élimination est trop précoce** : manche 5 à 4 joueurs, pour une cible « pas avant la manche 6 ». La rotation ne la corrige pas. Le levier naturel est la grille PV et bouclier de départ de l'étape 2.2.
+- **Les retournements existent** : le meneur à mi-partie gagne 56 à 69 % du temps, d'autant moins que la table est grande.
+- **Les bots visent le meneur un peu plus que le hasard** (41 % à 4 joueurs, pour 33 % avec un choix au hasard), en partie à cause des égalités de PV, qui comptent comme « meneur ». La « prime sur le leader » (étape 2.3) mesurera l'effet d'une vraie incitation.
+
+### Référence du 2026-09-24
+
+Rapport : [`2026-09-24-reference.md`](2026-09-24-reference.md), 8 000 parties, aucune erreur du moteur. Il a été produit avant l'étape 1, avec les bots `normal` (anciennement `--samples 2`).
+
+1. **Fort avantage au premier joueur.** Le joueur qui gagne l'initiative remporte 71 % des duels (au lieu de 50 %), 46 % des parties à 3 (au lieu de 33 %) et 38 % à 4 (au lieu de 25 %). Le taux de victoire décroît avec la position dans le tour. C'est le déséquilibre le plus net, et il est structurel.
+2. **La Fin des temps rythme les parties.** Elle est atteinte dans 38 % des duels, 67 % des parties à 3, 82 % à 4 et 90 % à 5. Les parties durent en moyenne 9 à 13 manches, soit environ 9 à 22 minutes à 30 s par tour de joueur (hypothèse). Le réglage de `DoomRound[n]` sera le levier principal de la durée.
+3. **L'Élection galactique n'arrive presque jamais** (0 à 0,4 % des victoires). Réunir 4 paires de couleurs en sacrifiant ses cartes semble irréaliste dans la durée d'une partie.
+4. **Les choix comptent face au hasard pur.** Un bot `normal` bat des bots aléatoires dans 77 à 99 % des parties. C'est rassurant, mais la référence aléatoire est faible (ADR-0010).
 5. **Combats.** Environ 3,5 PV retirés par attaque, et une attaque sur cinq ne fait aucun dégât.
-6. **Cartes à surveiller** (écart par rapport à la moyenne des cartes, bots actuels) :
+6. **Cartes à surveiller** (écart par rapport à la moyenne des cartes) :
    - **fortes** : Orgueil (D_016, +12 pts), Quarantaine obligatoire (D_021), Canon à particules (A_001), Vente de pièces détachées (D_012), Générateur auxiliaire (D_011) ;
    - **faibles** : Tout est une question d'équilibre (D_020, −7 pts), Le grand final (A_010, −6 pts), Spores corrosifs (A_020), Recels en tous genres (A_014), Niaque (D_010).
 
-   Les soins massifs et le bouclier ressortent en tête : dans un jeu où l'on retire peu de PV par attaque, récupérer des PV ou monter son bouclier est très rentable. Ces classements dépendent en partie du style des bots : ils sont à confirmer lors de la revue des cartes.
+   Les soins massifs et le bouclier ressortent en tête : dans un jeu où l'on retire peu de PV par attaque, récupérer des PV ou monter son bouclier est très rentable. Ces classements dépendent en partie du style des bots ; ils seront confirmés lors de la revue des cartes.

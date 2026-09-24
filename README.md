@@ -4,15 +4,15 @@ Jeu de combat de vaisseaux spatiaux au tour par tour, en chacun pour soi, de 2 �
 
 Adaptation numérique d'un jeu de société. Cibles : **Android** et **Windows**. Style 3D simple, pensé pour le mobile.
 
-> État : **M3, simulateur d'équilibrage**. M0 à M2 sont terminés. La feuille de route est plus bas.
+> État : **passe d'équilibrage** (entre M3 et M4). M0 à M3 sont terminés : moteur complet, 54 modificateurs, 8 événements, 4 technologies, bots et simulateur. La feuille de route est plus bas.
 
 ## Structure du dépôt
 
 | Dossier | Contenu |
 |---|---|
-| [`docs/`](docs/) | [Règles](docs/RULES.md), [catalogue des cartes](docs/CARDS.md) (généré), [architecture](docs/ARCHITECTURE.md), [sécurité](docs/SECURITY.md), [contribution](docs/CONTRIBUTING.md), [décisions (ADR)](docs/adr/). |
+| [`docs/`](docs/) | [Règles](docs/RULES.md), [journal des arbitrages](docs/ARBITRAGES.md), [catalogue des cartes](docs/CARDS.md) (généré), [équilibrage](docs/balance/README.md), [architecture](docs/ARCHITECTURE.md), [sécurité](docs/SECURITY.md), [contribution](docs/CONTRIBUTING.md), [décisions techniques (ADR)](docs/adr/). |
 | `core/` | Moteur de règles en C# pur, partagé entre Unity, les tests, le simulateur et le futur serveur. `core/Runtime/Data/*.json` est la **source de vérité** des cartes. |
-| `dotnet/` | Solution .NET : tests, outil de contenu (validation, format, catalogue), simulateur d'équilibrage (M3), serveur (phase 2). |
+| `dotnet/` | Solution .NET : tests, outil de contenu (validation, format, catalogue), simulateur d'équilibrage, serveur (phase 2). |
 | `unity/` | Client Unity 6.3 LTS (URP). |
 
 ## Pré-requis
@@ -27,10 +27,33 @@ Adaptation numérique d'un jeu de société. Cibles : **Android** et **Windows**
 ```bash
 git clone <url> && cd vortex
 git lfs pull
-dotnet test dotnet/Vortex.sln        # à partir de M0
+dotnet test dotnet/Vortex.sln
+```
+
+Valider le contenu après une modification de carte :
+
+```bash
+dotnet run --project dotnet/Vortex.ContentTool -- validate core/Runtime/Data
+```
+
+Simuler des parties et comparer une variante de règles à la référence (mode d'emploi : [`docs/balance/README.md`](docs/balance/README.md)) :
+
+```bash
+dotnet run -c Release --project dotnet/Vortex.Simulator -- compare --games 2000 --variant docs/balance/variants/rotation-horaire.json
 ```
 
 Ouvrir le dossier `unity/` dans Unity Hub (à partir de M4).
+
+## Où trouver quoi
+
+| Je cherche… | Document |
+|---|---|
+| Comment se joue une partie | [`RULES.md`](docs/RULES.md), partie A |
+| Pourquoi une règle ou une carte fonctionne ainsi | [`ARBITRAGES.md`](docs/ARBITRAGES.md) |
+| Le texte et l'interprétation d'une carte | [`CARDS.md`](docs/CARDS.md) (généré depuis `core/Runtime/Data/`) |
+| Les objectifs et l'avancement de l'équilibrage | [`balance/README.md`](docs/balance/README.md) |
+| Pourquoi le code est organisé ainsi | [`adr/`](docs/adr/) et [`ARCHITECTURE.md`](docs/ARCHITECTURE.md) |
+| Les questions encore ouvertes | [`RULES.md`](docs/RULES.md#questions-ouvertes-à-trancher-par-le-game-designer), en fin de fichier |
 
 ## Feuille de route
 
@@ -40,6 +63,7 @@ Ouvrir le dossier `unity/` dans Unity Hub (à partir de M4).
 | **M1** | Moteur de base : tours, marchés, attaques, Tourment, événements, combos, victoire |
 | **M2** | Les 54 modificateurs, 8 événements et 4 technologies |
 | **M3** | Simulateur bot contre bot et rapport d'équilibrage |
+| **Équilibrage** | Règles de base, puis revue des cartes avec un éditeur visuel (plan : [`docs/balance/README.md`](docs/balance/README.md)) |
 | **M4** | Client Unity jouable en hot-seat (visuels provisoires, habillage modifiable) |
 | **M5** | Finitions : modèles 3D, animations, builds Android et Windows |
 | Phase 2 | Serveur autoritaire, lobby, jeu en ligne |
