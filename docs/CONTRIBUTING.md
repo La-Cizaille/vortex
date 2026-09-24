@@ -103,6 +103,41 @@ Unity MCP permet à un assistant IA de piloter l'éditeur : scènes, objets, mod
 - **Jamais dans un produit livré** : le paquet contient un petit assembly runtime (utilitaires passifs). `ReleaseBuildGuard` fait donc échouer tout build de publication tant qu'un paquet réservé au développement est installé. Les builds de développement restent possibles.
 - Pour une montée de version : relire le changelog, mettre à jour le commit, la version du serveur et, si elles changent, les clés de préférence dans `UnityMcpSetup`.
 
+## Outils Unity sans l'éditeur
+
+Ces scripts lancent Unity en mode batch : l'éditeur doit être **fermé** (ils le vérifient et s'arrêtent sinon).
+
+| Script | Rôle |
+|---|---|
+| `tools/Test-Unity.ps1 [-Platform PlayMode]` | Lance les tests Unity et affiche le résumé. |
+| `tools/Update-UnityAssets.ps1` | Crée les assets de base qui manquent (thème, catalogues, prefabs, scènes, textes) et complète la table des textes. Ne remplace jamais un asset existant : pour en régénérer un, le supprimer d'abord. |
+| `tools/Capture-Unity.ps1 -Scene Game\|Gallery -Out <fichier.png> [-Round N]` | Enregistre une image 1920×1080 de la table (des bots jouent jusqu'à la manche demandée) ou de la galerie. Pratique pour vérifier une disposition, une illustration ou un modèle en contexte. |
+
+Chaque commande se lance avec `powershell -ExecutionPolicy Bypass -File <script>`.
+
+## Blender (modèles 3D)
+
+La chaîne de production est décrite dans l'ADR-0016, les visuels à créer et leurs formats dans [`ASSETS.md`](ASSETS.md).
+
+**Installer, une fois par poste**
+1. Blender LTS 4.5 : `winget install BlenderFoundation.Blender.LTS.4.5`. La 5.2 est possible, c'est une question ouverte d'ASSETS §5.
+2. L'extension Blender MCP, dans la même version que le serveur de `.mcp.json` : `uvx --from mcp-for-blender==2.0.4 mcp-for-blender install-addon`. Puis, dans Blender : *Edit → Preferences → Add-ons*, activer **MCP for Blender**.
+3. Dans les préférences de l'extension :
+   - laisser la télémétrie **décochée** ;
+   - dans le panneau de l'extension, laisser **décochées** les intégrations de téléchargement (Poly Haven, Sketchfab, Poly Pizza, Hyper3D, Hunyuan3D), sauf décision contraire (ASSETS §5).
+4. Laisser **désactivé** *Edit → Preferences → Save & Load → Auto Run Python Scripts* (réglage par défaut) : un `.blend` peut contenir des scripts.
+
+**Travailler avec l'assistant**
+1. Ouvrir Blender, appuyer sur `N` dans la vue 3D, ouvrir l'onglet **MCP for Blender** et cliquer sur **Start MCP Server**. L'extension écoute alors sur 127.0.0.1:9876.
+2. Démarrer Claude Code à la racine du dépôt, puis approuver le serveur `blender` de `.mcp.json`. Il tourne en **mode sûr** (`BLENDER_MCP_SAFE_MODE=1`) : chaque script est contrôlé avant de s'exécuter.
+3. Arrêter le serveur de l'extension à la fin de l'atelier : il n'a pas d'authentification.
+
+**Du modèle au jeu**
+1. Enregistrer la source dans `art-src/` (par exemple `art-src/ships/Ship_Faucon.blend`). Elle est stockée avec Git LFS.
+2. Exporter : `blender --background art-src/ships/Ship_Faucon.blend --python tools/blender/export_unity.py -- unity/Assets/_Vortex/Art/Ships/Ship_Faucon.fbx`. Le script refuse d'exporter si l'échelle n'est pas appliquée ou si le budget de triangles est dépassé.
+3. Dans Unity, associer le modèle à un siège ou au vaisseau par défaut dans `Theme/ShipCatalog`.
+4. Vérifier le résultat dans la scène Galerie, ou avec `tools/Capture-Unity.ps1`.
+
 ## Fusion des fichiers Unity
 Ajouter UnityYAMLMerge dans votre configuration Git locale (le chemin dépend de votre version d'Unity) :
 ```

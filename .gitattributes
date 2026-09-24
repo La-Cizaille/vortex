@@ -23,8 +23,9 @@
 *.psd  filter=lfs diff=lfs merge=lfs -text
 *.tga  filter=lfs diff=lfs merge=lfs -text
 *.exr  filter=lfs diff=lfs merge=lfs -text
-# 3D
+# 3D (Blender sources: art-src/, ADR-0016)
 *.fbx  filter=lfs diff=lfs merge=lfs -text
+*.blend filter=lfs diff=lfs merge=lfs -text
 *.glb  filter=lfs diff=lfs merge=lfs -text
 *.obj  filter=lfs diff=lfs merge=lfs -text
 # Audio

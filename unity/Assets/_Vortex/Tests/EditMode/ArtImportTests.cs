@@ -72,6 +72,29 @@ namespace Vortex.Tests.EditMode
             }
         }
 
+        [Test]
+        public void A_dropped_icon_becomes_a_small_sprite()
+        {
+            string path = ArtImportRules.IconsFolder + "/__test_icone.png";
+            Assume.That(File.Exists(path), Is.False);
+            try
+            {
+                var image = new Texture2D(8, 8, TextureFormat.RGBA32, false);
+                File.WriteAllBytes(path, image.EncodeToPNG());
+                Object.DestroyImmediate(image);
+                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceSynchronousImport);
+
+                var importer = (TextureImporter)AssetImporter.GetAtPath(path);
+                Assert.That(importer.textureType, Is.EqualTo(TextureImporterType.Sprite));
+                Assert.That(importer.maxTextureSize, Is.EqualTo(ArtImportRules.IconMaxSize));
+                Assert.That(importer.GetPlatformTextureSettings("Android").format, Is.EqualTo(TextureImporterFormat.ASTC_4x4));
+            }
+            finally
+            {
+                AssetDatabase.DeleteAsset(path);
+            }
+        }
+
         private static string PathOf(string id) => ArtImportRules.CardsFolder + "/" + id + ".png";
     }
 }

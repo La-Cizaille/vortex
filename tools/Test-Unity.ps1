@@ -5,7 +5,8 @@
 .DESCRIPTION
     Finds the editor matching unity/ProjectSettings/ProjectVersion.txt (or the one given by the
     UNITY_EDITOR environment variable), runs the tests of the requested platform, then reads the
-    NUnit result file. Exit code: 0 when every test passed, 1 otherwise, 2 on a setup problem.
+    NUnit result file. The editor must be closed. Exit code: 0 when every test passed, 1 otherwise,
+    2 on a setup problem.
 
 .EXAMPLE
     ./tools/Test-Unity.ps1
@@ -17,29 +18,24 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$root = Split-Path -Parent $PSScriptRoot
-$project = Join-Path $root 'unity'
-$versionLine = Select-String -Path (Join-Path $project 'ProjectSettings/ProjectVersion.txt') -Pattern '^m_EditorVersion: (.+)$'
-$version = $versionLine.Matches[0].Groups[1].Value.Trim()
+. (Join-Path $PSScriptRoot 'UnityCommon.ps1')
 
-$candidates = @(
-    $env:UNITY_EDITOR,
-    (Join-Path $env:ProgramFiles "Unity\Hub\Editor\$version\Editor\Unity.exe"),
-    "C:\Unity\$version\Editor\Unity.exe"
-) | Where-Object { $_ -and (Test-Path $_) }
-if (-not $candidates) {
-    Write-Error "Unity $version not found. Install it with Unity Hub, or set UNITY_EDITOR to its Unity.exe."
+try {
+    $editor = Get-VortexUnityEditor
+    Assert-VortexProjectClosed
+}
+catch {
+    Write-Error $_
     exit 2
 }
 
-$unity = @($candidates)[0]
 $results = Join-Path $env:TEMP "vortex-unity-$Platform-results.xml"
 $log = Join-Path $env:TEMP "vortex-unity-$Platform.log"
 Remove-Item -Force -ErrorAction SilentlyContinue $results, $log
 
-Write-Output "Unity $version, $Platform tests..."
-$arguments = @('-batchmode', '-projectPath', "`"$project`"", '-runTests', '-testPlatform', $Platform, '-testResults', "`"$results`"", '-logFile', "`"$log`"")
-$process = Start-Process -FilePath $unity -ArgumentList $arguments -Wait -PassThru -NoNewWindow
+Write-Output "Unity $($editor.Version), $Platform tests..."
+$arguments = @('-batchmode', '-projectPath', "`"$($editor.Project)`"", '-runTests', '-testPlatform', $Platform, '-testResults', "`"$results`"", '-logFile', "`"$log`"")
+$process = Start-Process -FilePath $editor.Path -ArgumentList $arguments -Wait -PassThru -NoNewWindow
 
 if (-not (Test-Path $results)) {
     Write-Error "No test results (exit code $($process.ExitCode)). See the log: $log"

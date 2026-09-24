@@ -61,6 +61,9 @@ namespace Vortex.Tests.EditMode
                 tray.Advance(0.2f);
                 Assert.That(tray.Settled, Is.True, "At speed 4, a 0.6 s roll takes 0.15 s.");
 
+                feedback.Play(new GameEvent { Type = GameEventType.DieRolled, Value = 4 }, new Stage(parent.transform, 1f));
+                Assert.That(parent.GetComponentsInChildren<DiceTray>(), Has.Length.EqualTo(1), "A new roll replaces the previous tray.");
+
                 Assert.That(feedback.Play(new GameEvent { Type = GameEventType.DiceRolled }, new Stage(parent.transform, 1f)), Is.Zero, "No dice, nothing to show.");
             }
             finally

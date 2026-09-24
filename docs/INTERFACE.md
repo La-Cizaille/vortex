@@ -113,6 +113,12 @@ Disposition à 5 joueurs, vue du joueur dont c'est le tour :
 - **Journal** : un panneau repliable, fermé par défaut, qui dit qui a fait quoi et avec quels jets de dés.
 - **Animations** : chaque événement du moteur est montré à son tour (ADR-0014). Un bouton « accélérer / passer » est disponible pendant qu'elles se jouent, et la vitesse par défaut se règle dans les options.
 
+### 3.9 Temps de tour limité (ARB-70)
+
+- Le tour d'un joueur a une **durée limitée**, que l'on peut **désactiver** pour les tests.
+- Le temps qui reste se voit, par exemple un anneau qui se vide autour du vaisseau ou du bouton « Fin de tour ». Il s'entend aussi : un signal sonore dans les dernières secondes.
+- Durée, comportement à l'expiration et temps de réponse aux décisions : questions ouvertes (§7).
+
 ## 4. Point de vue
 
 Toutes les informations sont publiques : aucun écran de passage de l'appareil n'est nécessaire.
@@ -156,7 +162,11 @@ Chaque geste envoie une commande du moteur à la session. Le moteur la valide : 
 
 ## 7. Questions ouvertes
 
-Aucune pour l'instant. La dépense de la surcharge a été tranchée par ARB-67.
+Sur le temps de tour limité (§3.9, ARB-70) :
+1. **Durée** d'un tour : fixe (par exemple 60 secondes) ou réglable dans le menu de la partie ?
+2. **À l'expiration** : le tour se termine simplement (fin du marché, puis fin de tour), ou un bot joue le reste du tour à la place du joueur ?
+3. **Décisions** demandées pendant le tour d'un autre (coup critique, déviation…) : un délai plus court, par exemple 15 secondes, puis un choix par défaut ?
+4. **Réglage** : activé par défaut dans une partie normale, désactivé dans le mode test ?
 
 ## 8. Ce qui est construit
 
@@ -166,4 +176,5 @@ Aucune pour l'instant. La dépense de la surcharge a été tranchée par ARB-67.
 | M4.4 | La table (scène `Game`) : bandeau, adversaires en arc dans l'ordre du tour, marché noir, vaisseau et cartes du joueur, jetons de Tourment, technologies, surcharge, effets temporaires, tour en cours, épave d'un joueur éliminé, marqueur du leader (option), journal, vitesse de lecture. Des bots jouent une partie entière qu'on regarde. |
 | M4.4, mode test | Le siège 1 est joué par une personne, les autres par des bots (niveau « normal » par défaut). Un panneau en bas à droite liste les coups que le moteur autorise, un bouton par coup, ainsi que les réponses quand une carte demande un choix. C'est un outil provisoire : il disparaîtra quand les gestes seront là. Réglages : objet `Partie` de la scène `Game`, rubrique *Partie de test*. |
 | M4.5, lisibilité | Après le premier playtest : **zoom** sur toute carte de la table (marché, panneaux, cartes du joueur). À la souris, la carte s'agrandit au survol ; sur écran tactile, tant que le doigt est posé dessus (l'appui long viendra avec le glisser-déposer). **Dés animés** : chaque lancer (attaque, ou dé d'un effet) s'affiche au centre, roule puis s'arrête sur les valeurs du moteur, avec le total gardé. |
-| M4.5, gestes | À venir : les gestes (§3.3 à §3.7) pour jouer soi-même. |
+| M4.5, gestes | À venir. Priorités retenues après le premier playtest (ARB-71) : boutons de recyclage au niveau du marché (§3.3) ; actions d'équipage au niveau du vaisseau, avec des pictogrammes reconnaissables (§3.4) ; informations d'un adversaire au survol (§3.1) ; glisser-déposer et aperçus (§3.4 à §3.7) ; temps de tour limité (§3.9). |
+| M5 | À venir (ARB-72) : modèles 3D (Blender, ADR-0016, [`ASSETS.md`](ASSETS.md)), fond stellaire animé (étoiles qui scintillent, planètes), audio (effets, signaux du temps de tour, musique). |

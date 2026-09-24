@@ -149,3 +149,13 @@ Le game designer a joué ses premières parties contre des bots. Ses remarques s
 | ARB-68 | La rotation du premier joueur (ARB-50) fait jouer deux fois de suite en duel : la manche suivante commence par le joueur qui vient de finir la précédente. Que faire ? | **La couper dès qu'il ne reste que deux joueurs en vie** : la manche commence alors par le joueur qui n'a pas joué en dernier. Personne ne joue jamais deux fois de suite, en partie à 2 comme en fin de partie à 5 (où le même double tour apparaissait une fois sur deux). Remarque du designer : « ça ne marche pas, il faut désactiver en duel ». | RULES A4.4, `Game.FirstSeatOfRound`, test `With_two_players_left_nobody_plays_twice_in_a_row` |
 | ARB-69 | L'événement `EVT_SURCHARGE_IONIQUE` s'appelait « **surcharge** Ionique », avec des marques de gras héritées de l'import Excel. | **« Surcharge ionique »**. | `events.json`, `CARDS.md` |
 
+## 2026-09-25 : idées pour la suite
+
+Le game designer a précisé ses attentes pour les prochaines étapes, après le premier playtest.
+
+| # | Question | Décision | Appliqué dans |
+|---|---|---|---|
+| ARB-70 | Faut-il limiter le temps de jeu ? | **Oui : un temps de tour limité**, désactivable pour les tests, avec des signaux visuels et sonores. Durée, comportement à l'expiration et délai des décisions restent à trancher. | INTERFACE §3.9 et §7, feuille de route M4.5 |
+| ARB-71 | Quelles priorités pour les gestes (M4.5) ? | Les boutons de recyclage au niveau du marché noir ; les actions d'équipage au niveau du vaisseau, avec des pictogrammes reconnaissables ; les informations d'un adversaire au survol de la souris ; le temps de tour limité (ARB-70). Les trois premiers points confirment INTERFACE §3.1, §3.3 et §3.4 : le panneau du mode test les regroupe aujourd'hui en bas à droite, c'est provisoire. | INTERFACE §8, feuille de route du README |
+| ARB-72 | Que mettre dans les finitions (M5) ? | L'**audio** et un **fond stellaire animé**, en plus des modèles 3D (ADR-0016). | INTERFACE §8, ASSETS §2 à §4, feuille de route du README |
+

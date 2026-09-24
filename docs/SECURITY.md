@@ -38,7 +38,7 @@ Conséquences concrètes :
 | S5 | Serveurs MCP (Unity, Blender) | 1 | Outils avec exécution de code dans l'éditeur |
 | S6 | WebSocket serveur | 2 | Tout le trafic réseau |
 | S7 | Builds distribués (APK, exe) | 1–2 | Rétro-ingénierie, modification du client |
-| S9 | Illustrations et modèles déposés dans `unity/Assets/_Vortex/Art/` | 1 | Fichiers lus par les importeurs de l'éditeur (PNG, FBX) |
+| S9 | Illustrations et modèles déposés dans `unity/Assets/_Vortex/Art/`, sources Blender dans `art-src/` | 1 | Fichiers lus par les importeurs de l'éditeur (PNG, FBX) et par Blender (`.blend`, qui peuvent contenir des scripts) |
 | S8 | Variantes et grilles d'équilibrage (`docs/balance/variants/*.json`, `docs/balance/grids/*.json`) et options du simulateur | 1 | Fichiers édités à la main, passés en ligne de commande à un outil de développement |
 
 ## 3. Modèle de menaces (STRIDE) et mesures
@@ -61,19 +61,22 @@ Conséquences concrètes :
 | **Usurpation** de session ou de salon | S6 | Jetons de session de 128 bits (CSPRNG), stockés hachés, avec expiration. Codes de salon non énumérables et limités en tentatives. WSS/TLS obligatoire et vérification de l'Origin. | Phase 2 |
 | **Répudiation** (contestation d'une partie) | S6 | Journal des commandes et graine conservés par partie, donc replay exact possible. Journaux sans données personnelles. | Phase 2 |
 | **Élévation** via une dépendance compromise | S4 | Versions épinglées (lockfiles, `packages-lock.json`, actions épinglées par SHA), Dependabot, `dotnet list package --vulnerable` bloquant en CI, CodeQL. | **Fait M0** |
-| **Élévation** via les outils IA | S5 | Voir §4. Unity MCP : paquet et serveur épinglés, transport stdio, pont sur 127.0.0.1 uniquement, télémétrie coupée, refus des builds de publication tant qu'il est installé (`ReleaseBuildGuard`). | **Fait M4** (Blender MCP : M5) |
+| **Élévation** via les outils IA | S5 | Voir §4. Unity MCP : paquet et serveur épinglés, transport stdio, pont sur 127.0.0.1 uniquement, télémétrie coupée, refus des builds de publication tant qu'il est installé (`ReleaseBuildGuard`). Blender MCP : serveur `mcp-for-blender==2.0.4` épinglé, mode sûr, télémétrie coupée, téléchargements désactivés, extension sur 127.0.0.1:9876 (ADR-0016). | **Fait M4** (Blender MCP : préparé, activé au premier atelier) |
 | **Fuite de secrets** | S4 | `.gitignore` sur les keystores et les `.env`, gitleaks en CI, secret scanning et push protection GitHub. Les secrets de CI sont stockés dans les *GitHub Secrets*. | **Fait M0** (push protection : réglage GitHub à activer) |
 | **Bot qui triche** (lecture de l'ordre des paquets ou des dés futurs) | S1 | Les bots n'utilisent que l'API publique et **remplacent l'information cachée** par leur propre tirage avant toute simulation (ADR-0010, test `The_heuristic_bot_cannot_see_hidden_information`). Limite documentée : pendant une décision en attente, le bot voit la fin de la commande en cours. | **Fait M3** |
 | **Client modifié** | S7 | Accepté en phase 1 (jeu local). En phase 2, le serveur autoritaire rend la modification du client inutile pour tricher, sauf pour des aides visuelles, car toute l'information est publique. | Accepté |
 
 ## 4. Outils IA : risque à connaître
 
-Unity MCP et Blender MCP exécutent des actions **avec les droits de l'éditeur**. Blender MCP expose notamment l'exécution de Python arbitraire et des intégrations de téléchargement (Poly Haven, Hyper3D).
+Unity MCP et Blender MCP exécutent des actions **avec les droits de l'éditeur**. Blender MCP expose notamment l'exécution de Python arbitraire et des intégrations de téléchargement (Poly Haven, Sketchfab, Poly Pizza, Hyper3D, Hunyuan3D). Leurs ponts locaux (6400 pour Unity, 9876 pour Blender) n'ont pas d'authentification : tout programme local peut les piloter tant qu'ils sont ouverts.
 
 Mesures :
-- versions épinglées sur un tag, avec relecture du changelog avant chaque mise à jour ;
-- intégrations de téléchargement de Blender MCP **désactivées** ;
+- versions épinglées (Unity MCP sur un commit, Blender MCP sur une version PyPI), avec relecture du changelog avant chaque mise à jour ;
+- Blender MCP en **mode sûr** (`BLENDER_MCP_SAFE_MODE=1`) : chaque script est contrôlé avant de s'exécuter ; accès directs aux fichiers, lancement de programmes et réseau bloqués ;
+- télémétrie coupée des deux côtés ;
+- intégrations de téléchargement de Blender MCP **désactivées** ; une ressource libre n'entre qu'avec sa source et sa licence notées (`art-src/LICENCES.md`) ;
 - serveurs MCP démarrés uniquement quand on en a besoin, et en écoute sur localhost seulement ;
+- Blender garde *Auto Run Python Scripts* désactivé : un `.blend` ne lance pas de script à l'ouverture ;
 - aucun secret dans les projets ouverts par ces outils.
 
 ## 5. Builds
