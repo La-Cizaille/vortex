@@ -160,10 +160,16 @@ namespace Vortex.Core.Rules
             return id;
         }
 
-        /// <summary>First alive seat at or after the initiative seat (RULES A4.4).</summary>
+        /// <summary>
+        /// First player of the current round (RULES A4.4): the initiative seat, moved by the configured rotation
+        /// once per round, then the first alive seat clockwise from there.
+        /// </summary>
         public int FirstSeatOfRound()
         {
-            return AliveFrom(State.InitiativeSeat).First();
+            int n = State.Players.Count;
+            int step = Config.RoundStartRotation == RoundStartRotation.Clockwise ? 1 : (Config.RoundStartRotation == RoundStartRotation.CounterClockwise ? -1 : 0);
+            int offset = (step * (State.Round - 1)) % n;
+            return AliveFrom(((State.InitiativeSeat + offset) % n + n) % n).First();
         }
 
         /// <summary>Starts a player's turn (RULES A5.1). Skips to the next player if they die during it.</summary>
