@@ -189,3 +189,111 @@ MonoBehaviour:
     Text: "D\xE9 lanc\xE9 \xE0 l'avance"
   - Key: status.DefensivePosture
     Text: "Posture d\xE9fensive"
+  - Key: panel.your-turn
+    Text: "{0}, \xE0 vous de jouer"
+  - Key: panel.waiting
+    Text: "Les bots jouent\u2026"
+  - Key: command.pick
+    Text: Prendre {0} ({1})
+  - Key: command.recycle
+    Text: "Recycler le march\xE9 {0}"
+  - Key: command.end-market
+    Text: "Passer le march\xE9"
+  - Key: command.activate
+    Text: Utiliser {0}
+  - Key: command.technology
+    Text: Activer le combo
+  - Key: command.attack
+    Text: Attaquer {0}
+  - Key: command.attack-overcharged
+    Text: Attaquer {0} en surcharge
+  - Key: command.reroll
+    Text: "Reparam\xE9trer son bouclier"
+  - Key: command.reroll-overcharged
+    Text: "Reparam\xE9trer en surcharge"
+  - Key: command.sabotage
+    Text: Saboter le bouclier de {0}
+  - Key: command.overcharge
+    Text: Prendre un jeton de surcharge
+  - Key: command.posture
+    Text: "Posture d\xE9fensive"
+  - Key: command.end-turn
+    Text: Fin de tour
+  - Key: option.market
+    Text: "march\xE9"
+  - Key: decision.bet.face
+    Text: "Annoncez une valeur de d\xE9"
+  - Key: decision.cap.enemy
+    Text: "Choisissez l'ennemi vis\xE9"
+  - Key: decision.convert.hp
+    Text: Combien de PV convertir ?
+  - Key: decision.convert.shield
+    Text: Combien de points de bouclier convertir ?
+  - Key: decision.critical.discard
+    Text: 'Coup critique : quel modificateur perdez-vous ?'
+  - Key: decision.dictate.action
+    Text: "Imposez une action d'\xE9quipage"
+  - Key: decision.disable.shield
+    Text: "Quel bouclier d\xE9sactiver ?"
+  - Key: decision.discard.opponent
+    Text: "Quel adversaire d\xE9fausse ?"
+  - Key: decision.ghost.event
+    Text: "Choisissez l'\xE9v\xE9nement de la manche"
+  - Key: decision.market.pick
+    Text: "Choisissez une carte du march\xE9"
+  - Key: decision.redirect.attack
+    Text: "Vers qui d\xE9vier l'attaque ?"
+  - Key: decision.reroll.shield
+    Text: Quel bouclier relancer ?
+  - Key: decision.rotate.direction
+    Text: Dans quel sens tourner les boucliers ?
+  - Key: decision.steal.card
+    Text: Quelle carte prendre ?
+  - Key: decision.steal.opponent
+    Text: "\xC0 quel adversaire ?"
+  - Key: decision.steal.or.destroy
+    Text: "Voler ou d\xE9truire ?"
+  - Key: decision.swap.partner
+    Text: "Avec qui \xE9changer ?"
+  - Key: decision.swap.shield.first
+    Text: "Premier bouclier \xE0 \xE9changer"
+  - Key: decision.swap.shield.second
+    Text: "Second bouclier \xE0 \xE9changer"
+  - Key: decision.torment.market
+    Text: "Sur quelle carte du march\xE9 poser le Tourment ?"
+  - Key: decision.torment.place
+    Text: Sur quel modificateur poser le Tourment ?
+  - Key: decision.torment.target
+    Text: "Quel joueur re\xE7oit le Tourment ?"
+  - Key: option.yes
+    Text: Oui
+  - Key: option.no
+    Text: Non
+  - Key: option.none
+    Text: Aucun
+  - Key: option.clockwise
+    Text: Sens horaire
+  - Key: option.counterclockwise
+    Text: Sens anti-horaire
+  - Key: option.destroy
+    Text: "D\xE9truire"
+  - Key: option.steal
+    Text: Voler
+  - Key: option.first
+    Text: Le premier
+  - Key: option.second
+    Text: Le second
+  - Key: option.attack
+    Text: Attaque
+  - Key: option.reroll
+    Text: "Reparam\xE9trage"
+  - Key: option.sabotage
+    Text: Sabotage
+  - Key: option.overcharge
+    Text: Surcharge
+  - Key: option.posture
+    Text: "Posture d\xE9fensive"
+  - Key: decision.discard.targetModifier
+    Text: "Quel modificateur de la cible d\xE9fausser ?"
+  - Key: decision.swap.targetCard
+    Text: "Avec quelle carte \xE9changer ?"
