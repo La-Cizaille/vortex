@@ -4,7 +4,7 @@ Un ADR consigne **une** décision structurante : son contexte, les options envis
 
 | # | Décision | Statut |
 |---|---|---|
-| [0001](0001-moteur-unity.md) | Unity 6.3 LTS comme moteur client | Accepté |
+| [0001](0001-moteur-unity.md) | Unity 6.3 LTS comme moteur client | Accepté ; choix de version remplacé par 0013 |
 | [0002](0002-core-partage.md) | Moteur de règles C# pur partagé (package UPM local) | Accepté |
 | [0003](0003-reseau-serveur-autoritaire.md) | Serveur autoritaire .NET + WebSocket (phase 2) | Accepté |
 | [0004](0004-rng-deterministe.md) | RNG déterministe maison (PCG32) | Accepté |
@@ -16,5 +16,6 @@ Un ADR consigne **une** décision structurante : son contexte, les options envis
 | [0010](0010-bots-generiques-par-simulation.md) | Bots génériques par simulation (détermination et fin de tour simulée) | Accepté, complété par 0012 |
 | [0011](0011-options-de-regles-et-variantes.md) | Équilibrage : options de règles, variantes de contenu et comparaison statistique | Accepté |
 | [0012](0012-bot-protection-effective.md) | Le bot évalue sa protection effective (complète 0010) | Accepté |
+| [0013](0013-version-unity.md) | Version de Unity : versions Update en développement, LTS pour publier | Accepté |
 
 Modèle : copier un ADR existant et garder les sections *Statut*, *Contexte*, *Options*, *Décision* et *Conséquences*.

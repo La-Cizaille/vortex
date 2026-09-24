@@ -16,6 +16,7 @@
 /unity/ExportedObj/
 /unity/.consulo/
 /unity/*.csproj
+/unity/*.slnx
 /unity/*.unityproj
 /unity/*.sln
 /unity/*.suo

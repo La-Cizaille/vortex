@@ -5,6 +5,6 @@
   "unity": "6000.3",
   "description": "Vortex rules engine: pure C#, engine-agnostic, shared with the .NET tools and server (ADR-0002).",
   "dependencies": {
-    "com.unity.nuget.newtonsoft-json": "3.2.1"
+    "com.unity.nuget.newtonsoft-json": "3.2.2"
   }
 }
