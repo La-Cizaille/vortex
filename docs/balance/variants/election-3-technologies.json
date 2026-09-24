@@ -1,0 +1,7 @@
+{
+  "name": "Élection à 3 technologies",
+  "description": "Étape 2.5 : l'Élection galactique demande 3 technologies différentes au lieu de 4 (RULES A9).",
+  "config": {
+    "technologiesToWin": 3
+  }
+}

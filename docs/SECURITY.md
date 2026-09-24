@@ -24,6 +24,7 @@
 | S5 | Serveurs MCP (Unity, Blender) | 1 | Outils avec exécution de code dans l'éditeur |
 | S6 | WebSocket serveur | 2 | Tout le trafic réseau |
 | S7 | Builds distribués (APK, exe) | 1–2 | Rétro-ingénierie, modification du client |
+| S8 | Variantes d'équilibrage `docs/balance/variants/*.json` et options du simulateur | 1 | Fichiers édités à la main, passés en ligne de commande à un outil de développement |
 
 ## 3. Modèle de menaces (STRIDE) et mesures
 
@@ -34,6 +35,7 @@
 | **Fuite d'information** (ordre des paquets, graine) | S6 | `GameView.Of()` n'expose que la taille des paquets, sans leur contenu (test `The_public_view_never_exposes_hidden_information`). Le client ne travaille que sur la projection dès la phase 1. | **Fait M1** (utilisation côté client : M4) |
 | **Exécution de code** par désérialisation | S2, S6 | Newtonsoft avec `TypeNameHandling.None` et `MetadataPropertyHandling.Ignore` (règles d'analyse CA2326–CA2330 en erreur). Membres inconnus et enums numériques rejetés, `MaxDepth` de 16, entrée limitée à 1 Mo. Polymorphisme par discriminateur en liste blanche (M1). | **Fait M0** pour les fichiers de contenu (tests dans `ContentJsonTests`) |
 | **Contenu malformé ou piégé** | S3 | Même chargeur durci que le jeu. Validation (ids, énumérations, bornes, unicité entre fichiers), forme canonique vérifiée en CI. Surface xlsx **supprimée** (ADR-0008) : plus de parseur de classeur, donc plus de risques XXE ni de bombe zip. | **Fait M0** |
+| **Variante malformée ou piégée** | S8 | Taille bornée (256 Kio) et profondeur bornée (16). Lecture en arbre JSON brut, sans aucune résolution de type. Correctif strict : clés, ids et champs inconnus refusés, pas de `null`, ni id ni version de format modifiables. Le contenu obtenu repasse par **le chargeur durci du jeu** (S3), en mémoire uniquement : les fichiers de contenu ne sont jamais réécrits. Options du simulateur validées (bornes, niveaux de bot en liste blanche, au plus 8 variantes). Outil de développement, jamais embarqué dans un build (ADR-0011). | **Fait (équilibrage)** |
 | **Logique arbitraire dans les données** | S3 | Les briques d'effets forment un catalogue **fermé** (`BrickCatalog`, enregistrement explicite sans réflexion). Le JSON sélectionne une brique par son nom et la paramètre ; il n'exécute jamais de code ni d'expression. Les paramètres sont typés et bornés, un paramètre inconnu est refusé, et seules les valeurs scalaires (entier, booléen, texte) sont acceptées, via un convertisseur JSON explicite. | **Fait M2** (tests `BrickCatalogTests`) |
 | **Texte trompeur** (« Trojan Source », caractères invisibles) | S2, S3, S4 | Le validateur rejette les caractères de contrôle et bidi dans les données. L'importeur retire les caractères invisibles. Un test parcourt tout le dépôt (`SourceHygieneTests`). | **Fait M0** |
 | **État incohérent** chargé depuis un fichier | S2 | `GameEngine.ValidateState()` vérifie les invariants (PV, bouclier, cartes conservées, ids et statuts connus, décision en attente cohérente) avant tout chargement. Il tourne aussi après chaque commande dans les tests. | **Fait M1** |

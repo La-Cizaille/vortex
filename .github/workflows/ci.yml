@@ -78,7 +78,15 @@ jobs:
           $tool docs core/Runtime/Data docs --check
 
       - name: Simulator smoke run (no engine error)
-        run: dotnet run -c Release --no-build --project dotnet/Vortex.Simulator -- --players 2,5 --games 10 --out simulation-smoke.md
+        run: dotnet run -c Release --no-build --project dotnet/Vortex.Simulator -- run --players 2,5 --games 10 --out simulation-smoke.md
+
+      - name: Variant comparison smoke run (every committed variant loads and plays)
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in docs/balance/variants/*.json; do
+            dotnet run -c Release --no-build --project dotnet/Vortex.Simulator -- compare --players 3 --games 5 --variant "$f" --out compare-smoke.md
+          done
 
       - name: Upload coverage
         if: always()

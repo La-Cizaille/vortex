@@ -77,7 +77,7 @@ sequenceDiagram
 | `Dice/` | `Pcg32`, le générateur déterministe (ADR-0004). **M1.** |
 | `Rules/` | `GameEngine` (API publique sans état), `Game` (contexte de résolution, découpé en `Game.Actions`, `Game.Flow`, `Game.Commands` et `Game.Attack`), `GameStateValidator` (invariants). **M1.** |
 | `Projection/` | `GameView.Of(state)`, la vue publique sans informations cachées (ordre des paquets, état du RNG). **M1.** |
-| `Bots/` | `IBot`, `RandomBot` et `HeuristicBot` (ADR-0010) : bots génériques qui ne connaissent aucune carte et ne voient pas l'information cachée. Ils servent au simulateur, et plus tard d'IA ou de remplaçants pour un joueur inactif. **M3.** |
+| `Bots/` | `IBot`, `RandomBot` et `HeuristicBot` (ADR-0010) : bots génériques qui ne connaissent aucune carte et ne voient pas l'information cachée. `BotFactory` crée les quatre niveaux (`BotLevel` : `random`, `naive`, `normal`, `strong`). Ils servent au simulateur, et plus tard d'IA ou de remplaçants pour un joueur inactif. **M3.** |
 
 ### Comportement des cartes
 - **Le moteur ne connaît aucune carte** (ADR-0007). Les règles de base exposent des points d'interception (calculs, autorisations, réactions : RULES B2), et les effets agissent par des actions élémentaires (RULES B3), qui appliquent elles-mêmes les autorisations. L'empilement est générique (RULES B4).
@@ -93,13 +93,27 @@ Défini une seule fois, dans RULES B7 :
 
 Les chaînes de réactions sont bornées à 16 niveaux.
 
-## 4. Client Unity (`unity/`)
+## 4. Simulateur d'équilibrage (`dotnet/Vortex.Simulator`)
+
+Outil de développement, jamais embarqué dans un build. Il joue des parties bot contre bot avec le vrai moteur et écrit un rapport markdown en français (mode d'emploi : [`balance/README.md`](balance/README.md), décision : ADR-0011).
+
+| Fichier | Rôle |
+|---|---|
+| `Program.cs` | Commandes `run` (rapport complet) et `compare` (référence contre variantes), options validées, parties jouées en parallèle avec une graine par partie. |
+| `Variants.cs` | Charge la référence et applique les **variantes** (correctifs JSON), puis revalide le tout avec le chargeur du jeu. Calcule l'empreinte du contenu simulé. |
+| `GameRunner.cs` | Joue une partie et relève ses mesures (`GameRecord`) à partir des événements du moteur. |
+| `Stats.cs` | Agrège un lot de parties (`ScenarioStats`) : proportions et moyennes avec leur erreur type. |
+| `Report.cs`, `CompareReport.cs` | Mise en forme des deux types de rapport. |
+
+**Reproductibilité** : la graine de chaque partie dépend seulement de la graine globale, du nombre de joueurs et du numéro de la partie. Le résultat ne dépend donc pas de l'ordonnancement des threads, et la référence et ses variantes jouent les mêmes parties.
+
+## 5. Client Unity (`unity/`)
 
 - `Session/` : `IGameSession`, avec `LocalHotSeatSession` en phase 1 et `NetworkSession` en phase 2. La présentation ne connaît que l'interface.
 - `Presentation/` : `EventPlayer` (joue les événements un par un), vues (vaisseau, carte, marché, dé, jetons), UI des phases et fenêtres de décision.
 - **Habillage** : les catalogues ScriptableObject (`ThemeSettings`, `CardArtCatalog`, `ShipCatalog`…) associent les ids du moteur aux assets. Un asset manquant est remplacé par un placeholder généré. Voir `CONTRIBUTING.md` › *Ajouter ou modifier un visuel*.
 
-## 5. Réseau (phase 2, prévu mais non implémenté)
+## 6. Réseau (phase 2, prévu mais non implémenté)
 
 ```mermaid
 flowchart LR
