@@ -1,13 +1,10 @@
 {
-  "name": "Vortex.Editor",
-  "rootNamespace": "Vortex.Editor",
+  "name": "Vortex.Client",
+  "rootNamespace": "Vortex.Client",
   "references": [
-    "Vortex.Core",
-    "Vortex.Client"
+    "Vortex.Core"
   ],
-  "includePlatforms": [
-    "Editor"
-  ],
+  "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
   "overrideReferences": true,

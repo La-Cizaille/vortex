@@ -65,6 +65,7 @@ Une question de règle que `RULES.md` ne tranche pas est **posée au game design
 Une décision **technique** ou structurante ne va pas dans ce journal : elle fait l'objet d'un ADR (`docs/adr/`).
 
 ## Ajouter ou modifier un visuel (à partir du jalon M4)
+- **Réaction à un événement du jeu** (attaque, soin, élimination…) : c'est le profil de retours visuels, `unity/Assets/_Vortex/Presentation/Feedback/DefaultFeedbackProfile.asset`, qui dit quoi jouer pour chaque type d'événement (ADR-0014). Pour changer une réaction, on crée un retour visuel (*Create → Vortex → Retours visuels*), par exemple un `PrefabFeedback` qui fait apparaître des particules ou une séquence Timeline sur le vaisseau visé, puis on le branche dans le profil. Aucun code n'est à modifier.
 - Le code ne référence **jamais** un asset directement : tout passe par les catalogues de `unity/Assets/_Vortex/Theme/`.
 - Pour remplacer l'illustration d'une carte, déposer `unity/Assets/_Vortex/Art/Cards/<ID>.png` (par exemple `A_005.png`). Les réglages d'import mobile et l'enregistrement dans le catalogue sont appliqués automatiquement.
 - Pour un vaisseau, déposer `Art/Ships/<Nom>.fbx`, puis l'associer dans `ShipCatalog`.
