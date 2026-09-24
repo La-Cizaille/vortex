@@ -87,6 +87,7 @@ namespace Vortex.Core.Rules
                 case CommandType.RerollShield:
                 case CommandType.Sabotage:
                 case CommandType.Overcharge:
+                case CommandType.DefensivePosture:
                     return State.Phase == TurnPhase.Main ? ValidateCrewAction(player, command, ignoreForcedAction: false) : WrongPhase();
 
                 case CommandType.EndTurn:
@@ -146,6 +147,7 @@ namespace Vortex.Core.Rules
                 case CommandType.RerollShield:
                 case CommandType.Sabotage:
                 case CommandType.Overcharge:
+                case CommandType.DefensivePosture:
                     PerformCrewAction(player, command);
                     break;
 
@@ -271,6 +273,12 @@ namespace Vortex.Core.Rules
             return Math.Max(0, Calculate(1, (e, s, m) => e.ModifyCrewActions(this, s, player, m)));
         }
 
+        /// <summary>False for a crew action that exists only when a rule option enables it, and it is disabled.</summary>
+        public bool IsCrewActionEnabled(CrewAction action)
+        {
+            return action != CrewAction.DefensivePosture || Config.DefensivePostureBonus > 0;
+        }
+
         /// <summary>Imposed crew action of a player (active status), or null.</summary>
         public StatusState? ForcedActionOf(int player)
         {
@@ -286,6 +294,7 @@ namespace Vortex.Core.Rules
                 case CrewAction.Attack: return Command.Attack(target);
                 case CrewAction.RerollShield: return Command.RerollShield();
                 case CrewAction.Sabotage: return Command.Sabotage(target);
+                case CrewAction.DefensivePosture: return Command.DefensivePosture();
                 default: return Command.Overcharge();
             }
         }
@@ -297,6 +306,7 @@ namespace Vortex.Core.Rules
                 case CommandType.Attack: return CrewAction.Attack;
                 case CommandType.RerollShield: return CrewAction.RerollShield;
                 case CommandType.Sabotage: return CrewAction.Sabotage;
+                case CommandType.DefensivePosture: return CrewAction.DefensivePosture;
                 default: return CrewAction.Overcharge;
             }
         }
@@ -304,6 +314,11 @@ namespace Vortex.Core.Rules
         private CommandError? ValidateCrewAction(int player, Command command, bool ignoreForcedAction)
         {
             CrewAction action = ActionOf(command.Type);
+            if (!IsCrewActionEnabled(action))
+            {
+                return Error(CommandErrorCode.ActionNotAvailable, "This crew action is not enabled by the rules.");
+            }
+
             if (State.CrewActionsTaken.Count >= CrewActionsAllowed(player))
             {
                 return Error(CommandErrorCode.NoCrewActionLeft, "No crew action left this turn.");
@@ -348,6 +363,9 @@ namespace Vortex.Core.Rules
 
                     return CanChangeShield(player, command.Target) ? null : Error(CommandErrorCode.ShieldChangeNotAllowed, "This shield cannot be modified by this player.");
 
+                case CommandType.DefensivePosture:
+                    return null;
+
                 default:
                     return p.Overcharge >= Config.MaxOvercharge ? Error(CommandErrorCode.OverchargeFull, "Overcharge tokens are at the maximum.") : null;
             }
@@ -387,6 +405,15 @@ namespace Vortex.Core.Rules
                     List<int> die = ThrowDice(player, 1, usePreRolled: true);
                     Emit(new GameEvent { Type = GameEventType.DiceRolled, Player = player, Values = die, Amount = die[0] });
                     TrySetShield(player, command.Target, die[0], null);
+                    break;
+
+                case CommandType.DefensivePosture:
+                    // Until the start of the player's next turn (RULES A5.4); a new posture replaces the previous one.
+                    RemoveStatuses(s => s.Kind == StatusKinds.DefensivePosture && StatusesOf(player).Contains(s));
+                    AddStatus(player, StatusKinds.DefensivePosture, player, StatusExpiry.StartOfTurn, player, vars: new[]
+                    {
+                        new KeyValuePair<string, int>(StatusKinds.VarAmount, Config.DefensivePostureBonus),
+                    });
                     break;
 
                 default:

@@ -86,6 +86,7 @@ namespace Vortex.Core.Effects
             {
                 [StatusKinds.ForcedCrewAction] = new ForcedCrewActionStatus(),
                 [StatusKinds.PreRolledDie] = new PreRolledDieStatus(),
+                [StatusKinds.DefensivePosture] = new DefensivePostureStatus(),
             };
         }
 

@@ -26,7 +26,7 @@ Validés par le game designer (ARB-40), puis recentrés sur le **mode standard �
 | Élection galactique | 5 à 15 % des victoires | 0,2 % | **Atteint** : 6,4 % |
 | Puissance des cartes | Chaque carte à ±5 pts de la moyenne, aucune carte « morte » | Écarts de −7 à +12 pts | Non atteint : de −5,2 à +9,2 pts ; 9 cartes à +5 pts ou plus, 2 à −5 pts ou moins |
 | Part des choix face au hasard | À définir avec les niveaux de bot (étape 1) | Mal mesurée | À définir |
-| Première élimination | Pas avant la manche 6 : un joueur ne devrait pas sortir avant d'avoir joué environ 6 tours (cible fixée pour 4 joueurs, **à confirmer** à 5) | Non mesurée | Non atteint : manche 4,6 |
+| Première élimination | Pas avant la manche 6 : un joueur ne devrait pas sortir avant d'avoir joué environ 6 tours (ARB-55) | Non mesurée | Non atteint : manche 4,6 |
 
 ## Plan et avancement
 
@@ -36,7 +36,7 @@ Validés par le game designer (ARB-40), puis recentrés sur le **mode standard �
 | **1** | Instruments de mesure : variantes et comparaison, niveaux de bot, nouvelles mesures, options de règles | Faite (ARB-41, ADR-0011) |
 | **2.1** | Avantage du premier joueur : premier joueur tournant, sens horaire ou anti-horaire (ARB-42) | **Adoptée** : rotation horaire (ARB-50) |
 | **2.2** | Grille PV × bouclier de départ × manche de Fin des temps, à 5 joueurs (ARB-43, ARB-52) | **Adoptée** : 30 PV, bouclier 5, Fin des temps à la manche 16 (ARB-54) |
-| **2.3** | Nouvelles mécaniques (ARB-44, ARB-45) : relance d'un dé par la surcharge, reparamétrage à 2 dés dont on garde 1, coût du recyclage, posture défensive, événement annoncé, prime sur le leader, pillage, fantômes, défausse tactique | À faire |
+| **2.3** | Nouvelles mécaniques (ARB-44, ARB-45) : relance d'un dé par la surcharge, reparamétrage à 2 dés dont on garde 1, coût du recyclage, posture défensive, événement annoncé, prime sur le leader, pillage, fantômes, défausse tactique | En cours : lot A (posture, prime, fantômes) mesuré, décision attendue |
 | **2.4** | Fréquence des événements (une par manche, toutes les 2 ou 3 manches) et effet de chaque événement (ARB-46) | À faire |
 | **2.5** | Élection galactique à 3 technologies au lieu de 4 (ARB-47) | **Adoptée** : 3 technologies (ARB-51). Fréquence de l'Élection à revoir avec 2.2 |
 | **3** | Revue des cartes : tri, ajustement par famille, cartes de hasard, équilibre des couleurs. Outil visuel à construire au début de l'étape (ARB-48) | À faire |
@@ -153,6 +153,32 @@ Une variante est un petit fichier JSON dans [`variants/`](variants/). Il ne cont
 3. Joindre le rapport de comparaison à la PR.
 
 ## Constats
+
+### Étape 2.3, lot A : posture défensive, prime sur le leader, fantômes (2026-09-24)
+
+Rapport : [`2026-09-24-mecaniques-lot-a.md`](2026-09-24-mecaniques-lot-a.md). 3 000 parties à 5 joueurs par variante, bots `normal`, aucune erreur du moteur. Objectif principal : retarder la première élimination (ARB-55).
+
+| Variante | Première élimination | Attaques sur le plus faible | Le meneur à mi-partie gagne | Fin des temps atteinte | Élection |
+|---|---|---|---|---|---|
+| Référence (v3) | manche 4,6 | 50,4 % | 52,5 % | 20,4 % | 6,4 % |
+| Posture défensive (+2) | 4,6 | 50,3 % | 53,1 % | 22,3 % | 6,0 % |
+| Prime sur le leader (+1) | 4,7 | 48,0 % | 46,1 % | 15,7 % | 5,4 % |
+| Prime sur le leader (+2) | 4,7 | 45,5 % | 41,0 % | 10,9 % | 4,8 % |
+| Fantômes | 4,6 | 50,4 % | 51,7 % | 23,3 % | 6,8 % |
+| Les trois (posture, prime +1, fantômes) | 4,7 | 48,1 % | 46,7 % | 19,7 % | 6,6 % |
+
+1. **Aucune de ces mécaniques ne retarde la première élimination** (manche 4,6 à 4,7). Le problème reste entier.
+2. **La prime sur le leader fait ce qu'elle promet, sans régler ce problème.** Les attaques glissent du plus faible vers le meneur, et il y a plus de retournements : le meneur à mi-partie ne gagne plus que 41 à 46 % des parties, contre 53 %. Les parties raccourcissent un peu. Mais le plus faible reste la cible d'une attaque sur deux. Avec +2, l'Élection repasse sous sa cible (4,8 %).
+3. **La posture défensive n'est pas réellement mesurée.** Les bots ne la choisissent que dans 1 % de leurs actions. Ils n'anticipent que leur propre tour (ADR-0010) : une protection qui ne sert que pendant le tour des adversaires ne vaut rien à leurs yeux. C'est une **limite du bot**, pas un verdict sur la mécanique.
+4. **Les fantômes ne changent presque rien aux chiffres, comme prévu** : ils ne retardent pas l'élimination, ils occupent l'éliminé. Leur intérêt se jugera en partie réelle. Le bot d'un joueur éliminé choisit l'événement sans intention.
+5. **Les bots s'acharnent sur le plus faible** : une attaque sur deux vise le joueur qui a le moins de PV (égalités comprises). Leur évaluation récompense fortement l'élimination d'un adversaire : elle vaut autant que 25 PV retirés. Des humains feraient-ils de même ? Probablement en partie seulement. **La première élimination mesurée est donc sans doute plus précoce qu'en partie réelle.**
+
+**Propositions**
+- **Améliorer le bot** avant de conclure sur la posture : qu'il évalue sa **protection effective** (son bouclier tel que le calcule le moteur pour une attaque adverse, statuts compris) plutôt que la seule valeur de son bouclier. C'est générique, puisque le bot ne connaît toujours aucune carte, et cela profite aussi à l'évaluation de toutes les protections. En contrepartie, tous les chiffres de référence bougent un peu : il faudra une nouvelle référence. Décision structurante : ADR à écrire.
+- **Tester des pistes plus directes** contre la première élimination, à valider par le game designer avant simulation :
+  - **sursis** : pendant les premières manches (par exemple jusqu'à la manche 5), un vaisseau ne peut pas descendre sous 1 PV. C'est radical et garantit la cible, mais c'est artificiel ;
+  - **dernier carré** : un joueur à 10 PV ou moins gagne +2 au bouclier effectif. C'est un mécanisme de rattrapage classique, mais il ressemble à la carte Lève la tête, bombe le torse (D_015) et en réduirait l'intérêt ;
+  - **malus contre le plus faible** : le miroir de la prime, par exemple −1 à la valeur d'attaque contre le seul joueur qui a le moins de PV.
 
 ### Référence v3 : rythme adopté (2026-09-24)
 

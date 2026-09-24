@@ -54,6 +54,16 @@ namespace Vortex.Core.Tests.Bots
         }
 
         [Test]
+        public void Crew_action_statistics_cover_every_crew_action()
+        {
+            Assert.That(Enum.GetValues<Vortex.Core.Commands.CrewAction>(), Has.Length.EqualTo(GameRecord.CrewActionCount));
+            var engine = new GameEngine(TestPaths.LoadRealContent(), TestPaths.LoadRealConfig());
+            GameRecord r = GameRunner.Play(engine, 0, 77, new IBot[] { new HeuristicBot(1), new HeuristicBot(2), new HeuristicBot(3) }, doomRound: 10);
+            Assert.That(r.CrewActions.Sum(), Is.GreaterThan(0));
+            Assert.That(r.CrewActions[(int)Vortex.Core.Commands.CrewAction.Attack], Is.EqualTo(r.Attacks.Sum()));
+        }
+
+        [Test]
         public void Statistics_count_positions_from_the_initiative_winner()
         {
             GameData data = TestPaths.LoadRealContent();

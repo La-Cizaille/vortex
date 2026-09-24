@@ -49,6 +49,8 @@ namespace Vortex.Core.Rules
         ShieldChangeNotAllowed = 21,
         /// <summary>Unknown command type or malformed command.</summary>
         MalformedCommand = 22,
+        /// <summary>The action exists only when a rule option enables it, and it is disabled.</summary>
+        ActionNotAvailable = 23,
     }
 
     /// <summary>A rejected command.</summary>

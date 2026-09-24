@@ -521,6 +521,29 @@ namespace Vortex.Core.Rules
             });
         }
 
+        /// <summary>The alive player who alone has the most HP, or -1 on a tie (RULES A6 step 6, bounty).</summary>
+        public int SoleHpLeader()
+        {
+            int best = -1;
+            int bestHp = int.MinValue;
+            bool tie = false;
+            foreach (PlayerState p in State.Players.Where(p => !p.Eliminated))
+            {
+                if (p.Hp > bestHp)
+                {
+                    best = p.Seat;
+                    bestHp = p.Hp;
+                    tie = false;
+                }
+                else if (p.Hp == bestHp)
+                {
+                    tie = true;
+                }
+            }
+
+            return tie ? -1 : best;
+        }
+
         // ---------------------------------------------------------------- Eliminations and victory (RULES A9)
 
         /// <summary>

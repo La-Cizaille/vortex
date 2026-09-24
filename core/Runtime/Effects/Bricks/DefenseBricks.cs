@@ -176,6 +176,11 @@ namespace Vortex.Core.Effects.Bricks
 
             options.Add(new DecisionOption { Key = "reroll", Number = (int)CrewAction.RerollShield });
             options.Add(new DecisionOption { Key = "overcharge", Number = (int)CrewAction.Overcharge });
+            if (game.IsCrewActionEnabled(CrewAction.DefensivePosture))
+            {
+                options.Add(new DecisionOption { Key = "posture", Number = (int)CrewAction.DefensivePosture });
+            }
+
             string key = game.Ask(self.Holder, DecisionKind.ChooseCrewAction, "dictate.action", self.Id, options);
             DecisionOption chosen = options.First(o => o.Key == key);
             game.ImposeCrewAction(attacker, (CrewAction)chosen.Number, chosen.Player, self.Holder);

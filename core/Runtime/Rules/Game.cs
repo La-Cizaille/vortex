@@ -324,9 +324,12 @@ namespace Vortex.Core.Rules
         }
 
         /// <summary>Calculation: every active effect registers its modifications; returns the stacked result (RULES B4).</summary>
-        public int Calculate(int baseValue, Action<Effect, EffectSource, ValueModifiers> calculation)
+        public int Calculate(int baseValue, Action<Effect, EffectSource, ValueModifiers> calculation, Action<ValueModifiers>? baseRule = null)
         {
             var modifiers = new ValueModifiers();
+
+            // Modifiers of the base rules themselves (rule options) stack with the effects' ones (RULES B4).
+            baseRule?.Invoke(modifiers);
             foreach (KeyValuePair<Effect, EffectSource> pair in ActiveEffects())
             {
                 calculation(pair.Key, pair.Value, modifiers);

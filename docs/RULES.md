@@ -54,6 +54,7 @@ Les valeurs marquées ⚙ sont **configurables** (`config.json`) et sont calibr�
 ## A4. Début de manche
 
 1. Si `EventFrequency` ⚙ le prévoit (manches 1, 1+N, 1+2N…), on révèle un événement, dès la première manche. Il reste **actif** jusqu'au début de la manche suivante.
+   - *Option à l'étude* **Fantômes** (`GhostsChooseEvent` ⚙, désactivée) : si au moins un joueur est éliminé, on pioche **deux** événements. Un joueur éliminé choisit celui qui s'applique, et l'autre va à la défausse. Les éliminés choisissent chacun leur tour, dans l'ordre des sièges. Ce choix n'a pas lieu à la manche de la Fin des temps.
 2. À la manche `DoomRound[n]` ⚙, c'est le `DoomEvent` qui est révélé **à la place**. Au mode standard à 5 joueurs, c'est la **manche 16** (ARB-54).
 3. Un paquet vide se reconstitue en mélangeant sa défausse. Cette règle vaut pour **tous** les paquets.
 4. **Premier joueur de la manche** : à la première manche, le gagnant de l'initiative. Ensuite, le premier joueur **avance d'un siège dans le sens horaire** à chaque manche. S'il est éliminé, la manche commence au joueur vivant suivant dans le sens horaire. Le tour de table reste toujours horaire.
@@ -89,6 +90,7 @@ Le joueur fait **une** action, ou passe. Le nombre d'actions est un calcul (B2.1
 | **Reparamétrage** | Je relance mon bouclier avec le lot de dés « bouclier » : 1d8, ou 2d8 additionnés si je consomme ma surcharge. Le résultat est borné (B2.1, « bornes du bouclier »). Si l'autorisation B2.2 « modifier un bouclier » est refusée, l'action n'a pas d'effet. |
 | **Sabotage** | Je relance 1d8 pour le bouclier d'un adversaire. Si l'autorisation B2.2 « modifier un bouclier » est refusée, l'action est **illégale** : on ne peut pas la choisir. La surcharge ne s'applique pas. |
 | **Surcharge** | Je gagne un jeton de surcharge, dans la limite du maximum. |
+| **Posture défensive** (*option à l'étude*, `DefensivePostureBonus` ⚙, désactivée) | Jusqu'au début de mon prochain tour, mon bouclier effectif (A6, étape 7) gagne le bonus. La valeur du bouclier ne change pas : ce n'est pas une modification, et le bonus compte même si le bouclier est désactivé ou ignoré. Une nouvelle posture remplace la précédente. |
 
 **Surcharge** : un jeton se consomme **volontairement** lors d'une attaque ou d'un reparamétrage. Il est perdu si le joueur subit une perte de PV de cause `Attack`, `Reflect` ou `Event`, sauf si l'autorisation B2.2 « perdre la surcharge » est refusée.
 
@@ -108,7 +110,7 @@ Chaque étape nomme le point d'interception (B2) où les effets peuvent agir.
 | 3 | **Avant le jet** : effets préparatoires, comme un pari sur le dé ou une modification de bouclier. | Réaction « avant le jet ». |
 | 4 | **Jet** : on lance le lot de dés d'attaque. Par défaut 1d8, plus 1d8 si l'attaque est surchargée. | Calcul « lot de dés d'attaque ». |
 | 5 | **Critique** : au moins un dé **conservé** affiche 8. | — |
-| 6 | **Valeur d'attaque** = somme des dés conservés, puis modificateurs. | Calcul « valeur d'attaque ». |
+| 6 | **Valeur d'attaque** = somme des dés conservés, puis modificateurs. *Option à l'étude* **prime sur le leader** (`LeaderBounty` ⚙, désactivée) : si la cible est **seule** à avoir le plus de PV parmi les joueurs vivants, la valeur gagne la prime. Comme les autres bonus, elle s'applique avant le bouclier (ARB-13). | Calcul « valeur d'attaque ». |
 | 7 | **Bouclier effectif** de la cible. | Calcul « bouclier effectif ». |
 | 8 | **Dégâts** = max(0, valeur d'attaque − bouclier effectif), puis modificateurs. | Calcul « dégâts ». |
 | 9 | **Effet du critique** : si la cible a au moins un modificateur, **elle choisit** celui qui est défaussé (avec ses jetons). Sinon, dégâts +1 ⚙. | — |
@@ -290,6 +292,6 @@ Une question tranchée quitte cette liste et entre dans le [journal des arbitrag
 - **Synergie technologique** : effets à définir (ARB-14).
 
 **Équilibrage** (plan et mesures : [`balance/README.md`](balance/README.md))
-- **Durée minimale en jeu** (ARB-40) : l'objectif « première élimination pas avant la manche 6 » veut dire qu'aucun joueur ne devrait être éliminé avant d'avoir joué environ 6 tours, pour ne pas passer le reste de la partie à attendre. Ce n'est pas une règle du jeu, seulement une mesure. À 5 joueurs, avec les réglages adoptés, le premier éliminé sort vers la manche 4,6 et attend alors environ 14 minutes. Aucun réglage de PV, de bouclier ou de Fin des temps n'atteint la manche 6. Faut-il le corriger avec les mécaniques de l'étape 2.3 (posture défensive, fantômes…), ou accepter une première élimination plus précoce à 5 joueurs ?
+- **Première élimination trop précoce** (ARB-55) : les mécaniques du lot A de l'étape 2.3 (posture défensive, prime sur le leader, fantômes) ne la retardent pas en simulation. Des pistes plus directes sont proposées dans [`balance/README.md`](balance/README.md) : laquelle tester ?
 - **Fréquence des événements** : une par manche, jugée potentiellement excessive (ARB-12, ARB-46).
-- **Nouvelles mécaniques** validées pour simulation (ARB-44, ARB-45) : aucune n'est une règle tant qu'elle n'a pas été mesurée puis adoptée.
+- **Nouvelles mécaniques** validées pour simulation (ARB-44, ARB-45) : aucune n'est une règle tant qu'elle n'a pas été mesurée puis adoptée. Les trois premières (posture défensive, prime sur le leader, fantômes) sont codées comme options ⚙ désactivées. Leur interprétation (A4.1, A5.4, A6) est **provisoire** : elle sera confirmée ou corrigée au moment de l'adoption.

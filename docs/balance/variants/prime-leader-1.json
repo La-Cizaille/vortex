@@ -1,0 +1,7 @@
+{
+  "name": "Prime sur le leader (+1)",
+  "description": "Étape 2.3 (ARB-44) : +1 à la valeur d'attaque contre le seul joueur qui a le plus de PV (RULES A6).",
+  "config": {
+    "leaderBounty": 1
+  }
+}

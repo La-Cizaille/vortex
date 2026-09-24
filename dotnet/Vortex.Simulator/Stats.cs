@@ -91,6 +91,9 @@ namespace Vortex.Simulator
 
         public Proportion MidGameLeaderWins { get; private set; }
 
+        /// <summary>Share of each crew action (indexed by <see cref="Vortex.Core.Commands.CrewAction"/>) among all crew actions.</summary>
+        public Proportion[] CrewActions { get; private set; } = Array.Empty<Proportion>();
+
         /// <summary>Win rate of a card taker across all cards (reference of card deviations).</summary>
         public double CardBaseline { get; private set; }
 
@@ -131,6 +134,8 @@ namespace Vortex.Simulator
             s.FirstElimination = new Mean(ok.Where(r => r.FirstEliminationRound >= 0).Select(r => (double)r.FirstEliminationRound).ToList());
             List<bool> mid = ok.Select(r => r.MidGameLeaderWon).Where(m => m.HasValue).Select(m => m!.Value).ToList();
             s.MidGameLeaderWins = new Proportion(mid.Count(m => m), mid.Count);
+            long crew = ok.Sum(r => (long)r.CrewActions.Sum());
+            s.CrewActions = Enumerable.Range(0, GameRecord.CrewActionCount).Select(a => new Proportion(ok.Sum(r => (long)r.CrewActions[a]), crew)).ToArray();
 
             ComputeCards(s, ok, data);
             ComputeColors(s, ok);

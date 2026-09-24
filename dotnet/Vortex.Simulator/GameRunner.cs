@@ -68,6 +68,12 @@ namespace Vortex.Simulator
         /// <summary>Market picks per seat and per colour (second index = <see cref="TechColor"/>).</summary>
         public int[,] ColorPicks { get; }
 
+        /// <summary>Crew actions performed, indexed by <see cref="CrewAction"/>.</summary>
+        public int[] CrewActions { get; } = new int[CrewActionCount];
+
+        /// <summary>Number of crew action kinds (size of <see cref="CrewActions"/>).</summary>
+        public const int CrewActionCount = 5;
+
         /// <summary>Attacks made while at least two opponents were alive (so "leader" and "weakest" mean something).</summary>
         public int ChoiceAttacks { get; set; }
 
@@ -201,6 +207,9 @@ namespace Vortex.Simulator
                         break;
                     case GameEventType.TurnStarted:
                         record.Turns++;
+                        break;
+                    case GameEventType.CrewActionPerformed when e.Value >= 0 && e.Value < GameRecord.CrewActionCount:
+                        record.CrewActions[e.Value]++;
                         break;
                     case GameEventType.MarketCardTaken:
                         record.Picks.Add((e.Player, e.Id!));

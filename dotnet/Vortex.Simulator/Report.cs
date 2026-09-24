@@ -111,6 +111,16 @@ namespace Vortex.Simulator
                 L(sb, $"| {s.Players} | {Num(s.AttacksPerTurn)} | {Num(s.HpPerAttack)} | {Pct(s.Harmless)} | {Pct(s.AttacksOnLeader)} | {Pct(s.AttacksOnWeakest)} | {Num(s.FirstElimination.Value)} | {Pct(s.MidGameLeaderWins)} |");
             }
 
+            L(sb);
+            L(sb, "**Actions d'équipage choisies** (part de toutes les actions d'équipage) :");
+            L(sb);
+            L(sb, "| Joueurs | " + string.Join(" | ", Enumerable.Range(0, GameRecord.CrewActionCount).Select(a => CrewActionFr(a))) + " |");
+            L(sb, "|---|" + string.Concat(Enumerable.Repeat("---|", GameRecord.CrewActionCount)));
+            foreach (ScenarioStats s in full)
+            {
+                L(sb, "| " + s.Players + " | " + string.Join(" | ", s.CrewActions.Select(p => Pct(p))) + " |");
+            }
+
             ScenarioStats all = ScenarioStats.Of(0, scenarios.Where(s => !s.SkillGap).SelectMany(s => s.Records).ToList(), data);
             WriteCards(sb, data, all);
             WriteColors(sb, all);
@@ -198,6 +208,18 @@ namespace Vortex.Simulator
             foreach (GameRecord r in unfinished.Take(20))
             {
                 L(sb, $"- graine `{r.Seed}` ({r.Players} joueurs) : non terminée");
+            }
+        }
+
+        internal static string CrewActionFr(int action)
+        {
+            switch (action)
+            {
+                case 0: return "Attaque";
+                case 1: return "Reparamétrage";
+                case 2: return "Sabotage";
+                case 3: return "Surcharge";
+                default: return "Posture défensive";
             }
         }
 
