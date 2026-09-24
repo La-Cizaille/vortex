@@ -21,6 +21,35 @@ namespace Vortex.Core.Bots
         Command Choose(GameEngine engine, GameState state, int seat, IReadOnlyList<Command> legal);
     }
 
+    /// <summary>Strength levels used by the simulator (ADR-0010).</summary>
+    public enum BotLevel
+    {
+        /// <summary>Uniformly random legal play: no skill at all.</summary>
+        Random = 0,
+        /// <summary>Evaluates only the immediate result of each command, one sample, no rollout.</summary>
+        Naive = 1,
+        /// <summary>Two samples per command and a rollout to the end of its turn (default).</summary>
+        Normal = 2,
+        /// <summary>Six samples per command and a rollout: less noise, slower.</summary>
+        Strong = 3,
+    }
+
+    /// <summary>Creates bots by level.</summary>
+    public static class BotFactory
+    {
+        /// <summary>Creates a bot of the given level with its own random stream.</summary>
+        public static IBot Create(BotLevel level, ulong seed)
+        {
+            switch (level)
+            {
+                case BotLevel.Random: return new RandomBot(seed);
+                case BotLevel.Naive: return new HeuristicBot(seed, samples: 1, rollout: false, name: "naive");
+                case BotLevel.Strong: return new HeuristicBot(seed, samples: 6, rollout: true, name: "strong");
+                default: return new HeuristicBot(seed, samples: 2, rollout: true, name: "normal");
+            }
+        }
+    }
+
     /// <summary>Uniformly random legal play: the "no skill" baseline for balance measurements.</summary>
     public sealed class RandomBot : IBot
     {
@@ -93,12 +122,15 @@ namespace Vortex.Core.Bots
         private readonly Pcg32 _rng;
         private readonly int _samples;
         private readonly HeuristicWeights _weights;
+        private readonly bool _rollout;
 
         /// <summary>Creates a bot.</summary>
         /// <param name="seed">Seed of the bot's own random stream (guesses and tie breaks).</param>
         /// <param name="samples">Simulations per candidate command; more is stronger and slower.</param>
         /// <param name="weights">Evaluation weights, or null for defaults.</param>
-        public HeuristicBot(ulong seed, int samples = 2, HeuristicWeights? weights = null)
+        /// <param name="rollout">Finish its own turn with the default policy before evaluating (stronger).</param>
+        /// <param name="name">Name used in reports.</param>
+        public HeuristicBot(ulong seed, int samples = 2, HeuristicWeights? weights = null, bool rollout = true, string name = "heuristic")
         {
             if (samples < 1)
             {
@@ -108,10 +140,12 @@ namespace Vortex.Core.Bots
             _rng = Pcg32.Seeded(seed, 0xB07UL);
             _samples = samples;
             _weights = weights ?? new HeuristicWeights();
+            _rollout = rollout;
+            Name = name;
         }
 
         /// <inheritdoc/>
-        public string Name => "heuristic";
+        public string Name { get; }
 
         /// <inheritdoc/>
         public Command Choose(GameEngine engine, GameState state, int seat, IReadOnlyList<Command> legal)
@@ -216,7 +250,7 @@ namespace Vortex.Core.Bots
             }
 
             GameState after = FinishCommand(engine, result.State);
-            return after.Pending == null && after.Outcome == null ? Rollout(engine, Determinize(after), seat) : after;
+            return _rollout && after.Pending == null && after.Outcome == null ? Rollout(engine, Determinize(after), seat) : after;
         }
 
         // Answers, at random, the remaining decisions of the command being resolved.
