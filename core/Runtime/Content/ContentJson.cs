@@ -149,6 +149,11 @@ namespace Vortex.Core.Content
                 doomExists |= e.Id == config.DoomEventId;
             }
 
+            if (config.TechnologiesToWin > data.Technologies.Count)
+            {
+                errors.Add("config: technologiesToWin exceeds the number of technologies in technologies.json");
+            }
+
             if (!doomExists)
             {
                 errors.Add("config: doomEventId '" + config.DoomEventId + "' is not an event of events.json");

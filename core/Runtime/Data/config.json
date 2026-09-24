@@ -1,6 +1,6 @@
 {
   "$schema": "./schema/config.schema.json",
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "startingHp": 30,
   "maxHp": 30,
   "minShield": 0,
@@ -12,6 +12,8 @@
   "tormentValue": 1,
   "eventFrequency": 1,
   "doomEventId": "EVT_FIN_DES_TEMPS",
+  "roundStartRotation": "None",
+  "technologiesToWin": 4,
   "playerCounts": [
     {
       "players": 2,

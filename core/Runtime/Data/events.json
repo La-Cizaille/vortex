@@ -1,6 +1,6 @@
 {
   "$schema": "./schema/events.schema.json",
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "events": [
     {
       "id": "EVT_TEMPETE_ELECTRO_MAGNETIQUE",

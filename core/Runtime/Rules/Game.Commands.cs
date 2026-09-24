@@ -249,7 +249,7 @@ namespace Vortex.Core.Rules
                 }
             }
 
-            // 3. Marked as obtained; the galactic election is won with every technology (RULES A9).
+            // 3. Marked as obtained; the galactic election is won with the configured number of technologies (RULES A9).
             PlayerState p = State.Players[player];
             if (!p.Technologies.Contains(color))
             {
@@ -257,7 +257,7 @@ namespace Vortex.Core.Rules
             }
 
             CheckEliminations();
-            if (!IsOver && !p.Eliminated && Data.Technologies.All(t => p.Technologies.Contains(t.Color)))
+            if (!IsOver && !p.Eliminated && p.Technologies.Count >= Config.TechnologiesToWin)
             {
                 EndGame(player, WinCondition.GalacticElection);
             }

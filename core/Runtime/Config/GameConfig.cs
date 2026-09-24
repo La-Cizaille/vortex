@@ -30,6 +30,8 @@ namespace Vortex.Core.Config
             int tormentValue,
             int eventFrequency,
             string doomEventId,
+            RoundStartRotation roundStartRotation,
+            int technologiesToWin,
             IReadOnlyList<PlayerCountSettings> playerCounts,
             int reactionDepthLimit,
             int maxDecisionsPerCommand)
@@ -46,6 +48,8 @@ namespace Vortex.Core.Config
             TormentValue = tormentValue;
             EventFrequency = eventFrequency;
             DoomEventId = doomEventId;
+            RoundStartRotation = roundStartRotation;
+            TechnologiesToWin = technologiesToWin;
             PlayerCounts = playerCounts ?? Array.Empty<PlayerCountSettings>();
             ReactionDepthLimit = reactionDepthLimit;
             MaxDecisionsPerCommand = maxDecisionsPerCommand;
@@ -83,6 +87,12 @@ namespace Vortex.Core.Config
 
         /// <summary>Event kept out of the deck and revealed at the doom round.</summary>
         public string DoomEventId { get; }
+
+        /// <summary>How the first player of each round moves (RULES A4.4). Play order is always clockwise.</summary>
+        public RoundStartRotation RoundStartRotation { get; }
+
+        /// <summary>Distinct technologies needed to win the galactic election (RULES A9).</summary>
+        public int TechnologiesToWin { get; }
 
         /// <summary>Settings that depend on the number of players.</summary>
         public IReadOnlyList<PlayerCountSettings> PlayerCounts { get; }
@@ -130,6 +140,8 @@ namespace Vortex.Core.Config
             Check(TormentValue >= 0 && TormentValue <= 99, "tormentValue must be in 0..99");
             Check(EventFrequency >= 0 && EventFrequency <= 99, "eventFrequency must be in 0..99");
             Check(!string.IsNullOrEmpty(DoomEventId), "doomEventId is required");
+            Check(Enum.IsDefined(typeof(RoundStartRotation), RoundStartRotation), "roundStartRotation is not a known value");
+            Check(TechnologiesToWin >= 1 && TechnologiesToWin <= 4, "technologiesToWin must be in 1..4");
             Check(ReactionDepthLimit >= 4 && ReactionDepthLimit <= 64, "reactionDepthLimit must be in 4..64");
             Check(MaxDecisionsPerCommand >= 8 && MaxDecisionsPerCommand <= 512, "maxDecisionsPerCommand must be in 8..512");
 
@@ -151,6 +163,17 @@ namespace Vortex.Core.Config
             Check(seen.Count > 0, "playerCounts must not be empty");
             return errors;
         }
+    }
+
+    /// <summary>How the first player of each round is chosen (RULES A4.4).</summary>
+    public enum RoundStartRotation
+    {
+        /// <summary>Every round starts with the initiative winner (or the next alive player).</summary>
+        None = 0,
+        /// <summary>The starting seat moves one seat clockwise each round.</summary>
+        Clockwise = 1,
+        /// <summary>The starting seat moves one seat counter-clockwise each round (the last player of a round also starts the next one).</summary>
+        CounterClockwise = 2,
     }
 
     /// <summary>Setup values that depend on the number of players (RULES A3, A4).</summary>

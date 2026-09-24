@@ -44,10 +44,10 @@ namespace Vortex.Core.Tests.Support
             return new CardDefinition(id, "Test " + id, slot, color, CardUsage.Durable, copies, false, "Test.", "Test.", null);
         }
 
-        public static GameConfig Config(int eventFrequency = 1, int doomRound = 50, int startShield = 4, int startingHp = 30)
+        public static GameConfig Config(int eventFrequency = 1, int doomRound = 50, int startShield = 4, int startingHp = 30, RoundStartRotation rotation = RoundStartRotation.None, int technologiesToWin = 4)
         {
             var counts = Enumerable.Range(2, 4).Select(n => new PlayerCountSettings(n, startShield, doomRound)).ToList();
-            return new GameConfig(null, ContentFile.CurrentSchemaVersion, startingHp, 30, 0, 8, 8, 5, 1, 1, 1, eventFrequency, DoomEvent, counts, 16, 64);
+            return new GameConfig(null, ContentFile.CurrentSchemaVersion, startingHp, 30, 0, 8, 8, 5, 1, 1, 1, eventFrequency, DoomEvent, rotation, technologiesToWin, counts, 16, 64);
         }
     }
 
