@@ -292,6 +292,6 @@ Une question tranchée quitte cette liste et entre dans le [journal des arbitrag
 - **Synergie technologique** : effets à définir (ARB-14).
 
 **Équilibrage** (plan et mesures : [`balance/README.md`](balance/README.md))
-- **Première élimination trop précoce** (ARB-55) : la prime sur le leader ne la retarde pas (gardée en réserve, ARB-57), et les mesures directes ont été écartées (ARB-56). Avec le bot amélioré (ADR-0012), la posture défensive la recule de près d'une manche (4,7 → 5,4), mais elle ralentit nettement le jeu. Faut-il la garder, l'affaiblir, ou attendre les parties réelles ?
+- **Première élimination trop précoce** (ARB-55) : en simulation, seule la posture défensive la recule (de la manche 4,7 à 5,4), au prix de parties plus lentes. La prime sur le leader est en réserve (ARB-57), et les mesures directes ont été écartées (ARB-56). À évaluer en partie réelle sur le prototype (ARB-58) : les joueurs s'acharnent-ils autant que les bots ?
 - **Fréquence des événements** : une par manche, jugée potentiellement excessive (ARB-12, ARB-46).
 - **Nouvelles mécaniques** validées pour simulation (ARB-44, ARB-45) : aucune n'est une règle tant qu'elle n'a pas été mesurée puis adoptée. Les trois premières (posture défensive, prime sur le leader, fantômes) sont codées comme options ⚙ désactivées. Leur interprétation (A4.1, A5.4, A6) est **provisoire** : elle sera confirmée ou corrigée au moment de l'adoption.
