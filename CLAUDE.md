@@ -27,7 +27,8 @@ The user is a security professional: security, optimisation, and clean documenta
 
 ## Commands
 - Tests: `dotnet test dotnet/Vortex.sln`
-- Unity tests (batch mode, no editor window): `pwsh tools/Test-Unity.ps1 [-Platform PlayMode]`
+- Unity tests (batch mode, no editor window): `powershell -ExecutionPolicy Bypass -File tools/Test-Unity.ps1 [-Platform PlayMode]`
+- Unity MCP (dev only): project `.mcp.json`, pinned server `mcpforunityserver==10.2.0` over stdio; the editor bridge listens on 127.0.0.1:6400. Release builds refuse dev-only packages (`ReleaseBuildGuard`).
 - Format check: `dotnet format dotnet/Vortex.sln --verify-no-changes`
 - Balance report: `dotnet run -c Release --project dotnet/Vortex.Simulator -- run --games 1000 --seed 1 --out docs/balance/<date>-<topic>.md`
 - Balance grid: `dotnet run -c Release --project dotnet/Vortex.Simulator -- grid --grid docs/balance/grids/<file>.json --games 1000 --seed 1 --out docs/balance/<date>-<topic>.md` (5 players by default, the standard table)
