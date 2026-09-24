@@ -94,6 +94,16 @@ namespace Vortex.Core.Rules
             return attack;
         }
 
+        /// <summary>
+        /// Effective shield of <paramref name="target"/> against a plain attack by <paramref name="attacker"/>
+        /// (RULES A6 step 7), computed without resolving any attack. Callers work on a copy of the state.
+        /// </summary>
+        public int PreviewEffectiveShield(int target, int attacker)
+        {
+            var attack = new AttackInfo(attacker, target);
+            return Math.Max(0, Calculate(ShieldOf(target), (e, s, m) => e.ModifyEffectiveShield(this, s, attack, m)));
+        }
+
         /// <summary>Redirects an attack once (RULES A6 step 2). Returns false if not allowed.</summary>
         public bool Redirect(AttackInfo attack, int newTarget)
         {

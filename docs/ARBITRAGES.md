@@ -23,6 +23,7 @@ Ce journal garde la trace **chronologique** de chaque décision de game design :
 - [2026-09-24 : passe d'équilibrage](#2026-09-24--passe-déquilibrage) (ARB-40 à ARB-49)
 - [2026-09-24 : décisions après les étapes 2.1 et 2.5](#2026-09-24--décisions-après-les-étapes-21-et-25) (ARB-50 à ARB-53)
 - [2026-09-24 : décisions après l'étape 2.2](#2026-09-24--décisions-après-létape-22) (ARB-54 et ARB-55)
+- [2026-09-24 : décisions sur le lot A de l'étape 2.3](#2026-09-24--décisions-sur-le-lot-a-de-létape-23) (ARB-56 et ARB-57)
 
 ---
 
@@ -112,3 +113,12 @@ ARB-54 repose sur les grilles de rythme et la comparaison de confirmation ([`bal
 |---|---|---|---|
 | ARB-54 | Rythme du mode standard : PV, bouclier de départ et manche de Fin des temps à 5 joueurs (suite d'ARB-43) ? | **30 PV (inchangés), bouclier de départ 5, Fin des temps à la manche 16**, selon la recommandation du rapport. La Fin des temps n'est plus atteinte que dans environ 20 % des parties (88 % avant) et redevient un filet de sécurité. L'Élection passe à environ 7 % des victoires, dans sa cible. La première élimination recule un peu, pour un coût modéré en attaques sans dégâts (27 % au lieu de 22 %). Les autres tailles de table gardent leurs réglages. | `config.json` (`playerCounts` à 5 joueurs), RULES A3 et A4, test `Rule_options_match_the_designer_rulings` |
 | ARB-55 | La première élimination précoce est-elle un problème ? L'objectif « pas avant la manche 6 » (ARB-40) mesure le temps que chaque joueur passe en jeu avant qu'un premier joueur soit éliminé ; ce n'est pas un déblocage de fonctionnalités. | **Oui, c'est un problème.** La cible est gardée au mode standard à 5 joueurs : pas de première élimination avant la manche 6. Aujourd'hui, le premier éliminé sort vers la manche 4,6 et attend environ 14 minutes la fin de la partie. On cherche la solution avec les mécaniques de l'étape 2.3. | [balance/README.md](balance/README.md#objectifs-étape-0) |
+
+## 2026-09-24 : décisions sur le lot A de l'étape 2.3
+
+Décisions prises sur le rapport [`balance/2026-09-24-mecaniques-lot-a.md`](balance/2026-09-24-mecaniques-lot-a.md) et son analyse dans [`balance/README.md`](balance/README.md). Le game designer a aussi validé l'amélioration du bot (décision technique : [ADR-0012](adr/0012-bot-protection-effective.md)).
+
+| # | Question | Décision | Appliqué dans |
+|---|---|---|---|
+| ARB-56 | Tester des mesures directes contre la première élimination précoce : sursis (pas sous 1 PV pendant les premières manches), dernier carré (+2 au bouclier effectif sous 10 PV) ou malus contre le plus faible ? | **Aucune des trois.** | Rien à appliquer |
+| ARB-57 | La prime sur le leader ne retarde pas la première élimination mais crée des retournements : que faire ? | **La garder en réserve.** L'option reste dans le moteur, désactivée, pour une décision ultérieure. | `config.json` (`leaderBounty` à 0), RULES A6 |

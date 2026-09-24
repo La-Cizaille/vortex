@@ -77,7 +77,7 @@ sequenceDiagram
 | `Dice/` | `Pcg32`, le générateur déterministe (ADR-0004). **M1.** |
 | `Rules/` | `GameEngine` (API publique sans état), `Game` (contexte de résolution, découpé en `Game.Actions`, `Game.Flow`, `Game.Commands` et `Game.Attack`), `GameStateValidator` (invariants). **M1.** |
 | `Projection/` | `GameView.Of(state)`, la vue publique sans informations cachées (ordre des paquets, état du RNG). **M1.** |
-| `Bots/` | `IBot`, `RandomBot` et `HeuristicBot` (ADR-0010) : bots génériques qui ne connaissent aucune carte et ne voient pas l'information cachée. `BotFactory` crée les quatre niveaux (`BotLevel` : `random`, `naive`, `normal`, `strong`). Ils servent au simulateur, et plus tard d'IA ou de remplaçants pour un joueur inactif. **M3.** |
+| `Bots/` | `IBot`, `RandomBot` et `HeuristicBot` (ADR-0010) : bots génériques qui ne connaissent aucune carte et ne voient pas l'information cachée. `BotFactory` crée les quatre niveaux (`BotLevel` : `random`, `naive`, `normal`, `strong`). Le bot note sa protection effective, calculée par le moteur (ADR-0012). Ils servent au simulateur, et plus tard d'IA ou de remplaçants pour un joueur inactif. **M3.** |
 
 ### Comportement des cartes
 - **Le moteur ne connaît aucune carte** (ADR-0007). Les règles de base exposent des points d'interception (calculs, autorisations, réactions : RULES B2), et les effets agissent par des actions élémentaires (RULES B3), qui appliquent elles-mêmes les autorisations. L'empilement est générique (RULES B4).

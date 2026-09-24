@@ -13,7 +13,8 @@ Un ADR consigne **une** décision structurante : son contexte, les options envis
 | [0007](0007-points-interception-et-briques-effets.md) | Moteur indépendant des cartes : points d'interception et briques d'effets | Accepté |
 | [0008](0008-json-source-de-verite.md) | Le JSON est la source de vérité du contenu (Excel retiré) | Accepté |
 | [0009](0009-decisions-par-re-execution-deterministe.md) | Décisions par re-exécution déterministe | Accepté |
-| [0010](0010-bots-generiques-par-simulation.md) | Bots génériques par simulation (détermination et fin de tour simulée) | Accepté |
+| [0010](0010-bots-generiques-par-simulation.md) | Bots génériques par simulation (détermination et fin de tour simulée) | Accepté, complété par 0012 |
 | [0011](0011-options-de-regles-et-variantes.md) | Équilibrage : options de règles, variantes de contenu et comparaison statistique | Accepté |
+| [0012](0012-bot-protection-effective.md) | Le bot évalue sa protection effective (complète 0010) | Accepté |
 
 Modèle : copier un ADR existant et garder les sections *Statut*, *Contexte*, *Options*, *Décision* et *Conséquences*.
