@@ -12,7 +12,8 @@ The user is a security professional: security, optimisation, and clean documenta
 - Game rules: `docs/RULES.md` - part A base rules, part B effect model (engine behaviour must match it; cite sections like `RULES A6` / `RULES B4` in code).
 - Card data: `core/Runtime/Data/{cards,events,technologies}.json` is the **source of truth** (ADR-0008): printed text + ruling per card. `docs/CARDS.md` is generated from it (never hand-edit).
 - Decisions: `docs/adr/`. Add an ADR for any structural decision.
-- Rulings not covered by RULES.md: **ask the user**, do not guess; then record the answer in the card's `ruling` (card-specific) or RULES.md part A/B (generic).
+- Rulings not covered by RULES.md: **ask the user**, do not guess; then record the answer in the card's `ruling` (card-specific) or RULES.md part A/B (generic), **and** log it in `docs/ARBITRAGES.md` (new `ARB-xx` entry: question, decision, reason, where applied; entries are never rewritten). Unanswered questions live in RULES.md "Questions ouvertes".
+- Rule changes under study: generic `config.json` options whose default keeps the current rule (ADR-0011); tried through variant files, never by editing content.
 
 ## Hard rules
 - Engine is card-agnostic (ADR-0007): base rules and engine code never name a card; cards act only through RULES B2 interception points and B3 elementary actions. A missing hook is added generically, never as a card exception. Rulings never name another card.
@@ -26,5 +27,6 @@ The user is a security professional: security, optimisation, and clean documenta
 ## Commands
 - Tests: `dotnet test dotnet/Vortex.sln`
 - Format check: `dotnet format dotnet/Vortex.sln --verify-no-changes`
-- Balance: `dotnet run -c Release --project dotnet/Vortex.Simulator -- --games 1000 --seed 1 --out docs/balance/<date>-<topic>.md` (reports are generated, never hand-edited; bots never name a card, ADR-0010)
+- Balance report: `dotnet run -c Release --project dotnet/Vortex.Simulator -- run --games 1000 --seed 1 --out docs/balance/<date>-<topic>.md`
+- Balance comparison: `dotnet run -c Release --project dotnet/Vortex.Simulator -- compare --games 2000 --seed 1 --variant docs/balance/variants/<file>.json [--variant …] --out docs/balance/<date>-<topic>.md` (reports are generated, never hand-edited; bots never name a card, ADR-0010; plan and targets in `docs/balance/README.md`)
 - Content: `dotnet run --project dotnet/Vortex.ContentTool -- validate core/Runtime/Data` (also `format <dir> [--check]`, `docs core/Runtime/Data docs [--check]`)

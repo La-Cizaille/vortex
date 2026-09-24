@@ -48,9 +48,21 @@ La source de vérité est `core/Runtime/Data/` : `cards.json`, `events.json` et 
    ```
 4. Si le nombre de cartes change, mettre à jour les quantités attendues dans `GameDataContentTests`. C'est le **seul** test lié au contenu réel.
 5. Déclarer les **briques d'effets** de la carte dans `effects` (catalogue et paramètres : [`BRICKS.md`](BRICKS.md)). Pour une mécanique qu'aucune brique ne couvre : ajouter une brique **générique** dans `core/Runtime/Effects/Bricks`, l'enregistrer dans `BrickCatalog`, écrire son test sur contenu factice (`dotnet/Vortex.Core.Tests/Bricks`), puis régénérer la documentation.
-6. Mesurer l'impact avec le simulateur, avant et après la modification, avec la même graine : voir [`balance/README.md`](balance/README.md).
+6. Mesurer l'impact **avant** de modifier le contenu : décrire le changement dans une variante (`docs/balance/variants/`), puis le comparer à la référence avec `Vortex.Simulator compare`. Voir [`balance/README.md`](balance/README.md).
 
 Les valeurs globales (PV, bouclier de départ, fréquence des événements…) sont dans `GameConfig`, pas dans les cartes.
+
+## Consigner un arbitrage de game design
+Une question de règle que `RULES.md` ne tranche pas est **posée au game designer**, jamais devinée. Une fois la réponse obtenue :
+1. L'appliquer au bon endroit :
+   - le champ `ruling` de la carte, si la décision ne concerne qu'elle ;
+   - `RULES.md`, partie A ou B, si elle est générique (sans jamais citer de carte) ;
+   - `config.json` et la valeur ⚙ de `RULES.md`, si c'est un réglage.
+2. Ajouter une entrée `ARB-xx` au [journal des arbitrages](ARBITRAGES.md) : la question, la décision, la raison donnée et l'endroit où elle est appliquée. Une entrée n'est jamais réécrite : une décision qui change fait l'objet d'une nouvelle entrée qui cite l'ancienne.
+3. Retirer la question des « Questions ouvertes » de `RULES.md` si elle y figurait.
+4. Écrire ou adapter le test qui fixe le comportement.
+
+Une décision **technique** ou structurante ne va pas dans ce journal : elle fait l'objet d'un ADR (`docs/adr/`).
 
 ## Ajouter ou modifier un visuel (à partir du jalon M4)
 - Le code ne référence **jamais** un asset directement : tout passe par les catalogues de `unity/Assets/_Vortex/Theme/`.
