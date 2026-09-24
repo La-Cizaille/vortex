@@ -30,6 +30,8 @@ namespace Vortex.Editor
         {
             EnsureContent();
             EnsureFeedbackProfile();
+            ThemeAssets.EnsureAll();
+            GalleryScene.Ensure();
             AssetDatabase.SaveAssets();
         }
 
@@ -76,7 +78,8 @@ namespace Vortex.Editor
             return asset;
         }
 
-        private static void Create(Object asset, string path)
+        /// <summary>Saves a new asset, creating its folder if needed.</summary>
+        internal static void Create(Object asset, string path)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             AssetDatabase.CreateAsset(asset, path);

@@ -65,12 +65,21 @@ Une question de règle que `RULES.md` ne tranche pas est **posée au game design
 Une décision **technique** ou structurante ne va pas dans ce journal : elle fait l'objet d'un ADR (`docs/adr/`).
 
 ## Ajouter ou modifier un visuel (à partir du jalon M4)
-- **Réaction à un événement du jeu** (attaque, soin, élimination…) : c'est le profil de retours visuels, `unity/Assets/_Vortex/Presentation/Feedback/DefaultFeedbackProfile.asset`, qui dit quoi jouer pour chaque type d'événement (ADR-0014). Pour changer une réaction, on crée un retour visuel (*Create → Vortex → Retours visuels*), par exemple un `PrefabFeedback` qui fait apparaître des particules ou une séquence Timeline sur le vaisseau visé, puis on le branche dans le profil. Aucun code n'est à modifier.
-- Le code ne référence **jamais** un asset directement : tout passe par les catalogues de `unity/Assets/_Vortex/Theme/`.
-- Pour remplacer l'illustration d'une carte, déposer `unity/Assets/_Vortex/Art/Cards/<ID>.png` (par exemple `A_005.png`). Les réglages d'import mobile et l'enregistrement dans le catalogue sont appliqués automatiquement.
-- Pour un vaisseau, déposer `Art/Ships/<Nom>.fbx`, puis l'associer dans `ShipCatalog`.
-- Les couleurs, polices et vitesses d'animation se règlent dans `ThemeSettings`, en direct dans la scène **Galerie**.
-- Tant qu'un visuel manque, un placeholder généré est affiché.
+Le code ne référence **jamais** un asset directement : tout passe par les catalogues de `unity/Assets/_Vortex/Theme/`. Tant qu'un visuel manque, un visuel provisoire généré le remplace et le jeu fonctionne. Les chemins ci-dessous partent de `unity/Assets/_Vortex/`.
+
+| Pour changer… | Où | Comment |
+|---|---|---|
+| L'illustration d'une carte, d'un événement ou d'une technologie | `Art/Cards/<ID>.png` | Déposer l'image, nommée avec l'identifiant de [`CARDS.md`](CARDS.md) : `A_005.png`, `EVT_TROU_NOIR.png`, `TECH_BLUE.png`. À sa première importation, elle reçoit les réglages mobiles (sprite, 1024 pixels au plus, compression ASTC 6×6 sous Android), qu'on peut ajuster ensuite, et elle entre dans `Theme/CardArtCatalog`. La supprimer ramène le visuel provisoire. Un fichier dont le nom n'est pas un identifiant est signalé dans la console et ignoré. Le menu *Vortex → Habillage → Vérifier les illustrations* liste les identifiants encore sans image. |
+| La mise en page d'une carte | `Prefabs/Card.prefab` | Éditer le prefab : tailles, positions, polices. Le code ne fait que remplir ses éléments. |
+| Un vaisseau | `Art/Ships/<Nom>.fbx`, puis `Theme/ShipCatalog` | Déposer le modèle (importé sans caméras ni lumières), en faire un prefab si besoin, puis l'associer au vaisseau par défaut ou à un siège. |
+| Les couleurs, les polices et la vitesse des animations | `Theme/ThemeSettings` | Éditer dans l'inspecteur. En mode Play dans la scène Galerie, le changement se voit aussitôt. |
+| Les icônes dans le texte des cartes (`<ATQ>`, `<BOU>`…) | `Theme/ThemeSettings`, champ *Text Icons* | Créer un sprite asset TextMeshPro dont les sprites s'appellent `ATQ`, `BOU`, `DIC`, `MKT`, `MOD`, `SUR` et `TOR`, puis le choisir dans le thème. Sans lui, les icônes sont omises et le texte reste lisible. |
+| Les textes de l'interface | `Content/TextTable` | Éditer le texte de chaque clé. Le nom et le texte des cartes viennent du contenu du jeu, pas de cette table. |
+| La réaction à un événement du jeu (attaque, soin, élimination…) | `Presentation/Feedback/DefaultFeedbackProfile` | Le profil dit quoi jouer pour chaque type d'événement (ADR-0014). On crée un retour visuel (*Create → Vortex → Retours visuels*), par exemple un `PrefabFeedback` qui fait apparaître des particules ou une séquence Timeline sur le vaisseau visé, puis on le branche dans le profil. |
+
+**Scène Galerie** (`Scenes/Gallery.unity`) : en mode Play, elle montre toutes les cartes, tous les événements, toutes les technologies et le vaisseau de chaque siège, avec le thème et les illustrations du moment. Elle sert à régler l'apparence sans jouer une partie ; elle ne fait pas partie du jeu livré.
+
+Un asset de base supprimé par erreur se recrée avec le menu *Vortex → Développement → Créer les assets de base manquants*. Ce menu ne remplace jamais un asset existant.
 
 ## Installer Unity
 - Version : celle de `unity/ProjectSettings/ProjectVersion.txt`, aujourd'hui **6000.6.3f1**. Politique : la dernière version Update pendant le développement, la LTS du moment avant toute publication (ADR-0013). Modules : *Android Build Support* et *Windows Build Support (IL2CPP)*.

@@ -31,7 +31,7 @@ L'option 3.
 - Une couche d'entrée unique traduit souris et doigt en trois gestes : voir en grand (survol, ou appui long), sélectionner (clic ou toucher), agir sur une cible (glisser-déposer). Les vues ne connaissent que ces gestes.
 
 **Textes**
-- Tous les textes de l'interface passent par une table de textes (clé → texte), en français seulement pour l'instant. Le mécanisme sera choisi avec les premiers écrans (M4.4) ; le paquet Localization de Unity sera évalué si l'on traduit.
+- Tous les textes de l'interface passent par une table de textes, en français seulement pour l'instant : `TextTable`, un asset clé → texte éditable dans Unity, avec les clés listées dans le code (`TextKeys`). Une clé sans texte s'affiche `#clé`, pour que le manque se voie. Le paquet Localization de Unity, plus lourd (il repose sur Addressables), sera évalué si l'on traduit.
 - Les textes qui ne viennent pas du jeu lui-même (noms des joueurs) sont affichés sans interprétation des balises de mise en forme : un nom ne peut pas changer l'apparence de l'écran.
 
 ## Conséquences
