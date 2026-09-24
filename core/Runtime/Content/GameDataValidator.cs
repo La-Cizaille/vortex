@@ -160,8 +160,7 @@ namespace Vortex.Core.Content
 
             foreach (char c in text)
             {
-                // Only '\n' is allowed among control characters: no '\r', tabs, NUL, or bidi overrides.
-                if ((char.IsControl(c) && c != '\n') || IsBidiControl(c))
+                if (IsForbiddenTextCharacter(c))
                 {
                     errors.Add(where + string.Format(CultureInfo.InvariantCulture, " contains forbidden character U+{0:X4}.", (int)c));
                     return;
@@ -175,6 +174,15 @@ namespace Vortex.Core.Content
             {
                 errors.Add(where + string.Format(CultureInfo.InvariantCulture, ": copies must be between 1 and {0} (got {1}).", MaxCopies, copies));
             }
+        }
+
+        /// <summary>
+        /// True for a character refused in any displayed text: a control character other than '\n' (no '\r', tab or NUL),
+        /// or a bidirectional override. Shared with the tools so that every text shown to a reader follows one policy.
+        /// </summary>
+        public static bool IsForbiddenTextCharacter(char c)
+        {
+            return (char.IsControl(c) && c != '\n') || IsBidiControl(c);
         }
 
         // Bidirectional overrides can make displayed text differ from stored text (CVE-2021-42574 "Trojan Source").

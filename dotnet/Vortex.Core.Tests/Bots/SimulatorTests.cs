@@ -101,6 +101,7 @@ namespace Vortex.Core.Tests.Bots
         [TestCase(new string[0], false, "run --players 5 --games 200 --seed 1 --bot normal --skill normal,random")]
         [TestCase(new[] { "run", "--players", "5,3,3", "--bot", "strong", "--skill", "strong,naive" }, false, "run --players 3,5 --games 200 --seed 1 --bot strong --skill strong,naive")]
         [TestCase(new[] { "compare", "--variant", "a.json", "--variant", "b.json", "--games", "50" }, true, "compare --players 5 --games 50 --seed 1 --bot normal --variant a.json --variant b.json")]
+        [TestCase(new[] { "grid", "--grid", "g.json", "--games", "10" }, false, "grid --players 5 --games 10 --seed 1 --bot normal --grid g.json")]
         public void Options_are_parsed_and_echoed_explicitly(string[] args, bool compare, string described)
         {
             Program.Options o = Program.Options.Parse(args);
@@ -119,6 +120,10 @@ namespace Vortex.Core.Tests.Bots
         [TestCase("--seed", "x")]
         [TestCase("--games")]
         [TestCase("--unknown")]
+        [TestCase("grid")]
+        [TestCase("grid", "--grid", "g.json", "--players", "4,5")]
+        [TestCase("grid", "--grid", "g.json", "--variant", "v.json")]
+        [TestCase("run", "--grid", "g.json")]
         public void Bad_options_are_refused(params string[] args)
         {
             Assert.That(() => Program.Options.Parse(args), Throws.TypeOf<ArgumentException>());

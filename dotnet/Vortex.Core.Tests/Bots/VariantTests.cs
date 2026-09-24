@@ -51,6 +51,17 @@ namespace Vortex.Core.Tests.Bots
         }
 
         [Test]
+        public void Player_count_settings_are_patched_by_player_count()
+        {
+            ContentSet reference = Variants.LoadReference(TestPaths.DataDir);
+            ContentSet v = Load("{ \"name\": \"Bouclier\", \"config\": { \"playerCounts\": { \"5\": { \"startShield\": 6 } } } }");
+
+            Assert.That(v.Config.ForPlayers(5)!.StartShield, Is.EqualTo(6));
+            Assert.That(v.Config.ForPlayers(5)!.DoomRound, Is.EqualTo(reference.Config.ForPlayers(5)!.DoomRound));
+            Assert.That(v.Config.ForPlayers(4)!.StartShield, Is.EqualTo(reference.Config.ForPlayers(4)!.StartShield));
+        }
+
+        [Test]
         public void A_patch_that_restates_the_reference_keeps_its_fingerprint()
         {
             ContentSet reference = Variants.LoadReference(TestPaths.DataDir);
@@ -83,6 +94,11 @@ namespace Vortex.Core.Tests.Bots
         [TestCase("{ \"name\": \"x\", \"config\": { \"startingHp\": \"many\" } }", "startingHp")]
         [TestCase("{ \"name\": \"x\", \"events\": { \"EVT_FIN_DES_TEMPS\": { \"effects\": [ { \"brick\": \"NoSuchBrick\" } ] } } }", "NoSuchBrick")]
         [TestCase("{ \"name\": \"x\", \"config\": { \"startingHp\": 20, \"startingHp\": 30 } }", "startingHp")]
+        [TestCase("{ \"name\": \"x\", \"config\": 3 }", "'config' must be an object")]
+        [TestCase("{ \"name\": 3 }", "'name' must be a string")]
+        [TestCase("{ \"name\": \"a|b\" }", "forbidden character U+007C")]
+        [TestCase("{ \"name\": \"x\", \"description\": \"line\\nbreak\" }", "forbidden character U+000A")]
+        [TestCase("{ \"name\": \"x\", \"config\": { \"playerCounts\": { \"five\": { \"startShield\": 3 } } } }", "unknown player count 'five'")]
         [TestCase("{ \"name\": ", "")]
         public void Invalid_variants_are_refused_with_a_message(string json, string expected)
         {

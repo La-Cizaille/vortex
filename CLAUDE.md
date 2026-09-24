@@ -28,5 +28,6 @@ The user is a security professional: security, optimisation, and clean documenta
 - Tests: `dotnet test dotnet/Vortex.sln`
 - Format check: `dotnet format dotnet/Vortex.sln --verify-no-changes`
 - Balance report: `dotnet run -c Release --project dotnet/Vortex.Simulator -- run --games 1000 --seed 1 --out docs/balance/<date>-<topic>.md`
+- Balance grid: `dotnet run -c Release --project dotnet/Vortex.Simulator -- grid --grid docs/balance/grids/<file>.json --games 1000 --seed 1 --out docs/balance/<date>-<topic>.md` (5 players by default, the standard table)
 - Balance comparison: `dotnet run -c Release --project dotnet/Vortex.Simulator -- compare --games 2000 --seed 1 --variant docs/balance/variants/<file>.json [--variant …] --out docs/balance/<date>-<topic>.md` (reports are generated, never hand-edited; bots never name a card, ADR-0010; plan and targets in `docs/balance/README.md`)
 - Content: `dotnet run --project dotnet/Vortex.ContentTool -- validate core/Runtime/Data` (also `format <dir> [--check]`, `docs core/Runtime/Data docs [--check]`)

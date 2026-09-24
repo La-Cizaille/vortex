@@ -99,11 +99,12 @@ Outil de développement, jamais embarqué dans un build. Il joue des parties bot
 
 | Fichier | Rôle |
 |---|---|
-| `Program.cs` | Commandes `run` (rapport complet) et `compare` (référence contre variantes), options validées, parties jouées en parallèle avec une graine par partie. |
+| `Program.cs` | Commandes `run` (rapport complet), `compare` (référence contre variantes) et `grid` (combinaisons classées selon les objectifs), options validées, parties jouées en parallèle avec une graine par partie. |
 | `Variants.cs` | Charge la référence et applique les **variantes** (correctifs JSON), puis revalide le tout avec le chargeur du jeu. Calcule l'empreinte du contenu simulé. |
 | `GameRunner.cs` | Joue une partie et relève ses mesures (`GameRecord`) à partir des événements du moteur. |
 | `Stats.cs` | Agrège un lot de parties (`ScenarioStats`) : proportions et moyennes avec leur erreur type. |
-| `Report.cs`, `CompareReport.cs` | Mise en forme des deux types de rapport. |
+| `Grid.cs` | Charge une **grille** : produit cartésien de correctifs, objectifs chiffrés, classement par distance aux objectifs. |
+| `Report.cs`, `CompareReport.cs`, `GridReport.cs` | Mise en forme des trois types de rapport. |
 
 **Reproductibilité** : la graine de chaque partie dépend seulement de la graine globale, du nombre de joueurs et du numéro de la partie. Le résultat ne dépend donc pas de l'ordonnancement des threads, et la référence et ses variantes jouent les mêmes parties.
 

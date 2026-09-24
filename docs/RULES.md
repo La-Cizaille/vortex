@@ -290,7 +290,7 @@ Une question tranchée quitte cette liste et entre dans le [journal des arbitrag
 - **Synergie technologique** : effets à définir (ARB-14).
 
 **Équilibrage** (plan et mesures : [`balance/README.md`](balance/README.md))
-- **Première élimination au mode standard** : la cible « pas avant la manche 6 » avait été fixée pour 4 joueurs (ARB-40). La garder telle quelle à 5 joueurs ?
-- **PV, `StartShield[n]` et `DoomRound[n]`** : grille à simuler (ARB-43). Elle doit aussi retarder la première élimination et rapprocher l'Élection galactique de sa cible (ARB-51).
+- **Première élimination au mode standard** : la cible « pas avant la manche 6 » avait été fixée pour 4 joueurs (ARB-40). À 5 joueurs, aucun réglage de PV, de bouclier de départ ou de Fin des temps ne l'atteint (au mieux la manche 5,6). La garder, et la confier aux mécaniques de l'étape 2.3, ou l'adapter au mode à 5 joueurs ?
+- **PV, `StartShield[n]` et `DoomRound[n]`** : mesurés à l'étape 2.2 (ARB-43). Recommandation : 30 PV, bouclier de départ 5 et Fin des temps à la manche 16 à 5 joueurs. Décision attendue. Elle doit aussi retarder la première élimination et rapprocher l'Élection galactique de sa cible (ARB-51).
 - **Fréquence des événements** : une par manche, jugée potentiellement excessive (ARB-12, ARB-46).
 - **Nouvelles mécaniques** validées pour simulation (ARB-44, ARB-45) : aucune n'est une règle tant qu'elle n'a pas été mesurée puis adoptée.

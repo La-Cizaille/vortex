@@ -89,6 +89,15 @@ jobs:
             dotnet run -c Release --no-build --project dotnet/Vortex.Simulator -- compare --players 3 --games 5 --variant "$f" --out compare-smoke.md
           done
 
+      - name: Grid smoke run (every committed grid loads and plays)
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          for f in docs/balance/grids/*.json; do
+            dotnet run -c Release --no-build --project dotnet/Vortex.Simulator -- grid --games 2 --grid "$f" --out grid-smoke.md
+          done
+
       - name: Upload coverage
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
