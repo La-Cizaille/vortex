@@ -4,6 +4,7 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Non publié]
 ### Ajouté
+- Unity MCP pour le développement : paquet épinglé sur un commit (v10.2.0), serveur `mcpforunityserver==10.2.0` en stdio déclaré dans `.mcp.json`, télémétrie coupée, menu *Vortex → Développement → Configurer Unity MCP*. Garde-fou `ReleaseBuildGuard` : un build de publication échoue tant qu'un paquet réservé au développement est installé (SECURITY.md §0).
 - M4.1 : projet Unity (`unity/`) créé depuis le modèle URP multiplateforme et épuré. Paquets épinglés : URP 17.6.0, Input System 1.20.0, uGUI 2.6.0, Test Framework 1.8.0 ; le moteur est branché comme paquet local (`file:../../core`). Unity 6000.6.3f1 (ADR-0013). Le moteur compile dans Unity avec les types nullables activés (`csc.rsp`). Premiers tests EditMode : le vrai contenu se charge dans Unity et une partie complète à 5 bots s'y joue. Script `tools/Test-Unity.ps1` pour lancer ces tests en mode batch.
 - Doctrine de sécurité (`SECURITY.md` §0) : aucun raccourci sur le produit livré, raccourcis documentés acceptés pour l'outillage de développement.
 - Le bot heuristique note sa **protection effective** (ADR-0012) : le bouclier effectif calculé par le moteur face à une attaque simple de chaque adversaire (`GameEngine.AverageEffectiveShield`, en lecture seule), et non plus la seule valeur de son bouclier. Les protections temporaires sont ainsi valorisées. Nouvelle référence d'équilibrage (v4), presque identique à la v3.

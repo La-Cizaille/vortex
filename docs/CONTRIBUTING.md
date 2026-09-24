@@ -74,9 +74,20 @@ Une décision **technique** ou structurante ne va pas dans ce journal : elle fai
 ## Installer Unity
 - Version : celle de `unity/ProjectSettings/ProjectVersion.txt`, aujourd'hui **6000.6.3f1**. Politique : la dernière version Update pendant le développement, la LTS du moment avant toute publication (ADR-0013). Modules : *Android Build Support* et *Windows Build Support (IL2CPP)*.
 - **Dossier d'installation** : l'emplacement par défaut du Hub (`C:\Program Files\Unity\Hub\Editor`) convient. Évitez les dossiers profonds : des fichiers de paquets internes peuvent y dépasser la limite Windows de 260 caractères, l'installeur les abandonne sans rien signaler, et le projet ne compile plus. C'est arrivé avec le paquet URP, installé sous `AppData\Local\Programs`.
-- **Tests Unity** : `pwsh tools/Test-Unity.ps1` (EditMode par défaut, `-Platform PlayMode` pour les tests en jeu). Le script trouve l'éditeur d'après la version du projet ; la variable `UNITY_EDITOR` permet d'en désigner un autre.
+- **Tests Unity** : `powershell -ExecutionPolicy Bypass -File tools/Test-Unity.ps1` (EditMode par défaut, `-Platform PlayMode` pour les tests en jeu). L'option `-ExecutionPolicy Bypass` ne vaut que pour ce lancement : sans elle, Windows PowerShell refuse les scripts locaux. Le script trouve l'éditeur d'après la version du projet ; la variable `UNITY_EDITOR` permet d'en désigner un autre.
 - Le projet est dans `unity/`. Ses paquets sont épinglés dans `unity/Packages/manifest.json`, et le moteur y est référencé comme paquet local (`file:../../core`).
 - **Unity Hub installé depuis le Microsoft Store** : Windows isole ses fichiers, et la licence activée dans le Hub reste dans son dossier privé (`%LOCALAPPDATA%\Packages\UnityTechnologies.UnityHub_…\LocalCache\Local\Unity\licenses\`). L'éditeur lancé en ligne de commande (tests, builds) ne la voit pas. Il faut copier `UnityEntitlementLicense.xml` dans `%LOCALAPPDATA%\Unity\licenses\`, puis refaire cette copie quand le Hub renouvelle la licence. La version classique du Hub n'a pas ce problème.
+
+## Unity MCP (outil de développement)
+Unity MCP permet à un assistant IA de piloter l'éditeur : scènes, objets, mode Play, console, captures, tests. C'est un outil de développement (SECURITY.md §0) :
+- Le paquet Unity est épinglé sur un commit (`com.coplaydev.unity-mcp`, v10.2.0), et le serveur MCP sur sa version PyPI (`mcpforunityserver==10.2.0`, dans `.mcp.json`).
+- **Mise en route**, une fois par poste :
+  1. Installer [uv](https://docs.astral.sh/uv/) (`winget install astral-sh.uv`).
+  2. Ouvrir le projet dans Unity, puis lancer le menu *Vortex → Développement → Configurer Unity MCP*. Ce menu choisit le transport stdio et coupe la télémétrie de l'éditeur. Redémarrer ensuite l'éditeur.
+  3. Démarrer ou redémarrer Claude Code à la racine du dépôt, et approuver le serveur `unity` déclaré dans `.mcp.json`.
+- **Fonctionnement** : Claude Code lance le serveur, qui parle au pont de l'éditeur sur `127.0.0.1:6400`. Le pont n'écoute que sur la machine, mais **sans authentification** : tout programme local peut le piloter tant que l'éditeur est ouvert. La télémétrie est coupée des deux côtés : variables d'environnement pour le serveur, préférence de l'éditeur pour le pont.
+- **Jamais dans un produit livré** : le paquet contient un petit assembly runtime (utilitaires passifs). `ReleaseBuildGuard` fait donc échouer tout build de publication tant qu'un paquet réservé au développement est installé. Les builds de développement restent possibles.
+- Pour une montée de version : relire le changelog, mettre à jour le commit, la version du serveur et, si elles changent, les clés de préférence dans `UnityMcpSetup`.
 
 ## Fusion des fichiers Unity
 Ajouter UnityYAMLMerge dans votre configuration Git locale (le chemin dépend de votre version d'Unity) :

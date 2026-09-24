@@ -45,7 +45,7 @@ dotnet run -c Release --project dotnet/Vortex.Simulator -- compare --games 2000 
 Ouvrir le dossier `unity/` dans Unity Hub. Pour lancer les tests Unity sans ouvrir l'éditeur :
 
 ```bash
-pwsh tools/Test-Unity.ps1
+powershell -ExecutionPolicy Bypass -File tools/Test-Unity.ps1
 ```
 
 ## Où trouver quoi
