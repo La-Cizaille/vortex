@@ -4,7 +4,7 @@ Jeu de combat de vaisseaux spatiaux au tour par tour, en chacun pour soi, de 2 �
 
 Adaptation numérique d'un jeu de société. Cibles : **Android** et **Windows**. Style 3D simple, pensé pour le mobile.
 
-> État : **passe d'équilibrage** (entre M3 et M4). M0 à M3 sont terminés : moteur complet, 54 modificateurs, 8 événements, 4 technologies, bots et simulateur. La feuille de route est plus bas.
+> État : **M4, prototype Unity**. M0 à M3 et l'équilibrage des règles de base sont terminés : moteur complet, 54 modificateurs, 8 événements, 4 technologies, bots, simulateur, mode standard à 5 joueurs réglé. La feuille de route est plus bas.
 
 ## Structure du dépôt
 
@@ -13,12 +13,12 @@ Adaptation numérique d'un jeu de société. Cibles : **Android** et **Windows**
 | [`docs/`](docs/) | [Règles](docs/RULES.md), [journal des arbitrages](docs/ARBITRAGES.md), [catalogue des cartes](docs/CARDS.md) (généré), [équilibrage](docs/balance/README.md), [architecture](docs/ARCHITECTURE.md), [sécurité](docs/SECURITY.md), [contribution](docs/CONTRIBUTING.md), [décisions techniques (ADR)](docs/adr/). |
 | `core/` | Moteur de règles en C# pur, partagé entre Unity, les tests, le simulateur et le futur serveur. `core/Runtime/Data/*.json` est la **source de vérité** des cartes. |
 | `dotnet/` | Solution .NET : tests, outil de contenu (validation, format, catalogue), simulateur d'équilibrage, serveur (phase 2). |
-| `unity/` | Client Unity 6.3 LTS (URP). |
+| `unity/` | Client Unity 6 (URP). Version : [ADR-0013](docs/adr/0013-version-unity.md). |
 
 ## Pré-requis
 
 - [SDK .NET 10](https://dotnet.microsoft.com/download)
-- [Unity Hub](https://unity.com/download) + **Unity 6.3 LTS**, avec les modules *Android Build Support* et *Windows Build Support (IL2CPP)*
+- [Unity Hub](https://unity.com/download) + **Unity 6000.6.3f1**, la version indiquée dans `unity/ProjectSettings/ProjectVersion.txt` (politique de version : ADR-0013), avec les modules *Android Build Support* et *Windows Build Support (IL2CPP)*. Détails et pièges connus : [`CONTRIBUTING.md`](docs/CONTRIBUTING.md#installer-unity)
 - Git + Git LFS (`git lfs install`), utilisé pour les assets graphiques
 - (Outils IA, optionnel) [uv](https://docs.astral.sh/uv/) pour Unity MCP
 
@@ -42,7 +42,11 @@ Simuler des parties et comparer une variante de règles à la référence (mode 
 dotnet run -c Release --project dotnet/Vortex.Simulator -- compare --games 2000 --variant docs/balance/variants/rotation-antihoraire.json
 ```
 
-Ouvrir le dossier `unity/` dans Unity Hub (à partir de M4).
+Ouvrir le dossier `unity/` dans Unity Hub. Pour lancer les tests Unity sans ouvrir l'éditeur :
+
+```bash
+pwsh tools/Test-Unity.ps1
+```
 
 ## Où trouver quoi
 
@@ -63,7 +67,7 @@ Ouvrir le dossier `unity/` dans Unity Hub (à partir de M4).
 | **M1** | Moteur de base : tours, marchés, attaques, Tourment, événements, combos, victoire |
 | **M2** | Les 54 modificateurs, 8 événements et 4 technologies |
 | **M3** | Simulateur bot contre bot et rapport d'équilibrage |
-| **Équilibrage** | Règles de base, puis revue des cartes avec un éditeur visuel (plan : [`docs/balance/README.md`](docs/balance/README.md)) |
+| **Équilibrage** | Règles de base : fait. Revue des cartes avec un éditeur visuel après le prototype (plan : [`docs/balance/README.md`](docs/balance/README.md)) |
 | **M4** | Client Unity jouable en hot-seat (visuels provisoires, habillage modifiable) |
 | **M5** | Finitions : modèles 3D, animations, builds Android et Windows |
 | Phase 2 | Serveur autoritaire, lobby, jeu en ligne |

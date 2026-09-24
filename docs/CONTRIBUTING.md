@@ -71,6 +71,13 @@ Une décision **technique** ou structurante ne va pas dans ce journal : elle fai
 - Les couleurs, polices et vitesses d'animation se règlent dans `ThemeSettings`, en direct dans la scène **Galerie**.
 - Tant qu'un visuel manque, un placeholder généré est affiché.
 
+## Installer Unity
+- Version : celle de `unity/ProjectSettings/ProjectVersion.txt`, aujourd'hui **6000.6.3f1**. Politique : la dernière version Update pendant le développement, la LTS du moment avant toute publication (ADR-0013). Modules : *Android Build Support* et *Windows Build Support (IL2CPP)*.
+- **Dossier d'installation** : l'emplacement par défaut du Hub (`C:\Program Files\Unity\Hub\Editor`) convient. Évitez les dossiers profonds : des fichiers de paquets internes peuvent y dépasser la limite Windows de 260 caractères, l'installeur les abandonne sans rien signaler, et le projet ne compile plus. C'est arrivé avec le paquet URP, installé sous `AppData\Local\Programs`.
+- **Tests Unity** : `pwsh tools/Test-Unity.ps1` (EditMode par défaut, `-Platform PlayMode` pour les tests en jeu). Le script trouve l'éditeur d'après la version du projet ; la variable `UNITY_EDITOR` permet d'en désigner un autre.
+- Le projet est dans `unity/`. Ses paquets sont épinglés dans `unity/Packages/manifest.json`, et le moteur y est référencé comme paquet local (`file:../../core`).
+- **Unity Hub installé depuis le Microsoft Store** : Windows isole ses fichiers, et la licence activée dans le Hub reste dans son dossier privé (`%LOCALAPPDATA%\Packages\UnityTechnologies.UnityHub_…\LocalCache\Local\Unity\licenses\`). L'éditeur lancé en ligne de commande (tests, builds) ne la voit pas. Il faut copier `UnityEntitlementLicense.xml` dans `%LOCALAPPDATA%\Unity\licenses\`, puis refaire cette copie quand le Hub renouvelle la licence. La version classique du Hub n'a pas ce problème.
+
 ## Fusion des fichiers Unity
 Ajouter UnityYAMLMerge dans votre configuration Git locale (le chemin dépend de votre version d'Unity) :
 ```

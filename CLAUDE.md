@@ -1,7 +1,7 @@
 # CLAUDE.md — working agreement for AI-assisted sessions
 
 ## Project
-Vortex: turn-based FFA (2–5 players) space-ship card game. Unity 6.3 LTS client (Android + Windows), rules engine in pure C#.
+Vortex: turn-based FFA (2–5 players) space-ship card game. Unity 6 client (Android + Windows; version policy ADR-0013: latest Update release in development, LTS before any release), rules engine in pure C#.
 The user is a security professional: security, optimisation, and clean documentation are non-negotiable. Explain *what* and *why*.
 
 ## Language
@@ -22,10 +22,12 @@ The user is a security professional: security, optimisation, and clean documenta
 - Illegal commands return typed errors and leave state untouched; every rule/card gets tests (use `ScriptedDice`).
 - Unity code never references assets directly: use theme catalogs; missing art → generated placeholder.
 - Never commit secrets/keystores. Pin dependency versions. Update `docs/SECURITY.md` when adding an input surface or dependency.
+- Security doctrine (`docs/SECURITY.md` §0): **no shortcut on the shipped product** (builds, server, network, saves, runtime dependencies); **pragmatic shortcuts allowed for dev tooling** (editor tools, MCP, simulator, scripts) if nothing reaches a build, no secret is exposed, and the shortcut is documented.
 - Work on feature branches; `main` only via PR with green CI. PR template: Quoi / Pourquoi / Risques / Vérification.
 
 ## Commands
 - Tests: `dotnet test dotnet/Vortex.sln`
+- Unity tests (batch mode, no editor window): `pwsh tools/Test-Unity.ps1 [-Platform PlayMode]`
 - Format check: `dotnet format dotnet/Vortex.sln --verify-no-changes`
 - Balance report: `dotnet run -c Release --project dotnet/Vortex.Simulator -- run --games 1000 --seed 1 --out docs/balance/<date>-<topic>.md`
 - Balance grid: `dotnet run -c Release --project dotnet/Vortex.Simulator -- grid --grid docs/balance/grids/<file>.json --games 1000 --seed 1 --out docs/balance/<date>-<topic>.md` (5 players by default, the standard table)
