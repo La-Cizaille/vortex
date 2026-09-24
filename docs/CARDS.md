@@ -626,7 +626,7 @@
 | `EVT_TEMPETE_ELECTRO_MAGNETIQUE` | tempête électro-magnetique | 2 |
 | `EVT_TROU_NOIR` | trou noir | 2 |
 | `EVT_NOUVEL_ARRIVAGE` | Nouvel arrivage | 2 |
-| `EVT_SURCHARGE_IONIQUE` | **surcharge** Ionique | 2 |
+| `EVT_SURCHARGE_IONIQUE` | Surcharge ionique | 2 |
 | `EVT_NUEE_PARASITAIRE` | Nuée parasitaire | 2 |
 | `EVT_ESPACE_ASEPTISE` | Espace aseptisé | 2 |
 | `EVT_LE_CALME_AVANT_LA_TEMPETE` | Le calme avant la tempête | 2 |
@@ -662,7 +662,7 @@
 
 **Effets (moteur)** : [`RefreshAllMarkets`](BRICKS.md#refreshallmarkets) · [`ExtraMarketPicks(amount=1)`](BRICKS.md#extramarketpicks)
 
-### EVT_SURCHARGE_IONIQUE — **surcharge** Ionique
+### EVT_SURCHARGE_IONIQUE — Surcharge ionique
 
 2 exemplaire(s)
 

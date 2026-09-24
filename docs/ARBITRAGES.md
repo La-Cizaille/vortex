@@ -139,3 +139,13 @@ Le game designer a décrit l'écran de jeu, puis validé les propositions faites
 | ARB-65 | Menus hors partie ? | Simples au début, améliorables ensuite : accueil (trouver une partie et social grisés), partie locale, options, pause, écran de fin. La partie locale propose **2 à 5 joueurs, 5 par défaut** (suite d'ARB-52), chaque siège humain ou bot. Les options de règles et la graine sont dans un menu de développement, absent des builds publiés. La sauvegarde d'une partie en cours viendra au M5. | INTERFACE §5 |
 | ARB-66 | Langue ? | **Français seulement**, mais tous les textes de l'interface passent par une table de textes, pour pouvoir traduire un jour. | INTERFACE §5, ADR-0015 |
 | ARB-67 | Surcharge : comment choisir de dépenser le jeton sur une attaque ou un reparamétrage ? Le moteur le demande à chaque fois ; la question était restée ouverte dans INTERFACE §7. | **Armer le jeton.** On touche le jeton de surcharge pour l'armer : il brille, et l'aperçu montre l'attaque ou le reparamétrage surchargé. La prochaine attaque ou le prochain reparamétrage le dépense. On le touche de nouveau pour le désarmer. | INTERFACE §3.2, §3.4 et §6 |
+
+## 2026-09-24 : premier playtest (mode test, M4.4)
+
+Le game designer a joué ses premières parties contre des bots. Ses remarques sur la lisibilité (cartes, zoom sur le marché, animation des dés) orientent M4.5. Deux décisions portent sur les règles et le contenu.
+
+| # | Question | Décision | Appliqué dans |
+|---|---|---|---|
+| ARB-68 | La rotation du premier joueur (ARB-50) fait jouer deux fois de suite en duel : la manche suivante commence par le joueur qui vient de finir la précédente. Que faire ? | **La couper dès qu'il ne reste que deux joueurs en vie** : la manche commence alors par le joueur qui n'a pas joué en dernier. Personne ne joue jamais deux fois de suite, en partie à 2 comme en fin de partie à 5 (où le même double tour apparaissait une fois sur deux). Remarque du designer : « ça ne marche pas, il faut désactiver en duel ». | RULES A4.4, `Game.FirstSeatOfRound`, test `With_two_players_left_nobody_plays_twice_in_a_row` |
+| ARB-69 | L'événement `EVT_SURCHARGE_IONIQUE` s'appelait « **surcharge** Ionique », avec des marques de gras héritées de l'import Excel. | **« Surcharge ionique »**. | `events.json`, `CARDS.md` |
+
