@@ -23,7 +23,7 @@ Ce journal garde la trace **chronologique** de chaque décision de game design :
 - [2026-09-24 : passe d'équilibrage](#2026-09-24--passe-déquilibrage) (ARB-40 à ARB-49)
 - [2026-09-24 : décisions après les étapes 2.1 et 2.5](#2026-09-24--décisions-après-les-étapes-21-et-25) (ARB-50 à ARB-53)
 - [2026-09-24 : décisions après l'étape 2.2](#2026-09-24--décisions-après-létape-22) (ARB-54 et ARB-55)
-- [2026-09-24 : décisions sur le lot A de l'étape 2.3](#2026-09-24--décisions-sur-le-lot-a-de-létape-23) (ARB-56 et ARB-57)
+- [2026-09-24 : décisions sur le lot A de l'étape 2.3](#2026-09-24--décisions-sur-le-lot-a-de-létape-23) (ARB-56 à ARB-58)
 
 ---
 
@@ -122,3 +122,4 @@ Décisions prises sur le rapport [`balance/2026-09-24-mecaniques-lot-a.md`](bala
 |---|---|---|---|
 | ARB-56 | Tester des mesures directes contre la première élimination précoce : sursis (pas sous 1 PV pendant les premières manches), dernier carré (+2 au bouclier effectif sous 10 PV) ou malus contre le plus faible ? | **Aucune des trois.** | Rien à appliquer |
 | ARB-57 | La prime sur le leader ne retarde pas la première élimination mais crée des retournements : que faire ? | **La garder en réserve.** L'option reste dans le moteur, désactivée, pour une décision ultérieure. | `config.json` (`leaderBounty` à 0), RULES A6 |
+| ARB-58 | Faut-il poursuivre l'équilibrage par simulation, ou passer au prototype ? | **Clore l'étape 2 et passer au prototype Unity (M4).** Le game designer estime que les bases sont bonnes et que le réglage fin viendra dans un second temps. Les règles de base actuelles sont figées. La posture défensive, la prime sur le leader et les fantômes restent des options désactivées, activables dans le prototype pour être essayées en partie réelle. Les autres mécaniques de l'étape 2.3 et la fréquence des événements (2.4) attendent les premiers retours. La revue des cartes (étape 3) vient après le prototype, avec Vortex Studio. | [balance/README.md](balance/README.md#plan-et-avancement), README |

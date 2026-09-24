@@ -36,11 +36,11 @@ Validés par le game designer (ARB-40), puis recentrés sur le **mode standard �
 | **1** | Instruments de mesure : variantes et comparaison, niveaux de bot, nouvelles mesures, options de règles | Faite (ARB-41, ADR-0011) |
 | **2.1** | Avantage du premier joueur : premier joueur tournant, sens horaire ou anti-horaire (ARB-42) | **Adoptée** : rotation horaire (ARB-50) |
 | **2.2** | Grille PV × bouclier de départ × manche de Fin des temps, à 5 joueurs (ARB-43, ARB-52) | **Adoptée** : 30 PV, bouclier 5, Fin des temps à la manche 16 (ARB-54) |
-| **2.3** | Nouvelles mécaniques (ARB-44, ARB-45) : relance d'un dé par la surcharge, reparamétrage à 2 dés dont on garde 1, coût du recyclage, posture défensive, événement annoncé, prime sur le leader, pillage, fantômes, défausse tactique | En cours : lot A mesuré ; prime en réserve (ARB-57), mesures directes écartées (ARB-56), posture et fantômes à décider |
-| **2.4** | Fréquence des événements (une par manche, toutes les 2 ou 3 manches) et effet de chaque événement (ARB-46) | À faire |
+| **2.3** | Nouvelles mécaniques (ARB-44, ARB-45) : relance d'un dé par la surcharge, reparamétrage à 2 dés dont on garde 1, coût du recyclage, posture défensive, événement annoncé, prime sur le leader, pillage, fantômes, défausse tactique | **Close** (ARB-58) : lot A mesuré ; posture, prime et fantômes gardés comme options désactivées, à essayer dans le prototype ; autres mécaniques en attente des parties réelles |
+| **2.4** | Fréquence des événements (une par manche, toutes les 2 ou 3 manches) et effet de chaque événement (ARB-46) | Reportée : après les premières parties réelles (ARB-58) |
 | **2.5** | Élection galactique à 3 technologies au lieu de 4 (ARB-47) | **Adoptée** : 3 technologies (ARB-51). Fréquence de l'Élection à revoir avec 2.2 |
-| **3** | Revue des cartes : tri, ajustement par famille, cartes de hasard, équilibre des couleurs. Outil visuel à construire au début de l'étape (ARB-48) | À faire |
-| **4** | Validation humaine sur un prototype Unity (ARB-49) | Après l'étape 3 |
+| **3** | Revue des cartes : tri, ajustement par famille, cartes de hasard, équilibre des couleurs. Outil visuel à construire au début de l'étape (ARB-48) | Après le prototype (ARB-58) |
+| **4** | Validation humaine sur un prototype Unity (ARB-49) | **En cours** : jalon M4 (ARB-58) |
 
 ## Outils
 

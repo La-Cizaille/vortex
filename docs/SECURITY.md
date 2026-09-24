@@ -3,6 +3,20 @@
 > Principe directeur : **le client n'est jamais fiable, le moteur valide tout, rien ne s'exécute implicitement.**
 > Ce document est tenu à jour à chaque jalon. Toute nouvelle surface d'attaque (entrée externe, dépendance, service) doit y être ajoutée **avant** d'être fusionnée.
 
+## 0. Doctrine : intransigeance sur le produit, pragmatisme sur l'outillage
+
+Décision du porteur du projet (2026-09-24) :
+
+| Périmètre | Exigence |
+|---|---|
+| **Produit livré** : builds Android et Windows, serveur et réseau (phase 2), sauvegardes, contenu embarqué, dépendances présentes dans les builds | **Aucun raccourci.** Toutes les mesures de ce document s'appliquent : validation stricte, versions épinglées, surface minimale, pas de télémétrie non voulue. |
+| **Outillage de développement** : éditeur et outils Unity (dont Unity MCP), simulateur, outil de contenu, scripts locaux | **Raccourcis acceptés** s'ils accélèrent le travail, à trois conditions : rien de cet outillage n'entre dans un build, aucun secret n'est exposé, et chaque raccourci est documenté. |
+
+Conséquences concrètes :
+- un paquet ou un assembly **éditeur uniquement** (par exemple Unity MCP) peut être ajouté pour le confort de développement, à condition de vérifier qu'il n'est pas embarqué dans les builds ;
+- toute dépendance **d'exécution** du client, c'est-à-dire présente dans les builds, relève du produit : elle est justifiée, épinglée et inscrite ici ;
+- la CI de sécurité (§6) et la revue des PR restent inchangées pour tout le dépôt.
+
 ## 1. Actifs à protéger
 
 | Actif | Pourquoi |
