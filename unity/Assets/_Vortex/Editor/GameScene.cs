@@ -41,9 +41,25 @@ namespace Vortex.Editor
                 SceneFiles.Create(ScenePath, Build);
             }
 
-            if (File.Exists(ScenePath) && EditorBuildSettings.scenes.All(s => s.path != ScenePath))
+            if (File.Exists(ScenePath))
             {
-                EditorBuildSettings.scenes = EditorBuildSettings.scenes.Append(new EditorBuildSettingsScene(ScenePath, true)).ToArray();
+                ListInBuild();
+            }
+        }
+
+        // The game scene first in the build, under its current id (a regenerated scene gets a new one); scenes that no
+        // longer exist are dropped from the list.
+        private static void ListInBuild()
+        {
+            EditorBuildSettingsScene[] current = EditorBuildSettings.scenes;
+            EditorBuildSettingsScene[] wanted = new[] { new EditorBuildSettingsScene(ScenePath, true) }
+                .Concat(current.Where(s => s.path != ScenePath && File.Exists(s.path)))
+                .ToArray();
+            bool same = wanted.Length == current.Length
+                && wanted.Zip(current, (a, b) => a.path == b.path && a.guid == b.guid && a.enabled == b.enabled).All(equal => equal);
+            if (!same)
+            {
+                EditorBuildSettings.scenes = wanted;
             }
         }
 
