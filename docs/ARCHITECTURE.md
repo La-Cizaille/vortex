@@ -114,15 +114,19 @@ Le projet utilise Unity 6 et URP (version : ADR-0013). Tout le code du jeu est d
 
 | Dossier | Assembly | Rôle |
 |---|---|---|
-| `Scripts/Content/` | `Vortex.Client` | `GameContent` : les fichiers de contenu du moteur, référencés comme assets texte et donc embarqués dans les builds, chargés par le chargeur validant du moteur. |
+| `Scripts/Content/` | `Vortex.Client` | `GameContent` : les fichiers de contenu du moteur, référencés comme assets texte et donc embarqués dans les builds, chargés par le chargeur validant du moteur. `TextTable` : les textes de l'interface par clé (`TextKeys`), en français seulement pour l'instant (ADR-0015). |
+| `Scripts/Theme/` | `Vortex.Client` | Habillage : `ThemeSettings` (couleurs, polices, icônes du texte, vitesse), `CardArtCatalog` (illustration par identifiant de contenu), `ShipCatalog` (vaisseau par siège), visuels provisoires générés (`PlaceholderArt`, `PlaceholderShip`), conversion du texte des cartes en texte enrichi (`CardText`). |
 | `Scripts/Session/` | `Vortex.Client` | `IGameSession` : la présentation ne connaît que la vue publique, le joueur qui doit agir, les commandes légales et la soumission d'une commande. `LocalHotSeatSession` en phase 1 (bots possibles sur tout siège, joués pas à pas), `NetworkSession` en phase 2. |
-| `Scripts/Presentation/` | `Vortex.Client` | `EventPlayer` (joue les événements un par un), retours visuels (`FeedbackAsset`, `PauseFeedback`, `PrefabFeedback`), `FeedbackProfile` (quel retour pour quel événement). À venir : vues du vaisseau, des cartes, des marchés et du dé, UI des phases et fenêtres de décision. |
-| `Editor/` | `Vortex.Editor` (éditeur seul) | Création des assets de base, configuration de Unity MCP, garde-fou des builds de publication (`ReleaseBuildGuard`). |
-| `Tests/EditMode/` | `Vortex.Tests.EditMode` | Tests exécutés dans Unity : moteur et contenu réel, session, lecture des événements, conventions. |
-| `Content/`, `Presentation/Feedback/` | — | Assets : `GameContent.asset`, profil de retours visuels par défaut. |
+| `Scripts/Presentation/` | `Vortex.Client` | `EventPlayer` (joue les événements un par un), retours visuels (`FeedbackAsset`, `PauseFeedback`, `PrefabFeedback`), `FeedbackProfile` (quel retour pour quel événement). `CardView` : une carte (cadre à la couleur de sa technologie, illustration, textes), remplie depuis un `CardFace`. À venir : vues du vaisseau, des marchés et du dé, UI des phases et fenêtres de décision ([`INTERFACE.md`](INTERFACE.md)). |
+| `Scripts/Gallery/` | `Vortex.Client` | `GalleryController` : la scène Galerie, pour régler l'apparence sans jouer une partie. |
+| `Editor/` | `Vortex.Editor` (éditeur seul) | Création des assets de base (`ProjectAssets`, `ThemeAssets`, `GalleryScene`), règles d'import des illustrations et des modèles (`ArtImportRules`), configuration de Unity MCP, garde-fou des builds de publication (`ReleaseBuildGuard`). |
+| `Tests/EditMode/` | `Vortex.Tests.EditMode` | Tests exécutés dans Unity : moteur et contenu réel, session, lecture des événements, habillage, import des illustrations, galerie, conventions. |
+| `Content/`, `Theme/`, `Prefabs/`, `Scenes/`, `Art/`, `Presentation/Feedback/` | — | Assets : contenu du jeu et textes de l'interface, thème et catalogues, prefab de carte, scène Galerie, illustrations et modèles déposés, profil de retours visuels. |
+
+Les ressources de TextMeshPro (police LiberationSans, shaders, réglages) sont versionnées dans `unity/Assets/TextMesh Pro/`. Elles sont extraites du paquet uGUI épinglé, avec leurs identifiants Unity, sans les deux shaders HDRP, inutiles avec URP.
 
 Le moteur (`core/`) est un paquet local du projet (`file:../../core`) : Unity compile exactement le même code que les tests .NET et le simulateur.
-- **Habillage** : les catalogues ScriptableObject (`ThemeSettings`, `CardArtCatalog`, `ShipCatalog`…) associent les ids du moteur aux assets. Un asset manquant est remplacé par un placeholder généré. Voir `CONTRIBUTING.md` › *Ajouter ou modifier un visuel*.
+- **Habillage** : les catalogues associent les ids du moteur aux assets ; un asset manquant est remplacé par un visuel provisoire généré. Voir `CONTRIBUTING.md` › *Ajouter ou modifier un visuel*.
 
 ## 6. Réseau (phase 2, prévu mais non implémenté)
 

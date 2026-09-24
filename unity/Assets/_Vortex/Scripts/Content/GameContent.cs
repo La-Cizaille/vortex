@@ -18,10 +18,13 @@ namespace Vortex.Client.Content
         [SerializeField] private TextAsset technologies = null!;
         [SerializeField] private TextAsset config = null!;
 
+        /// <summary>Loads and validates the cards, events and technologies. Throws <see cref="GameDataException"/> on invalid content.</summary>
+        public GameData LoadData() => GameDataLoader.Load(Text(cards, nameof(cards)), Text(events, nameof(events)), Text(technologies, nameof(technologies)));
+
         /// <summary>Loads and validates the content, then builds a rules engine. Throws <see cref="GameDataException"/> on invalid content.</summary>
         public GameEngine CreateEngine()
         {
-            GameData data = GameDataLoader.Load(Text(cards, nameof(cards)), Text(events, nameof(events)), Text(technologies, nameof(technologies)));
+            GameData data = LoadData();
             GameConfig gameConfig = GameDataLoader.LoadConfig(Text(config, nameof(config)), data);
             return new GameEngine(data, gameConfig);
         }

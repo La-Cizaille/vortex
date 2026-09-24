@@ -3,7 +3,10 @@
   "rootNamespace": "Vortex.Editor",
   "references": [
     "Vortex.Core",
-    "Vortex.Client"
+    "Vortex.Client",
+    "Unity.TextMeshPro",
+    "UnityEngine.UI",
+    "Unity.InputSystem"
   ],
   "includePlatforms": [
     "Editor"

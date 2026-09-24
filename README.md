@@ -79,7 +79,7 @@ powershell -ExecutionPolicy Bypass -File tools/Test-Unity.ps1
 |---|---|---|
 | M4.1 | Socle du projet Unity, moteur exécuté dans Unity | Fait |
 | M4.2 | Session de jeu et lecture des événements (ADR-0014) | Fait |
-| M4.3 | Habillage : thème, catalogues d'illustrations, visuels provisoires générés, import automatique, scène Galerie | En cours |
+| M4.3 | Habillage : thème, catalogues d'illustrations, visuels provisoires générés, import automatique, scène Galerie | Fait |
 | M4.4 | Table et affichage : scène de jeu, adversaires, vaisseau, marché, informations de partie ; les bots jouent et tout se voit | À faire |
 | M4.5 | Interactions : glisser-déposer, aperçus calculés par le moteur, décisions, marché, combo, fin de tour | À faire |
 | M4.6 | Menus : accueil, partie locale, options, pause, fin de partie, menu de développement | À faire |
@@ -88,3 +88,5 @@ powershell -ExecutionPolicy Bypass -File tools/Test-Unity.ps1
 ## Licence
 
 À définir. Tous droits réservés tant qu'aucune licence n'est ajoutée.
+
+Composant tiers livré avec le jeu : la police LiberationSans, fournie avec TextMeshPro, sous licence SIL Open Font License 1.1 (`unity/Assets/TextMesh Pro/Fonts/LiberationSans - OFL.txt`).
