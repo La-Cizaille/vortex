@@ -1,6 +1,6 @@
 # Vortex : règles du jeu
 
-> **Statut** : v0.4. **Partie B (modèle d'effets) validée par le game designer le 2026-09-23.** Parties A et C : en attente de validation. Tous les arbitrages jusqu'au 2026-09-24 sont intégrés ; leur historique et leurs raisons sont dans le [journal des arbitrages](ARBITRAGES.md).
+> **Statut** : v0.5. **Partie B (modèle d'effets) validée par le game designer le 2026-09-23.** Parties A et C : en attente de validation. Tous les arbitrages jusqu'au 2026-09-24 sont intégrés ; leur historique et leurs raisons sont dans le [journal des arbitrages](ARBITRAGES.md).
 > **Rôle** : c'est la **référence du moteur de règles**. Le code renvoie aux sections d'ici (par ex. `RULES A6`).
 
 Le document a trois parties, qui dépendent uniquement vers le bas :
@@ -45,7 +45,7 @@ Les valeurs marquées ⚙ sont **configurables** (`config.json`) et sont calibr�
 
 ## A3. Mise en place
 
-1. Chaque vaisseau commence avec **30 PV** ⚙ (maximum 30 ⚙) et un bouclier égal à `StartShield[n]` ⚙, identique pour tous, où n est le nombre de joueurs.
+1. Chaque vaisseau commence avec **30 PV** ⚙ (maximum 30 ⚙) et un bouclier égal à `StartShield[n]` ⚙, identique pour tous, où n est le nombre de joueurs. Au mode standard à 5 joueurs, ce bouclier vaut **5** (ARB-54).
 2. On mélange chaque paquet. L'événement « fin des temps » (`DoomEvent` ⚙) est tenu **hors du paquet** (A4).
 3. On révèle 5 ⚙ cartes de chaque paquet de modificateurs : ce sont les deux **marchés noirs**.
 4. **Initiative** : chaque joueur lance 1d8. Le plus haut commence. En cas d'égalité, seuls les joueurs à égalité relancent.
@@ -54,7 +54,7 @@ Les valeurs marquées ⚙ sont **configurables** (`config.json`) et sont calibr�
 ## A4. Début de manche
 
 1. Si `EventFrequency` ⚙ le prévoit (manches 1, 1+N, 1+2N…), on révèle un événement, dès la première manche. Il reste **actif** jusqu'au début de la manche suivante.
-2. À la manche `DoomRound[n]` ⚙, c'est le `DoomEvent` qui est révélé **à la place**.
+2. À la manche `DoomRound[n]` ⚙, c'est le `DoomEvent` qui est révélé **à la place**. Au mode standard à 5 joueurs, c'est la **manche 16** (ARB-54).
 3. Un paquet vide se reconstitue en mélangeant sa défausse. Cette règle vaut pour **tous** les paquets.
 4. **Premier joueur de la manche** : à la première manche, le gagnant de l'initiative. Ensuite, le premier joueur **avance d'un siège dans le sens horaire** à chaque manche. S'il est éliminé, la manche commence au joueur vivant suivant dans le sens horaire. Le tour de table reste toujours horaire.
    - Réglage `RoundStartRotation` ⚙ : sens horaire (ARB-50). Pour l'équilibrage, on peut aussi choisir « aucun déplacement » ou « sens anti-horaire ». En sens anti-horaire, le dernier joueur d'une manche est aussi le premier de la suivante.
@@ -290,7 +290,6 @@ Une question tranchée quitte cette liste et entre dans le [journal des arbitrag
 - **Synergie technologique** : effets à définir (ARB-14).
 
 **Équilibrage** (plan et mesures : [`balance/README.md`](balance/README.md))
-- **Première élimination au mode standard** : la cible « pas avant la manche 6 » avait été fixée pour 4 joueurs (ARB-40). À 5 joueurs, aucun réglage de PV, de bouclier de départ ou de Fin des temps ne l'atteint (au mieux la manche 5,6). La garder, et la confier aux mécaniques de l'étape 2.3, ou l'adapter au mode à 5 joueurs ?
-- **PV, `StartShield[n]` et `DoomRound[n]`** : mesurés à l'étape 2.2 (ARB-43). Recommandation : 30 PV, bouclier de départ 5 et Fin des temps à la manche 16 à 5 joueurs. Décision attendue. Elle doit aussi retarder la première élimination et rapprocher l'Élection galactique de sa cible (ARB-51).
+- **Durée minimale en jeu** (ARB-40) : l'objectif « première élimination pas avant la manche 6 » veut dire qu'aucun joueur ne devrait être éliminé avant d'avoir joué environ 6 tours, pour ne pas passer le reste de la partie à attendre. Ce n'est pas une règle du jeu, seulement une mesure. À 5 joueurs, avec les réglages adoptés, le premier éliminé sort vers la manche 4,6 et attend alors environ 14 minutes. Aucun réglage de PV, de bouclier ou de Fin des temps n'atteint la manche 6. Faut-il le corriger avec les mécaniques de l'étape 2.3 (posture défensive, fantômes…), ou accepter une première élimination plus précoce à 5 joueurs ?
 - **Fréquence des événements** : une par manche, jugée potentiellement excessive (ARB-12, ARB-46).
 - **Nouvelles mécaniques** validées pour simulation (ARB-44, ARB-45) : aucune n'est une règle tant qu'elle n'a pas été mesurée puis adoptée.

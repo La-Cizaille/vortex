@@ -32,8 +32,8 @@
     },
     {
       "players": 5,
-      "startShield": 4,
-      "doomRound": 10
+      "startShield": 5,
+      "doomRound": 16
     }
   ],
   "reactionDepthLimit": 16,

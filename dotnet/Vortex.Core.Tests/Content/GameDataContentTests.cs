@@ -57,10 +57,14 @@ namespace Vortex.Core.Tests.Content
         [Test]
         public void Rule_options_match_the_designer_rulings()
         {
-            // docs/ARBITRAGES.md ARB-50 (clockwise rotation of the first player) and ARB-51 (election with 3 technologies).
+            // docs/ARBITRAGES.md ARB-50 (clockwise rotation of the first player), ARB-51 (election with 3 technologies)
+            // and ARB-54 (rhythm of the standard 5-player table).
             GameConfig config = TestPaths.LoadRealConfig();
             Assert.That(config.RoundStartRotation, Is.EqualTo(RoundStartRotation.Clockwise));
             Assert.That(config.TechnologiesToWin, Is.EqualTo(3));
+            Assert.That(config.StartingHp, Is.EqualTo(30));
+            Assert.That(config.ForPlayers(5)!.StartShield, Is.EqualTo(5));
+            Assert.That(config.ForPlayers(5)!.DoomRound, Is.EqualTo(16));
         }
 
         [Test]

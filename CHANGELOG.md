@@ -4,7 +4,7 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Non publié]
 ### Ajouté
-- Simulateur : commande `grid`. Elle croise des réglages (au plus 4 axes et 64 combinaisons), simule chaque combinaison sur les mêmes graines et les **classe** selon leur distance aux objectifs chiffrés déclarés dans le fichier de grille. Étape 2.2 : deux grilles de rythme à 5 joueurs et une comparaison de confirmation de cinq candidats (variantes `rythme-*`), analysées dans `docs/balance/README.md`.
+- Simulateur : commande `grid`. Elle croise des réglages (au plus 4 axes et 64 combinaisons), simule chaque combinaison sur les mêmes graines et les **classe** selon leur distance aux objectifs chiffrés déclarés dans le fichier de grille. Étape 2.2 : deux grilles de rythme à 5 joueurs et une comparaison de confirmation de cinq candidats, analysées dans `docs/balance/README.md`.
 - Variantes : réglages par taille de table désignés par le nombre de joueurs (`playerCounts: { "5": … }`). Noms et descriptions soumis à la règle de caractères du contenu, exposée par `GameDataValidator.IsForbiddenTextCharacter`.
 - Passe d'équilibrage, étape 1 (ADR-0011) : **variantes** de contenu (`docs/balance/variants/*.json`, correctifs JSON revalidés par le chargeur du jeu, jamais écrits dans le contenu) et commande `compare` du simulateur. Elle joue la référence et les variantes sur les mêmes parties et donne chaque écart avec sa marge d'erreur à 95 %.
 - Simulateur : commandes `run` et `compare`, quatre niveaux de bot (`--bot random|naive|normal|strong`, `--skill hero,others`), commande complète et empreinte SHA-256 du contenu simulé en tête de rapport. Nouvelles mesures : écart maximal de position, première élimination, victoire du meneur à mi-partie, attaques sur le meneur ou le plus faible, taux de victoire par couleur dominante, combos par partie, effet de chaque événement sur le meneur.
@@ -26,6 +26,7 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 - M0 : structure du dépôt, règles consolidées (`docs/RULES.md`), architecture, modèle de sécurité, guide de contribution, ADR 0001 à 0006, configuration Git/LFS/EditorConfig, Dependabot.
 
 ### Modifié
+- Rythme du mode standard adopté après l'étape 2.2 (ARB-54) : à 5 joueurs, bouclier de départ 5 et Fin des temps à la manche 16 ; 30 PV inchangés. `RULES.md` v0.5. Nouvelle référence d'équilibrage (v3).
 - Règles adoptées après les étapes 2.1 et 2.5 de l'équilibrage : le premier joueur de chaque manche tourne dans le sens horaire (ARB-50), et l'Élection galactique demande 3 technologies (ARB-51). `RULES.md` v0.4. **5 joueurs devient le mode standard**, seule table équilibrée (ARB-52), avec un objectif de durée de 20 à 25 minutes (ARB-53). Le simulateur joue à 5 joueurs par défaut. Nouvelle référence d'équilibrage.
 - `RULES.md` v0.3 : options ⚙ de rotation du premier joueur et de nombre de technologies, questions ouvertes réorganisées (règles et équilibrage) avec renvoi au journal des arbitrages.
 - Le rapport d'équilibrage identifie le contenu par l'empreinte des quatre fichiers de contenu, et non plus du seul `cards.json`. L'option `--samples` est remplacée par `--bot`.

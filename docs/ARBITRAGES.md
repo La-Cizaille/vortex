@@ -22,6 +22,7 @@ Ce journal garde la trace **chronologique** de chaque décision de game design :
 - [2026-09-24 : arbitrages après les briques d'effets (M2)](#2026-09-24--arbitrages-après-les-briques-deffets-m2) (ARB-30 à ARB-36)
 - [2026-09-24 : passe d'équilibrage](#2026-09-24--passe-déquilibrage) (ARB-40 à ARB-49)
 - [2026-09-24 : décisions après les étapes 2.1 et 2.5](#2026-09-24--décisions-après-les-étapes-21-et-25) (ARB-50 à ARB-53)
+- [2026-09-24 : décision après l'étape 2.2](#2026-09-24--décision-après-létape-22) (ARB-54)
 
 ---
 
@@ -102,3 +103,11 @@ Décisions prises sur le rapport [`balance/2026-09-24-ordre-et-election.md`](bal
 | ARB-51 | Élection galactique : 3 ou 4 technologies (suite d'ARB-47) ? | **3 technologies.** Les victoires par Élection passent de moins de 0,5 % à 2,4 à 5 %, sans autre effet mesurable. La cible de 5 à 15 % n'est pas encore atteinte : à revoir avec la grille de l'étape 2.2. | `config.json` (`technologiesToWin`), RULES A9, test `Rule_options_match_the_designer_rulings` |
 | ARB-52 | Sur quelle taille de table équilibrer ? | **5 joueurs est le mode standard**, et c'est la seule table qu'on équilibre. Raison du game designer : certaines cartes n'ont de sens qu'à 5, en particulier celles qui visent les joueurs adjacents. Par exemple, à 4 joueurs, Accident bactériologique (A_021) touche tous les adversaires si l'on vise le joueur d'en face. 4 joueurs avait d'abord été envisagé, puis écarté pour cette raison. De 2 à 4 joueurs, le jeu reste jouable (moteur et réglages par table conservés), mais sans objectif d'équilibrage. Les tailles de table proposées dans le menu seront décidées au jalon M4. | RULES A2, [balance/README.md](balance/README.md#objectifs-étape-0), simulateur (`--players 5` par défaut) |
 | ARB-53 | Objectif de durée pour le mode standard ? | **20 à 25 minutes à 5 joueurs.** Il remplace la cible « 15 à 20 minutes à 4 joueurs » d'ARB-40. La durée réelle d'un tour sera mesurée sur le prototype (étape 4), car plus de choix allongeront les tours. | [balance/README.md](balance/README.md#objectifs-étape-0) |
+
+## 2026-09-24 : décision après l'étape 2.2
+
+Décision prise sur les grilles de rythme et la comparaison de confirmation ([`balance/2026-09-24-rythme-confirmation.md`](balance/2026-09-24-rythme-confirmation.md), 18 000 parties avec une autre graine), analysées dans [`balance/README.md`](balance/README.md).
+
+| # | Question | Décision | Appliqué dans |
+|---|---|---|---|
+| ARB-54 | Rythme du mode standard : PV, bouclier de départ et manche de Fin des temps à 5 joueurs (suite d'ARB-43) ? | **30 PV (inchangés), bouclier de départ 5, Fin des temps à la manche 16**, selon la recommandation du rapport. La Fin des temps n'est plus atteinte que dans environ 20 % des parties (88 % avant) et redevient un filet de sécurité. L'Élection passe à environ 7 % des victoires, dans sa cible. La première élimination recule un peu, pour un coût modéré en attaques sans dégâts (27 % au lieu de 22 %). Les autres tailles de table gardent leurs réglages. | `config.json` (`playerCounts` à 5 joueurs), RULES A3 et A4, test `Rule_options_match_the_designer_rulings` |
