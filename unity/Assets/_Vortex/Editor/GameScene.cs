@@ -113,6 +113,7 @@ namespace Vortex.Editor
             RoundBanner banner = BuildBanner(ui);
             GameLogDisplay log = BuildLog(ui);
             PlaybackControls playback = BuildPlayback(ui);
+            CommandPanel commands = BuildCommandPanel(ui);
 
             var director = new GameObject("Partie", typeof(GameDirector)).GetComponent<GameDirector>();
             director.Assign(
@@ -134,13 +135,49 @@ namespace Vortex.Editor
                 ships,
                 centre,
                 camera);
+            director.AssignTestMode(commands);
+        }
+
+        // Test mode: one button per legal move, in the free space right of the player's ship, above the playback
+        // buttons; it grows upwards.
+        private static CommandPanel BuildCommandPanel(Transform ui)
+        {
+            Image root = UiBuilder.Box(UiBuilder.Fixed<Image>(ui, "Coups (mode test)", new Vector2(1f, 0f), new Vector2(-20f, 132f), new Vector2(520f, 100f)), Panel, receivesPointer: true);
+            VerticalLayoutGroup layout = root.gameObject.AddComponent<VerticalLayoutGroup>();
+            layout.padding = new RectOffset(10, 10, 8, 10);
+            layout.spacing = 6f;
+            layout.childControlWidth = true;
+            layout.childControlHeight = true;
+            layout.childForceExpandWidth = true;
+            layout.childForceExpandHeight = false;
+            root.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            TMP_Text title = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(root.transform, "Titre", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), 20f, FontStyles.Bold, TextAlignmentOptions.Left);
+            title.fontSize = 18f;
+            GridLayoutGroup grid = UiBuilder.Part<GridLayoutGroup>(root.transform, "Boutons", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            grid.cellSize = new Vector2(162f, 38f);
+            grid.spacing = new Vector2(8f, 5f);
+            grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            grid.constraintCount = 3;
+
+            (Button template, TMP_Text label) = UiBuilder.Button(root.transform, "Modèle de bouton", Vector2.zero, Vector2.zero, new Vector2(162f, 38f));
+            label.fontSize = 15f;
+            label.enableAutoSizing = true;
+            label.fontSizeMin = 10f;
+            label.fontSizeMax = 15f;
+            // Inactive, so the layout skips it; its active clones are laid out in the grid.
+            template.gameObject.SetActive(false);
+
+            CommandPanel panel = root.gameObject.AddComponent<CommandPanel>();
+            panel.Assign(title, (RectTransform)grid.transform, template);
+            return panel;
         }
 
         // The two black markets in the middle: attack on the left, defense on the right (INTERFACE.md 3.3).
         private static MarketDisplay BuildMarket(Transform ui)
         {
             // 1180 wide: the panels of the opponents at the ends of the arc stay clear of it.
-            Image root = UiBuilder.Box(UiBuilder.Fixed<Image>(ui, "Marché noir", new Vector2(0.5f, 0.5f), new Vector2(0f, -40f), new Vector2(1180f, 210f)), new Color(0f, 0f, 0f, 0.35f));
+            Image root = UiBuilder.Box(UiBuilder.Fixed<Image>(ui, "Marché noir", new Vector2(0.5f, 0.5f), new Vector2(0f, -20f), new Vector2(1180f, 210f)), new Color(0f, 0f, 0f, 0.35f));
             (RectTransform attackRow, TMP_Text attackLabel, TMP_Text attackDeck) = MarketHalf(root.transform, "ATK", 0f, 0.5f);
             (RectTransform defenseRow, TMP_Text defenseLabel, TMP_Text defenseDeck) = MarketHalf(root.transform, "DEF", 0.5f, 1f);
             MarketDisplay market = root.gameObject.AddComponent<MarketDisplay>();

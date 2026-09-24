@@ -93,6 +93,54 @@ namespace Vortex.Client.Content
         /// <summary>Skip the playback.</summary>
         public const string PlaybackSkip = "playback.skip";
 
+        /// <summary>Command panel title on a human's turn (test mode). {0}: player.</summary>
+        public const string PanelYourTurn = "panel.your-turn";
+
+        /// <summary>Command panel title while waiting for the bots.</summary>
+        public const string PanelWaiting = "panel.waiting";
+
+        /// <summary>Take a market card. {0}: card, {1}: market.</summary>
+        public const string CommandPick = "command.pick";
+
+        /// <summary>Recycle a market. {0}: market.</summary>
+        public const string CommandRecycle = "command.recycle";
+
+        /// <summary>Leave the market phase.</summary>
+        public const string CommandEndMarket = "command.end-market";
+
+        /// <summary>Use a card. {0}: card.</summary>
+        public const string CommandActivate = "command.activate";
+
+        /// <summary>Activate the combo.</summary>
+        public const string CommandTechnology = "command.technology";
+
+        /// <summary>Attack. {0}: target.</summary>
+        public const string CommandAttack = "command.attack";
+
+        /// <summary>Attack spending the overcharge token. {0}: target.</summary>
+        public const string CommandAttackOvercharged = "command.attack-overcharged";
+
+        /// <summary>Reroll one's shield.</summary>
+        public const string CommandReroll = "command.reroll";
+
+        /// <summary>Reroll one's shield spending the overcharge token.</summary>
+        public const string CommandRerollOvercharged = "command.reroll-overcharged";
+
+        /// <summary>Sabotage. {0}: target.</summary>
+        public const string CommandSabotage = "command.sabotage";
+
+        /// <summary>Take an overcharge token.</summary>
+        public const string CommandOvercharge = "command.overcharge";
+
+        /// <summary>Defensive posture (rule option).</summary>
+        public const string CommandPosture = "command.posture";
+
+        /// <summary>End the turn.</summary>
+        public const string CommandEndTurn = "command.end-turn";
+
+        /// <summary>Where a card offered in a decision lies, when it is in a market.</summary>
+        public const string OptionMarket = "option.market";
+
         /// <summary>Every key with its default text.</summary>
         public static readonly IReadOnlyList<KeyValuePair<string, string>> Defaults = BuildDefaults();
 
@@ -110,6 +158,12 @@ namespace Vortex.Client.Content
 
         /// <summary>Name of a way to win.</summary>
         public static string Win(WinCondition condition) => "win." + condition;
+
+        /// <summary>Question of a decision, by its engine prompt key (e.g. <c>critical.discard</c>).</summary>
+        public static string Decision(string prompt) => "decision." + prompt;
+
+        /// <summary>Word for a decision answer, by its engine key (e.g. <c>yes</c>, <c>clockwise</c>).</summary>
+        public static string Option(string key) => "option." + key;
 
         private static List<KeyValuePair<string, string>> BuildDefaults()
         {
@@ -144,6 +198,63 @@ namespace Vortex.Client.Content
             Add(LogNobody, "—");
             Add(PlaybackSpeed, "Vitesse ×{0}");
             Add(PlaybackSkip, "Passer");
+            Add(PanelYourTurn, "{0}, à vous de jouer");
+            Add(PanelWaiting, "Les bots jouent…");
+            Add(CommandPick, "Prendre {0} ({1})");
+            Add(CommandRecycle, "Recycler le marché {0}");
+            Add(CommandEndMarket, "Passer le marché");
+            Add(CommandActivate, "Utiliser {0}");
+            Add(CommandTechnology, "Activer le combo");
+            Add(CommandAttack, "Attaquer {0}");
+            Add(CommandAttackOvercharged, "Attaquer {0} en surcharge");
+            Add(CommandReroll, "Reparamétrer son bouclier");
+            Add(CommandRerollOvercharged, "Reparamétrer en surcharge");
+            Add(CommandSabotage, "Saboter le bouclier de {0}");
+            Add(CommandOvercharge, "Prendre un jeton de surcharge");
+            Add(CommandPosture, "Posture défensive");
+            Add(CommandEndTurn, "Fin de tour");
+            Add(OptionMarket, "marché");
+
+            // Engine decision prompts (RULES B6); an unknown prompt shows "#decision.key" until its text is added.
+            Add(Decision("bet.face"), "Annoncez une valeur de dé");
+            Add(Decision("cap.enemy"), "Choisissez l'ennemi visé");
+            Add(Decision("convert.hp"), "Combien de PV convertir ?");
+            Add(Decision("convert.shield"), "Combien de points de bouclier convertir ?");
+            Add(Decision("critical.discard"), "Coup critique : quel modificateur perdez-vous ?");
+            Add(Decision("dictate.action"), "Imposez une action d'équipage");
+            Add(Decision("disable.shield"), "Quel bouclier désactiver ?");
+            Add(Decision("discard.opponent"), "Quel adversaire défausse ?");
+            Add(Decision("discard.targetModifier"), "Quel modificateur de la cible défausser ?");
+            Add(Decision("ghost.event"), "Choisissez l'événement de la manche");
+            Add(Decision("market.pick"), "Choisissez une carte du marché");
+            Add(Decision("redirect.attack"), "Vers qui dévier l'attaque ?");
+            Add(Decision("reroll.shield"), "Quel bouclier relancer ?");
+            Add(Decision("rotate.direction"), "Dans quel sens tourner les boucliers ?");
+            Add(Decision("steal.card"), "Quelle carte prendre ?");
+            Add(Decision("steal.opponent"), "À quel adversaire ?");
+            Add(Decision("steal.or.destroy"), "Voler ou détruire ?");
+            Add(Decision("swap.partner"), "Avec qui échanger ?");
+            Add(Decision("swap.shield.first"), "Premier bouclier à échanger");
+            Add(Decision("swap.shield.second"), "Second bouclier à échanger");
+            Add(Decision("swap.targetCard"), "Avec quelle carte échanger ?");
+            Add(Decision("torment.market"), "Sur quelle carte du marché poser le Tourment ?");
+            Add(Decision("torment.place"), "Sur quel modificateur poser le Tourment ?");
+            Add(Decision("torment.target"), "Quel joueur reçoit le Tourment ?");
+
+            Add(Option("yes"), "Oui");
+            Add(Option("no"), "Non");
+            Add(Option("none"), "Aucun");
+            Add(Option("clockwise"), "Sens horaire");
+            Add(Option("counterclockwise"), "Sens anti-horaire");
+            Add(Option("destroy"), "Détruire");
+            Add(Option("steal"), "Voler");
+            Add(Option("first"), "Le premier");
+            Add(Option("second"), "Le second");
+            Add(Option("attack"), "Attaque");
+            Add(Option("reroll"), "Reparamétrage");
+            Add(Option("sabotage"), "Sabotage");
+            Add(Option("overcharge"), "Surcharge");
+            Add(Option("posture"), "Posture défensive");
 
             Add(Log(GameEventType.GameStarted), "Nouvelle partie à {2} joueurs.");
             Add(Log(GameEventType.InitiativeRolled), "{0} lance l'initiative : {3}.");

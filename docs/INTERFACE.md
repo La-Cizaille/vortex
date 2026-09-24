@@ -164,4 +164,5 @@ Aucune pour l'instant. La dépense de la surcharge a été tranchée par ARB-67.
 |---|---|
 | M4.3 | Cartes, visuels provisoires, galerie. |
 | M4.4 | La table (scène `Game`) : bandeau, adversaires en arc dans l'ordre du tour, marché noir, vaisseau et cartes du joueur, jetons de Tourment, technologies, surcharge, effets temporaires, tour en cours, épave d'un joueur éliminé, marqueur du leader (option), journal, vitesse de lecture. Des bots jouent une partie entière qu'on regarde. |
+| M4.4, mode test | Le siège 1 est joué par une personne, les autres par des bots (niveau « normal » par défaut). Un panneau en bas à droite liste les coups que le moteur autorise, un bouton par coup, ainsi que les réponses quand une carte demande un choix. C'est un outil provisoire : il disparaîtra quand les gestes seront là. Réglages : objet `Partie` de la scène `Game`, rubrique *Partie de test*. |
 | M4.5 | À venir : les gestes (§3.3 à §3.7) pour jouer soi-même. |

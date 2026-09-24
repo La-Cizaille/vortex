@@ -42,7 +42,9 @@ Simuler des parties et comparer une variante de règles à la référence (mode 
 dotnet run -c Release --project dotnet/Vortex.Simulator -- compare --games 2000 --variant docs/balance/variants/rotation-antihoraire.json
 ```
 
-Ouvrir le dossier `unity/` dans Unity Hub. Pour lancer les tests Unity sans ouvrir l'éditeur :
+Ouvrir le dossier `unity/` dans Unity Hub. Pour **jouer une partie de test** contre quatre bots : ouvrir la scène `Assets/_Vortex/Scenes/Game.unity`, puis lancer le mode Play. Vous jouez le siège 1 avec le panneau des coups, en bas à droite.
+
+Pour lancer les tests Unity sans ouvrir l'éditeur :
 
 ```bash
 powershell -ExecutionPolicy Bypass -File tools/Test-Unity.ps1

@@ -7,6 +7,7 @@ using Vortex.Client.Content;
 using Vortex.Client.Session;
 using Vortex.Client.Theme;
 using Vortex.Core.Bots;
+using Vortex.Core.Commands;
 using Vortex.Core.Content;
 using Vortex.Core.Events;
 
@@ -36,6 +37,7 @@ namespace Vortex.Client.Presentation
         [SerializeField] private RoundBanner banner = null!;
         [SerializeField] private GameLogDisplay log = null!;
         [SerializeField] private PlaybackControls playback = null!;
+        [SerializeField] private CommandPanel commands = null!;
         [SerializeField] private Transform shipRow = null!;
         [SerializeField] private Transform tableCentre = null!;
         [SerializeField] private Camera view = null!;
@@ -54,7 +56,9 @@ namespace Vortex.Client.Presentation
         [Tooltip("Décalage du panneau d'un adversaire par rapport à son vaisseau, en unités d'interface.")]
         [SerializeField] private Vector2 opponentPanelOffset = new Vector2(0f, -45f);
 
-        [Header("Partie de démonstration (en attendant les menus)")]
+        [Header("Partie de test (en attendant les menus)")]
+        [Tooltip("Mode test : le siège 1 est joué par vous, à l'aide du panneau des coups ; les autres sièges par des bots.")]
+        [SerializeField] private bool humanFirstSeat = true;
         [SerializeField, Range(2, 5)] private int seatCount = 5;
         [SerializeField] private BotLevel botLevel = BotLevel.Normal;
         [Tooltip("0 : une graine différente à chaque partie.")]
@@ -72,6 +76,8 @@ namespace Vortex.Client.Presentation
         private TableModel? _model;
         private TableContext? _context;
         private GameLogFormatter? _log;
+        private CommandLabels? _labels;
+        private PanelState _panel;
         private int _viewer;
         private float _wait;
         private bool _dirty;
@@ -89,21 +95,32 @@ namespace Vortex.Client.Presentation
         /// <summary>True while events are being played.</summary>
         public bool IsPlaying => _player?.IsPlaying ?? false;
 
+        /// <summary>Test mode: the first seat is played by a person through the command panel.</summary>
+        public bool HumanFirstSeat
+        {
+            get => humanFirstSeat;
+            set => humanFirstSeat = value;
+        }
+
         /// <summary>Seat displays by seat number.</summary>
         public IReadOnlyDictionary<int, SeatDisplay> Seats => _seats;
 
         /// <summary>Ships by seat number.</summary>
         public IReadOnlyDictionary<int, Transform> Ships => _ships;
 
-        /// <summary>Starts a new game: every seat is a bot for now (the local game menu comes with M4.6).</summary>
+        /// <summary>Starts a new game: bots, and the first seat for a person in test mode (the local game menu comes with M4.6).</summary>
         public void Begin()
         {
             Clear();
             GameData data = content.LoadData();
             _context = new TableContext(theme, cardArt, texts, data, cardPrefab);
             _log = new GameLogFormatter(texts, data);
+            _labels = new CommandLabels(_context);
             List<SeatSetup> seats = Enumerable.Range(1, seatCount)
-                .Select(n => new SeatSetup(string.Format(CultureInfo.InvariantCulture, texts.Get(TextKeys.SeatDefaultName), n), SeatKind.Bot, botLevel))
+                .Select(n => new SeatSetup(
+                    string.Format(CultureInfo.InvariantCulture, texts.Get(TextKeys.SeatDefaultName), n),
+                    n == 1 && humanFirstSeat ? SeatKind.Human : SeatKind.Bot,
+                    botLevel))
                 .ToList();
             ulong gameSeed = seed != 0 ? seed : (ulong)DateTime.UtcNow.Ticks;
             _session = new LocalHotSeatSession(content.CreateEngine(), gameSeed, seats);
@@ -120,6 +137,8 @@ namespace Vortex.Client.Presentation
             banner.Bind(_context);
             log.Bind(_context);
             playback.Bind(_context, _player);
+            commands.Hide();
+            _panel = PanelState.Hidden;
             ShowAll(redrawCards: true);
             _patching = false;
             Play(_session.OpeningEvents);
@@ -142,11 +161,25 @@ namespace Vortex.Client.Presentation
                 ShowAll(redrawCards: false);
             }
 
-            if (_player.IsPlaying || _session.IsOver || !_session.IsBotTurn)
+            if (_player.IsPlaying)
             {
                 return;
             }
 
+            if (_session.IsOver)
+            {
+                SetPanel(PanelState.Hidden);
+                return;
+            }
+
+            if (!_session.IsBotTurn)
+            {
+                // A person's turn, or a person's decision during another seat's command.
+                SetPanel(PanelState.Choices);
+                return;
+            }
+
+            SetPanel(PanelState.Waiting);
             _wait += deltaTime * _player.Speed;
             if (_wait < botPause)
             {
@@ -179,6 +212,58 @@ namespace Vortex.Client.Presentation
         private void Update() => Advance(Time.deltaTime);
 
         private Transform? Ship(int seat) => _ships.TryGetValue(seat, out Transform ship) ? ship : null;
+
+        // Test mode: the command panel lists what the engine allows the person who must act (INTERFACE.md 6 maps
+        // each of these commands to the gesture that will replace its button).
+        private void SetPanel(PanelState state)
+        {
+            if (state == _panel)
+            {
+                return;
+            }
+
+            _panel = state;
+            switch (state)
+            {
+                case PanelState.Hidden:
+                    commands.Hide();
+                    break;
+                case PanelState.Waiting:
+                    commands.ShowMessage(texts.Get(TextKeys.PanelWaiting));
+                    break;
+                default:
+                    OfferChoices();
+                    break;
+            }
+        }
+
+        private void OfferChoices()
+        {
+            int actor = _session!.Actor;
+            var view = _session.View;
+            var decision = _session.Decision;
+            var choices = _session.LegalCommands(actor)
+                .Select(command => (_labels!.Describe(command, view, decision), (Action)(() => Submit(actor, command))))
+                .ToList();
+            string heading = decision != null
+                ? view.Players[actor].Name + " : " + _labels!.Question(decision)
+                : string.Format(CultureInfo.InvariantCulture, texts.Get(TextKeys.PanelYourTurn), view.Players[actor].Name);
+            commands.Show(heading, choices);
+        }
+
+        private void Submit(int seat, Command command)
+        {
+            SetPanel(PanelState.Hidden);
+            SessionResult result = _session!.Submit(seat, command);
+            if (!result.Accepted)
+            {
+                // The panel only offers legal commands; a refusal would be an engine or panel bug.
+                Debug.LogError("A command from the panel was refused: " + result.Error);
+                return;
+            }
+
+            Play(result.Events);
+        }
 
         private void Play(IReadOnlyList<GameEvent> events)
         {
@@ -347,6 +432,9 @@ namespace Vortex.Client.Presentation
             feedback = feedbackProfile;
             cardPrefab = card;
         }
+
+        /// <summary>Wires the command panel of the test mode (editor setup).</summary>
+        public void AssignTestMode(CommandPanel panel) => commands = panel;
 
         /// <summary>Wires the table of the scene (editor setup).</summary>
         public void AssignTable(SeatDisplay opponent, RectTransform opponentRoot, SeatDisplay player, MarketDisplay markets, RoundBanner roundBanner, GameLogDisplay gameLog, PlaybackControls controls, Transform shipRoot, Transform centre, Camera sceneCamera)
