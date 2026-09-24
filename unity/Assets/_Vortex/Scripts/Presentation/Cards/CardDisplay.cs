@@ -26,6 +26,9 @@ namespace Vortex.Client.Presentation
         /// <summary>The face shown.</summary>
         public CardFace Face { get; private set; }
 
+        /// <summary>Torment tokens shown on the card.</summary>
+        public int Torments { get; private set; }
+
         /// <summary>True while the card shows a generated placeholder instead of its art.</summary>
         public bool ShowsPlaceholder { get; private set; }
 
@@ -59,6 +62,7 @@ namespace Vortex.Client.Presentation
         /// <summary>Shows the Torment tokens on the card (RULES A7); the badge is hidden when there is none.</summary>
         public void ShowTorments(int count)
         {
+            Torments = count;
             if (tormentBadge != null)
             {
                 tormentBadge.SetActive(count > 0);

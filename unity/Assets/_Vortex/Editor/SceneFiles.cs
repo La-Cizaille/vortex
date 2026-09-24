@@ -19,7 +19,8 @@ namespace Vortex.Editor
         {
             Scene previous = SceneManager.GetActiveScene();
             bool additive = !string.IsNullOrEmpty(previous.path);
-            if (!additive && previous.isDirty && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+            // In batch mode nobody can be asked, and the untitled scene only held objects of the asset builders.
+            if (!additive && previous.isDirty && !Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
             {
                 Debug.Log(path + " not created: the current scene was kept open.");
                 return false;

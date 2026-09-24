@@ -41,6 +41,10 @@ namespace Vortex.Client.Presentation
                 shape.anchoredPosition = Vector2.zero;
                 float scale = Mathf.Min(_slot.rect.width / shape.sizeDelta.x, _slot.rect.height / shape.sizeDelta.y);
                 shape.localScale = new Vector3(scale, scale, 1f);
+                if (context.Zoom != null)
+                {
+                    _card.gameObject.AddComponent<CardHover>().Bind(context.Zoom);
+                }
             }
 
             _card.gameObject.SetActive(true);

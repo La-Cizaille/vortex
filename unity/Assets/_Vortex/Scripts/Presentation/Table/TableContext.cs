@@ -13,8 +13,9 @@ namespace Vortex.Client.Presentation
         private readonly Dictionary<string, CardFace> _faces;
 
         /// <summary>Creates the context of a game.</summary>
-        public TableContext(ThemeSettings theme, CardArtCatalog art, TextTable texts, GameData data, CardDisplay cardPrefab)
+        public TableContext(ThemeSettings theme, CardArtCatalog art, TextTable texts, GameData data, CardDisplay cardPrefab, CardZoom? zoom = null)
         {
+            Zoom = zoom;
             Theme = theme != null ? theme : throw new ArgumentNullException(nameof(theme));
             Art = art != null ? art : throw new ArgumentNullException(nameof(art));
             Texts = texts != null ? texts : throw new ArgumentNullException(nameof(texts));
@@ -38,6 +39,9 @@ namespace Vortex.Client.Presentation
 
         /// <summary>Interface texts.</summary>
         public TextTable Texts { get; }
+
+        /// <summary>Enlarged card shown when a table card is pointed at, or null (no zoom).</summary>
+        public CardZoom? Zoom { get; }
 
         /// <summary>Layout of a card.</summary>
         public CardDisplay CardPrefab { get; }

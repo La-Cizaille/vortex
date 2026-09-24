@@ -18,6 +18,9 @@ namespace Vortex.Client.Presentation
     {
         /// <summary>The transform for <paramref name="anchor"/> about <paramref name="gameEvent"/>, or null when the scene has none.</summary>
         Transform? AnchorFor(FeedbackAnchor anchor, GameEvent gameEvent);
+
+        /// <summary>Playback speed (1 = normal): a feedback that animates by itself runs this much faster.</summary>
+        float PlaybackSpeed { get; }
     }
 
     /// <summary>Places a feedback can target; the scene resolves them for each event.</summary>
