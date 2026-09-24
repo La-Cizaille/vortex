@@ -16,17 +16,17 @@ Les bots ne jouent pas comme des humains (ADR-0010). Un écart mesuré est un **
 
 ## Objectifs (étape 0)
 
-Validés par le game designer (ARB-40). Les réglages sont optimisés en priorité pour **4 joueurs** (ARB-52) : les réglages communs à toutes les tables sont choisis sur les parties à 4, et on vérifie que les autres tailles ne se dégradent pas.
+Validés par le game designer (ARB-40), puis recentrés sur le **mode standard à 5 joueurs**, seule table équilibrée (ARB-52, ARB-53). De 2 à 4 joueurs, le jeu reste jouable, sans objectif d'équilibrage.
 
-| Critère | Cible | Référence initiale | Aujourd'hui ([référence v2](2026-09-24-reference-v2.md)) |
+| Critère (5 joueurs) | Cible | Référence initiale | Aujourd'hui ([référence v2](2026-09-24-reference-v2.md)) |
 |---|---|---|---|
-| Avantage de position | Chaque position à ±3 pts de la part équitable (±5 pts en duel) | Premier joueur à +14 à +21 pts | **Atteint** à 4 joueurs (1,8 pts), 2 et 5 joueurs ; 3,5 pts à 3 joueurs |
-| Durée à 4 joueurs | 15 à 20 min | Environ 18 min | **Atteint** : environ 17 min (estimation à 30 s par tour) |
-| Rôle de la Fin des temps | Filet de sécurité : atteinte dans moins de 30 % des parties | 38 à 90 % | Non atteint : 80 % à 4 joueurs (33 à 89 % selon la table) |
-| Élection galactique | 5 à 15 % des victoires | Moins de 0,5 % | Non atteint : 2,4 % à 4 joueurs (0,8 à 3,7 %) |
-| Puissance des cartes | Chaque carte à ±5 pts de la moyenne, aucune carte « morte » | Écarts de −7 à +12 pts | Non atteint : de −7,0 à +16,7 pts ; une quinzaine de cartes à +5 pts ou plus, 2 sous −5 pts |
+| Avantage de position | Chaque position à ±3 pts de la part équitable | Premier joueur à +10 pts | **Atteint** : 2,9 pts |
+| Durée | 20 à 25 min (ARB-53) | Environ 22 min | **Atteint** : environ 21 min (estimation à 30 s par tour) |
+| Rôle de la Fin des temps | Filet de sécurité : atteinte dans moins de 30 % des parties | 90 % | Non atteint : 89 % |
+| Élection galactique | 5 à 15 % des victoires | 0,2 % | Non atteint : 3,7 % |
+| Puissance des cartes | Chaque carte à ±5 pts de la moyenne, aucune carte « morte » | Écarts de −7 à +12 pts | Non atteint : de −7,0 à +16,7 pts (toutes tables confondues) |
 | Part des choix face au hasard | À définir avec les niveaux de bot (étape 1) | Mal mesurée | À définir |
-| Première élimination | Pas avant la manche 6 à 4 joueurs | Non mesurée | Non atteint : manche 4,9 à 4 joueurs |
+| Première élimination | Pas avant la manche 6 (cible fixée pour 4 joueurs, transposée à 5 : **à confirmer**) | Non mesurée | Non atteint : manche 4,3 |
 
 ## Plan et avancement
 
@@ -50,7 +50,7 @@ Validés par le game designer (ARB-40). Les réglages sont optimisés en priorit
 dotnet run -c Release --project dotnet/Vortex.Simulator -- run --games 1000 --seed 1 --out docs/balance/<date>-<sujet>.md
 ```
 
-Pour chaque taille de table, deux scénarios :
+Pour chaque taille de table demandée (5 joueurs par défaut), deux scénarios :
 - **scénario principal** : tous les bots au niveau `--bot`. Il sert à mesurer la durée, l'avantage de position, les combats, les cartes, les couleurs et les événements ;
 - **écart de niveau** : un bot `hero` contre des bots `others` (`--skill hero,others`), pour mesurer le poids des choix.
 
@@ -75,7 +75,7 @@ La référence (le contenu du dépôt) et chaque variante jouent **les mêmes pa
 | Option | Rôle | Défaut |
 |---|---|---|
 | `run` ou `compare` | Commande (premier argument) | `run` |
-| `--players` | Tailles de table simulées | `2,3,4,5` |
+| `--players` | Tailles de table simulées, par exemple `2,3,4,5` | `5`, le mode standard (ARB-52) |
 | `--games` | Parties par taille de table (et par scénario) | `200` |
 | `--seed` | Graine : même commande et même contenu donnent les mêmes chiffres | `1` |
 | `--bot` | Niveau des bots du scénario principal : `random`, `naive`, `normal`, `strong` | `normal` |
@@ -125,12 +125,12 @@ Une variante est un petit fichier JSON dans [`variants/`](variants/). Il ne cont
 
 ### Référence v2 : règles adoptées (2026-09-24)
 
-Rapport : [`2026-09-24-reference-v2.md`](2026-09-24-reference-v2.md). 2 000 parties par taille de table et par scénario, bots `normal`, aucune erreur du moteur. Règles : rotation horaire du premier joueur (ARB-50) et Élection à 3 technologies (ARB-51). Lecture en priorité à 4 joueurs (ARB-52).
+Rapport : [`2026-09-24-reference-v2.md`](2026-09-24-reference-v2.md). 2 000 parties par taille de table et par scénario, bots `normal`, aucune erreur du moteur. Règles : rotation horaire du premier joueur (ARB-50) et Élection à 3 technologies (ARB-51). Lecture sur le mode standard à 5 joueurs (ARB-52).
 
-1. **Position et durée sont dans les cibles** à 4 joueurs : écart maximal de 1,8 pts, environ 17 minutes par partie.
-2. **La Fin des temps décide encore de la plupart des parties** (80 % à 4 joueurs), alors que la **première élimination arrive trop tôt** (manche 4,9). Ces deux cibles tirent en sens opposés : il faut un début de partie plus sûr et une fin plus rapide. C'est l'objet de la grille de l'étape 2.2 (PV, bouclier de départ et manche de Fin des temps).
-3. **L'Élection recule un peu avec la rotation** : 2,4 % à 4 joueurs, contre 3,6 % avec 3 technologies et l'ordre fixe. Les parties sont un peu plus courtes, donc on réunit moins de combos. Elle reste un objectif de l'étape 2.2.
-4. **Cartes** : une quinzaine de cartes sont à +5 pts ou plus, et deux sous −5 pts. Les cartes à **usage unique** occupent presque tout le haut du classement. Deux explications possibles, à départager à l'étape 3 : elles sont réellement trop fortes, ou les bots les prennent surtout quand ils sont déjà en position de force (biais de sélection). Orgueil (D_016) reste en tête (+16,7 pts). Tout est une question d'équilibre (D_020, −7,0 pts) et Le grand final (A_010, −5,6 pts) restent en bas.
+1. **Position et durée sont dans les cibles** à 5 joueurs : écart maximal de 2,9 pts, environ 21 minutes par partie.
+2. **La Fin des temps décide encore de la plupart des parties** (89 %), alors que la **première élimination arrive trop tôt** (manche 4,3) : le premier éliminé attend alors environ 15 minutes. Ces deux cibles tirent en sens opposés : il faut un début de partie plus sûr et une fin plus rapide. C'est l'objet de la grille de l'étape 2.2 (PV, bouclier de départ et manche de Fin des temps). La mécanique « fantômes » (étape 2.3), qui garde les joueurs éliminés dans la partie, prend de l'importance à 5.
+3. **L'Élection recule un peu avec la rotation** : 3,7 % à 5 joueurs, contre 5,0 % avec 3 technologies et l'ordre fixe. Les parties sont un peu plus courtes, donc on réunit moins de combos. Elle reste un objectif de l'étape 2.2.
+4. **Cartes** (toutes tables confondues ; les prochains rapports, à 5 joueurs par défaut, isoleront le mode standard) : une quinzaine de cartes sont à +5 pts ou plus, et deux sous −5 pts. Les cartes à **usage unique** occupent presque tout le haut du classement. Deux explications possibles, à départager à l'étape 3 : elles sont réellement trop fortes, ou les bots les prennent surtout quand ils sont déjà en position de force (biais de sélection). Orgueil (D_016) reste en tête (+16,7 pts). Tout est une question d'équilibre (D_020, −7,0 pts) et Le grand final (A_010, −5,6 pts) restent en bas.
 5. **Couleurs** : les joueurs à dominante **bleue** gagnent 33,4 % de leurs parties, contre 27,5 % pour le jaune. Un point à examiner à l'étape 3.
 6. **Événements** : Tempête électro-magnétique et Surcharge ionique rebattent le plus les cartes (le meneur garde la tête dans 72 % des cas, contre 83 % pour l'événement témoin sans effet). Trou noir semble plutôt protéger le meneur (87 %). À approfondir à l'étape 2.4.
 

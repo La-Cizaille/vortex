@@ -24,7 +24,7 @@ namespace Vortex.Simulator
         private const int MaxVariants = 8;
 
         private const string Usage =
-            "Usage: Vortex.Simulator [run|compare] [--players 2,3,4,5] [--games 200] [--seed 1] [--bot normal]\n" +
+            "Usage: Vortex.Simulator [run|compare] [--players 5] [--games 200] [--seed 1] [--bot normal]\n" +
             "                        [--skill normal,random] [--variant <file.json>]... [--data <dir>] [--out <file.md>]\n" +
             "  Bot levels: random, naive, normal, strong. 'compare' needs at least one --variant.";
 
@@ -154,7 +154,8 @@ namespace Vortex.Simulator
 
             public bool Compare { get; private set; }
 
-            public List<int> Players { get; private set; } = new List<int> { 2, 3, 4, 5 };
+            // 5 players is the standard, balanced table (docs/ARBITRAGES.md ARB-52); other sizes on request.
+            public List<int> Players { get; private set; } = new List<int> { 5 };
 
             public int Games { get; private set; } = 200;
 
