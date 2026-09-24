@@ -59,6 +59,7 @@ Les valeurs marquées ⚙ sont **configurables** (`config.json`) et sont calibr�
 3. Un paquet vide se reconstitue en mélangeant sa défausse. Cette règle vaut pour **tous** les paquets.
 4. **Premier joueur de la manche** : à la première manche, le gagnant de l'initiative. Ensuite, le premier joueur **avance d'un siège dans le sens horaire** à chaque manche. S'il est éliminé, la manche commence au joueur vivant suivant dans le sens horaire. Le tour de table reste toujours horaire.
    - Réglage `RoundStartRotation` ⚙ : sens horaire (ARB-50). Pour l'équilibrage, on peut aussi choisir « aucun déplacement » ou « sens anti-horaire ». En sens anti-horaire, le dernier joueur d'une manche est aussi le premier de la suivante.
+   - **Duel** (ARB-68) : quand il ne reste que **deux joueurs en vie**, la rotation ne s'applique plus. La manche commence par le joueur qui n'a **pas joué en dernier**, pour que personne ne joue deux fois de suite. Cela vaut pour une partie à 2 joueurs comme pour la fin d'une partie plus grande.
 
 ## A5. Tour d'un joueur
 

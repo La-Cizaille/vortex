@@ -44,7 +44,7 @@
     },
     {
       "id": "EVT_SURCHARGE_IONIQUE",
-      "name": "**surcharge** Ionique",
+      "name": "Surcharge ionique",
       "copies": 2,
       "text": "Toutes les **attaques** infligent +4 points de dégâts pendant ce tour.",
       "ruling": "+4 à la valeur de toutes les attaques pendant la manche.",

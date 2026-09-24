@@ -191,11 +191,18 @@ namespace Vortex.Core.Rules
 
         /// <summary>
         /// First player of the current round (RULES A4.4): the initiative seat, moved by the configured rotation
-        /// once per round, then the first alive seat clockwise from there.
+        /// once per round, then the first alive seat clockwise from there. With two players left, nobody plays twice
+        /// in a row (ARB-68): the round starts with the one who did not play last.
         /// </summary>
         public int FirstSeatOfRound()
         {
             int n = State.Players.Count;
+            int last = State.CurrentPlayer;
+            if (State.Round > 1 && last >= 0 && last < n && !State.Players[last].Eliminated && AliveFrom(0).Count() == 2)
+            {
+                return AliveFrom(last + 1).First();
+            }
+
             int step = Config.RoundStartRotation == RoundStartRotation.Clockwise ? 1 : (Config.RoundStartRotation == RoundStartRotation.CounterClockwise ? -1 : 0);
             int offset = (step * (State.Round - 1)) % n;
             return AliveFrom(((State.InitiativeSeat + offset) % n + n) % n).First();

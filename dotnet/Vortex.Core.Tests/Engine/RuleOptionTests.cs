@@ -54,16 +54,56 @@ namespace Vortex.Core.Tests.Engine
         [Test]
         public void Rotation_skips_an_eliminated_starting_seat()
         {
-            var s = Scenario.Start(3, config: TestContent.Config(rotation: RoundStartRotation.Clockwise));
-            int next = (s.State.InitiativeSeat + 1) % 3;
+            // Four seats, so that three players remain: with two, the duel rule decides who starts (ARB-68).
+            var s = Scenario.Start(4, config: TestContent.Config(rotation: RoundStartRotation.Clockwise));
+            int next = (s.State.InitiativeSeat + 1) % 4;
             s.P(next).Hp = 0;
             s.P(next).Eliminated = true;
-            s.ToMain();
-            s.MustAccept(s.Current, Command.EndTurn());
-            s.ToMain();
-            s.MustAccept(s.Current, Command.EndTurn());
-            Assert.That(s.State.Round, Is.EqualTo(2));
-            Assert.That(s.Current, Is.EqualTo((next + 1) % 3), "The round would start with the eliminated seat: the next alive one starts.");
+            while (s.State.Round == 1)
+            {
+                int seat = s.Current;
+                s.ToMain();
+                s.MustAccept(seat, Command.EndTurn());
+            }
+
+            Assert.That(s.Current, Is.EqualTo((next + 1) % 4), "The round would start with the eliminated seat: the next alive one starts.");
+        }
+
+        [TestCase(2, RoundStartRotation.None)]
+        [TestCase(2, RoundStartRotation.Clockwise)]
+        [TestCase(2, RoundStartRotation.CounterClockwise)]
+        [TestCase(5, RoundStartRotation.None)]
+        [TestCase(5, RoundStartRotation.Clockwise)]
+        [TestCase(5, RoundStartRotation.CounterClockwise)]
+        public void With_two_players_left_nobody_plays_twice_in_a_row(int players, RoundStartRotation rotation)
+        {
+            // ARB-68: a duel, whether the game started with two players or three of five are out. The survivors of
+            // the five-seat game are not neighbours, so the rotation has eliminated seats to skip.
+            var s = Scenario.Start(players, config: TestContent.Config(rotation: rotation));
+            var alive = new HashSet<int> { s.Current, (s.Current + (players == 2 ? 1 : 2)) % players };
+            for (int seat = 0; seat < players; seat++)
+            {
+                if (!alive.Contains(seat))
+                {
+                    s.P(seat).Hp = 0;
+                    s.P(seat).Eliminated = true;
+                }
+            }
+
+            var turns = new List<int>();
+            while (s.State.Round <= 8 && s.State.Outcome == null)
+            {
+                int seat = s.Current;
+                turns.Add(seat);
+                s.ToMain();
+                s.MustAccept(seat, Command.EndTurn());
+            }
+
+            Assert.That(turns.Count, Is.GreaterThanOrEqualTo(16));
+            for (int i = 1; i < turns.Count; i++)
+            {
+                Assert.That(turns[i], Is.Not.EqualTo(turns[i - 1]), "Turn " + i + " of " + string.Join(",", turns));
+            }
         }
 
         [Test]
