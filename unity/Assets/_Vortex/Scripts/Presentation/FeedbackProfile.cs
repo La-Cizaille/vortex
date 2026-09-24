@@ -29,6 +29,21 @@ namespace Vortex.Client.Presentation
             return fallback;
         }
 
+        /// <summary>
+        /// Plays <paramref name="feedback"/> for <paramref name="type"/> unless the profile already has a feedback for
+        /// it (editor setup: never replaces the designer's choice). Returns false when nothing was added.
+        /// </summary>
+        public bool MapIfMissing(GameEventType type, FeedbackAsset feedback)
+        {
+            if (entries.Exists(e => e.EventType == type && e.Feedback != null))
+            {
+                return false;
+            }
+
+            entries.Add(new Entry { EventType = type, Feedback = feedback });
+            return true;
+        }
+
         /// <summary>Replaces the mapping (editor setup and tests).</summary>
         public void Configure(FeedbackAsset? fallbackFeedback, params (GameEventType Type, FeedbackAsset Feedback)[] mapping)
         {

@@ -38,6 +38,7 @@ namespace Vortex.Client.Presentation
         [SerializeField] private GameLogDisplay log = null!;
         [SerializeField] private PlaybackControls playback = null!;
         [SerializeField] private CommandPanel commands = null!;
+        [SerializeField] private CardZoom zoom = null!;
         [SerializeField] private Transform shipRow = null!;
         [SerializeField] private Transform tableCentre = null!;
         [SerializeField] private Camera view = null!;
@@ -113,7 +114,8 @@ namespace Vortex.Client.Presentation
         {
             Clear();
             GameData data = content.LoadData();
-            _context = new TableContext(theme, cardArt, texts, data, cardPrefab);
+            _context = new TableContext(theme, cardArt, texts, data, cardPrefab, zoom);
+            zoom.Bind(_context);
             _log = new GameLogFormatter(texts, data);
             _labels = new CommandLabels(_context);
             List<SeatSetup> seats = Enumerable.Range(1, seatCount)
@@ -196,6 +198,9 @@ namespace Vortex.Client.Presentation
 
             Play(result.Events);
         }
+
+        /// <inheritdoc/>
+        public float PlaybackSpeed => _player?.Speed ?? 1f;
 
         /// <inheritdoc/>
         public Transform? AnchorFor(FeedbackAnchor anchor, GameEvent gameEvent) => anchor switch
@@ -432,6 +437,9 @@ namespace Vortex.Client.Presentation
             feedback = feedbackProfile;
             cardPrefab = card;
         }
+
+        /// <summary>Wires the card zoom (editor setup).</summary>
+        public void AssignZoom(CardZoom cardZoom) => zoom = cardZoom;
 
         /// <summary>Wires the command panel of the test mode (editor setup).</summary>
         public void AssignTestMode(CommandPanel panel) => commands = panel;

@@ -83,7 +83,7 @@ powershell -ExecutionPolicy Bypass -File tools/Test-Unity.ps1
 | M4.2 | Session de jeu et lecture des événements (ADR-0014) | Fait |
 | M4.3 | Habillage : thème, catalogues d'illustrations, visuels provisoires générés, import automatique, scène Galerie | Fait |
 | M4.4 | Table et affichage : scène de jeu, adversaires, vaisseau, marché, informations de partie ; les bots jouent et tout se voit | Fait |
-| M4.5 | Interactions : glisser-déposer, aperçus calculés par le moteur, décisions, marché, combo, fin de tour | À faire |
+| M4.5 | Interactions : zoom sur les cartes et dés animés (fait), glisser-déposer, aperçus calculés par le moteur, décisions, marché, combo, fin de tour | En cours |
 | M4.6 | Menus : accueil, partie locale, options, pause, fin de partie, menu de développement | À faire |
 | M4.7 | Vérification : parties complètes à 2, 3 et 5 joueurs, sans erreur ; remplacer une image change le visuel sans code | À faire |
 

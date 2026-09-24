@@ -12,5 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62458580e49b8a542a718e9adc1cd1f7, type: 3}
   m_Name: DefaultFeedbackProfile
   m_EditorClassIdentifier: Vortex.Client::Vortex.Client.Presentation.FeedbackProfile
-  entries: []
+  entries:
+  - EventType: 17
+    Feedback: {fileID: 11400000, guid: 9709fd3a769ee6b4f94e20b6487ad7b7, type: 2}
+  - EventType: 33
+    Feedback: {fileID: 11400000, guid: 9709fd3a769ee6b4f94e20b6487ad7b7, type: 2}
   fallback: {fileID: 11400000, guid: 8c7a767d5c6036749b463a7b3db5cfc3, type: 2}

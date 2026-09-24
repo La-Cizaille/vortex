@@ -14,6 +14,8 @@ namespace Vortex.Tests.EditMode
         private sealed class NoStage : IFeedbackStage
         {
             public Transform? AnchorFor(FeedbackAnchor anchor, GameEvent gameEvent) => null;
+
+            public float PlaybackSpeed => 1f;
         }
 
         private sealed class FixedFeedback : IFeedback

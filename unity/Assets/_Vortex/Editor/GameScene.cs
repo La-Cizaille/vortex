@@ -136,6 +136,15 @@ namespace Vortex.Editor
                 centre,
                 camera);
             director.AssignTestMode(commands);
+
+            // Last child, so that the enlarged card shows above everything; it never takes pointer events.
+            RectTransform zoomArea = UiBuilder.Part<RectTransform>(ui, "Zoom", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            CanvasGroup zoomGroup = zoomArea.gameObject.AddComponent<CanvasGroup>();
+            zoomGroup.blocksRaycasts = false;
+            zoomGroup.interactable = false;
+            CardZoom zoom = zoomArea.gameObject.AddComponent<CardZoom>();
+            zoom.Assign(zoomArea);
+            director.AssignZoom(zoom);
         }
 
         // Test mode: one button per legal move, in the free space right of the player's ship, above the playback
