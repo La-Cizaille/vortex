@@ -19,5 +19,6 @@ Un ADR consigne **une** décision structurante : son contexte, les options envis
 | [0013](0013-version-unity.md) | Version de Unity : versions Update en développement, LTS pour publier | Accepté |
 | [0014](0014-presentation-par-evenements.md) | Présentation pilotée par les événements, retours visuels décrits dans l'éditeur | Accepté |
 | [0015](0015-scene-de-jeu.md) | Scène de jeu en 3D à caméra fixe, interface 2D sans logique de règles | Accepté |
+| [0016](0016-modeles-3d-blender.md) | Modèles 3D : Blender, export FBX par script, sources versionnées | Accepté |
 
 Modèle : copier un ADR existant et garder les sections *Statut*, *Contexte*, *Options*, *Décision* et *Conséquences*.

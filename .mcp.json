@@ -2,11 +2,31 @@
   "mcpServers": {
     "unity": {
       "command": "uvx",
-      "args": ["--from", "mcpforunityserver==10.2.0", "mcp-for-unity", "--transport", "stdio"],
+      "args": [
+        "--from",
+        "mcpforunityserver==10.2.0",
+        "mcp-for-unity",
+        "--transport",
+        "stdio"
+      ],
       "env": {
         "DISABLE_TELEMETRY": "true",
         "UNITY_MCP_DISABLE_TELEMETRY": "true",
         "MCP_DISABLE_TELEMETRY": "true"
+      }
+    },
+    "blender": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "mcp-for-blender==2.0.4",
+        "mcp-for-blender"
+      ],
+      "env": {
+        "DISABLE_TELEMETRY": "true",
+        "BLENDER_MCP_SAFE_MODE": "1",
+        "BLENDER_HOST": "127.0.0.1",
+        "BLENDER_PORT": "9876"
       }
     }
   }

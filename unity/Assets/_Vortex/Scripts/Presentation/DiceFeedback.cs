@@ -49,6 +49,19 @@ namespace Vortex.Client.Presentation
             Transform? at = stage.AnchorFor(anchor, gameEvent);
             if (tray != null && at != null)
             {
+                // A new roll replaces the previous one: at a high playback speed, trays would pile up otherwise.
+                foreach (DiceTray previous in at.GetComponentsInChildren<DiceTray>())
+                {
+                    if (Application.isPlaying)
+                    {
+                        Destroy(previous.gameObject);
+                    }
+                    else
+                    {
+                        DestroyImmediate(previous.gameObject);
+                    }
+                }
+
                 float speed = Mathf.Max(0.01f, stage.PlaybackSpeed);
                 DiceTray shown = Instantiate(tray, at, false);
                 shown.Roll(values, sum, rollSeconds / speed, holdSeconds / speed);

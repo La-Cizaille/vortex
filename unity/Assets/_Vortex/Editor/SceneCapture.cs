@@ -1,0 +1,119 @@
+using System;
+using System.IO;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.UI;
+using Vortex.Client.Gallery;
+using Vortex.Client.Presentation;
+using Object = UnityEngine.Object;
+
+namespace Vortex.Editor
+{
+    /// <summary>
+    /// Renders a scene to a PNG without the editor window (tools/Capture-Unity.ps1), to check a layout, an illustration
+    /// or a model in context from batch mode. The output path comes from VORTEX_CAPTURE; for the game, the round to
+    /// reach comes from VORTEX_ROUND. Development tool: editor assembly only.
+    /// </summary>
+    public static class SceneCapture
+    {
+        private const int Width = 1920;
+        private const int Height = 1080;
+
+        /// <summary>Five bots play the game scene until the requested round, then the table is rendered.</summary>
+        public static void Game()
+        {
+            string output = Output();
+            int round = int.TryParse(Environment.GetEnvironmentVariable("VORTEX_ROUND"), out int value) ? Math.Clamp(value, 1, 30) : 4;
+            EditorSceneManager.OpenScene(GameScene.ScenePath, OpenSceneMode.Single);
+            (Camera camera, RenderTexture target) = Prepare();
+            GameDirector director = Object.FindAnyObjectByType<GameDirector>();
+            director.HumanFirstSeat = false;
+            director.Begin();
+            for (int frame = 0; frame < 50000 && director.Model!.Outcome == null && !(director.Model.Round >= round && director.IsPlaying); frame++)
+            {
+                director.Advance(0.2f);
+            }
+
+            // Dice trays are animated by the frame loop, which does not run here: show their result.
+            foreach (DiceTray tray in Object.FindObjectsByType<DiceTray>())
+            {
+                tray.Settle();
+            }
+
+            Render(camera, target, output);
+        }
+
+        /// <summary>Renders the gallery: every card, event, technology and seat ship.</summary>
+        public static void Gallery()
+        {
+            string output = Output();
+            EditorSceneManager.OpenScene(GalleryScene.ScenePath, OpenSceneMode.Single);
+            (Camera camera, RenderTexture target) = Prepare();
+            Object.FindAnyObjectByType<GalleryController>().Build();
+            Render(camera, target, output);
+        }
+
+        private static string Output()
+        {
+            string? path = Environment.GetEnvironmentVariable("VORTEX_CAPTURE");
+            if (string.IsNullOrEmpty(path) || !path.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException("Set VORTEX_CAPTURE to the .png file to write.");
+            }
+
+            return path;
+        }
+
+        // The camera draws into an image of the reference size; the overlay interface is drawn by that camera too,
+        // since an overlay canvas never reaches a render texture.
+        private static (Camera Camera, RenderTexture Target) Prepare()
+        {
+            Camera camera = Object.FindAnyObjectByType<Camera>();
+            var target = new RenderTexture(Width, Height, 24);
+            camera.targetTexture = target;
+            Canvas canvas = Object.FindAnyObjectByType<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceCamera;
+            canvas.worldCamera = camera;
+            canvas.planeDistance = 1f;
+            return (camera, target);
+        }
+
+        private static void Render(Camera camera, RenderTexture target, string output)
+        {
+            // Layouts and anchors are normally settled over frames; settle them now, a few times for nested layouts.
+            for (int pass = 0; pass < 3; pass++)
+            {
+                Canvas.ForceUpdateCanvases();
+                foreach (LayoutGroup group in Object.FindObjectsByType<LayoutGroup>())
+                {
+                    LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)group.transform);
+                }
+
+                foreach (ContentSizeFitter fitter in Object.FindObjectsByType<ContentSizeFitter>())
+                {
+                    LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)fitter.transform);
+                }
+
+                foreach (ScreenAnchor anchor in Object.FindObjectsByType<ScreenAnchor>())
+                {
+                    anchor.Place();
+                }
+
+                camera.Render();
+            }
+
+            RenderTexture previous = RenderTexture.active;
+            RenderTexture.active = target;
+            var image = new Texture2D(Width, Height, TextureFormat.RGB24, false);
+            image.ReadPixels(new Rect(0, 0, Width, Height), 0, 0);
+            image.Apply();
+            RenderTexture.active = previous;
+            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(output))!);
+            File.WriteAllBytes(output, image.EncodeToPNG());
+            Object.DestroyImmediate(image);
+            camera.targetTexture = null;
+            Object.DestroyImmediate(target);
+            Debug.Log("Captured " + output);
+        }
+    }
+}

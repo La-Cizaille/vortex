@@ -71,11 +71,10 @@ BenchmarkDotNet.Artifacts/
 secrets.*
 
 # ---------------------------------------------------------------
-# Art sources: heavy .blend files are kept out of the repo for now
-# (GitHub free LFS quota is 1 GiB). Decision to revisit at M5.
+# Art sources: .blend files are versioned with Git LFS (ADR-0016);
+# Blender's backup copies (.blend1, .blend2...) are not.
 # ---------------------------------------------------------------
-/art-src/**/*.blend1
-/art-src/**/*.blend
+*.blend[0-9]
 
 # ---------------------------------------------------------------
 # OS / editors

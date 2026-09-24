@@ -4,7 +4,7 @@ Jeu de combat de vaisseaux spatiaux au tour par tour, en chacun pour soi, de 2 �
 
 Adaptation numérique d'un jeu de société. Cibles : **Android** et **Windows**. Style 3D simple, pensé pour le mobile.
 
-> État : **M4, prototype Unity**. M0 à M3 et l'équilibrage des règles de base sont terminés : moteur complet, 54 modificateurs, 8 événements, 4 technologies, bots, simulateur, mode standard à 5 joueurs réglé. La feuille de route est plus bas.
+> État : **M4, prototype Unity**. M0 à M3 et l'équilibrage des règles de base sont terminés : moteur complet, 54 modificateurs, 8 événements, 4 technologies, bots, simulateur, mode standard à 5 joueurs réglé. La table de jeu est jouable en **mode test** contre des bots (M4.4), avec zoom sur les cartes et dés animés. Prochaines étapes : les gestes (M4.5), les menus (M4.6), puis l'atelier Blender (M5). La feuille de route est plus bas.
 
 ## Structure du dépôt
 
@@ -44,11 +44,21 @@ dotnet run -c Release --project dotnet/Vortex.Simulator -- compare --games 2000 
 
 Ouvrir le dossier `unity/` dans Unity Hub. Pour **jouer une partie de test** contre quatre bots : ouvrir la scène `Assets/_Vortex/Scenes/Game.unity`, puis lancer le mode Play. Vous jouez le siège 1 avec le panneau des coups, en bas à droite.
 
-Pour lancer les tests Unity sans ouvrir l'éditeur :
+Sans ouvrir l'éditeur (il doit être fermé) :
 
 ```bash
 powershell -ExecutionPolicy Bypass -File tools/Test-Unity.ps1
 ```
+
+```bash
+powershell -ExecutionPolicy Bypass -File tools/Update-UnityAssets.ps1
+```
+
+```bash
+powershell -ExecutionPolicy Bypass -File tools/Capture-Unity.ps1 -Scene Game -Round 5 -Out captures/table.png
+```
+
+Le premier lance les tests Unity. Le deuxième crée les assets de base qui manquent (il ne remplace jamais un asset existant). Le troisième enregistre une image de la table ou de la galerie. Pour les modèles 3D, voir [`CONTRIBUTING.md`](docs/CONTRIBUTING.md#blender-modèles-3d) et [`ASSETS.md`](docs/ASSETS.md).
 
 ## Où trouver quoi
 
@@ -56,6 +66,7 @@ powershell -ExecutionPolicy Bypass -File tools/Test-Unity.ps1
 |---|---|
 | Comment se joue une partie | [`RULES.md`](docs/RULES.md), partie A |
 | Pourquoi une règle ou une carte fonctionne ainsi | [`ARBITRAGES.md`](docs/ARBITRAGES.md) |
+| Les visuels à créer et leur format | [`ASSETS.md`](docs/ASSETS.md) |
 | Ce que le joueur voit et comment il agit | [`INTERFACE.md`](docs/INTERFACE.md) |
 | Le texte et l'interprétation d'une carte | [`CARDS.md`](docs/CARDS.md) (généré depuis `core/Runtime/Data/`) |
 | Les objectifs et l'avancement de l'équilibrage | [`balance/README.md`](docs/balance/README.md) |
@@ -72,7 +83,7 @@ powershell -ExecutionPolicy Bypass -File tools/Test-Unity.ps1
 | **M3** | Simulateur bot contre bot et rapport d'équilibrage |
 | **Équilibrage** | Règles de base : fait. Revue des cartes avec un éditeur visuel après le prototype (plan : [`docs/balance/README.md`](docs/balance/README.md)) |
 | **M4** | Client Unity jouable en hot-seat (visuels provisoires, habillage modifiable), selon [`INTERFACE.md`](docs/INTERFACE.md) |
-| **M5** | Finitions : modèles 3D, animations, builds Android et Windows |
+| **M5** | Finitions : modèles 3D (Blender, ADR-0016), fond stellaire animé, audio, animations, builds Android et Windows |
 | Phase 2 | Serveur autoritaire, lobby, jeu en ligne |
 
 Étapes du jalon M4 :
@@ -83,7 +94,7 @@ powershell -ExecutionPolicy Bypass -File tools/Test-Unity.ps1
 | M4.2 | Session de jeu et lecture des événements (ADR-0014) | Fait |
 | M4.3 | Habillage : thème, catalogues d'illustrations, visuels provisoires générés, import automatique, scène Galerie | Fait |
 | M4.4 | Table et affichage : scène de jeu, adversaires, vaisseau, marché, informations de partie ; les bots jouent et tout se voit | Fait |
-| M4.5 | Interactions : zoom sur les cartes et dés animés (fait), glisser-déposer, aperçus calculés par le moteur, décisions, marché, combo, fin de tour | En cours |
+| M4.5 | Interactions : zoom sur les cartes et dés animés (fait) ; recyclage au niveau du marché ; actions d'équipage au niveau du vaisseau, avec des pictogrammes ; informations d'un adversaire au survol ; glisser-déposer et aperçus calculés par le moteur ; décisions, combo, fin de tour ; temps de tour limité et désactivable (ARB-70, ARB-71) | En cours |
 | M4.6 | Menus : accueil, partie locale, options, pause, fin de partie, menu de développement | À faire |
 | M4.7 | Vérification : parties complètes à 2, 3 et 5 joueurs, sans erreur ; remplacer une image change le visuel sans code | À faire |
 

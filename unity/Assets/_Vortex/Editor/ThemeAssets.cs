@@ -42,7 +42,8 @@ namespace Vortex.Editor
         {
             EnsureTextMeshPro();
             EnsureFolder(ArtImportRules.CardsFolder, "Illustrations des cartes, des événements et des technologies : un fichier par identifiant, nommé comme lui (A_005.png, EVT_TROU_NOIR.png, TECH_BLUE.png). Voir docs/CONTRIBUTING.md.");
-            EnsureFolder(ArtImportRules.ShipsFolder, "Modèles des vaisseaux (.fbx), à associer à un siège dans Theme/ShipCatalog. Voir docs/CONTRIBUTING.md.");
+            EnsureFolder(ArtImportRules.ShipsFolder, "Modèles des vaisseaux (.fbx), exportés depuis art-src/ships avec tools/blender/export_unity.py, puis associés à un siège dans Theme/ShipCatalog. Voir docs/ASSETS.md.");
+            EnsureFolder(ArtImportRules.IconsFolder, "Icônes (PNG transparents) : actions d'équipage, icônes du texte des cartes, technologies, jetons. Noms et tailles : docs/ASSETS.md.");
             Ensure<ThemeSettings>(ThemePath);
             Ensure<CardArtCatalog>(CardArtPath);
             Ensure<ShipCatalog>(ShipsPath);
