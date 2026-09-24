@@ -28,6 +28,7 @@ La chaîne de production (Blender, export, versions) est décrite dans [ADR-0016
 | Visuel | Nombre | Rôle dans le jeu | Taille, budget | Fichiers | Priorité |
 |---|---|---|---|---|---|
 | **Vaisseau** | 5, un par siège, ou 1 modèle recoloré par siège (question ouverte 1) | Un par joueur autour de la table ; celui du joueur est au premier plan | Environ 2 m de long, 2,4 m d'envergure au plus (comme le vaisseau provisoire) ; 5 000 triangles au plus | `art-src/ships/Ship_<Nom>.blend` exporté en `Art/Ships/Ship_<Nom>.fbx`, puis associé à un siège dans `Theme/ShipCatalog` | 1 |
+| **Carte** | 1 modèle | Le corps de toutes les cartes (ADR-0017) ; la face (illustration, textes) est posée dessus par le jeu | 1 × 1,4 m, 0,02 m d'épaisseur ; coins arrondis et biseau bienvenus ; face avant vers −Y, comme un vaisseau ; 500 triangles au plus | `art-src/cards/Card.blend` exporté en `Art/Cards3D/Card.fbx`, puis placé comme corps dans `Prefabs/Card.prefab` | 2 |
 | Épave | 0 à 1 | Vaisseau d'un joueur éliminé | Aujourd'hui, le jeu grise et incline le vaisseau lui-même : un modèle dédié est facultatif | `Ship_<Nom>_Epave` | 3 |
 | Dé à 8 faces (d8) | 1 | Un dé en 3D pourra remplacer les dés 2D actuels | Octaèdre d'environ 0,5 m, faces numérotées de 1 à 8 ; 500 triangles au plus | `art-src/dice/D8.blend` exporté en `Art/Dice/D8.fbx` | 3 |
 | Planètes, décor | 2 à 3 | Arrière-plan spatial (INTERFACE §2, pas nécessaire au prototype) | Sphères de 2 000 triangles au plus, texture équirectangulaire de 2048×1024 | `art-src/props/Planet_<Nom>.blend` exporté en `Art/Props/` | 3 |
@@ -42,6 +43,7 @@ La chaîne de production (Blender, export, versions) est décrite dans [ADR-0016
 | Icônes des technologies | 4 | Les ronds des technologies obtenues | PNG transparent 128×128 | `Art/Icons/Tech_BLUE.png`, `Tech_RED`, `Tech_GREEN`, `Tech_YELLOW` | 3 |
 | Jetons | 2 : Tourment, surcharge | Sur les cartes et près du vaisseau | PNG transparent 128×128 | `Art/Icons/Token_Tourment.png`, `Token_Surcharge.png` | 3 |
 | Icônes des effets temporaires | 16, facultatives | À côté du texte des effets | PNG transparent 128×128 | `Art/Icons/Status_<Type>.png` (types : clés `status.*` de la table des textes) | 4 |
+| Dos de carte | 1 | Le dos des cartes (retournement, pioche) | PNG 1024×1434 (proportions de la carte) | `Art/Cards3D/CardBack.png`, à mettre dans le matériau `Theme/Materials/CardBack` | 3 |
 | Cadres de carte | 5, facultatifs : neutre et 4 technologies | Remplacent le cadre de couleur unie | PNG 512×716 découpable en 9 zones (bords fixes) | `Art/Frames/Frame_Neutral.png`, `Frame_Blue`… | 4 |
 | Fond spatial | 1 | Ciel étoilé derrière la table ; le scintillement se fait dans Unity | Panorama équirectangulaire 4096×2048, PNG ou EXR | `Art/Backgrounds/Space.png` | 3 |
 | Logo | 1 | Écran d'accueil (M4.6) | PNG transparent, 2048 px de large | `Art/Brand/Logo.png` | 3 |

@@ -32,8 +32,20 @@ namespace Vortex.Editor
         /// <summary>Interface texts.</summary>
         public const string TextsPath = "Assets/_Vortex/Content/TextTable.asset";
 
-        /// <summary>Layout of a card.</summary>
+        /// <summary>The card, a 3D object (ADR-0017).</summary>
         public const string CardPrefabPath = "Assets/_Vortex/Prefabs/Card.prefab";
+
+        /// <summary>Body of the cards (tinted with their technology colour).</summary>
+        public const string CardBodyMaterialPath = "Assets/_Vortex/Theme/Materials/CardBody.mat";
+
+        /// <summary>Face parts of the cards: background and illustration.</summary>
+        public const string CardFaceMaterialPath = "Assets/_Vortex/Theme/Materials/CardFace.mat";
+
+        /// <summary>Back of the cards.</summary>
+        public const string CardBackMaterialPath = "Assets/_Vortex/Theme/Materials/CardBack.mat";
+
+        /// <summary>Disc of the Torment badge.</summary>
+        public const string CardBadgeMaterialPath = "Assets/_Vortex/Theme/Materials/CardBadge.mat";
 
         private const string TextMeshProSettingsPath = "Assets/TextMesh Pro/Resources/TMP Settings.asset";
 
@@ -175,44 +187,98 @@ namespace Vortex.Editor
                 return;
             }
 
-            // A 250 x 350 card: frame, inner background, illustration on top, then name, kind, text and id.
-            var root = new GameObject("Card", typeof(RectTransform), typeof(Image), typeof(CardDisplay));
-            ((RectTransform)root.transform).sizeDelta = new Vector2(250f, 350f);
-            Image frame = root.GetComponent<Image>();
-            Image background = UiBuilder.Part<Image>(root.transform, "Fond", Vector2.zero, Vector2.one, new Vector2(6f, 6f), new Vector2(-6f, -6f));
-            Image art = UiBuilder.Part<Image>(background.transform, "Illustration", new Vector2(0f, 1f), Vector2.one, new Vector2(8f, -128f), new Vector2(-8f, -8f));
-            TMP_Text title = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(background.transform, "Nom", new Vector2(0f, 1f), Vector2.one, new Vector2(8f, -162f), new Vector2(-8f, -132f)), 20f, FontStyles.Bold, TextAlignmentOptions.Center);
-            TMP_Text caption = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(background.transform, "Type", new Vector2(0f, 1f), Vector2.one, new Vector2(8f, -182f), new Vector2(-8f, -162f)), 13f, FontStyles.Normal, TextAlignmentOptions.Center);
-            TMP_Text body = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(background.transform, "Texte", Vector2.zero, Vector2.one, new Vector2(10f, 24f), new Vector2(-10f, -186f)), 15f, FontStyles.Normal, TextAlignmentOptions.TopLeft);
-            body.enableAutoSizing = true;
-            body.fontSizeMin = 9f;
-            body.fontSizeMax = 15f;
-            TMP_Text id = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(background.transform, "Identifiant", Vector2.zero, new Vector2(1f, 0f), new Vector2(8f, 4f), new Vector2(-8f, 22f)), 11f, FontStyles.Normal, TextAlignmentOptions.BottomRight);
+            Material body = EnsureMaterial(CardBodyMaterialPath, Color.white);
+            Material face = EnsureMaterial(CardFaceMaterialPath, Color.white);
+            Material back = EnsureMaterial(CardBackMaterialPath, new Color32(30, 34, 62, 255));
+            Material badgeColour = EnsureMaterial(CardBadgeMaterialPath, new Color32(150, 40, 60, 255));
 
-            // A long name shrinks to stay on one line instead of running over the caption.
+            // A 1 x 1.4 card, 0.02 thick (ADR-0017). The front faces -Z, like Unity's quads and TextMeshPro texts, so a
+            // card turned like the camera shows its front to it. Everything visible is under "Visuel", so that the card
+            // can be hidden without being destroyed; the box collider takes pointer events.
+            var size = new Vector2(1f, 1.4f);
+            const float Thickness = 0.02f;
+            var root = new GameObject("Card", typeof(CardDisplay), typeof(BoxCollider));
+            var area = root.GetComponent<BoxCollider>();
+            area.size = new Vector3(size.x, size.y, Thickness);
+            Transform visual = new GameObject("Visuel").transform;
+            visual.SetParent(root.transform, false);
+
+            // The body: a box for now, which a modelled card (rounded corners, bevel) can replace in the prefab.
+            Renderer frame = Primitive(PrimitiveType.Cube, visual, "Corps", Vector3.zero, Vector3.zero, new Vector3(size.x, size.y, Thickness), body);
+            Renderer background = Primitive(PrimitiveType.Quad, visual, "Fond", new Vector3(0f, 0f, -0.011f), Vector3.zero, new Vector3(0.94f, 1.34f, 1f), face);
+            const float ArtWidth = 0.86f;
+            const float ArtHeight = ArtWidth * 9f / 16f;
+            Renderer art = Primitive(PrimitiveType.Quad, visual, "Illustration", new Vector3(0f, 0.65f - (ArtHeight / 2f), -0.012f), Vector3.zero, new Vector3(ArtWidth, ArtHeight, 1f), face);
+            Primitive(PrimitiveType.Quad, visual, "Dos", new Vector3(0f, 0f, 0.011f), new Vector3(0f, 180f, 0f), new Vector3(0.96f, 1.36f, 1f), back);
+
+            TMP_Text title = Text3D(visual, "Nom", new Vector2(0f, 0.1f), new Vector2(0.86f, 0.1f), 0.4f, 1f, FontStyles.Bold, TextAlignmentOptions.Center);
             title.textWrappingMode = TextWrappingModes.NoWrap;
-            title.enableAutoSizing = true;
-            title.fontSizeMin = 12f;
-            title.fontSizeMax = 20f;
+            TMP_Text caption = Text3D(visual, "Type", new Vector2(0f, 0.01f), new Vector2(0.86f, 0.07f), 0.3f, 0.55f, FontStyles.Normal, TextAlignmentOptions.Center);
+            TMP_Text text = Text3D(visual, "Texte", new Vector2(0f, -0.34f), new Vector2(0.84f, 0.56f), 0.25f, 0.62f, FontStyles.Normal, TextAlignmentOptions.TopLeft);
+            TMP_Text id = Text3D(visual, "Identifiant", new Vector2(0.24f, -0.655f), new Vector2(0.4f, 0.05f), 0.2f, 0.4f, FontStyles.Normal, TextAlignmentOptions.Right);
 
-            // Torment tokens: a disc with the count, over the top right corner of the illustration. It is large, so
-            // that it stays readable when the card is shown small on a seat panel.
-            Image badge = UiBuilder.Fixed<Image>(root.transform, "Tourments", Vector2.one, new Vector2(4f, 4f), new Vector2(96f, 96f));
-            badge.sprite = UiBuilder.Disc;
-            badge.color = new Color32(150, 40, 60, 255);
-            badge.raycastTarget = false;
-            TMP_Text torments = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(badge.transform, "Nombre", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), 56f, FontStyles.Bold, TextAlignmentOptions.Center);
-            badge.gameObject.SetActive(false);
+            // Torment tokens: a disc with the count, over the top right corner, large enough to read on a small card.
+            var badge = new GameObject("Tourments");
+            badge.transform.SetParent(visual, false);
+            badge.transform.localPosition = new Vector3(0.42f, 0.62f, -0.02f);
+            Primitive(PrimitiveType.Cylinder, badge.transform, "Disque", Vector3.zero, new Vector3(90f, 0f, 0f), new Vector3(0.3f, 0.004f, 0.3f), badgeColour);
+            TMP_Text torments = Text3D(badge.transform, "Nombre", Vector2.zero, new Vector2(0.3f, 0.26f), 0.5f, 1.6f, FontStyles.Bold, TextAlignmentOptions.Center);
+            torments.transform.localPosition = new Vector3(0f, 0f, -0.006f);
+            badge.SetActive(false);
 
-            // Only the frame receives pointer events; the parts inside are never hit-tested.
-            background.raycastTarget = false;
-            art.raycastTarget = false;
-            root.GetComponent<CardDisplay>().Assign(frame, background, art, title, caption, body, id, badge.gameObject, torments);
-
+            root.GetComponent<CardDisplay>().Assign(frame, background, art, title, caption, text, id, badge, torments, visual.gameObject, area, size);
             Directory.CreateDirectory(Path.GetDirectoryName(CardPrefabPath)!);
             PrefabUtility.SaveAsPrefabAsset(root, CardPrefabPath);
             Object.DestroyImmediate(root);
             Debug.Log("Created " + CardPrefabPath);
+        }
+
+        // Unlit materials: the card reads the same whatever the lighting of the scene. The designer can switch them to
+        // a lit shader (Universal Render Pipeline/Lit), which takes the same colour and texture properties.
+        private static Material EnsureMaterial(string path, Color color)
+        {
+            Material material = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (material != null)
+            {
+                return material;
+            }
+
+            material = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+            material.SetColor("_BaseColor", color);
+            ProjectAssets.Create(material, path);
+            return material;
+        }
+
+        private static Renderer Primitive(PrimitiveType type, Transform parent, string name, Vector3 position, Vector3 rotation, Vector3 scale, Material material)
+        {
+            GameObject part = GameObject.CreatePrimitive(type);
+            part.name = name;
+            Object.DestroyImmediate(part.GetComponent<Collider>());
+            part.transform.SetParent(parent, false);
+            part.transform.localPosition = position;
+            part.transform.localEulerAngles = rotation;
+            part.transform.localScale = scale;
+            var renderer = part.GetComponent<Renderer>();
+            renderer.sharedMaterial = material;
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            return renderer;
+        }
+
+        // A world-space TextMeshPro label, sized by its rectangle; auto-sizing keeps long texts inside it.
+        private static TMP_Text Text3D(Transform parent, string name, Vector2 position, Vector2 size, float minSize, float maxSize, FontStyles style, TextAlignmentOptions alignment)
+        {
+            var holder = new GameObject(name);
+            holder.transform.SetParent(parent, false);
+            TextMeshPro label = holder.AddComponent<TextMeshPro>();
+            var shape = (RectTransform)holder.transform;
+            shape.sizeDelta = size;
+            shape.localPosition = new Vector3(position.x, position.y, -0.013f);
+            label.enableAutoSizing = true;
+            label.fontSizeMin = minSize;
+            label.fontSizeMax = maxSize;
+            label.fontStyle = style;
+            label.alignment = alignment;
+            return label;
         }
     }
 }

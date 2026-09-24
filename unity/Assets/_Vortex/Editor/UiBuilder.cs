@@ -17,6 +17,20 @@ namespace Vortex.Editor
         /// <summary>Disc of the built-in interface resources.</summary>
         public static Sprite Disc => AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
 
+        /// <summary>A root canvas scaled from the 1920 x 1080 reference, with its raycaster.</summary>
+        public static Canvas Canvas(string name, RenderMode mode, Camera? camera, int order)
+        {
+            var canvas = new GameObject(name, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster)).GetComponent<Canvas>();
+            canvas.renderMode = mode;
+            canvas.worldCamera = camera;
+            canvas.sortingOrder = order;
+            var scaler = canvas.GetComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920f, 1080f);
+            scaler.matchWidthOrHeight = 0.5f;
+            return canvas;
+        }
+
         /// <summary>Creates a child with a component, placed by anchors and offsets.</summary>
         public static T Part<T>(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax)
             where T : Component

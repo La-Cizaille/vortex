@@ -64,17 +64,29 @@ namespace Vortex.Editor
             return path;
         }
 
-        // The camera draws into an image of the reference size; the overlay interface is drawn by that camera too,
-        // since an overlay canvas never reaches a render texture.
+        // The camera draws into an image of the reference size. An overlay canvas never reaches a render texture, so it
+        // is drawn by the camera too, at 1 unit: in front of the 3D cards and the zoom, as on screen.
         private static (Camera Camera, RenderTexture Target) Prepare()
         {
             Camera camera = Object.FindAnyObjectByType<Camera>();
             var target = new RenderTexture(Width, Height, 24);
             camera.targetTexture = target;
-            Canvas canvas = Object.FindAnyObjectByType<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceCamera;
-            canvas.worldCamera = camera;
-            canvas.planeDistance = 1f;
+            foreach (Canvas canvas in Object.FindObjectsByType<Canvas>())
+            {
+                if (!canvas.isRootCanvas)
+                {
+                    continue;
+                }
+
+                if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
+                {
+                    canvas.renderMode = RenderMode.ScreenSpaceCamera;
+                    canvas.planeDistance = 1f;
+                }
+
+                canvas.worldCamera = camera;
+            }
+
             return (camera, target);
         }
 
@@ -97,6 +109,11 @@ namespace Vortex.Editor
                 foreach (ScreenAnchor anchor in Object.FindObjectsByType<ScreenAnchor>())
                 {
                     anchor.Place();
+                }
+
+                foreach (CardAnchor card in Object.FindObjectsByType<CardAnchor>())
+                {
+                    card.Place();
                 }
 
                 camera.Render();

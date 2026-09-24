@@ -7,12 +7,13 @@ namespace Vortex.Client.Presentation
     /// <summary>
     /// Shows a dice roll: the dice of an attack (<see cref="GameEventType.DiceRolled"/>: every die, then the total kept)
     /// or a single die rolled for an effect (<see cref="GameEventType.DieRolled"/>). The tray runs at the playback speed.
+    /// It is an interface element: its anchor must be a place of the interface, by default the foreground layer.
     /// </summary>
     [CreateAssetMenu(menuName = "Vortex/Retours visuels/Dés", fileName = "DiceFeedback")]
     public sealed class DiceFeedback : FeedbackAsset
     {
         [SerializeField] private DiceTray? tray;
-        [SerializeField] private FeedbackAnchor anchor = FeedbackAnchor.Market;
+        [SerializeField] private FeedbackAnchor anchor = FeedbackAnchor.Foreground;
         [Tooltip("Durée du lancer, en secondes à vitesse normale.")]
         [SerializeField, Min(0f)] private float rollSeconds = 0.6f;
         [Tooltip("Temps pendant lequel le résultat reste affiché, en secondes à vitesse normale.")]

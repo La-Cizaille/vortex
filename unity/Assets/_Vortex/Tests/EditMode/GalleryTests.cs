@@ -53,7 +53,7 @@ namespace Vortex.Tests.EditMode
             var view = prefab.GetComponent<CardDisplay>();
             Assert.That(view, Is.Not.Null);
             var serialized = new SerializedObject(view);
-            foreach (string field in new[] { "frame", "background", "art", "title", "caption", "body", "id" })
+            foreach (string field in new[] { "frame", "background", "art", "title", "caption", "body", "id", "tormentBadge", "tormentCount", "visual", "pointerArea" })
             {
                 Assert.That(serialized.FindProperty(field).objectReferenceValue, Is.Not.Null, field);
             }

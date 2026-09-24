@@ -42,6 +42,10 @@ namespace Vortex.Client.Presentation
         [SerializeField] private Transform shipRow = null!;
         [SerializeField] private Transform tableCentre = null!;
         [SerializeField] private Camera view = null!;
+        [SerializeField] private Transform cardRoot = null!;
+        [SerializeField] private RectTransform foreground = null!;
+        [Tooltip("Distance des cartes à la caméra : plus près que le plan de l'interface, pour passer devant ses panneaux.")]
+        [SerializeField, Min(0.5f)] private float cardDepth = 6f;
 
         [Header("Disposition (positions à l'écran : 0,0 en bas à gauche, 1,1 en haut à droite)")]
         [Tooltip("Position à l'écran du vaisseau du joueur.")]
@@ -114,7 +118,7 @@ namespace Vortex.Client.Presentation
         {
             Clear();
             GameData data = content.LoadData();
-            _context = new TableContext(theme, cardArt, texts, data, cardPrefab, zoom);
+            _context = new TableContext(theme, cardArt, texts, data, cardPrefab, cardRoot, view, cardDepth, zoom);
             zoom.Bind(_context);
             _log = new GameLogFormatter(texts, data);
             _labels = new CommandLabels(_context);
@@ -209,6 +213,7 @@ namespace Vortex.Client.Presentation
             FeedbackAnchor.Other => Ship(gameEvent.Other),
             FeedbackAnchor.Market => market.transform,
             FeedbackAnchor.Banner => banner.transform,
+            FeedbackAnchor.Foreground => foreground,
             _ => tableCentre,
         };
 
@@ -438,8 +443,13 @@ namespace Vortex.Client.Presentation
             cardPrefab = card;
         }
 
-        /// <summary>Wires the card zoom (editor setup).</summary>
-        public void AssignZoom(CardZoom cardZoom) => zoom = cardZoom;
+        /// <summary>Wires the 3D cards: their parent, the zoom and the foreground layer (editor setup).</summary>
+        public void AssignCards(Transform cards, CardZoom cardZoom, RectTransform foregroundLayer)
+        {
+            cardRoot = cards;
+            zoom = cardZoom;
+            foreground = foregroundLayer;
+        }
 
         /// <summary>Wires the command panel of the test mode (editor setup).</summary>
         public void AssignTestMode(CommandPanel panel) => commands = panel;

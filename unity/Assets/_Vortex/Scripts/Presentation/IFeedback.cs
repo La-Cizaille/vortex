@@ -40,5 +40,8 @@ namespace Vortex.Client.Presentation
 
         /// <summary>The banner showing the round and the active event.</summary>
         Banner = 4,
+
+        /// <summary>The middle of the foreground layer, drawn above the table and its cards (dice, messages).</summary>
+        Foreground = 5,
     }
 }
