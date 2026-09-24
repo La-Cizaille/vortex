@@ -7,6 +7,7 @@ using UnityEngine;
 using Vortex.Client.Content;
 using Vortex.Client.Theme;
 using Vortex.Core.Content;
+using Vortex.Core.Events;
 using Vortex.Editor;
 
 namespace Vortex.Tests.EditMode
@@ -41,6 +42,14 @@ namespace Vortex.Tests.EditMode
         {
             string text = CardText.ToRichText("<ATQ>**attaques** et <TOR>tourment", icon => icon == "ATQ");
             Assert.That(text, Is.EqualTo("<sprite name=\"ATQ\"><b>attaques</b> et tourment"));
+        }
+
+        [Test]
+        public void Names_are_shown_without_markup()
+        {
+            Assert.That(CardText.ToPlainText("**surcharge** Ionique"), Is.EqualTo("surcharge Ionique"));
+            Assert.That(CardText.ToPlainText("<ATQ> Tapis !"), Is.EqualTo("Tapis !"));
+            Assert.That(CardText.ToPlainText("a < b"), Is.EqualTo("a < b"), "A plain '<' stays: the label does not read markup.");
         }
 
         [Test]
@@ -89,8 +98,15 @@ namespace Vortex.Tests.EditMode
                 .Where(f => f.IsLiteral)
                 .Select(f => (string)f.GetRawConstantValue())
                 .ToList();
-            Assert.That(TextKeys.Defaults.Select(d => d.Key), Is.EquivalentTo(constants), "Every key has a default text.");
-            foreach (string key in constants)
+            List<string> keys = TextKeys.Defaults.Select(d => d.Key).ToList();
+            Assert.That(keys, Is.Unique);
+            Assert.That(constants.Except(keys), Is.Empty, "Every key has a default text.");
+            foreach (GameEventType type in System.Enum.GetValues(typeof(GameEventType)))
+            {
+                Assert.That(keys, Does.Contain(TextKeys.Log(type)), "Every event type has a log line, possibly empty.");
+            }
+
+            foreach (string key in keys)
             {
                 Assert.That(table.Contains(key), key);
             }

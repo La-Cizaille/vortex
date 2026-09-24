@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Vortex.Core.Bots;
 using Vortex.Core.Commands;
+using Vortex.Core.Config;
 using Vortex.Core.Decisions;
 using Vortex.Core.Events;
 using Vortex.Core.Projection;
@@ -54,6 +55,9 @@ namespace Vortex.Client.Session
 
         /// <inheritdoc/>
         public GameView View => _view;
+
+        /// <inheritdoc/>
+        public GameConfig Rules => _engine.Config;
 
         /// <inheritdoc/>
         public int Actor => _state.Outcome != null ? -1 : (_state.Pending?.Decision.Player ?? _state.CurrentPlayer);

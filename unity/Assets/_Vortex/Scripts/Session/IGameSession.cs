@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Vortex.Core.Bots;
 using Vortex.Core.Commands;
+using Vortex.Core.Config;
 using Vortex.Core.Decisions;
 using Vortex.Core.Events;
 using Vortex.Core.Projection;
@@ -18,6 +19,9 @@ namespace Vortex.Client.Session
     {
         /// <summary>Public view of the game, refreshed after each accepted command.</summary>
         GameView View { get; }
+
+        /// <summary>Rules of this game (public): HP, doom round, technologies to win, rule options.</summary>
+        GameConfig Rules { get; }
 
         /// <summary>Seat expected to act: the pending decision's player, else the current player; -1 once the game is over.</summary>
         int Actor { get; }
