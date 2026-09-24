@@ -215,6 +215,28 @@ namespace Vortex.Core.Rules
             return EngineResult.Ok(work, game.Events.Skip(delivered).ToList(), null);
         }
 
+        /// <summary>
+        /// Protection of <paramref name="target"/>: its effective shield (RULES A6 step 7) against a plain attack,
+        /// averaged over its alive opponents. It includes every active effect (disabled shield, temporary bonus...)
+        /// and never changes <paramref name="state"/>. Returns the stored shield when no opponent is alive.
+        /// </summary>
+        public double AverageEffectiveShield(GameState state, int target)
+        {
+            if (state is null)
+            {
+                throw new ArgumentNullException(nameof(state));
+            }
+
+            if (target < 0 || target >= state.Players.Count)
+            {
+                throw new ArgumentOutOfRangeException(nameof(target));
+            }
+
+            var game = new Game(state.Clone(), Data, Config, _catalog, Array.Empty<string>());
+            List<int> attackers = state.Players.Where(p => p.Seat != target && !p.Eliminated).Select(p => p.Seat).ToList();
+            return attackers.Count == 0 ? state.Players[target].Shield : attackers.Average(a => game.PreviewEffectiveShield(target, a));
+        }
+
         // Every command shape that could be legal for the player; validation filters them.
         private static IEnumerable<Command> Candidates(Game game, int player)
         {

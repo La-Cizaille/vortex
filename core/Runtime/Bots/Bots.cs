@@ -82,7 +82,10 @@ namespace Vortex.Core.Bots
         /// <summary>Own hit point.</summary>
         public double Hp { get; set; } = 1.0;
 
-        /// <summary>Own shield point (roughly the damage it prevents per attack suffered).</summary>
+        /// <summary>
+        /// Own protection point: effective shield against the opponents' attacks, as the rules compute it
+        /// (roughly the damage it prevents per attack suffered; ADR-0012).
+        /// </summary>
         public double Shield { get; set; } = 1.0;
 
         /// <summary>Equipped durable or triggered modifier.</summary>
@@ -177,7 +180,7 @@ namespace Vortex.Core.Bots
                 double total = 0;
                 for (int i = 0; i < _samples; i++)
                 {
-                    total += Evaluate(Simulate(engine, state, seat, candidate), seat, engine.Data);
+                    total += Evaluate(Simulate(engine, state, seat, candidate), seat, engine);
                 }
 
                 // Tiny random tie break so equal options do not always resolve to the first one.
@@ -193,10 +196,36 @@ namespace Vortex.Core.Bots
         }
 
         /// <summary>
-        /// Position value for <paramref name="seat"/> (higher is better). With <paramref name="data"/>, single-use
-        /// modifiers are valued by their public usage (card metadata, never a specific card).
+        /// Position value for <paramref name="seat"/> as the bot plays it (ADR-0012): protection is the effective
+        /// shield computed by <paramref name="engine"/>, so temporary protections and disabled shields count, and
+        /// single-use modifiers are valued by their public usage.
+        /// </summary>
+        public double Evaluate(GameState state, int seat, GameEngine engine)
+        {
+            if (engine is null)
+            {
+                throw new ArgumentNullException(nameof(engine));
+            }
+
+            if (state is null)
+            {
+                throw new ArgumentNullException(nameof(state));
+            }
+
+            bool scored = state.Outcome != null || state.Players[seat].Eliminated;
+            return Evaluate(state, seat, engine.Data, scored ? (double?)null : engine.AverageEffectiveShield(state, seat));
+        }
+
+        /// <summary>
+        /// Position value for <paramref name="seat"/> (higher is better), with the stored shield value as protection.
+        /// With <paramref name="data"/>, single-use modifiers are valued by their public usage (card metadata, never a specific card).
         /// </summary>
         public double Evaluate(GameState state, int seat, Content.GameData? data = null)
+        {
+            return Evaluate(state, seat, data, null);
+        }
+
+        private double Evaluate(GameState state, int seat, Content.GameData? data, double? protection)
         {
             if (state is null)
             {
@@ -217,7 +246,7 @@ namespace Vortex.Core.Bots
             List<PlayerState> opponents = state.Players.Where(p => p.Seat != seat).ToList();
             List<PlayerState> alive = opponents.Where(p => !p.Eliminated).ToList();
             double value = (_weights.Hp * me.Hp)
-                + (_weights.Shield * me.Shield)
+                + (_weights.Shield * (protection ?? me.Shield))
                 + me.Modifiers().Sum(c => IsSingleUse(data, c.CardId) ? _weights.SingleUseModifier : _weights.Modifier)
                 + (_weights.Torment * me.Modifiers().Sum(c => c.Torments))
                 + (_weights.Overcharge * me.Overcharge)

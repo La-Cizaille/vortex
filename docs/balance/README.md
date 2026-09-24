@@ -18,15 +18,15 @@ Les bots ne jouent pas comme des humains (ADR-0010). Un écart mesuré est un **
 
 Validés par le game designer (ARB-40), puis recentrés sur le **mode standard à 5 joueurs**, seule table équilibrée (ARB-52, ARB-53). De 2 à 4 joueurs, le jeu reste jouable, sans objectif d'équilibrage.
 
-| Critère (5 joueurs) | Cible | Référence initiale | Aujourd'hui ([référence v3](2026-09-24-reference-v3.md)) |
+| Critère (5 joueurs) | Cible | Référence initiale | Aujourd'hui ([référence v4](2026-09-24-reference-v4.md), bot ADR-0012) |
 |---|---|---|---|
-| Avantage de position | Chaque position à ±3 pts de la part équitable | Premier joueur à +10 pts | **Atteint** : 2,5 pts |
+| Avantage de position | Chaque position à ±3 pts de la part équitable | Premier joueur à +10 pts | **Atteint** : 2,6 pts |
 | Durée | 20 à 25 min (ARB-53) | Environ 22 min | **Atteint** : environ 23 min (estimation à 30 s par tour) |
 | Rôle de la Fin des temps | Filet de sécurité : atteinte dans moins de 30 % des parties | 90 % | **Atteint** : 20 % |
-| Élection galactique | 5 à 15 % des victoires | 0,2 % | **Atteint** : 6,4 % |
-| Puissance des cartes | Chaque carte à ±5 pts de la moyenne, aucune carte « morte » | Écarts de −7 à +12 pts | Non atteint : de −5,2 à +9,2 pts ; 9 cartes à +5 pts ou plus, 2 à −5 pts ou moins |
+| Élection galactique | 5 à 15 % des victoires | 0,2 % | **Atteint** : 7,1 % |
+| Puissance des cartes | Chaque carte à ±5 pts de la moyenne, aucune carte « morte » | Écarts de −7 à +12 pts | Non atteint (voir la référence v3 et l'étape 3) |
 | Part des choix face au hasard | À définir avec les niveaux de bot (étape 1) | Mal mesurée | À définir |
-| Première élimination | Pas avant la manche 6 : un joueur ne devrait pas sortir avant d'avoir joué environ 6 tours (ARB-55) | Non mesurée | Non atteint : manche 4,6 |
+| Première élimination | Pas avant la manche 6 : un joueur ne devrait pas sortir avant d'avoir joué environ 6 tours (ARB-55) | Non mesurée | Non atteint : manche 4,7 |
 
 ## Plan et avancement
 
@@ -36,7 +36,7 @@ Validés par le game designer (ARB-40), puis recentrés sur le **mode standard �
 | **1** | Instruments de mesure : variantes et comparaison, niveaux de bot, nouvelles mesures, options de règles | Faite (ARB-41, ADR-0011) |
 | **2.1** | Avantage du premier joueur : premier joueur tournant, sens horaire ou anti-horaire (ARB-42) | **Adoptée** : rotation horaire (ARB-50) |
 | **2.2** | Grille PV × bouclier de départ × manche de Fin des temps, à 5 joueurs (ARB-43, ARB-52) | **Adoptée** : 30 PV, bouclier 5, Fin des temps à la manche 16 (ARB-54) |
-| **2.3** | Nouvelles mécaniques (ARB-44, ARB-45) : relance d'un dé par la surcharge, reparamétrage à 2 dés dont on garde 1, coût du recyclage, posture défensive, événement annoncé, prime sur le leader, pillage, fantômes, défausse tactique | En cours : lot A (posture, prime, fantômes) mesuré, décision attendue |
+| **2.3** | Nouvelles mécaniques (ARB-44, ARB-45) : relance d'un dé par la surcharge, reparamétrage à 2 dés dont on garde 1, coût du recyclage, posture défensive, événement annoncé, prime sur le leader, pillage, fantômes, défausse tactique | En cours : lot A mesuré ; prime en réserve (ARB-57), mesures directes écartées (ARB-56), posture et fantômes à décider |
 | **2.4** | Fréquence des événements (une par manche, toutes les 2 ou 3 manches) et effet de chaque événement (ARB-46) | À faire |
 | **2.5** | Élection galactique à 3 technologies au lieu de 4 (ARB-47) | **Adoptée** : 3 technologies (ARB-51). Fréquence de l'Élection à revoir avec 2.2 |
 | **3** | Revue des cartes : tri, ajustement par famille, cartes de hasard, équilibre des couleurs. Outil visuel à construire au début de l'étape (ARB-48) | À faire |
@@ -153,6 +153,18 @@ Une variante est un petit fichier JSON dans [`variants/`](variants/). Il ne cont
 3. Joindre le rapport de comparaison à la PR.
 
 ## Constats
+
+### Bot amélioré (ADR-0012) et posture défensive (2026-09-24)
+
+Rapports : [`2026-09-24-reference-v4.md`](2026-09-24-reference-v4.md) (nouvelle référence, 6 000 parties) et [`2026-09-24-mecaniques-lot-a-bot-v2.md`](2026-09-24-mecaniques-lot-a-bot-v2.md) (3 000 parties par variante). Aucune erreur du moteur.
+
+1. **Le bot note maintenant sa protection effective**, calculée par le moteur, et non plus la seule valeur de son bouclier (ADR-0012). **La référence ne bouge presque pas** : Fin des temps 20 %, Élection 7,1 %, première élimination manche 4,7, environ 23 minutes. Les réglages adoptés restent valables.
+2. **La posture défensive est enfin mesurée.** Elle représente un tiers des actions d'équipage des bots.
+   - C'est **la seule mécanique qui recule nettement la première élimination** : de la manche 4,7 à 5,4.
+   - Elle **ralentit le jeu** : 2 manches de plus (environ 26 minutes, au-dessus de la cible), Fin des temps atteinte dans 44 % des parties (cible : moins de 30 %), surcharges presque abandonnées (4 % des actions au lieu de 15 %).
+   - Elle porte l'Élection à 11,4 %, toujours dans la cible.
+   - Telle quelle, elle rend le jeu défensif. Si on la garde, il faudra l'affaiblir (+1 au lieu de +2) ou la limiter, puis revoir le rythme.
+3. **La prime sur le leader** donne les mêmes résultats qu'avec l'ancien bot : plus de retournements, pas d'effet sur la première élimination. Elle est gardée en réserve (ARB-57).
 
 ### Étape 2.3, lot A : posture défensive, prime sur le leader, fantômes (2026-09-24)
 

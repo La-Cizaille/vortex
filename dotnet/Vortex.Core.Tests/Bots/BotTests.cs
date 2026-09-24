@@ -109,6 +109,57 @@ namespace Vortex.Core.Tests.Bots
         }
 
         [Test]
+        public void Protection_is_the_effective_shield_the_rules_compute()
+        {
+            GameEngine engine = Engine.Value;
+            GameState state = engine.NewGame(3, new[] { "A", "B", "C" }).State;
+            int shield = state.Players[0].Shield;
+            string before = Support.Scenario.Json(state);
+            Assert.That(engine.AverageEffectiveShield(state, 0), Is.EqualTo(shield));
+
+            GameState braced = state.Clone();
+            braced.Players[0].Statuses.Add(new StatusState
+            {
+                Uid = braced.NextUid++,
+                Kind = Effects.Statuses.StatusKinds.DefensivePosture,
+                Owner = 0,
+                Expiry = StatusExpiry.StartOfTurn,
+                ExpiryPlayer = 0,
+                Vars = new SortedDictionary<string, int> { [Effects.Statuses.StatusKinds.VarAmount] = 2 },
+            });
+            Assert.That(engine.AverageEffectiveShield(braced, 0), Is.EqualTo(shield + 2));
+
+            GameState alone = state.Clone();
+            alone.Players[1].Eliminated = true;
+            alone.Players[2].Eliminated = true;
+            alone.Players[0].Shield = 7;
+            Assert.That(engine.AverageEffectiveShield(alone, 0), Is.EqualTo(7), "No opponent: the stored shield.");
+            Assert.That(Support.Scenario.Json(state), Is.EqualTo(before), "The state is never changed.");
+            Assert.That(() => engine.AverageEffectiveShield(state, 3), Throws.TypeOf<ArgumentOutOfRangeException>());
+        }
+
+        [Test]
+        public void The_bot_values_a_temporary_protection()
+        {
+            var bot = new HeuristicBot(1);
+            GameEngine engine = Engine.Value;
+            GameState state = engine.NewGame(3, new[] { "A", "B" }).State;
+            GameState braced = state.Clone();
+            braced.Players[0].Statuses.Add(new StatusState
+            {
+                Uid = braced.NextUid++,
+                Kind = Effects.Statuses.StatusKinds.DefensivePosture,
+                Owner = 0,
+                Expiry = StatusExpiry.StartOfTurn,
+                ExpiryPlayer = 0,
+                Vars = new SortedDictionary<string, int> { [Effects.Statuses.StatusKinds.VarAmount] = 2 },
+            });
+
+            Assert.That(bot.Evaluate(braced, 0, engine) - bot.Evaluate(state, 0, engine), Is.EqualTo(2.0).Within(1e-9), "Weight 1 per protection point (ADR-0012).");
+            Assert.That(bot.Evaluate(braced, 0), Is.EqualTo(bot.Evaluate(state, 0)), "Without the engine, only the stored shield counts.");
+        }
+
+        [Test]
         public void Bots_reject_empty_choices()
         {
             GameState state = Engine.Value.NewGame(3, new[] { "A", "B" }).State;
