@@ -32,3 +32,6 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 - Règles adoptées après les étapes 2.1 et 2.5 de l'équilibrage : le premier joueur de chaque manche tourne dans le sens horaire (ARB-50), et l'Élection galactique demande 3 technologies (ARB-51). `RULES.md` v0.4. **5 joueurs devient le mode standard**, seule table équilibrée (ARB-52), avec un objectif de durée de 20 à 25 minutes (ARB-53). Le simulateur joue à 5 joueurs par défaut. Nouvelle référence d'équilibrage.
 - `RULES.md` v0.3 : options ⚙ de rotation du premier joueur et de nombre de technologies, questions ouvertes réorganisées (règles et équilibrage) avec renvoi au journal des arbitrages.
 - Le rapport d'équilibrage identifie le contenu par l'empreinte des quatre fichiers de contenu, et non plus du seul `cards.json`. L'option `--samples` est remplacée par `--bot`.
+
+### Sécurité
+- Le chargeur de contenu refuse les **clés JSON répétées** dans un même objet (`"copies": 1, … "copies": 8`), même quand elles ne diffèrent que par la casse ou par un échappement `\uXXXX`. Il refuse aussi tout contenu après la valeur racine. Newtonsoft gardait la dernière valeur en silence : le relecteur lisait une valeur, le jeu en utilisait une autre. Cela couvre `cards.json`, `events.json`, `technologies.json` et `config.json`. Le convertisseur d'effets refuse aussi, de lui-même, un paramètre répété.

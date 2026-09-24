@@ -68,7 +68,8 @@ namespace Vortex.Core.Content
                 throw new JsonSerializationException("An effect must be an object with a 'brick' property.");
             }
 
-            JObject obj = JObject.Load(reader);
+            // ContentJson already rejects repeated keys; this keeps the converter safe from any other entry point.
+            JObject obj = JObject.Load(reader, new JsonLoadSettings { DuplicatePropertyNameHandling = DuplicatePropertyNameHandling.Error });
             if (!(obj[BrickProperty] is JValue brick) || brick.Type != JTokenType.String || string.IsNullOrEmpty((string?)brick))
             {
                 throw new JsonSerializationException("An effect needs a non-empty string 'brick' property.");
