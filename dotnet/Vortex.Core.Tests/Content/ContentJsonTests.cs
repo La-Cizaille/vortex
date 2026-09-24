@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using Vortex.Core.Config;
 using Vortex.Core.Content;
 
 namespace Vortex.Core.Tests.Content
@@ -19,6 +20,19 @@ namespace Vortex.Core.Tests.Content
         {
             Assert.That(json, Does.Contain(oldValue), "Test precondition: fragment not found in cards.json.");
             return json.Replace(oldValue, newValue, StringComparison.Ordinal);
+        }
+
+        private static string ReadDataFile(string fileName)
+        {
+            return System.IO.File.ReadAllText(System.IO.Path.Combine(TestPaths.DataDir, fileName));
+        }
+
+        /// <summary>Loads the three content files and the configuration, with <paramref name="fileName"/> replaced.</summary>
+        private static void LoadAllWith(string fileName, string json)
+        {
+            string Pick(string name) => name == fileName ? json : ReadDataFile(name);
+            GameData data = GameDataLoader.Load(Pick(CardsFile.FileName), Pick(EventsFile.FileName), Pick(TechnologiesFile.FileName));
+            GameDataLoader.LoadConfig(Pick(GameConfig.FileName), data);
         }
 
         [Test]
@@ -88,6 +102,59 @@ namespace Vortex.Core.Tests.Content
             string json = Replace(TestPaths.CardsJson, "\"name\": \"Canon à particules\"", "\"name\": \"Canon" + rlo + "\"");
             var ex = Assert.Throws<GameDataException>(() => LoadWithCards(json));
             Assert.That(ex!.Message, Does.Contain("U+202E"));
+        }
+
+        // A repeated key makes a reviewer read one value while Newtonsoft silently keeps the last one:
+        // same "misleading text" family as Trojan Source. Every file and every nesting level is covered.
+        [TestCase(CardsFile.FileName, "\"schemaVersion\": 4,", "\"schemaVersion\": 4, \"schemaVersion\": 4,", "schemaVersion")]
+        [TestCase(CardsFile.FileName, "\"id\": \"A_001\",", "\"id\": \"A_001\", \"copies\": 8,", "copies")]
+        [TestCase(CardsFile.FileName, "\"brick\": \"StealShieldBeforeAttack\",", "\"brick\": \"StealShieldBeforeAttack\", \"amount\": 8,", "amount")]
+        [TestCase(EventsFile.FileName, "\"id\": \"EVT_TROU_NOIR\",", "\"id\": \"EVT_TROU_NOIR\", \"copies\": 9,", "copies")]
+        [TestCase(TechnologiesFile.FileName, "\"id\": \"TECH_BLUE\",", "\"id\": \"TECH_BLUE\", \"name\": \"Chaos\",", "name")]
+        [TestCase(GameConfig.FileName, "\"startingHp\": 30,", "\"startingHp\": 30, \"startingHp\": 1,", "startingHp")]
+        [TestCase(GameConfig.FileName, "\"players\": 2,", "\"players\": 2, \"doomRound\": 99,", "doomRound")]
+        public void Repeated_keys_are_rejected(string fileName, string fragment, string replacement, string key)
+        {
+            string original = ReadDataFile(fileName);
+            Assert.That(original, Does.Contain(fragment), "Test precondition: fragment not found in " + fileName + ".");
+            string json = original.Replace(fragment, replacement, StringComparison.Ordinal);
+
+            var ex = Assert.Throws<GameDataException>(() => LoadAllWith(fileName, json));
+            Assert.That(ex!.Message, Does.StartWith(fileName + ": ").And.Contain("duplicate key '" + key + "'").And.Contain("line "));
+        }
+
+        [Test]
+        public void Keys_differing_only_by_case_are_rejected()
+        {
+            // Newtonsoft falls back to a case-insensitive member match: "Copies" would silently set "copies".
+            string json = Replace(TestPaths.CardsJson, "\"id\": \"A_001\",", "\"id\": \"A_001\", \"Copies\": 8,");
+            var ex = Assert.Throws<GameDataException>(() => LoadWithCards(json));
+            Assert.That(ex!.Message, Does.Contain("duplicate key 'copies'").And.Contain("as 'Copies'"));
+        }
+
+        [Test]
+        public void Keys_are_compared_after_unescaping()
+        {
+            // "cop\u0069es" does not read like "copies", but it is the same key once decoded.
+            string json = Replace(TestPaths.CardsJson, "\"id\": \"A_001\",", "\"id\": \"A_001\", \"cop\\u0069es\": 8,");
+            var ex = Assert.Throws<GameDataException>(() => LoadWithCards(json));
+            Assert.That(ex!.Message, Does.Contain("duplicate key 'copies'"));
+        }
+
+        [Test]
+        public void Content_after_the_root_value_is_rejected()
+        {
+            // A second document after the first one would be read by a reviewer but ignored by the game.
+            Assert.Throws<GameDataException>(() => LoadWithCards(TestPaths.CardsJson + "{ \"schemaVersion\": 4, \"cards\": [] }\n"));
+        }
+
+        [Test]
+        public void Effect_converter_rejects_repeated_parameters_on_its_own()
+        {
+            // Defence in depth: holds for any future entry point that embeds effects (saves, scenarios).
+            const string json = "{ \"brick\": \"GainOvercharge\", \"amount\": 1, \"amount\": 9 }";
+            var ex = Assert.Catch<Newtonsoft.Json.JsonException>(() => Newtonsoft.Json.JsonConvert.DeserializeObject<EffectSpec>(json));
+            Assert.That(ex!.Message, Does.Contain("'amount'"));
         }
 
         [Test]

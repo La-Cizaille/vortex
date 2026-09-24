@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -15,6 +16,7 @@ namespace Vortex.Core.Content
     /// <item><c>TypeNameHandling.None</c> and <c>MetadataPropertyHandling.Ignore</c>: no type is ever chosen by the input (no deserialization gadgets).</item>
     /// <item>Input length and nesting depth are bounded.</item>
     /// <item>Unknown members and integer-encoded enums are rejected instead of silently ignored.</item>
+    /// <item>Repeated keys (even differing only by case) and content after the root value are rejected, so what a reviewer reads is what the game uses.</item>
     /// </list>
     /// Output is canonical (stable property order, 2-space indent, LF, trailing newline) so files diff cleanly
     /// and CI can verify they are formatted.
@@ -47,8 +49,9 @@ namespace Vortex.Core.Content
             T? result;
             try
             {
+                RejectRepeatedKeys(json, fileName);
                 var serializer = JsonSerializer.Create(CreateSettings());
-                using var reader = new JsonTextReader(new StringReader(json)) { MaxDepth = MaxDepth };
+                using var reader = CreateReader(json);
                 result = serializer.Deserialize<T>(reader);
             }
             catch (JsonException ex)
@@ -86,6 +89,70 @@ namespace Vortex.Core.Content
 
             writer.Write('\n');
             return writer.ToString();
+        }
+
+        /// <summary>
+        /// Token-only pass that rejects a key repeated within one object, and anything after the root value.
+        /// Newtonsoft would silently keep the last value (and ignore trailing content): a reviewer would read one
+        /// value while the game uses another, the same "misleading text" risk as Trojan Source.
+        /// </summary>
+        /// <remarks>
+        /// Keys are compared once unescaped and ignoring case, because Newtonsoft falls back to a case-insensitive
+        /// member match (<c>"Copies"</c> would set <c>copies</c>). Being a separate pass over an identically
+        /// configured reader, it leaves the deserialization itself unchanged. One key set per nesting level is
+        /// reused, so memory is bounded by <see cref="MaxDepth"/> whatever the file size.
+        /// </remarks>
+        /// <exception cref="GameDataException">A key is repeated.</exception>
+        /// <exception cref="JsonReaderException">Malformed JSON, excessive nesting, or content after the root value.</exception>
+        private static void RejectRepeatedKeys(string json, string fileName)
+        {
+            // Per open object: key -> its first spelling and line, for an error message a designer can act on.
+            var keysByLevel = new List<Dictionary<string, (string Spelling, int Line)>>();
+            int level = 0;
+            using var reader = CreateReader(json);
+            while (reader.Read())
+            {
+                switch (reader.TokenType)
+                {
+                    case JsonToken.StartObject:
+                        if (level == keysByLevel.Count)
+                        {
+                            keysByLevel.Add(new Dictionary<string, (string, int)>(StringComparer.OrdinalIgnoreCase));
+                        }
+                        else
+                        {
+                            keysByLevel[level].Clear();
+                        }
+
+                        level++;
+                        break;
+                    case JsonToken.EndObject:
+                        level--;
+                        break;
+                    case JsonToken.PropertyName:
+                        string key = (string)reader.Value!;
+                        if (keysByLevel[level - 1].TryGetValue(key, out (string Spelling, int Line) first))
+                        {
+                            string spelling = first.Spelling == key ? string.Empty : " as '" + first.Spelling + "', keys match ignoring case";
+                            throw new GameDataException(FormattableString.Invariant(
+                                $"{fileName}: duplicate key '{key}' in the same object (first at line {first.Line}{spelling}). Path '{reader.Path}', line {reader.LineNumber}, position {reader.LinePosition}."));
+                        }
+
+                        keysByLevel[level - 1].Add(key, (key, reader.LineNumber));
+                        break;
+                }
+            }
+        }
+
+        // Both passes read through identically configured readers, so they see exactly the same tokens.
+        private static JsonTextReader CreateReader(string json)
+        {
+            return new JsonTextReader(new StringReader(json))
+            {
+                MaxDepth = MaxDepth,
+                DateParseHandling = DateParseHandling.None,
+                FloatParseHandling = FloatParseHandling.Decimal,
+            };
         }
 
         // Settings are built per call: no shared mutable static state (CLAUDE.md hard rules).
