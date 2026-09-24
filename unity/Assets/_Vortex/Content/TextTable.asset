@@ -35,3 +35,157 @@ MonoBehaviour:
     Text: "\xC9v\xE9nements"
   - Key: gallery.technologies
     Text: Technologies
+  - Key: banner.round
+    Text: Manche {0}
+  - Key: banner.no-event
+    Text: "Pas d'\xE9v\xE9nement"
+  - Key: banner.doom-in
+    Text: Fin des temps dans {0} manches
+  - Key: banner.doom-passed
+    Text: "Fin des temps pass\xE9e"
+  - Key: banner.winner
+    Text: 'Victoire de {0} : {1}'
+  - Key: banner.draw
+    Text: "\xC9galit\xE9"
+  - Key: seat.default-name
+    Text: Joueur {0}
+  - Key: seat.hp
+    Text: PV {0}
+  - Key: seat.shield
+    Text: Bouclier {0}
+  - Key: seat.eliminated
+    Text: "\xC9limin\xE9"
+  - Key: seat.leader
+    Text: Leader
+  - Key: market.deck
+    Text: 'Pioche : {0}'
+  - Key: log.button
+    Text: Journal
+  - Key: log.nobody
+    Text: "\u2014"
+  - Key: playback.speed
+    Text: "Vitesse \xD7{0}"
+  - Key: playback.skip
+    Text: Passer
+  - Key: log.GameStarted
+    Text: "Nouvelle partie \xE0 {2} joueurs."
+  - Key: log.InitiativeRolled
+    Text: '{0} lance l''initiative : {3}.'
+  - Key: log.InitiativeWon
+    Text: '{0} gagne l''initiative.'
+  - Key: log.RoundStarted
+    Text: Manche {3}.
+  - Key: log.EventRevealed
+    Text: "\xC9v\xE9nement : {4}."
+  - Key: log.TurnStarted
+    Text: Tour de {0}.
+  - Key: log.MarketEnded
+    Text: 
+  - Key: log.MarketCardTaken
+    Text: '{0} prend {4}.'
+  - Key: log.MarketRecycled
+    Text: "Le march\xE9 {4} est recycl\xE9."
+  - Key: log.MarketCardRevealed
+    Text: 
+  - Key: log.CardEquipped
+    Text: 
+  - Key: log.CardDiscarded
+    Text: "{4} ({0}) est d\xE9fauss\xE9e."
+  - Key: log.CardStolen
+    Text: "{0} prend {4} \xE0 {1}."
+  - Key: log.CardActivated
+    Text: '{0} utilise {4}.'
+  - Key: log.TechnologyActivated
+    Text: '{0} active la technologie {4}.'
+  - Key: log.AttackDeclared
+    Text: '{0} attaque {1}.'
+  - Key: log.AttackRedirected
+    Text: "L'attaque est d\xE9vi\xE9e vers {0}."
+  - Key: log.DiceRolled
+    Text: "D\xE9s de {0} : {5} (total gard\xE9 {2})."
+  - Key: log.CriticalHit
+    Text: Coup critique sur {1}.
+  - Key: log.AttackResolved
+    Text: "Attaque de {3} contre {1} : {2} d\xE9g\xE2ts."
+  - Key: log.HpLost
+    Text: '{0} perd {2} PV.'
+  - Key: log.HpGained
+    Text: '{0} gagne {2} PV.'
+  - Key: log.ShieldChanged
+    Text: 'Bouclier de {0} : {3}.'
+  - Key: log.ShieldChangeRefused
+    Text: "Le bouclier de {0} ne peut pas \xEAtre modifi\xE9."
+  - Key: log.OverchargeChanged
+    Text: 'Surcharge de {0} : {3}.'
+  - Key: log.TormentPlaced
+    Text: "Jeton de Tourment pos\xE9 (carte de {0})."
+  - Key: log.TormentsRemoved
+    Text: "{2} jetons de Tourment retir\xE9s (cartes de {0})."
+  - Key: log.StatusAdded
+    Text: 'Effet sur {0} : {4}.'
+  - Key: log.StatusEnded
+    Text: 
+  - Key: log.PlayerEliminated
+    Text: "{0} est \xE9limin\xE9."
+  - Key: log.CrewActionPerformed
+    Text: 
+  - Key: log.TurnEnded
+    Text: 
+  - Key: log.GameOver
+    Text: 'Fin de partie : {4} ({0}).'
+  - Key: log.DieRolled
+    Text: "{0} lance un d\xE9 : {3}."
+  - Key: log.EffectTriggered
+    Text: 
+  - Key: log.LeaderBountyApplied
+    Text: 'Prime sur le leader : +{2} contre {1}.'
+  - Key: log.EventSetAside
+    Text: "{0} \xE9carte l'\xE9v\xE9nement {4}."
+  - Key: crew.Attack
+    Text: Attaque
+  - Key: crew.RerollShield
+    Text: "Reparam\xE9trage"
+  - Key: crew.Sabotage
+    Text: Sabotage
+  - Key: crew.Overcharge
+    Text: Surcharge
+  - Key: crew.DefensivePosture
+    Text: "Posture d\xE9fensive"
+  - Key: win.Domination
+    Text: Domination
+  - Key: win.GalacticElection
+    Text: "\xC9lection galactique"
+  - Key: win.Draw
+    Text: "\xC9galit\xE9"
+  - Key: status.ShieldDisabled
+    Text: "Bouclier d\xE9sactiv\xE9"
+  - Key: status.NextAttackBonus
+    Text: "Bonus \xE0 la prochaine attaque"
+  - Key: status.NextAttackBonusPerNeutral
+    Text: Bonus par carte neutre
+  - Key: status.NextAttackDamageMultiplier
+    Text: "D\xE9g\xE2ts multipli\xE9s"
+  - Key: status.NextAttackOvercharged
+    Text: "Prochaine attaque surcharg\xE9e"
+  - Key: status.NextAttackAllIn
+    Text: Tapis
+  - Key: status.SwapOnNextAttack
+    Text: "\xC9change \xE0 la prochaine attaque"
+  - Key: status.KeepOvercharge
+    Text: Garde sa surcharge
+  - Key: status.CannotTargetPlayer
+    Text: Cible interdite
+  - Key: status.RedirectAttacks
+    Text: "D\xE9vie les attaques"
+  - Key: status.ExtraCrewActions
+    Text: "Actions d'\xE9quipage en plus"
+  - Key: status.OverchargedAttackAdvantage
+    Text: Avantage en surcharge
+  - Key: status.TormentValueBonus
+    Text: "Tourment renforc\xE9"
+  - Key: status.ForcedCrewAction
+    Text: "Action impos\xE9e"
+  - Key: status.PreRolledDie
+    Text: "D\xE9 lanc\xE9 \xE0 l'avance"
+  - Key: status.DefensivePosture
+    Text: "Posture d\xE9fensive"

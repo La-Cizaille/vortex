@@ -77,6 +77,39 @@ namespace Vortex.Client.Theme
             return result.ToString();
         }
 
+        /// <summary>
+        /// The same text without its markup (bold markers and icon tags), for names shown as plain text: the title of
+        /// a card, the event in the banner, the log.
+        /// </summary>
+        public static string ToPlainText(string text)
+        {
+            if (text is null)
+            {
+                throw new ArgumentNullException(nameof(text));
+            }
+
+            var result = new StringBuilder(text.Length);
+            int i = 0;
+            while (i < text.Length)
+            {
+                if (text[i] == '*' && i + 1 < text.Length && text[i + 1] == '*')
+                {
+                    i += 2;
+                }
+                else if (text[i] == '<' && IconTagLength(text, i) is int length && length > 0)
+                {
+                    i += length;
+                }
+                else
+                {
+                    result.Append(text[i]);
+                    i++;
+                }
+            }
+
+            return result.ToString().Trim();
+        }
+
         // Length of an icon tag starting at `start` ('<', 2 to 5 capital letters, '>'), or 0 if there is none.
         private static int IconTagLength(string text, int start)
         {

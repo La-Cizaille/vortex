@@ -1,6 +1,6 @@
 # Interface du prototype (M4)
 
-Ce document décrit ce que le joueur voit et comment il agit, dans une partie et hors partie. Il fixe les décisions du game designer (ARB-59 à ARB-66 dans [`ARBITRAGES.md`](ARBITRAGES.md)) ; la manière de le construire est dans [ADR-0014](adr/0014-presentation-par-evenements.md) et [ADR-0015](adr/0015-scene-de-jeu.md).
+Ce document décrit ce que le joueur voit et comment il agit, dans une partie et hors partie. Il fixe les décisions du game designer (ARB-59 à ARB-67 dans [`ARBITRAGES.md`](ARBITRAGES.md)) ; la manière de le construire est dans [ADR-0014](adr/0014-presentation-par-evenements.md) et [ADR-0015](adr/0015-scene-de-jeu.md).
 
 Il décrit une **disposition et des comportements**, pas un style : couleurs, formes, polices et animations restent libres et se règlent dans Unity, sans code (voir [`CONTRIBUTING.md`](CONTRIBUTING.md#ajouter-ou-modifier-un-visuel-à-partir-du-jalon-m4)).
 
@@ -64,7 +64,7 @@ Disposition à 5 joueurs, vue du joueur dont c'est le tour :
 - **Devant moi**, en bas au centre. Le vaisseau est statique : pas d'interaction, seulement des animations et de la cosmétique, à voir plus tard.
 - **Mes deux modificateurs** sont de part et d'autre du vaisseau : ATK à gauche, DEF à droite, comme dans le marché. Ils portent leurs jetons de Tourment.
 - **Sous le vaisseau** : PV, bouclier, et **trois ronds** qui sont les technologies obtenues vers l'Élection galactique (il en faut 3 pour gagner). Chaque rond s'allume à la couleur de la technologie obtenue.
-- **Surcharge** : un petit jeton près du vaisseau, allumé quand je l'ai.
+- **Surcharge** : un petit jeton près du vaisseau, allumé quand je l'ai. Le toucher l'**arme** : il brille, et la prochaine attaque ou le prochain reparamétrage le dépense. Le toucher de nouveau le désarme (ARB-67).
 - **Effets temporaires** : en icônes, avec leur info-bulle.
 - **Bouton de combo** : à côté de mes cartes, puisqu'il les réunit. Il est allumé, à la couleur de la technologie, quand mes deux modificateurs ont la même couleur non neutre et que le combo est jouable. Au survol, il montre l'effet de la technologie.
 
@@ -83,7 +83,7 @@ Disposition à 5 joueurs, vue du joueur dont c'est le tour :
 - **Actions avec une cible** (Attaque, Sabotage) : glisser l'icône vers un adversaire.
 - **Actions sans cible** (Reparamétrage, Surcharge, Posture défensive) : un simple toucher.
 - **Aperçu pendant le glisser**, calculé par le moteur :
-  - Attaque : les dés lancés (par exemple « 2d8, avantage »), le détail des bonus et malus, le bouclier effectif de la cible et la fourchette de dégâts. Un bonus qui dépend du jet (par exemple « +3 si la somme est paire ») est affiché comme conditionnel.
+  - Attaque : les dés lancés (par exemple « 2d8, avantage »), le détail des bonus et malus, le bouclier effectif de la cible et la fourchette de dégâts. Un bonus qui dépend du jet (par exemple « +3 si la somme est paire ») est affiché comme conditionnel. Si le jeton de surcharge est armé, l'aperçu montre l'attaque surchargée.
   - Sabotage : le bouclier actuel de la cible.
 - **Cibles interdites** (protégées par une carte, ou imposées par une autre) : grisées pendant le glisser, avec la raison au survol.
 - **Deux actions dans le tour** (technologie Casino Cosmique) : l'action déjà faite s'éteint, les autres restent disponibles.
@@ -145,9 +145,10 @@ Chaque geste envoie une commande du moteur à la session. Le moteur la valide : 
 | Bouton « Passer le marché » | `EndMarket` |
 | Glisser une carte vers le centre | `ActivateCard(carte)` |
 | Bouton de combo | `ActivateTechnology` |
-| Glisser l'Attaque vers un adversaire | `Attack(cible, surcharge)` |
+| Toucher le jeton de surcharge | Rien : il s'arme ou se désarme, et sera dépensé par la prochaine attaque ou le prochain reparamétrage |
+| Glisser l'Attaque vers un adversaire | `Attack(cible, surcharge armée)` |
 | Glisser le Sabotage vers un adversaire | `Sabotage(cible)` |
-| Toucher Reparamétrage | `RerollShield(surcharge)` |
+| Toucher Reparamétrage | `RerollShield(surcharge armée)` |
 | Toucher Surcharge | `Overcharge` |
 | Toucher Posture défensive (option) | `DefensivePosture` |
 | Choisir dans une décision | `AnswerDecision(décision, choix)` |
@@ -155,4 +156,12 @@ Chaque geste envoie une commande du moteur à la session. Le moteur la valide : 
 
 ## 7. Questions ouvertes
 
-- **Dépenser ou garder la surcharge.** Quand j'ai un jeton de surcharge, une attaque ou un reparamétrage peut le dépenser (un dé de plus) ou le garder. Proposition : toucher le jeton pour l'« armer » ; armé, il brille et l'aperçu montre l'attaque surchargée. La prochaine attaque ou le prochain reparamétrage le dépense.
+Aucune pour l'instant. La dépense de la surcharge a été tranchée par ARB-67.
+
+## 8. Ce qui est construit
+
+| Étape | Ce qui marche |
+|---|---|
+| M4.3 | Cartes, visuels provisoires, galerie. |
+| M4.4 | La table (scène `Game`) : bandeau, adversaires en arc dans l'ordre du tour, marché noir, vaisseau et cartes du joueur, jetons de Tourment, technologies, surcharge, effets temporaires, tour en cours, épave d'un joueur éliminé, marqueur du leader (option), journal, vitesse de lecture. Des bots jouent une partie entière qu'on regarde. |
+| M4.5 | À venir : les gestes (§3.3 à §3.7) pour jouer soi-même. |

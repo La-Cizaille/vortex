@@ -175,57 +175,43 @@ namespace Vortex.Editor
             }
 
             // A 250 x 350 card: frame, inner background, illustration on top, then name, kind, text and id.
-            var root = new GameObject("Card", typeof(RectTransform), typeof(Image), typeof(CardView));
+            var root = new GameObject("Card", typeof(RectTransform), typeof(Image), typeof(CardDisplay));
             ((RectTransform)root.transform).sizeDelta = new Vector2(250f, 350f);
             Image frame = root.GetComponent<Image>();
-            Image background = Part<Image>(root.transform, "Fond", Vector2.zero, Vector2.one, new Vector2(6f, 6f), new Vector2(-6f, -6f));
-            Image art = Part<Image>(background.transform, "Illustration", new Vector2(0f, 1f), Vector2.one, new Vector2(8f, -128f), new Vector2(-8f, -8f));
-            TMP_Text title = Label(background.transform, "Nom", new Vector2(0f, 1f), Vector2.one, new Vector2(8f, -162f), new Vector2(-8f, -132f), 20f, FontStyles.Bold, TextAlignmentOptions.Center);
-            TMP_Text caption = Label(background.transform, "Type", new Vector2(0f, 1f), Vector2.one, new Vector2(8f, -182f), new Vector2(-8f, -162f), 13f, FontStyles.Normal, TextAlignmentOptions.Center);
-            TMP_Text body = Label(background.transform, "Texte", Vector2.zero, Vector2.one, new Vector2(10f, 24f), new Vector2(-10f, -186f), 15f, FontStyles.Normal, TextAlignmentOptions.TopLeft);
+            Image background = UiBuilder.Part<Image>(root.transform, "Fond", Vector2.zero, Vector2.one, new Vector2(6f, 6f), new Vector2(-6f, -6f));
+            Image art = UiBuilder.Part<Image>(background.transform, "Illustration", new Vector2(0f, 1f), Vector2.one, new Vector2(8f, -128f), new Vector2(-8f, -8f));
+            TMP_Text title = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(background.transform, "Nom", new Vector2(0f, 1f), Vector2.one, new Vector2(8f, -162f), new Vector2(-8f, -132f)), 20f, FontStyles.Bold, TextAlignmentOptions.Center);
+            TMP_Text caption = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(background.transform, "Type", new Vector2(0f, 1f), Vector2.one, new Vector2(8f, -182f), new Vector2(-8f, -162f)), 13f, FontStyles.Normal, TextAlignmentOptions.Center);
+            TMP_Text body = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(background.transform, "Texte", Vector2.zero, Vector2.one, new Vector2(10f, 24f), new Vector2(-10f, -186f)), 15f, FontStyles.Normal, TextAlignmentOptions.TopLeft);
             body.enableAutoSizing = true;
             body.fontSizeMin = 9f;
             body.fontSizeMax = 15f;
+            TMP_Text id = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(background.transform, "Identifiant", Vector2.zero, new Vector2(1f, 0f), new Vector2(8f, 4f), new Vector2(-8f, 22f)), 11f, FontStyles.Normal, TextAlignmentOptions.BottomRight);
 
             // A long name shrinks to stay on one line instead of running over the caption.
             title.textWrappingMode = TextWrappingModes.NoWrap;
             title.enableAutoSizing = true;
             title.fontSizeMin = 12f;
             title.fontSizeMax = 20f;
-            TMP_Text id = Label(background.transform, "Identifiant", Vector2.zero, new Vector2(1f, 0f), new Vector2(8f, 4f), new Vector2(-8f, 22f), 11f, FontStyles.Normal, TextAlignmentOptions.BottomRight);
+
+            // Torment tokens: a disc with the count, over the top right corner of the illustration. It is large, so
+            // that it stays readable when the card is shown small on a seat panel.
+            Image badge = UiBuilder.Fixed<Image>(root.transform, "Tourments", Vector2.one, new Vector2(4f, 4f), new Vector2(96f, 96f));
+            badge.sprite = UiBuilder.Disc;
+            badge.color = new Color32(150, 40, 60, 255);
+            badge.raycastTarget = false;
+            TMP_Text torments = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(badge.transform, "Nombre", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), 56f, FontStyles.Bold, TextAlignmentOptions.Center);
+            badge.gameObject.SetActive(false);
 
             // Only the frame receives pointer events; the parts inside are never hit-tested.
             background.raycastTarget = false;
             art.raycastTarget = false;
-            root.GetComponent<CardView>().Assign(frame, background, art, title, caption, body, id);
+            root.GetComponent<CardDisplay>().Assign(frame, background, art, title, caption, body, id, badge.gameObject, torments);
 
             Directory.CreateDirectory(Path.GetDirectoryName(CardPrefabPath)!);
             PrefabUtility.SaveAsPrefabAsset(root, CardPrefabPath);
             Object.DestroyImmediate(root);
             Debug.Log("Created " + CardPrefabPath);
-        }
-
-        private static T Part<T>(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax)
-            where T : Component
-        {
-            var part = new GameObject(name, typeof(RectTransform), typeof(T));
-            var rect = (RectTransform)part.transform;
-            rect.SetParent(parent, false);
-            rect.anchorMin = anchorMin;
-            rect.anchorMax = anchorMax;
-            rect.offsetMin = offsetMin;
-            rect.offsetMax = offsetMax;
-            return part.GetComponent<T>();
-        }
-
-        private static TMP_Text Label(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax, float size, FontStyles style, TextAlignmentOptions alignment)
-        {
-            TextMeshProUGUI label = Part<TextMeshProUGUI>(parent, name, anchorMin, anchorMax, offsetMin, offsetMax);
-            label.fontSize = size;
-            label.fontStyle = style;
-            label.alignment = alignment;
-            label.raycastTarget = false;
-            return label;
         }
     }
 }

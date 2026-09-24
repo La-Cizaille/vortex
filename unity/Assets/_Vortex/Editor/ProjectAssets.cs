@@ -32,6 +32,7 @@ namespace Vortex.Editor
             EnsureFeedbackProfile();
             ThemeAssets.EnsureAll();
             GalleryScene.Ensure();
+            GameScene.Ensure();
             AssetDatabase.SaveAssets();
         }
 

@@ -1,10 +1,8 @@
 using System.IO;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Vortex.Client.Content;
 using Vortex.Client.Gallery;
@@ -31,37 +29,7 @@ namespace Vortex.Editor
                 return;
             }
 
-            // Built next to the open scene, which stays untouched. An untitled scene (batch mode, or a new editor
-            // session) cannot have a scene added next to it: the new scene replaces it, once saved if the user wants.
-            Scene previous = SceneManager.GetActiveScene();
-            bool additive = !string.IsNullOrEmpty(previous.path);
-            if (!additive && previous.isDirty && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
-            {
-                Debug.Log("Gallery scene not created: the current scene was kept open.");
-                return;
-            }
-
-            Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, additive ? NewSceneMode.Additive : NewSceneMode.Single);
-            if (additive)
-            {
-                SceneManager.SetActiveScene(scene);
-            }
-
-            try
-            {
-                Build();
-                Directory.CreateDirectory(Path.GetDirectoryName(ScenePath)!);
-                EditorSceneManager.SaveScene(scene, ScenePath);
-                Debug.Log("Created " + ScenePath);
-            }
-            finally
-            {
-                if (additive)
-                {
-                    SceneManager.SetActiveScene(previous);
-                    EditorSceneManager.CloseScene(scene, true);
-                }
-            }
+            SceneFiles.Create(ScenePath, Build);
         }
 
         private static void Build()
@@ -125,7 +93,7 @@ namespace Vortex.Editor
                 AssetDatabase.LoadAssetAtPath<CardArtCatalog>(ThemeAssets.CardArtPath),
                 AssetDatabase.LoadAssetAtPath<ShipCatalog>(ThemeAssets.ShipsPath),
                 AssetDatabase.LoadAssetAtPath<TextTable>(ThemeAssets.TextsPath),
-                AssetDatabase.LoadAssetAtPath<GameObject>(ThemeAssets.CardPrefabPath).GetComponent<CardView>(),
+                AssetDatabase.LoadAssetAtPath<GameObject>(ThemeAssets.CardPrefabPath).GetComponent<CardDisplay>(),
                 sections,
                 shipRow,
                 camera);

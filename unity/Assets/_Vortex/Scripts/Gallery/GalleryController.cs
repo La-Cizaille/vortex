@@ -24,18 +24,18 @@ namespace Vortex.Client.Gallery
         [SerializeField] private CardArtCatalog cardArt = null!;
         [SerializeField] private ShipCatalog ships = null!;
         [SerializeField] private TextTable texts = null!;
-        [SerializeField] private CardView cardPrefab = null!;
+        [SerializeField] private CardDisplay cardPrefab = null!;
         [SerializeField] private RectTransform sections = null!;
         [SerializeField] private Transform shipRow = null!;
         [SerializeField] private Camera view = null!;
         [SerializeField, Range(2, 5)] private int seatCount = 5;
 
-        private readonly List<CardView> _cards = new List<CardView>();
+        private readonly List<CardDisplay> _cards = new List<CardDisplay>();
         private readonly List<TMP_Text> _headings = new List<TMP_Text>();
         private readonly List<GameObject> _ships = new List<GameObject>();
 
         /// <summary>The card views built by <see cref="Build"/>.</summary>
-        public IReadOnlyList<CardView> Cards => _cards;
+        public IReadOnlyList<CardDisplay> Cards => _cards;
 
         /// <summary>The ships built by <see cref="Build"/>.</summary>
         public IReadOnlyList<GameObject> Ships => _ships;
@@ -61,7 +61,7 @@ namespace Vortex.Client.Gallery
                 heading.color = theme.Text;
             }
 
-            foreach (CardView card in _cards)
+            foreach (CardDisplay card in _cards)
             {
                 card.Show(card.Face, theme, cardArt);
             }
@@ -120,7 +120,7 @@ namespace Vortex.Client.Gallery
             grid.spacing = new Vector2(24f, 24f);
             foreach (CardFace face in faces)
             {
-                CardView card = Instantiate(cardPrefab, grid.transform, false);
+                CardDisplay card = Instantiate(cardPrefab, grid.transform, false);
                 card.name = face.Id;
                 card.Show(face, theme, cardArt);
                 _cards.Add(card);
@@ -159,7 +159,7 @@ namespace Vortex.Client.Gallery
         }
 
         /// <summary>Wires the scene (editor setup).</summary>
-        public void Assign(GameContent gameContent, ThemeSettings themeSettings, CardArtCatalog artCatalog, ShipCatalog shipCatalog, TextTable textTable, CardView card, RectTransform sectionRoot, Transform shipRoot, Camera sceneCamera)
+        public void Assign(GameContent gameContent, ThemeSettings themeSettings, CardArtCatalog artCatalog, ShipCatalog shipCatalog, TextTable textTable, CardDisplay card, RectTransform sectionRoot, Transform shipRoot, Camera sceneCamera)
         {
             content = gameContent;
             theme = themeSettings;

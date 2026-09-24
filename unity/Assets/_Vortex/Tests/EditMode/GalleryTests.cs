@@ -28,7 +28,7 @@ namespace Vortex.Tests.EditMode
                 int expected = data.Modifiers.Count + data.Events.Count + data.Technologies.Count;
                 Assert.That(gallery.Cards, Has.Count.EqualTo(expected));
                 Assert.That(gallery.Ships, Has.Count.EqualTo(5));
-                foreach (CardView card in gallery.Cards)
+                foreach (CardDisplay card in gallery.Cards)
                 {
                     Assert.That(card.Face.Title, Is.Not.Empty, card.Face.Id);
                     Assert.That(card.Face.Caption, Does.Not.StartWith("#"), "Every caption text is in the table.");
@@ -50,7 +50,7 @@ namespace Vortex.Tests.EditMode
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(ThemeAssets.CardPrefabPath);
             Assert.That(prefab, Is.Not.Null);
-            var view = prefab.GetComponent<CardView>();
+            var view = prefab.GetComponent<CardDisplay>();
             Assert.That(view, Is.Not.Null);
             var serialized = new SerializedObject(view);
             foreach (string field in new[] { "frame", "background", "art", "title", "caption", "body", "id" })

@@ -1,5 +1,6 @@
 using System;
 using Vortex.Client.Content;
+using Vortex.Client.Theme;
 using Vortex.Core.Content;
 
 namespace Vortex.Client.Presentation
@@ -20,7 +21,7 @@ namespace Vortex.Client.Presentation
         /// <summary>Content id, which also names the illustration.</summary>
         public string Id { get; }
 
-        /// <summary>Card name.</summary>
+        /// <summary>Card name, without markup (plain text).</summary>
         public string Title { get; }
 
         /// <summary>Kind of card, e.g. "ATK · Usage unique".</summary>
@@ -47,7 +48,7 @@ namespace Vortex.Client.Presentation
                 CardUsage.Triggered => TextKeys.UsageTriggered,
                 _ => TextKeys.UsageDurable,
             });
-            return new CardFace(card.Id, card.Name, slot + " · " + usage, card.Text, card.Color);
+            return new CardFace(card.Id, CardText.ToPlainText(card.Name), slot + " · " + usage, card.Text, card.Color);
         }
 
         /// <summary>Face of an event.</summary>
@@ -58,7 +59,7 @@ namespace Vortex.Client.Presentation
                 throw new ArgumentNullException(nameof(gameEvent));
             }
 
-            return new CardFace(gameEvent.Id, gameEvent.Name, texts.Get(TextKeys.KindEvent), gameEvent.Text, TechColor.Neutral);
+            return new CardFace(gameEvent.Id, CardText.ToPlainText(gameEvent.Name), texts.Get(TextKeys.KindEvent), gameEvent.Text, TechColor.Neutral);
         }
 
         /// <summary>Face of a technology.</summary>
@@ -69,7 +70,7 @@ namespace Vortex.Client.Presentation
                 throw new ArgumentNullException(nameof(technology));
             }
 
-            return new CardFace(technology.Id, technology.Name, texts.Get(TextKeys.KindTechnology), technology.Text, technology.Color);
+            return new CardFace(technology.Id, CardText.ToPlainText(technology.Name), texts.Get(TextKeys.KindTechnology), technology.Text, technology.Color);
         }
     }
 }

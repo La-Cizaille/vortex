@@ -11,7 +11,7 @@ namespace Vortex.Client.Presentation
     /// component only fills it.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class CardView : MonoBehaviour
+    public sealed class CardDisplay : MonoBehaviour
     {
         [SerializeField] private Image frame = null!;
         [SerializeField] private Image background = null!;
@@ -20,6 +20,8 @@ namespace Vortex.Client.Presentation
         [SerializeField] private TMP_Text caption = null!;
         [SerializeField] private TMP_Text body = null!;
         [SerializeField] private TMP_Text id = null!;
+        [SerializeField] private GameObject? tormentBadge;
+        [SerializeField] private TMP_Text? tormentCount;
 
         /// <summary>The face shown.</summary>
         public CardFace Face { get; private set; }
@@ -54,8 +56,22 @@ namespace Vortex.Client.Presentation
             }
         }
 
+        /// <summary>Shows the Torment tokens on the card (RULES A7); the badge is hidden when there is none.</summary>
+        public void ShowTorments(int count)
+        {
+            if (tormentBadge != null)
+            {
+                tormentBadge.SetActive(count > 0);
+            }
+
+            if (tormentCount != null)
+            {
+                tormentCount.text = count.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            }
+        }
+
         /// <summary>Wires the prefab's parts (editor setup).</summary>
-        public void Assign(Image frameImage, Image backgroundImage, Image artImage, TMP_Text titleLabel, TMP_Text captionLabel, TMP_Text bodyLabel, TMP_Text idLabel)
+        public void Assign(Image frameImage, Image backgroundImage, Image artImage, TMP_Text titleLabel, TMP_Text captionLabel, TMP_Text bodyLabel, TMP_Text idLabel, GameObject? torments = null, TMP_Text? tormentLabel = null)
         {
             frame = frameImage;
             background = backgroundImage;
@@ -64,6 +80,8 @@ namespace Vortex.Client.Presentation
             caption = captionLabel;
             body = bodyLabel;
             id = idLabel;
+            tormentBadge = torments;
+            tormentCount = tormentLabel;
         }
 
         private static void Label(TMP_Text label, string text, TMP_FontAsset? font, Color color, bool richText)
