@@ -110,7 +110,7 @@ Outil de développement, jamais embarqué dans un build. Il joue des parties bot
 
 ## 5. Client Unity (`unity/`)
 
-Le projet utilise Unity 6 et URP (version : ADR-0013). Tout le code du jeu est dans `unity/Assets/_Vortex/`. Architecture de présentation : ADR-0014.
+Le projet utilise Unity 6 et URP (version : ADR-0013). Tout le code du jeu est dans `unity/Assets/_Vortex/`. Architecture de présentation : ADR-0014. Scène de jeu (3D à caméra fixe, interface 2D sans logique de règles) : ADR-0015. Ce que voit le joueur : [`INTERFACE.md`](INTERFACE.md).
 
 | Dossier | Assembly | Rôle |
 |---|---|---|
