@@ -21,6 +21,7 @@ Ce journal garde la trace **chronologique** de chaque décision de game design :
 - [2026-09-23 : règles de base](#2026-09-23--règles-de-base) (ARB-10 à ARB-28)
 - [2026-09-24 : arbitrages après les briques d'effets (M2)](#2026-09-24--arbitrages-après-les-briques-deffets-m2) (ARB-30 à ARB-36)
 - [2026-09-24 : passe d'équilibrage](#2026-09-24--passe-déquilibrage) (ARB-40 à ARB-49)
+- [2026-09-24 : décisions après les étapes 2.1 et 2.5](#2026-09-24--décisions-après-les-étapes-21-et-25) (ARB-50 à ARB-52)
 
 ---
 
@@ -90,3 +91,13 @@ Le plan complet et l'état d'avancement sont dans [`balance/README.md`](balance/
 | ARB-47 | Élection galactique (étape 2.5) ? | Tester **3 technologies au lieu de 4**. Le designer pense que cela équilibre mieux et rend cette victoire plus atteignable. | RULES A9 ⚙ `TechnologiesToWin` |
 | ARB-48 | Outil pour la revue des cartes (étape 3) ? | Le designer a besoin d'un **moyen visuel et simple de trier et d'éditer les cartes** pour faire des allers-retours. Proposition : **Vortex Studio**, une application web locale (tableau triable, fiche d'édition validée en direct, bouton « mesurer l'impact »). La décision sera prise au début de l'étape 3. | Étape 3 |
 | ARB-49 | Validation humaine (étape 4) ? | Un **prototype jouable dans Unity**, pas une version papier, une fois les étapes précédentes posées proprement. | Jalon M4 |
+
+## 2026-09-24 : décisions après les étapes 2.1 et 2.5
+
+Décisions prises sur le rapport [`balance/2026-09-24-ordre-et-election.md`](balance/2026-09-24-ordre-et-election.md) (32 000 parties) et son analyse dans [`balance/README.md`](balance/README.md).
+
+| # | Question | Décision | Appliqué dans |
+|---|---|---|---|
+| ARB-50 | Premier joueur de la manche : ordre fixe, rotation horaire ou anti-horaire (suite d'ARB-42) ? | **Rotation horaire.** Les deux sens ramènent l'avantage de position près de la cible (écart maximal de 1,4 à 3,7 pts, contre 9,8 à 21 pts avec l'ordre fixe). Le sens horaire évite le double tour du sens anti-horaire, qui avance la première élimination alors qu'elle est déjà trop précoce. | `config.json` (`roundStartRotation`), RULES A4.4, test `Rule_options_match_the_designer_rulings` |
+| ARB-51 | Élection galactique : 3 ou 4 technologies (suite d'ARB-47) ? | **3 technologies.** Les victoires par Élection passent de moins de 0,5 % à 2,4 à 5 %, sans autre effet mesurable. La cible de 5 à 15 % n'est pas encore atteinte : à revoir avec la grille de l'étape 2.2. | `config.json` (`technologiesToWin`), RULES A9, test `Rule_options_match_the_designer_rulings` |
+| ARB-52 | Pour quel nombre de joueurs optimiser en priorité ? | **4 joueurs**, sur proposition du game designer. Les réglages communs à toutes les tables (PV, règles, cartes) sont choisis sur les parties à 4. Les réglages par nombre de joueurs (`StartShield[n]`, `DoomRound[n]`) restent ajustés pour chaque taille. On vérifie que les autres tailles ne se dégradent pas. | [balance/README.md](balance/README.md#objectifs-étape-0) |

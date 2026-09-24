@@ -12,8 +12,8 @@
   "tormentValue": 1,
   "eventFrequency": 1,
   "doomEventId": "EVT_FIN_DES_TEMPS",
-  "roundStartRotation": "None",
-  "technologiesToWin": 4,
+  "roundStartRotation": "Clockwise",
+  "technologiesToWin": 3,
   "playerCounts": [
     {
       "players": 2,

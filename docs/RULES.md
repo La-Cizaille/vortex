@@ -1,6 +1,6 @@
 # Vortex : règles du jeu
 
-> **Statut** : v0.3. **Partie B (modèle d'effets) validée par le game designer le 2026-09-23.** Parties A et C : en attente de validation. Tous les arbitrages jusqu'au 2026-09-24 sont intégrés ; leur historique et leurs raisons sont dans le [journal des arbitrages](ARBITRAGES.md).
+> **Statut** : v0.4. **Partie B (modèle d'effets) validée par le game designer le 2026-09-23.** Parties A et C : en attente de validation. Tous les arbitrages jusqu'au 2026-09-24 sont intégrés ; leur historique et leurs raisons sont dans le [journal des arbitrages](ARBITRAGES.md).
 > **Rôle** : c'est la **référence du moteur de règles**. Le code renvoie aux sections d'ici (par ex. `RULES A6`).
 
 Le document a trois parties, qui dépendent uniquement vers le bas :
@@ -56,7 +56,8 @@ Les valeurs marquées ⚙ sont **configurables** (`config.json`) et sont calibr�
 1. Si `EventFrequency` ⚙ le prévoit (manches 1, 1+N, 1+2N…), on révèle un événement, dès la première manche. Il reste **actif** jusqu'au début de la manche suivante.
 2. À la manche `DoomRound[n]` ⚙, c'est le `DoomEvent` qui est révélé **à la place**.
 3. Un paquet vide se reconstitue en mélangeant sa défausse. Cette règle vaut pour **tous** les paquets.
-4. **Premier joueur de la manche** : le gagnant de l'initiative, déplacé d'un siège à chaque manche selon `RoundStartRotation` ⚙ (aucun déplacement, sens horaire ou sens anti-horaire). S'il est éliminé, la manche commence au joueur vivant suivant dans le sens horaire. Le tour de table reste toujours horaire. En sens anti-horaire, le dernier joueur d'une manche est aussi le premier de la suivante.
+4. **Premier joueur de la manche** : à la première manche, le gagnant de l'initiative. Ensuite, le premier joueur **avance d'un siège dans le sens horaire** à chaque manche. S'il est éliminé, la manche commence au joueur vivant suivant dans le sens horaire. Le tour de table reste toujours horaire.
+   - Réglage `RoundStartRotation` ⚙ : sens horaire (ARB-50). Pour l'équilibrage, on peut aussi choisir « aucun déplacement » ou « sens anti-horaire ». En sens anti-horaire, le dernier joueur d'une manche est aussi le premier de la suivante.
 
 ## A5. Tour d'un joueur
 
@@ -142,7 +143,7 @@ Chaque étape nomme le point d'interception (B2) où les effets peuvent agir.
 - **Victoire** : elle est vérifiée à la fin de chaque étape de résolution (fin d'une attaque, d'une activation, d'un début de tour, d'un début de manche).
 - **Élimination pendant son propre tour** (par exemple par une perte renvoyée) : le tour s'arrête immédiatement et le joueur suivant joue.
 - **Domination** : être le dernier joueur vivant.
-- **Élection galactique** : avoir obtenu `TechnologiesToWin` ⚙ technologies différentes (4 par défaut). La victoire est immédiate.
+- **Élection galactique** : avoir obtenu **3** technologies différentes (`TechnologiesToWin` ⚙, ARB-51). La victoire est immédiate.
 - **Égalité** : tous les joueurs restants sont éliminés au cours de la même étape de résolution.
 
 ---
@@ -289,9 +290,7 @@ Une question tranchée quitte cette liste et entre dans le [journal des arbitrag
 - **Synergie technologique** : effets à définir (ARB-14).
 
 **Équilibrage** (plan et mesures : [`balance/README.md`](balance/README.md))
-- **Premier joueur de la manche** (A4.4) : garder l'ordre fixe, ou le faire tourner dans le sens horaire ou anti-horaire (ARB-42) ?
-- **Élection galactique** (A9) : 4 ou 3 technologies (ARB-47) ?
-- **PV, `StartShield[n]` et `DoomRound[n]`** : grille à simuler (ARB-43).
+- Les réglages sont optimisés en priorité pour **4 joueurs** (ARB-52).
+- **PV, `StartShield[n]` et `DoomRound[n]`** : grille à simuler (ARB-43). Elle doit aussi retarder la première élimination et rapprocher l'Élection galactique de sa cible (ARB-51).
 - **Fréquence des événements** : une par manche, jugée potentiellement excessive (ARB-12, ARB-46).
 - **Nouvelles mécaniques** validées pour simulation (ARB-44, ARB-45) : aucune n'est une règle tant qu'elle n'a pas été mesurée puis adoptée.
-- **Nombre de joueurs prioritaire** pour les réglages (par exemple 3 et 4 joueurs) : non précisé.

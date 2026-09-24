@@ -1,6 +1,6 @@
 {
   "name": "Rotation anti-horaire",
-  "description": "Étape 2.1 : le premier joueur de chaque manche tourne dans le sens anti-horaire, donc le dernier joueur d'une manche ouvre la suivante (RULES A4.4). Le tour de jeu reste horaire.",
+  "description": "Étape 2.1, alternative écartée (ARB-50) : le premier joueur de chaque manche tourne dans le sens anti-horaire, donc le dernier joueur d'une manche ouvre la suivante (RULES A4.4). La référence tourne dans le sens horaire.",
   "config": {
     "roundStartRotation": "CounterClockwise"
   }

@@ -39,7 +39,7 @@ dotnet run --project dotnet/Vortex.ContentTool -- validate core/Runtime/Data
 Simuler des parties et comparer une variante de règles à la référence (mode d'emploi : [`docs/balance/README.md`](docs/balance/README.md)) :
 
 ```bash
-dotnet run -c Release --project dotnet/Vortex.Simulator -- compare --games 2000 --variant docs/balance/variants/rotation-horaire.json
+dotnet run -c Release --project dotnet/Vortex.Simulator -- compare --games 2000 --variant docs/balance/variants/rotation-antihoraire.json
 ```
 
 Ouvrir le dossier `unity/` dans Unity Hub (à partir de M4).

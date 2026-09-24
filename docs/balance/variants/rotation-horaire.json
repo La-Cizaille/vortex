@@ -1,7 +1,0 @@
-{
-  "name": "Rotation horaire",
-  "description": "Étape 2.1 : le premier joueur de chaque manche tourne dans le sens horaire (RULES A4.4). Le tour de jeu reste horaire.",
-  "config": {
-    "roundStartRotation": "Clockwise"
-  }
-}
