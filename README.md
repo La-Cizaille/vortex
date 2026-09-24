@@ -1,6 +1,6 @@
 # Vortex
 
-Jeu de combat de vaisseaux spatiaux au tour par tour, en chacun pour soi, de 2 à 5 joueurs. Chaque vaisseau a des points de vie, un bouclier et deux modificateurs (attaque et défense) achetés dans des « marchés noirs » communs.
+Jeu de combat de vaisseaux spatiaux au tour par tour, en chacun pour soi, de 2 à 5 joueurs (5 en mode standard). Chaque vaisseau a des points de vie, un bouclier et deux modificateurs (attaque et défense) achetés dans des « marchés noirs » communs.
 
 Adaptation numérique d'un jeu de société. Cibles : **Android** et **Windows**. Style 3D simple, pensé pour le mobile.
 

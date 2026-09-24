@@ -38,7 +38,7 @@ Les valeurs marquées ⚙ sont **configurables** (`config.json`) et sont calibr�
 
 ## A2. Matériel
 
-- De 2 à 5 joueurs, un vaisseau par joueur.
+- De 2 à 5 joueurs, un vaisseau par joueur. **5 joueurs est le mode standard** : c'est la table sur laquelle le jeu est équilibré (ARB-52). De 2 à 4 joueurs, le jeu reste jouable, sans garantie d'équilibre.
 - Un vaisseau a : des PV, un bouclier, un **emplacement ATK**, un **emplacement DEF**, au plus 1 ⚙ jeton de surcharge, et les technologies déjà obtenues.
 - Un paquet de modificateurs ATK, un paquet de modificateurs DEF et un paquet d'événements. Leur composition est définie dans les données (partie C).
 - Un dé à 8 faces.
@@ -290,7 +290,7 @@ Une question tranchée quitte cette liste et entre dans le [journal des arbitrag
 - **Synergie technologique** : effets à définir (ARB-14).
 
 **Équilibrage** (plan et mesures : [`balance/README.md`](balance/README.md))
-- Les réglages sont optimisés en priorité pour **4 joueurs** (ARB-52).
+- **Première élimination au mode standard** : la cible « pas avant la manche 6 » avait été fixée pour 4 joueurs (ARB-40). La garder telle quelle à 5 joueurs ?
 - **PV, `StartShield[n]` et `DoomRound[n]`** : grille à simuler (ARB-43). Elle doit aussi retarder la première élimination et rapprocher l'Élection galactique de sa cible (ARB-51).
 - **Fréquence des événements** : une par manche, jugée potentiellement excessive (ARB-12, ARB-46).
 - **Nouvelles mécaniques** validées pour simulation (ARB-44, ARB-45) : aucune n'est une règle tant qu'elle n'a pas été mesurée puis adoptée.

@@ -24,6 +24,6 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 - M0 : structure du dépôt, règles consolidées (`docs/RULES.md`), architecture, modèle de sécurité, guide de contribution, ADR 0001 à 0006, configuration Git/LFS/EditorConfig, Dependabot.
 
 ### Modifié
-- Règles adoptées après les étapes 2.1 et 2.5 de l'équilibrage : le premier joueur de chaque manche tourne dans le sens horaire (ARB-50), et l'Élection galactique demande 3 technologies (ARB-51). `RULES.md` v0.4. Réglages optimisés en priorité pour 4 joueurs (ARB-52). Nouvelle référence d'équilibrage.
+- Règles adoptées après les étapes 2.1 et 2.5 de l'équilibrage : le premier joueur de chaque manche tourne dans le sens horaire (ARB-50), et l'Élection galactique demande 3 technologies (ARB-51). `RULES.md` v0.4. **5 joueurs devient le mode standard**, seule table équilibrée (ARB-52), avec un objectif de durée de 20 à 25 minutes (ARB-53). Le simulateur joue à 5 joueurs par défaut. Nouvelle référence d'équilibrage.
 - `RULES.md` v0.3 : options ⚙ de rotation du premier joueur et de nombre de technologies, questions ouvertes réorganisées (règles et équilibrage) avec renvoi au journal des arbitrages.
 - Le rapport d'équilibrage identifie le contenu par l'empreinte des quatre fichiers de contenu, et non plus du seul `cards.json`. L'option `--samples` est remplacée par `--bot`.

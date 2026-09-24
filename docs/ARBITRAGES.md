@@ -21,7 +21,7 @@ Ce journal garde la trace **chronologique** de chaque décision de game design :
 - [2026-09-23 : règles de base](#2026-09-23--règles-de-base) (ARB-10 à ARB-28)
 - [2026-09-24 : arbitrages après les briques d'effets (M2)](#2026-09-24--arbitrages-après-les-briques-deffets-m2) (ARB-30 à ARB-36)
 - [2026-09-24 : passe d'équilibrage](#2026-09-24--passe-déquilibrage) (ARB-40 à ARB-49)
-- [2026-09-24 : décisions après les étapes 2.1 et 2.5](#2026-09-24--décisions-après-les-étapes-21-et-25) (ARB-50 à ARB-52)
+- [2026-09-24 : décisions après les étapes 2.1 et 2.5](#2026-09-24--décisions-après-les-étapes-21-et-25) (ARB-50 à ARB-53)
 
 ---
 
@@ -100,4 +100,5 @@ Décisions prises sur le rapport [`balance/2026-09-24-ordre-et-election.md`](bal
 |---|---|---|---|
 | ARB-50 | Premier joueur de la manche : ordre fixe, rotation horaire ou anti-horaire (suite d'ARB-42) ? | **Rotation horaire.** Les deux sens ramènent l'avantage de position près de la cible (écart maximal de 1,4 à 3,7 pts, contre 9,8 à 21 pts avec l'ordre fixe). Le sens horaire évite le double tour du sens anti-horaire, qui avance la première élimination alors qu'elle est déjà trop précoce. | `config.json` (`roundStartRotation`), RULES A4.4, test `Rule_options_match_the_designer_rulings` |
 | ARB-51 | Élection galactique : 3 ou 4 technologies (suite d'ARB-47) ? | **3 technologies.** Les victoires par Élection passent de moins de 0,5 % à 2,4 à 5 %, sans autre effet mesurable. La cible de 5 à 15 % n'est pas encore atteinte : à revoir avec la grille de l'étape 2.2. | `config.json` (`technologiesToWin`), RULES A9, test `Rule_options_match_the_designer_rulings` |
-| ARB-52 | Pour quel nombre de joueurs optimiser en priorité ? | **4 joueurs**, sur proposition du game designer. Les réglages communs à toutes les tables (PV, règles, cartes) sont choisis sur les parties à 4. Les réglages par nombre de joueurs (`StartShield[n]`, `DoomRound[n]`) restent ajustés pour chaque taille. On vérifie que les autres tailles ne se dégradent pas. | [balance/README.md](balance/README.md#objectifs-étape-0) |
+| ARB-52 | Sur quelle taille de table équilibrer ? | **5 joueurs est le mode standard**, et c'est la seule table qu'on équilibre. Raison du game designer : certaines cartes n'ont de sens qu'à 5, en particulier celles qui visent les joueurs adjacents. Par exemple, à 4 joueurs, Accident bactériologique (A_021) touche tous les adversaires si l'on vise le joueur d'en face. 4 joueurs avait d'abord été envisagé, puis écarté pour cette raison. De 2 à 4 joueurs, le jeu reste jouable (moteur et réglages par table conservés), mais sans objectif d'équilibrage. Les tailles de table proposées dans le menu seront décidées au jalon M4. | RULES A2, [balance/README.md](balance/README.md#objectifs-étape-0), simulateur (`--players 5` par défaut) |
+| ARB-53 | Objectif de durée pour le mode standard ? | **20 à 25 minutes à 5 joueurs.** Il remplace la cible « 15 à 20 minutes à 4 joueurs » d'ARB-40. La durée réelle d'un tour sera mesurée sur le prototype (étape 4), car plus de choix allongeront les tours. | [balance/README.md](balance/README.md#objectifs-étape-0) |
