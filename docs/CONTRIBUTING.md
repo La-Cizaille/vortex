@@ -48,7 +48,7 @@ La source de vérité est `core/Runtime/Data/` : `cards.json`, `events.json` et 
    ```
 4. Si le nombre de cartes change, mettre à jour les quantités attendues dans `GameDataContentTests`. C'est le **seul** test lié au contenu réel.
 5. Déclarer les **briques d'effets** de la carte dans `effects` (catalogue et paramètres : [`BRICKS.md`](BRICKS.md)). Pour une mécanique qu'aucune brique ne couvre : ajouter une brique **générique** dans `core/Runtime/Effects/Bricks`, l'enregistrer dans `BrickCatalog`, écrire son test sur contenu factice (`dotnet/Vortex.Core.Tests/Bricks`), puis régénérer la documentation.
-6. À partir de M3 : mesurer l'impact avec le simulateur.
+6. Mesurer l'impact avec le simulateur, avant et après la modification, avec la même graine : voir [`balance/README.md`](balance/README.md).
 
 Les valeurs globales (PV, bouclier de départ, fréquence des événements…) sont dans `GameConfig`, pas dans les cartes.
 

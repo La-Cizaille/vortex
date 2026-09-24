@@ -122,6 +122,12 @@
           "Newtonsoft.Json": "[13.0.4, )"
         }
       },
+      "vortex.simulator": {
+        "type": "Project",
+        "dependencies": {
+          "Vortex.Core": "[1.0.0, )"
+        }
+      },
       "Newtonsoft.Json": {
         "type": "CentralTransitive",
         "requested": "[13.0.4, )",

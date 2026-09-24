@@ -77,6 +77,9 @@ jobs:
           $tool format core/Runtime/Data --check
           $tool docs core/Runtime/Data docs --check
 
+      - name: Simulator smoke run (no engine error)
+        run: dotnet run -c Release --no-build --project dotnet/Vortex.Simulator -- --players 2,5 --games 10 --out simulation-smoke.md
+
       - name: Upload coverage
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
