@@ -18,7 +18,8 @@ Il décrit une **disposition et des comportements**, pas un style : couleurs, fo
 
 ## 2. Forme générale
 
-- **Une scène 3D vue par une caméra fixe** pour les vaisseaux, le dé, le fond et les effets, et **une interface 2D par-dessus** pour les cartes, le marché, les jauges, les actions et les info-bulles (ADR-0015).
+- **Une scène 3D vue par une caméra fixe** pour les vaisseaux, le dé, le fond et les effets, et **une interface 2D** pour le marché, les jauges, les actions et les info-bulles (ADR-0015).
+- **Les cartes sont des objets 3D** (ARB-73, ADR-0017) : chacune suit sa place dans l'interface, face à la caméra, et passe devant les panneaux. Elles peuvent ainsi être animées dans l'espace, et leur aspect se travaille comme un modèle.
 - **Paysage uniquement.** Résolution de référence 1920×1080. L'interface respecte les zones sûres des téléphones à encoche.
 - **Cible minimale : un téléphone de 6 pouces.** Le texte des cartes se lit en zoom (survol ou appui long).
 - **Fond** : un fond spatial (étoiles qui scintillent, planètes à l'arrière-plan) est prévu, mais pas nécessaire au prototype.

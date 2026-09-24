@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Dice
   m_EditorClassIdentifier: Vortex.Client::Vortex.Client.Presentation.DiceFeedback
   tray: {fileID: 6575762365256224729, guid: edf3406da658db24e8264282908257c1, type: 3}
-  anchor: 3
+  anchor: 5
   rollSeconds: 0.6
   holdSeconds: 0.8

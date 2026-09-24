@@ -4,17 +4,18 @@ using UnityEngine;
 namespace Vortex.Client.Presentation
 {
     /// <summary>
-    /// The enlarged card shown while a card of the table is pointed at (INTERFACE.md 1 and 3): the small cards of the
-    /// panels and the market become readable. It appears beside the card, on the side with more room, and never takes
-    /// pointer events itself.
+    /// The enlarged card shown while a card of the table is pointed at (INTERFACE.md 1 and 3): a copy of the card, as a
+    /// 3D object nearer to the camera than everything else (ADR-0017), beside the card, on the side with more room. The
+    /// copy never answers the pointer, so it cannot flicker.
     /// </summary>
     public sealed class CardZoom : MonoBehaviour
     {
-        [SerializeField] private RectTransform area = null!;
-        [Tooltip("Taille de la carte agrandie (1 = taille du prefab, 250 x 350).")]
-        [SerializeField, Min(0.5f)] private float scale = 1.5f;
-        [Tooltip("Écart entre la carte pointée, la carte agrandie et les bords de l'écran.")]
-        [SerializeField, Min(0f)] private float margin = 16f;
+        [Tooltip("Hauteur de la carte agrandie, en part de la hauteur de l'écran.")]
+        [SerializeField, Range(0.2f, 0.9f)] private float screenHeight = 0.5f;
+        [Tooltip("Distance de la carte agrandie à la caméra : plus près que les autres cartes, pour passer devant.")]
+        [SerializeField, Min(0.5f)] private float depth = 3f;
+        [Tooltip("Écart entre la carte pointée, la carte agrandie et les bords de l'écran, en part de la hauteur de l'écran.")]
+        [SerializeField, Range(0f, 0.1f)] private float margin = 0.015f;
 
         private TableContext? _context;
         private CardDisplay? _card;
@@ -42,19 +43,16 @@ namespace Vortex.Client.Presentation
 
             if (_card == null)
             {
-                _card = Instantiate(_context.CardPrefab, area, false);
+                _card = Instantiate(_context.CardPrefab, _context.CardRoot, false);
                 _card.name = "Carte agrandie";
-                var shape = (RectTransform)_card.transform;
-                shape.anchorMin = shape.anchorMax = shape.pivot = new Vector2(0.5f, 0.5f);
-                shape.localScale = new Vector3(scale, scale, 1f);
+                _card.SetPointable(false);
             }
 
             Source = source;
+            _card.gameObject.SetActive(true);
             _card.Show(source.Face, _context.Theme, _context.Art);
             _card.ShowTorments(source.Torments);
-            _card.transform.localPosition = PlaceBeside(source);
-            _card.gameObject.SetActive(true);
-            transform.SetAsLastSibling();
+            Place(source);
         }
 
         /// <summary>Hides the zoom if it shows <paramref name="source"/>.</summary>
@@ -76,21 +74,23 @@ namespace Vortex.Client.Presentation
             }
         }
 
-        /// <summary>Wires the parts of the layout (editor setup).</summary>
-        public void Assign(RectTransform zoomArea) => area = zoomArea;
-
         // Beside the source, on the side of the screen with more room, kept inside the screen.
-        private Vector3 PlaceBeside(CardDisplay source)
+        private void Place(CardDisplay source)
         {
-            Bounds pointed = RectTransformUtility.CalculateRelativeRectTransformBounds(area, source.transform);
-            Vector2 size = ((RectTransform)_card!.transform).sizeDelta * scale;
-            Rect screen = area.rect;
-            float x = pointed.center.x < screen.center.x
-                ? pointed.max.x + margin + (size.x / 2f)
-                : pointed.min.x - margin - (size.x / 2f);
-            x = Mathf.Clamp(x, screen.xMin + margin + (size.x / 2f), screen.xMax - margin - (size.x / 2f));
-            float y = Mathf.Clamp(pointed.center.y, screen.yMin + margin + (size.y / 2f), screen.yMax - margin - (size.y / 2f));
-            return new Vector3(x, y, 0f);
+            Camera view = _context!.View;
+            CardAnchor? anchor = source.GetComponent<CardAnchor>();
+            Rect pointed = anchor != null ? anchor.ScreenRect : new Rect(view.WorldToScreenPoint(source.transform.position), Vector2.zero);
+            float height = screenHeight * view.pixelHeight;
+            float width = height * _card!.Size.x / _card.Size.y;
+            float gap = margin * view.pixelHeight;
+            float x = pointed.center.x < view.pixelWidth / 2f ? pointed.xMax + gap + (width / 2f) : pointed.xMin - gap - (width / 2f);
+            x = Mathf.Clamp(x, gap + (width / 2f), view.pixelWidth - gap - (width / 2f));
+            float y = Mathf.Clamp(pointed.center.y, gap + (height / 2f), view.pixelHeight - gap - (height / 2f));
+
+            _card.transform.SetPositionAndRotation(
+                view.ViewportToWorldPoint(new Vector3(x / view.pixelWidth, y / view.pixelHeight, depth)),
+                view.transform.rotation);
+            _card.transform.localScale = Vector3.one * (CardAnchor.WorldHeightAt(view, depth, height) / _card.Size.y);
         }
     }
 }

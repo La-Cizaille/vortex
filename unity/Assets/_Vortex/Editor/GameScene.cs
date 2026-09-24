@@ -106,22 +106,25 @@ namespace Vortex.Editor
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.fieldOfView = 45f;
             camera.transform.SetPositionAndRotation(new Vector3(0f, 9f, -11f), Quaternion.Euler(38f, 0f, 0f));
+
+            // Pointer events on 3D objects (cards), next to those of the interface.
+            camera.gameObject.AddComponent<PhysicsRaycaster>();
             var light = new GameObject("Lumière", typeof(Light)).GetComponent<Light>();
             light.type = LightType.Directional;
             light.intensity = 1.2f;
             light.transform.rotation = Quaternion.Euler(55f, -30f, 0f);
             Transform ships = new GameObject("Vaisseaux").transform;
             Transform centre = new GameObject("Centre de la table").transform;
+            Transform cards = new GameObject("Cartes 3D").transform;
             _ = new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
 
-            // Interface, reference resolution 1920 x 1080 (INTERFACE.md 2).
-            var canvas = new GameObject("Interface", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster)).GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            var scaler = canvas.GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920f, 1080f);
-            scaler.matchWidthOrHeight = 0.5f;
+            // Interface, reference resolution 1920 x 1080 (INTERFACE.md 2), drawn by the camera at 10 units: the 3D cards,
+            // nearer (ADR-0017), show in front of its panels. The foreground layer, drawn last, stays above the cards.
+            Canvas canvas = UiBuilder.Canvas("Interface", RenderMode.ScreenSpaceCamera, camera, 0);
+            canvas.planeDistance = 10f;
             Transform ui = canvas.transform;
+            Canvas front = UiBuilder.Canvas("Premier plan", RenderMode.ScreenSpaceOverlay, null, 10);
+            RectTransform foreground = UiBuilder.Part<RectTransform>(front.transform, "Centre", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
 
             RectTransform opponents = UiBuilder.Part<RectTransform>(ui, "Adversaires", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             MarketDisplay market = BuildMarket(ui);
@@ -153,14 +156,8 @@ namespace Vortex.Editor
                 camera);
             director.AssignTestMode(commands);
 
-            // Last child, so that the enlarged card shows above everything; it never takes pointer events.
-            RectTransform zoomArea = UiBuilder.Part<RectTransform>(ui, "Zoom", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
-            CanvasGroup zoomGroup = zoomArea.gameObject.AddComponent<CanvasGroup>();
-            zoomGroup.blocksRaycasts = false;
-            zoomGroup.interactable = false;
-            CardZoom zoom = zoomArea.gameObject.AddComponent<CardZoom>();
-            zoom.Assign(zoomArea);
-            director.AssignZoom(zoom);
+            CardZoom zoom = new GameObject("Zoom", typeof(CardZoom)).GetComponent<CardZoom>();
+            director.AssignCards(cards, zoom, foreground);
         }
 
         // Test mode: one button per legal move, in the free space right of the player's ship, above the playback
@@ -206,7 +203,7 @@ namespace Vortex.Editor
             (RectTransform attackRow, TMP_Text attackLabel, TMP_Text attackDeck) = MarketHalf(root.transform, "ATK", 0f, 0.5f);
             (RectTransform defenseRow, TMP_Text defenseLabel, TMP_Text defenseDeck) = MarketHalf(root.transform, "DEF", 0.5f, 1f);
             MarketDisplay market = root.gameObject.AddComponent<MarketDisplay>();
-            market.Assign(attackRow, defenseRow, attackLabel, defenseLabel, attackDeck, defenseDeck, 0.38f);
+            market.Assign(attackRow, defenseRow, attackLabel, defenseLabel, attackDeck, defenseDeck, 133f);
             return market;
         }
 

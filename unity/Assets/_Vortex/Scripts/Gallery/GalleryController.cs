@@ -12,8 +12,8 @@ namespace Vortex.Client.Gallery
 {
     /// <summary>
     /// Sandbox scene: every modifier, event and technology, and the ship of every seat, shown with the current theme
-    /// and art. The look can be tuned without playing a game: theme edits show at once in Play mode. Not part of the
-    /// game build.
+    /// and art. The look can be tuned without playing a game: theme edits show at once in Play mode. The cards are the
+    /// game's 3D cards (ADR-0017), each following its place in a scrolling list. Not part of the game build.
     /// </summary>
     public sealed class GalleryController : MonoBehaviour
     {
@@ -26,16 +26,23 @@ namespace Vortex.Client.Gallery
         [SerializeField] private TextTable texts = null!;
         [SerializeField] private CardDisplay cardPrefab = null!;
         [SerializeField] private RectTransform sections = null!;
+        [SerializeField] private RectTransform viewport = null!;
+        [SerializeField] private Transform cardRoot = null!;
         [SerializeField] private Transform shipRow = null!;
         [SerializeField] private Camera view = null!;
         [SerializeField, Range(2, 5)] private int seatCount = 5;
+        [Tooltip("Hauteur d'une carte, en unités d'interface (référence 1920 x 1080).")]
+        [SerializeField, Min(50f)] private float cardHeight = 350f;
+        [Tooltip("Distance des cartes à la caméra : plus près que le plan de l'interface.")]
+        [SerializeField, Min(0.5f)] private float cardDepth = 6f;
 
-        private readonly List<CardDisplay> _cards = new List<CardDisplay>();
+        private readonly List<(CardHolder Holder, CardFace Face)> _cards = new List<(CardHolder, CardFace)>();
         private readonly List<TMP_Text> _headings = new List<TMP_Text>();
         private readonly List<GameObject> _ships = new List<GameObject>();
+        private TableContext? _context;
 
-        /// <summary>The card views built by <see cref="Build"/>.</summary>
-        public IReadOnlyList<CardDisplay> Cards => _cards;
+        /// <summary>The cards built by <see cref="Build"/>.</summary>
+        public IReadOnlyList<CardDisplay> Cards => _cards.Select(c => c.Holder.Card).Where(c => c != null).Select(c => c!).ToList();
 
         /// <summary>The ships built by <see cref="Build"/>.</summary>
         public IReadOnlyList<GameObject> Ships => _ships;
@@ -45,6 +52,7 @@ namespace Vortex.Client.Gallery
         {
             Clear();
             GameData data = content.LoadData();
+            _context = new TableContext(theme, cardArt, texts, data, cardPrefab, cardRoot, view, cardDepth);
             Section(TextKeys.GalleryAttack, data.Modifiers.Where(c => c.Slot == CardSlot.Attack).Select(c => CardFace.Of(c, texts)));
             Section(TextKeys.GalleryDefense, data.Modifiers.Where(c => c.Slot == CardSlot.Defense).Select(c => CardFace.Of(c, texts)));
             Section(TextKeys.GalleryEvents, data.Events.Select(e => CardFace.Of(e, texts)));
@@ -61,9 +69,12 @@ namespace Vortex.Client.Gallery
                 heading.color = theme.Text;
             }
 
-            foreach (CardDisplay card in _cards)
+            if (_context != null)
             {
-                card.Show(card.Face, theme, cardArt);
+                foreach ((CardHolder holder, CardFace face) in _cards)
+                {
+                    holder.ShowFace(face, _context);
+                }
             }
 
             // Ships are rebuilt: a placeholder takes its colour when it is created.
@@ -115,20 +126,24 @@ namespace Vortex.Client.Gallery
 
             var grid = new GameObject("Cartes", typeof(RectTransform)).AddComponent<GridLayoutGroup>();
             grid.transform.SetParent(sections, false);
-            RectTransform cardShape = (RectTransform)cardPrefab.transform;
-            grid.cellSize = cardShape.sizeDelta;
+            Vector2 proportions = cardPrefab.Size;
+            grid.cellSize = new Vector2(cardHeight * proportions.x / proportions.y, cardHeight);
             grid.spacing = new Vector2(24f, 24f);
             foreach (CardFace face in faces)
             {
-                CardDisplay card = Instantiate(cardPrefab, grid.transform, false);
-                card.name = face.Id;
-                card.Show(face, theme, cardArt);
-                _cards.Add(card);
+                var place = new GameObject(face.Id, typeof(RectTransform));
+                place.transform.SetParent(grid.transform, false);
+                _cards.Add((new CardHolder((RectTransform)place.transform, viewport), face));
             }
         }
 
         private void Clear()
         {
+            foreach ((CardHolder holder, CardFace _) in _cards)
+            {
+                holder.Release();
+            }
+
             _cards.Clear();
             _headings.Clear();
             var children = new List<GameObject>();
@@ -159,7 +174,7 @@ namespace Vortex.Client.Gallery
         }
 
         /// <summary>Wires the scene (editor setup).</summary>
-        public void Assign(GameContent gameContent, ThemeSettings themeSettings, CardArtCatalog artCatalog, ShipCatalog shipCatalog, TextTable textTable, CardDisplay card, RectTransform sectionRoot, Transform shipRoot, Camera sceneCamera)
+        public void Assign(GameContent gameContent, ThemeSettings themeSettings, CardArtCatalog artCatalog, ShipCatalog shipCatalog, TextTable textTable, CardDisplay card, RectTransform sectionRoot, RectTransform scrollViewport, Transform cards, Transform shipRoot, Camera sceneCamera)
         {
             content = gameContent;
             theme = themeSettings;
@@ -168,6 +183,8 @@ namespace Vortex.Client.Gallery
             texts = textTable;
             cardPrefab = card;
             sections = sectionRoot;
+            viewport = scrollViewport;
+            cardRoot = cards;
             shipRow = shipRoot;
             view = sceneCamera;
         }

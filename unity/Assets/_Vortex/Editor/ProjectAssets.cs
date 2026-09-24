@@ -90,7 +90,7 @@ namespace Vortex.Editor
             }
 
             var dice = ScriptableObject.CreateInstance<DiceFeedback>();
-            dice.Configure(tray, FeedbackAnchor.Market, 0.6f, 0.8f);
+            dice.Configure(tray, FeedbackAnchor.Foreground, 0.6f, 0.8f);
             Create(dice, DicePath);
             FeedbackProfile profile = AssetDatabase.LoadAssetAtPath<FeedbackProfile>(ProfilePath);
             bool attackDice = profile.MapIfMissing(GameEventType.DiceRolled, dice);

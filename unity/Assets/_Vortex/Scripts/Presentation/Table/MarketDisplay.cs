@@ -22,7 +22,8 @@ namespace Vortex.Client.Presentation
         [SerializeField] private TMP_Text defenseLabel = null!;
         [SerializeField] private TMP_Text attackDeck = null!;
         [SerializeField] private TMP_Text defenseDeck = null!;
-        [SerializeField, Min(0.1f)] private float cardScale = 0.5f;
+        [Tooltip("Hauteur d'une carte du marché, en unités d'interface (référence 1920 x 1080).")]
+        [SerializeField, Min(10f)] private float cardHeight = 133f;
 
         private readonly List<CardHolder> _attack = new List<CardHolder>();
         private readonly List<CardHolder> _defense = new List<CardHolder>();
@@ -62,9 +63,9 @@ namespace Vortex.Client.Presentation
         }
 
         /// <summary>Wires the parts of the layout (editor setup).</summary>
-        public void Assign(RectTransform attack, RectTransform defense, TMP_Text attackTitle, TMP_Text defenseTitle, TMP_Text attackDeckLabel, TMP_Text defenseDeckLabel, float scale)
+        public void Assign(RectTransform attack, RectTransform defense, TMP_Text attackTitle, TMP_Text defenseTitle, TMP_Text attackDeckLabel, TMP_Text defenseDeckLabel, float height)
         {
-            cardScale = scale;
+            cardHeight = height;
             attackRow = attack;
             defenseRow = defense;
             attackLabel = attackTitle;
@@ -100,13 +101,14 @@ namespace Vortex.Client.Presentation
             }
         }
 
-        // One card place of a row, sized like a card at the market scale; the row's layout group lines them up.
+        // One card place of a row, with the card's proportions; the row's layout group lines them up, the 3D card follows.
         private RectTransform NewPlace(RectTransform parent)
         {
             var place = new GameObject("Place", typeof(RectTransform), typeof(LayoutElement));
             var shape = (RectTransform)place.transform;
             shape.SetParent(parent, false);
-            Vector2 card = ((RectTransform)_context!.CardPrefab.transform).sizeDelta * cardScale;
+            Vector2 proportions = _context!.CardPrefab.Size;
+            var card = new Vector2(cardHeight * proportions.x / proportions.y, cardHeight);
             shape.sizeDelta = card;
             var layout = place.GetComponent<LayoutElement>();
             layout.preferredWidth = card.x;

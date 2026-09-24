@@ -39,6 +39,8 @@ namespace Vortex.Editor
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.fieldOfView = 40f;
             camera.transform.position = new Vector3(0f, 0f, -12f);
+            camera.gameObject.AddComponent<PhysicsRaycaster>();
+            Transform cards = new GameObject("Cartes 3D").transform;
 
             var light = new GameObject("Lumière", typeof(Light)).GetComponent<Light>();
             light.type = LightType.Directional;
@@ -48,12 +50,9 @@ namespace Vortex.Editor
             _ = new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
 
             // Interface: reference resolution 1920 x 1080 (INTERFACE.md); the cards scroll in the top 70 %.
-            var canvas = new GameObject("Interface", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster)).GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            var scaler = canvas.GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920f, 1080f);
-            scaler.matchWidthOrHeight = 0.5f;
+            // Drawn by the camera at 10 units: the 3D cards (ADR-0017), nearer, show in front of it.
+            Canvas canvas = UiBuilder.Canvas("Interface", RenderMode.ScreenSpaceCamera, camera, 0);
+            canvas.planeDistance = 10f;
 
             GameObject scroll = DefaultControls.CreateScrollView(new DefaultControls.Resources());
             scroll.name = "Cartes";
@@ -95,6 +94,8 @@ namespace Vortex.Editor
                 AssetDatabase.LoadAssetAtPath<TextTable>(ThemeAssets.TextsPath),
                 AssetDatabase.LoadAssetAtPath<GameObject>(ThemeAssets.CardPrefabPath).GetComponent<CardDisplay>(),
                 sections,
+                scrollRect.viewport,
+                cards,
                 shipRow,
                 camera);
         }
