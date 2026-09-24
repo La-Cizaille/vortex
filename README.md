@@ -54,6 +54,7 @@ powershell -ExecutionPolicy Bypass -File tools/Test-Unity.ps1
 |---|---|
 | Comment se joue une partie | [`RULES.md`](docs/RULES.md), partie A |
 | Pourquoi une règle ou une carte fonctionne ainsi | [`ARBITRAGES.md`](docs/ARBITRAGES.md) |
+| Ce que le joueur voit et comment il agit | [`INTERFACE.md`](docs/INTERFACE.md) |
 | Le texte et l'interprétation d'une carte | [`CARDS.md`](docs/CARDS.md) (généré depuis `core/Runtime/Data/`) |
 | Les objectifs et l'avancement de l'équilibrage | [`balance/README.md`](docs/balance/README.md) |
 | Pourquoi le code est organisé ainsi | [`adr/`](docs/adr/) et [`ARCHITECTURE.md`](docs/ARCHITECTURE.md) |
@@ -68,9 +69,21 @@ powershell -ExecutionPolicy Bypass -File tools/Test-Unity.ps1
 | **M2** | Les 54 modificateurs, 8 événements et 4 technologies |
 | **M3** | Simulateur bot contre bot et rapport d'équilibrage |
 | **Équilibrage** | Règles de base : fait. Revue des cartes avec un éditeur visuel après le prototype (plan : [`docs/balance/README.md`](docs/balance/README.md)) |
-| **M4** | Client Unity jouable en hot-seat (visuels provisoires, habillage modifiable) |
+| **M4** | Client Unity jouable en hot-seat (visuels provisoires, habillage modifiable), selon [`INTERFACE.md`](docs/INTERFACE.md) |
 | **M5** | Finitions : modèles 3D, animations, builds Android et Windows |
 | Phase 2 | Serveur autoritaire, lobby, jeu en ligne |
+
+Étapes du jalon M4 :
+
+| Étape | Contenu | État |
+|---|---|---|
+| M4.1 | Socle du projet Unity, moteur exécuté dans Unity | Fait |
+| M4.2 | Session de jeu et lecture des événements (ADR-0014) | Fait |
+| M4.3 | Habillage : thème, catalogues d'illustrations, visuels provisoires générés, import automatique, scène Galerie | En cours |
+| M4.4 | Table et affichage : scène de jeu, adversaires, vaisseau, marché, informations de partie ; les bots jouent et tout se voit | À faire |
+| M4.5 | Interactions : glisser-déposer, aperçus calculés par le moteur, décisions, marché, combo, fin de tour | À faire |
+| M4.6 | Menus : accueil, partie locale, options, pause, fin de partie, menu de développement | À faire |
+| M4.7 | Vérification : parties complètes à 2, 3 et 5 joueurs, sans erreur ; remplacer une image change le visuel sans code | À faire |
 
 ## Licence
 
