@@ -17,5 +17,6 @@ Un ADR consigne **une** décision structurante : son contexte, les options envis
 | [0011](0011-options-de-regles-et-variantes.md) | Équilibrage : options de règles, variantes de contenu et comparaison statistique | Accepté |
 | [0012](0012-bot-protection-effective.md) | Le bot évalue sa protection effective (complète 0010) | Accepté |
 | [0013](0013-version-unity.md) | Version de Unity : versions Update en développement, LTS pour publier | Accepté |
+| [0014](0014-presentation-par-evenements.md) | Présentation pilotée par les événements, retours visuels décrits dans l'éditeur | Accepté |
 
 Modèle : copier un ADR existant et garder les sections *Statut*, *Contexte*, *Options*, *Décision* et *Conséquences*.

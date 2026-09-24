@@ -3,6 +3,7 @@
   "rootNamespace": "Vortex.Tests.EditMode",
   "references": [
     "Vortex.Core",
+    "Vortex.Client",
     "Vortex.Editor",
     "UnityEngine.TestRunner",
     "UnityEditor.TestRunner"
