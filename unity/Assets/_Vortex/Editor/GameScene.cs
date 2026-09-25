@@ -117,6 +117,7 @@ namespace Vortex.Editor
             (Button endTurn, TMP_Text endTurnLabel) = UiBuilder.Button(ui, "Fin de tour", new Vector2(1f, 0f), new Vector2(-240f, 20f), new Vector2(220f, 104f));
             endTurnLabel.fontSize = 26f;
             endTurnLabel.fontStyle = FontStyles.Bold;
+            TurnTimerDisplay timer = BuildTimer(ui);
             CommandPanel commands = BuildChoicePanel(ui, "Coups (mode test)", new Vector2(1f, 0f), new Vector2(-20f, 132f), 520f, 3);
 
             // Foreground: the decision window, the help bubble and the aim line stay above the 3D cards.
@@ -182,6 +183,27 @@ namespace Vortex.Editor
             GameOverPanel gameOver = BuildGameOver(front.transform);
             PauseMenu pause = BuildPause(ui, front.transform);
             director.AssignMenus(pause, gameOver, announcement);
+            director.AssignTimer(timer);
+        }
+
+        // The time left, just above the end turn button (INTERFACE.md 3.9): the seconds and a bar that empties.
+        private static TurnTimerDisplay BuildTimer(Transform ui)
+        {
+            RectTransform root = UiBuilder.Fixed<RectTransform>(ui, "Temps de tour", new Vector2(1f, 0f), new Vector2(-240f, 128f), new Vector2(220f, 40f));
+            RectTransform content = UiBuilder.Part<RectTransform>(root, "Contenu", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            Image track = UiBuilder.Box(UiBuilder.Fixed<Image>(content, "Piste", new Vector2(0.5f, 0f), Vector2.zero, new Vector2(220f, 10f)), new Color(1f, 1f, 1f, 0.12f));
+            Image bar = UiBuilder.Part<Image>(track.transform, "Barre", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            bar.sprite = UiBuilder.RoundedBox;
+            bar.type = Image.Type.Filled;
+            bar.fillMethod = Image.FillMethod.Horizontal;
+            bar.fillOrigin = (int)Image.OriginHorizontal.Left;
+            bar.raycastTarget = false;
+            TMP_Text time = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(content, "Secondes", new Vector2(0.5f, 1f), Vector2.zero, new Vector2(220f, 28f)), 22f, FontStyles.Bold, TextAlignmentOptions.Center);
+            AudioSource sound = root.gameObject.AddComponent<AudioSource>();
+            sound.playOnAwake = false;
+            TurnTimerDisplay timer = root.gameObject.AddComponent<TurnTimerDisplay>();
+            timer.Assign(content.gameObject, bar, time, sound);
+            return timer;
         }
 
         // "Tour de X", in the upper middle of the screen; it never takes the pointer.

@@ -14,12 +14,20 @@ namespace Vortex.Client.Session
         /// <param name="seats">The seats, in table order (2 to 5; the engine checks the count and the names).</param>
         /// <param name="seed">Seed of the game; 0: a new one for each game.</param>
         /// <param name="rules">Rule options to try, or null for the current rules.</param>
-        public MatchSetup(IReadOnlyList<SeatSetup> seats, ulong seed = 0, RuleOptions? rules = null)
+        /// <param name="turnSeconds">Time of a person's turn in seconds; 0: no limit (ARB-80).</param>
+        public MatchSetup(IReadOnlyList<SeatSetup> seats, ulong seed = 0, RuleOptions? rules = null, int turnSeconds = 0)
         {
             Seats = seats ?? throw new ArgumentNullException(nameof(seats));
             Seed = seed;
             Rules = rules;
+            TurnSeconds = turnSeconds > 0 ? turnSeconds : 0;
         }
+
+        /// <summary>Time to answer a decision asked during another seat's turn, when turns are timed (ARB-80).</summary>
+        public const int DecisionSeconds = 15;
+
+        /// <summary>Time of a person's turn in seconds; 0: no limit (ARB-80).</summary>
+        public int TurnSeconds { get; }
 
         /// <summary>The seats, in table order.</summary>
         public IReadOnlyList<SeatSetup> Seats { get; }

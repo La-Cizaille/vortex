@@ -11,6 +11,7 @@ using Vortex.Core.Bots;
 using Vortex.Core.Commands;
 using Vortex.Core.Content;
 using Vortex.Core.Events;
+using Vortex.Core.Projection;
 using Vortex.Core.Rules;
 
 namespace Vortex.Client.Presentation
@@ -57,6 +58,7 @@ namespace Vortex.Client.Presentation
         [SerializeField] private PauseMenu pause = null!;
         [SerializeField] private GameOverPanel gameOver = null!;
         [SerializeField] private TurnAnnouncement announcement = null!;
+        [SerializeField] private TurnTimerDisplay timer = null!;
 
         [Header("Disposition (positions à l'écran : 0,0 en bas à gauche, 1,1 en haut à droite)")]
         [Tooltip("Position à l'écran du vaisseau du joueur.")]
@@ -81,6 +83,8 @@ namespace Vortex.Client.Presentation
         [SerializeField] private BotLevel botLevel = BotLevel.Normal;
         [Tooltip("0 : une graine différente à chaque partie.")]
         [SerializeField] private ulong seed;
+        [Tooltip("Temps d'un tour en secondes ; 0 : pas de limite (ARB-80).")]
+        [SerializeField, Min(0)] private int turnSeconds;
         [Tooltip("Pause entre deux coups d'un bot, en secondes (divisée par la vitesse de lecture).")]
         [SerializeField, Min(0f)] private float botPause = 0.4f;
 
@@ -93,6 +97,7 @@ namespace Vortex.Client.Presentation
         private MatchSetup? _setup;
         private bool _paused;
         private bool _outcomeShown;
+        private TurnClock _clock = new TurnClock(0f, MatchSetup.DecisionSeconds);
         private EventPlayer? _player;
         private TableModel? _model;
         private TableContext? _context;
@@ -135,11 +140,24 @@ namespace Vortex.Client.Presentation
         /// <summary>The "Tour de X" banner.</summary>
         public TurnAnnouncement Announcement => announcement;
 
+        /// <summary>The time the person who has to act has left (ARB-80).</summary>
+        public TurnClock Clock => _clock;
+
+        /// <summary>The display of that time.</summary>
+        public TurnTimerDisplay Timer => timer;
+
         /// <summary>Test mode: the first seat is played by a person through the command panel.</summary>
         public bool HumanFirstSeat
         {
             get => humanFirstSeat;
             set => humanFirstSeat = value;
+        }
+
+        /// <summary>Test game: time of a turn in seconds, 0 for no limit (captures and tests).</summary>
+        public int TurnSeconds
+        {
+            get => turnSeconds;
+            set => turnSeconds = value > 0 ? value : 0;
         }
 
         /// <summary>Test mode: the panel listing every allowed move is shown too.</summary>
@@ -203,6 +221,8 @@ namespace Vortex.Client.Presentation
             pause.Bind(texts, theme.PlaybackSpeed, paused => _paused = paused, Restart, ApplyOptions, MatchLauncher.BackToMenu);
             gameOver.Bind(texts, Restart, MatchLauncher.BackToMenu);
             announcement.Hide();
+            _clock = new TurnClock(setup.TurnSeconds, MatchSetup.DecisionSeconds);
+            timer.Bind(theme);
             _paused = false;
             _outcomeShown = false;
             ShowAll(redrawCards: true);
@@ -231,12 +251,14 @@ namespace Vortex.Client.Presentation
             if (_player.IsPlaying)
             {
                 WithdrawControls();
+                StopClock();
                 return;
             }
 
             if (_session.IsOver)
             {
                 WithdrawControls();
+                StopClock();
                 SetPanel(PanelState.Hidden);
                 ShowOutcome();
                 return;
@@ -248,10 +270,12 @@ namespace Vortex.Client.Presentation
                 FollowPerson();
                 OfferControls();
                 SetPanel(showCommandPanel ? PanelState.Choices : PanelState.Hidden);
+                FollowClock(deltaTime);
                 return;
             }
 
             WithdrawControls();
+            StopClock();
             SetPanel(showCommandPanel ? PanelState.Waiting : PanelState.Hidden);
             _wait += deltaTime * _player.Speed;
             if (_wait < botPause)
@@ -297,7 +321,40 @@ namespace Vortex.Client.Presentation
                     n == 1 && humanFirstSeat ? SeatKind.Human : SeatKind.Bot,
                     botLevel))
                 .ToList(),
-            seed);
+            seed,
+            turnSeconds: turnSeconds);
+
+        // The time of the person who has to act runs while they can act. When it is up, their turn ends by itself, or a
+        // bot answers their decision (ARB-80); the events of that step play, then the next step follows if needed.
+        private void FollowClock(float deltaTime)
+        {
+            GameView table = _session!.View;
+            _clock.Follow(table.Round, table.CurrentPlayer, _session.Actor, _session.Decision?.Id);
+            _clock.Tick(deltaTime);
+            timer.Show(_clock);
+            if (!_clock.Expired)
+            {
+                return;
+            }
+
+            int actor = _session.Actor;
+            WithdrawControls();
+            SetPanel(PanelState.Hidden);
+            SessionResult result = _session.Expire(actor);
+            if (!result.Accepted)
+            {
+                Debug.LogError("The step played when the time was up was refused: " + result.Error);
+                return;
+            }
+
+            Play(result.Events);
+        }
+
+        private void StopClock()
+        {
+            _clock.Stop();
+            timer.Show(_clock);
+        }
 
         // While a market card is dragged, the viewer's card it would replace is marked (INTERFACE.md 3.3).
         private void MarkLoss(CardSlot slot, bool held)
@@ -675,6 +732,9 @@ namespace Vortex.Client.Presentation
             controls = playerControls;
             icons = iconCatalog;
         }
+
+        /// <summary>Wires the display of the turn time (editor setup).</summary>
+        public void AssignTimer(TurnTimerDisplay turnTimer) => timer = turnTimer;
 
         /// <summary>Wires the menus of the game: pause, end of game, turn banner (editor setup).</summary>
         public void AssignMenus(PauseMenu pauseMenu, GameOverPanel gameOverPanel, TurnAnnouncement turnAnnouncement)

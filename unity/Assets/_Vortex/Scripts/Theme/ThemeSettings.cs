@@ -58,6 +58,10 @@ namespace Vortex.Client.Theme
         [Tooltip("Vitesse de lecture des événements par défaut (1 = normale).")]
         [SerializeField, Min(0.25f)] private float playbackSpeed = 1f;
 
+        [Header("Sons")]
+        [Tooltip("Tic des dernières secondes d'un tour limité. Vide : un bip généré en attendant le son définitif.")]
+        [SerializeField] private AudioClip? timerTick;
+
         /// <summary>Raised when the theme is edited in the inspector, so that views refresh.</summary>
         public event Action? Changed;
 
@@ -96,6 +100,9 @@ namespace Vortex.Client.Theme
 
         /// <summary>Default event playback speed.</summary>
         public float PlaybackSpeed => playbackSpeed;
+
+        /// <summary>Tick of the last seconds of a timed turn, or null for the generated placeholder (ARB-80).</summary>
+        public AudioClip? TimerTick => timerTick;
 
         /// <summary>Colour of a technology; neutral cards use the neutral colour.</summary>
         public Color Technology(TechColor color) => color switch

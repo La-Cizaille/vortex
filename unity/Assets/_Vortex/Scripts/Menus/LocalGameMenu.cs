@@ -20,6 +20,9 @@ namespace Vortex.Client.Menus
         /// <summary>Players of the standard table (ARB-52), chosen by default.</summary>
         public const int DefaultPlayers = 5;
 
+        // Turn times offered, in seconds (ARB-80): not timed by default in a local game.
+        private static readonly int[] TurnTimes = { 0, 60, 90, 120 };
+
         [SerializeField] private TMP_Text title = null!;
         [SerializeField] private Button fewer = null!;
         [SerializeField] private Button more = null!;
@@ -29,6 +32,7 @@ namespace Vortex.Client.Menus
         [SerializeField] private Button launch = null!;
         [SerializeField] private Button development = null!;
         [SerializeField] private DevMenu devMenu = null!;
+        [SerializeField] private Button? turnTime;
 
         private TextTable? _texts;
         private Action<MatchSetup>? _launch;
@@ -37,6 +41,9 @@ namespace Vortex.Client.Menus
 
         /// <summary>Number of players chosen.</summary>
         public int Players { get; private set; }
+
+        /// <summary>Time of a turn chosen, in seconds; 0: no limit.</summary>
+        public int TurnSeconds { get; private set; }
 
         /// <summary>The seats, the first <see cref="Players"/> of them in use.</summary>
         public IReadOnlyList<SeatRow> Rows => rows;
@@ -68,6 +75,12 @@ namespace Vortex.Client.Menus
             MenuButtons.Wire(back, closed ?? throw new ArgumentNullException(nameof(closed)));
             MenuButtons.Wire(launch, Launch);
             MenuButtons.Wire(development, OpenDevelopment);
+            TurnSeconds = TurnTimes[0];
+            if (turnTime != null)
+            {
+                MenuButtons.Wire(turnTime, NextTurnTime);
+                ShowTurnTime();
+            }
 
             // The first seat is a person's, the others bots': the usual game against the computer.
             for (int seat = 0; seat < rows.Length; seat++)
@@ -107,19 +120,29 @@ namespace Vortex.Client.Menus
             players.text = string.Format(CultureInfo.InvariantCulture, _texts!.Get(TextKeys.LocalPlayers), Players);
         }
 
-        /// <summary>The game chosen: the seats in use, and in development the seed and the rule options.</summary>
+        /// <summary>The next turn time offered (no limit, then 60, 90 and 120 seconds).</summary>
+        public void NextTurnTime()
+        {
+            TurnSeconds = TurnTimes[(Array.IndexOf(TurnTimes, TurnSeconds) + 1) % TurnTimes.Length];
+            ShowTurnTime();
+        }
+
+        /// <summary>The game chosen: the seats in use, the turn time, and in development the seed and the rule options.</summary>
         public MatchSetup BuildSetup()
         {
             List<SeatSetup> seats = rows.Take(Players).Select(r => r.ToSeat()).ToList();
 
             // A published build never reads the development menu (it has been removed anyway).
             return DevMenu.Available && devMenu != null
-                ? new MatchSetup(seats, devMenu.Seed, devMenu.Changed ? devMenu.Options : null)
-                : new MatchSetup(seats);
+                ? new MatchSetup(seats, devMenu.Seed, devMenu.Changed ? devMenu.Options : null, TurnSeconds)
+                : new MatchSetup(seats, turnSeconds: TurnSeconds);
         }
 
         /// <summary>Starts the chosen game.</summary>
         public void Launch() => _launch?.Invoke(BuildSetup());
+
+        /// <summary>Wires the turn time button (editor setup).</summary>
+        public void AssignTurnTime(Button button) => turnTime = button;
 
         /// <summary>Wires the parts of the layout (editor setup).</summary>
         public void Assign(TMP_Text titleLabel, Button fewerButton, Button moreButton, TMP_Text playersLabel, SeatRow[] seatRows, Button backButton, Button launchButton, Button developmentButton, DevMenu developmentMenu)
@@ -133,6 +156,19 @@ namespace Vortex.Client.Menus
             launch = launchButton;
             development = developmentButton;
             devMenu = developmentMenu;
+        }
+
+        private void ShowTurnTime()
+        {
+            if (turnTime == null || _texts is null)
+            {
+                return;
+            }
+
+            string value = TurnSeconds == 0
+                ? _texts.Get(TextKeys.LocalTurnTimeOff)
+                : string.Format(CultureInfo.InvariantCulture, _texts.Get(TextKeys.LocalTurnTimeSeconds), TurnSeconds);
+            MenuButtons.Label(turnTime, string.Format(CultureInfo.InvariantCulture, _texts.Get(TextKeys.LocalTurnTime), value));
         }
 
         private void OpenDevelopment()
