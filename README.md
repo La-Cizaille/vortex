@@ -42,7 +42,13 @@ Simuler des parties et comparer une variante de règles à la référence (mode 
 dotnet run -c Release --project dotnet/Vortex.Simulator -- compare --games 2000 --variant docs/balance/variants/rotation-antihoraire.json
 ```
 
-Ouvrir le dossier `unity/` dans Unity Hub. Pour **jouer une partie de test** contre quatre bots : ouvrir la scène `Assets/_Vortex/Scenes/Game.unity`, puis lancer le mode Play. Vous jouez le siège 1 avec le panneau des coups, en bas à droite.
+Ouvrir le dossier `unity/` dans Unity Hub. Pour **jouer une partie de test** contre quatre bots : ouvrir la scène `Assets/_Vortex/Scenes/Game.unity`, puis lancer le mode Play. Vous jouez le siège 1 :
+- toucher ou glisser les actions autour du vaisseau ;
+- glisser une carte du marché vers votre vaisseau pour l'acheter ;
+- glisser une de vos cartes au centre pour l'utiliser ;
+- « Fin de tour » en bas à droite.
+
+Le panneau qui liste tous les coups se réactive dans l'objet `Partie` (*Show Command Panel*).
 
 Sans ouvrir l'éditeur (il doit être fermé) :
 
@@ -94,7 +100,7 @@ Le premier lance les tests Unity. Le deuxième crée les assets de base qui manq
 | M4.2 | Session de jeu et lecture des événements (ADR-0014) | Fait |
 | M4.3 | Habillage : thème, catalogues d'illustrations, visuels provisoires générés, import automatique, scène Galerie | Fait |
 | M4.4 | Table et affichage : scène de jeu, adversaires, vaisseau, marché, informations de partie ; les bots jouent et tout se voit | Fait |
-| M4.5 | Interactions : zoom sur les cartes et dés animés (fait) ; recyclage au niveau du marché ; actions d'équipage au niveau du vaisseau, avec des pictogrammes ; informations d'un adversaire au survol ; glisser-déposer et aperçus calculés par le moteur ; décisions, combo, fin de tour ; temps de tour limité et désactivable (ARB-70, ARB-71) | En cours |
+| M4.5 | Interactions : zoom sur les cartes, dés animés, cartes en 3D, premiers gestes (faits) ; recyclage au niveau du marché ; actions d'équipage au niveau du vaisseau, avec des pictogrammes ; informations d'un adversaire au survol ; glisser-déposer et aperçus calculés par le moteur ; décisions, combo, fin de tour ; temps de tour limité et désactivable (ARB-70, ARB-71) | En cours |
 | M4.6 | Menus : accueil, partie locale, options, pause, fin de partie, menu de développement | À faire |
 | M4.7 | Vérification : parties complètes à 2, 3 et 5 joueurs, sans erreur ; remplacer une image change le visuel sans code | À faire |
 

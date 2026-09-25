@@ -141,6 +141,24 @@ namespace Vortex.Client.Content
         /// <summary>Where a card offered in a decision lies, when it is in a market.</summary>
         public const string OptionMarket = "option.market";
 
+        /// <summary>End turn button.</summary>
+        public const string ButtonEndTurn = "button.end-turn";
+
+        /// <summary>Button leaving the market phase.</summary>
+        public const string ButtonEndMarket = "button.end-market";
+
+        /// <summary>Button recycling a market.</summary>
+        public const string ButtonRecycle = "button.recycle";
+
+        /// <summary>Combo button.</summary>
+        public const string ButtonCombo = "button.combo";
+
+        /// <summary>Help of the overcharge token of the player.</summary>
+        public const string HelpOvercharge = "help.overcharge";
+
+        /// <summary>Help of the combo button.</summary>
+        public const string HelpCombo = "help.combo";
+
         /// <summary>Every key with its default text.</summary>
         public static readonly IReadOnlyList<KeyValuePair<string, string>> Defaults = BuildDefaults();
 
@@ -158,6 +176,12 @@ namespace Vortex.Client.Content
 
         /// <summary>Name of a way to win.</summary>
         public static string Win(WinCondition condition) => "win." + condition;
+
+        /// <summary>Short name of a crew action, shown while its pictogram is missing.</summary>
+        public static string ActionShort(CrewAction action) => "action.short." + action;
+
+        /// <summary>Help of a crew action, shown when its button is hovered.</summary>
+        public static string ActionHelp(CrewAction action) => "action.help." + action;
 
         /// <summary>Question of a decision, by its engine prompt key (e.g. <c>critical.discard</c>).</summary>
         public static string Decision(string prompt) => "decision." + prompt;
@@ -214,6 +238,23 @@ namespace Vortex.Client.Content
             Add(CommandPosture, "Posture défensive");
             Add(CommandEndTurn, "Fin de tour");
             Add(OptionMarket, "marché");
+            Add(ButtonEndTurn, "Fin de tour");
+            Add(ButtonEndMarket, "Passer le marché");
+            Add(ButtonRecycle, "Recycler");
+            Add(ButtonCombo, "Combo");
+            Add(HelpOvercharge, "Surcharge : touchez le jeton pour l'armer. La prochaine attaque ou le prochain reparamétrage la dépense (un dé de plus). Touchez de nouveau pour la désarmer.");
+            Add(HelpCombo, "Combo : vos deux modificateurs sont de la même technologie. Ils sont défaussés et la technologie est obtenue.");
+
+            Add(ActionShort(CrewAction.Attack), "ATQ");
+            Add(ActionShort(CrewAction.Sabotage), "SAB");
+            Add(ActionShort(CrewAction.RerollShield), "REP");
+            Add(ActionShort(CrewAction.Overcharge), "SUR");
+            Add(ActionShort(CrewAction.DefensivePosture), "POS");
+            Add(ActionHelp(CrewAction.Attack), "Attaque : glissez vers un adversaire. Dés lancés, plus les bonus, moins son bouclier : ce sont ses dégâts. Surcharge armée : un dé de plus.");
+            Add(ActionHelp(CrewAction.Sabotage), "Sabotage : glissez vers un adversaire pour relancer son bouclier (1d8).");
+            Add(ActionHelp(CrewAction.RerollShield), "Reparamétrage : touchez pour relancer votre bouclier (1d8 ; avec la surcharge armée, 2d8 plafonnés à 8).");
+            Add(ActionHelp(CrewAction.Overcharge), "Surcharge : touchez pour gagner un jeton de surcharge (un au plus).");
+            Add(ActionHelp(CrewAction.DefensivePosture), "Posture défensive : touchez pour renforcer votre bouclier jusqu'à votre prochain tour.");
 
             // Engine decision prompts (RULES B6); an unknown prompt shows "#decision.key" until its text is added.
             Add(Decision("bet.face"), "Annoncez une valeur de dé");

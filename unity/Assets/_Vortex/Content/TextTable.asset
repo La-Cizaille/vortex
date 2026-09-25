@@ -297,3 +297,35 @@ MonoBehaviour:
     Text: "Quel modificateur de la cible d\xE9fausser ?"
   - Key: decision.swap.targetCard
     Text: "Avec quelle carte \xE9changer ?"
+  - Key: button.end-turn
+    Text: Fin de tour
+  - Key: button.end-market
+    Text: "Passer le march\xE9"
+  - Key: button.recycle
+    Text: Recycler
+  - Key: button.combo
+    Text: Combo
+  - Key: help.overcharge
+    Text: "Surcharge : touchez le jeton pour l'armer. La prochaine attaque ou le prochain reparam\xE9trage la d\xE9pense (un d\xE9 de plus). Touchez de nouveau pour la d\xE9sarmer."
+  - Key: help.combo
+    Text: "Combo : vos deux modificateurs sont de la m\xEAme technologie. Ils sont d\xE9fauss\xE9s et la technologie est obtenue."
+  - Key: action.short.Attack
+    Text: ATQ
+  - Key: action.short.Sabotage
+    Text: SAB
+  - Key: action.short.RerollShield
+    Text: REP
+  - Key: action.short.Overcharge
+    Text: SUR
+  - Key: action.short.DefensivePosture
+    Text: POS
+  - Key: action.help.Attack
+    Text: "Attaque : glissez vers un adversaire. D\xE9s lanc\xE9s, plus les bonus, moins son bouclier : ce sont ses d\xE9g\xE2ts. Surcharge arm\xE9e : un d\xE9 de plus."
+  - Key: action.help.Sabotage
+    Text: 'Sabotage : glissez vers un adversaire pour relancer son bouclier (1d8).'
+  - Key: action.help.RerollShield
+    Text: "Reparam\xE9trage : touchez pour relancer votre bouclier (1d8 ; avec la surcharge arm\xE9e, 2d8 plafonn\xE9s \xE0 8)."
+  - Key: action.help.Overcharge
+    Text: 'Surcharge : touchez pour gagner un jeton de surcharge (un au plus).'
+  - Key: action.help.DefensivePosture
+    Text: "Posture d\xE9fensive : touchez pour renforcer votre bouclier jusqu'\xE0 votre prochain tour."

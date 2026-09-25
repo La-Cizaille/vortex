@@ -9,6 +9,7 @@ using UnityEngine.UI;
 using Vortex.Client.Content;
 using Vortex.Client.Presentation;
 using Vortex.Client.Theme;
+using Vortex.Core.Commands;
 
 namespace Vortex.Editor
 {
@@ -77,7 +78,7 @@ namespace Vortex.Editor
             shape.pivot = new Vector2(0.5f, 1f);
 
             Image highlight = UiBuilder.Box(UiBuilder.Part<Image>(root.transform, "Cadre", Vector2.zero, Vector2.one, new Vector2(-4f, -4f), new Vector2(4f, 4f)), Color.white);
-            UiBuilder.Box(UiBuilder.Part<Image>(root.transform, "Fond", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), SeatBackground);
+            UiBuilder.Box(UiBuilder.Part<Image>(root.transform, "Fond", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), SeatBackground, receivesPointer: true);
             TMP_Text name = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "Nom", new Vector2(0f, 1f), new Vector2(12f, -8f), new Vector2(150f, 26f)), 20f, FontStyles.Bold, TextAlignmentOptions.Left);
             TMP_Text hp = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "PV", new Vector2(0f, 1f), new Vector2(12f, -38f), new Vector2(150f, 24f)), 18f, FontStyles.Normal, TextAlignmentOptions.Left);
             TMP_Text shield = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "Bouclier", new Vector2(0f, 1f), new Vector2(12f, -62f), new Vector2(150f, 24f)), 18f, FontStyles.Normal, TextAlignmentOptions.Left);
@@ -91,7 +92,7 @@ namespace Vortex.Editor
             statuses.color = Muted;
             GameObject leader = Tag(root.transform, new Vector2(0.5f, 1f), new Vector2(0f, 30f));
 
-            root.GetComponent<SeatDisplay>().Assign(name, hp, shield, statuses, overcharge, rounds, attack, defense, highlight, leader, root.GetComponent<CanvasGroup>());
+            root.GetComponent<SeatDisplay>().Assign(name, hp, shield, statuses, overcharge, rounds, attack, defense, highlight, leader, root.GetComponent<CanvasGroup>(), growOnHover: 1.3f);
             Directory.CreateDirectory(Path.GetDirectoryName(SeatPanelPath)!);
             PrefabUtility.SaveAsPrefabAsset(root, SeatPanelPath);
             Object.DestroyImmediate(root);
@@ -127,12 +128,45 @@ namespace Vortex.Editor
             RectTransform foreground = UiBuilder.Part<RectTransform>(front.transform, "Centre", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
 
             RectTransform opponents = UiBuilder.Part<RectTransform>(ui, "Adversaires", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
-            MarketDisplay market = BuildMarket(ui);
-            SeatDisplay player = BuildPlayerPanel(ui);
+            (MarketDisplay market, Button recycleAttack, Button recycleDefense, Button endMarket) = BuildMarket(ui);
+            (SeatDisplay player, ActionButton[] actions, Button combo, Button overcharge, Graphic overchargeGlow) = BuildPlayerPanel(ui);
             RoundBanner banner = BuildBanner(ui);
             GameLogDisplay log = BuildLog(ui);
             PlaybackControls playback = BuildPlayback(ui);
-            CommandPanel commands = BuildCommandPanel(ui);
+            (Button endTurn, TMP_Text endTurnLabel) = UiBuilder.Button(ui, "Fin de tour", new Vector2(1f, 0f), new Vector2(-240f, 20f), new Vector2(220f, 104f));
+            endTurnLabel.fontSize = 26f;
+            endTurnLabel.fontStyle = FontStyles.Bold;
+            CommandPanel commands = BuildChoicePanel(ui, "Coups (mode test)", new Vector2(1f, 0f), new Vector2(-20f, 132f), 520f, 3);
+
+            // Foreground: the decision window, the help bubble and the aim line stay above the 3D cards.
+            CommandPanel decision = BuildChoicePanel(front.transform, "Décision", new Vector2(0.5f, 0.5f), new Vector2(0f, 60f), 720f, 3);
+            HelpBubble help = BuildHelp(front.transform);
+            Image aimLine = UiBuilder.Fixed<Image>(front.transform, "Visée", new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(10f, 8f));
+            aimLine.rectTransform.pivot = new Vector2(0f, 0.5f);
+            aimLine.color = new Color32(255, 214, 102, 220);
+            aimLine.raycastTarget = false;
+            aimLine.gameObject.SetActive(false);
+
+            var controls = new GameObject("Commandes", typeof(PlayerControls)).GetComponent<PlayerControls>();
+            controls.Assign(
+                actions,
+                combo,
+                combo.GetComponent<Image>(),
+                combo.GetComponentInChildren<TMP_Text>(),
+                endTurn,
+                endTurn.GetComponent<Image>(),
+                endTurnLabel,
+                endMarket,
+                endMarket.GetComponentInChildren<TMP_Text>(),
+                recycleAttack,
+                recycleDefense,
+                overcharge,
+                overchargeGlow,
+                decision,
+                help,
+                aimLine.rectTransform,
+                (RectTransform)player.transform,
+                (RectTransform)market.transform);
 
             var director = new GameObject("Partie", typeof(GameDirector)).GetComponent<GameDirector>();
             director.Assign(
@@ -155,16 +189,18 @@ namespace Vortex.Editor
                 centre,
                 camera);
             director.AssignTestMode(commands);
+            director.AssignControls(controls, AssetDatabase.LoadAssetAtPath<IconCatalog>(ThemeAssets.IconsPath));
 
             CardZoom zoom = new GameObject("Zoom", typeof(CardZoom)).GetComponent<CardZoom>();
             director.AssignCards(cards, zoom, foreground);
         }
 
-        // Test mode: one button per legal move, in the free space right of the player's ship, above the playback
-        // buttons; it grows upwards.
-        private static CommandPanel BuildCommandPanel(Transform ui)
+        // A window of choices: a title and one button per choice, three per row; it grows upwards from its anchor. The
+        // test-mode panel (every allowed move) and the decision window are built with it.
+        private static CommandPanel BuildChoicePanel(Transform parent, string name, Vector2 anchor, Vector2 position, float width, int columns)
         {
-            Image root = UiBuilder.Box(UiBuilder.Fixed<Image>(ui, "Coups (mode test)", new Vector2(1f, 0f), new Vector2(-20f, 132f), new Vector2(520f, 100f)), Panel, receivesPointer: true);
+            Image root = UiBuilder.Box(UiBuilder.Fixed<Image>(parent, name, anchor, position, new Vector2(width, 100f)), Panel, receivesPointer: true);
+            root.rectTransform.pivot = new Vector2(anchor.x, 0f);
             VerticalLayoutGroup layout = root.gameObject.AddComponent<VerticalLayoutGroup>();
             layout.padding = new RectOffset(10, 10, 8, 10);
             layout.spacing = 6f;
@@ -174,15 +210,15 @@ namespace Vortex.Editor
             layout.childForceExpandHeight = false;
             root.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-            TMP_Text title = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(root.transform, "Titre", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), 20f, FontStyles.Bold, TextAlignmentOptions.Left);
-            title.fontSize = 18f;
+            TMP_Text title = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(root.transform, "Titre", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), 18f, FontStyles.Bold, TextAlignmentOptions.Left);
             GridLayoutGroup grid = UiBuilder.Part<GridLayoutGroup>(root.transform, "Boutons", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
-            grid.cellSize = new Vector2(162f, 38f);
+            float cell = (width - 20f - ((columns - 1) * 8f)) / columns;
+            grid.cellSize = new Vector2(cell, 38f);
             grid.spacing = new Vector2(8f, 5f);
             grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            grid.constraintCount = 3;
+            grid.constraintCount = columns;
 
-            (Button template, TMP_Text label) = UiBuilder.Button(root.transform, "Modèle de bouton", Vector2.zero, Vector2.zero, new Vector2(162f, 38f));
+            (Button template, TMP_Text label) = UiBuilder.Button(root.transform, "Modèle de bouton", Vector2.zero, Vector2.zero, new Vector2(cell, 38f));
             label.fontSize = 15f;
             label.enableAutoSizing = true;
             label.fontSizeMin = 10f;
@@ -195,24 +231,46 @@ namespace Vortex.Editor
             return panel;
         }
 
-        // The two black markets in the middle: attack on the left, defense on the right (INTERFACE.md 3.3).
-        private static MarketDisplay BuildMarket(Transform ui)
+        // The help shown next to what the pointer is on: a small panel whose height follows its text.
+        private static HelpBubble BuildHelp(Transform parent)
+        {
+            Image bubble = UiBuilder.Box(UiBuilder.Fixed<Image>(parent, "Aide", new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(420f, 60f)), new Color(0.02f, 0.03f, 0.07f, 0.95f));
+            bubble.rectTransform.pivot = new Vector2(0.5f, 0f);
+            VerticalLayoutGroup layout = bubble.gameObject.AddComponent<VerticalLayoutGroup>();
+            layout.padding = new RectOffset(12, 12, 8, 8);
+            layout.childControlWidth = true;
+            layout.childControlHeight = true;
+            bubble.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            TMP_Text text = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(bubble.transform, "Texte", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), 17f, FontStyles.Normal, TextAlignmentOptions.TopLeft);
+            HelpBubble help = bubble.gameObject.AddComponent<HelpBubble>();
+            help.Assign(bubble.rectTransform, text);
+            bubble.gameObject.SetActive(false);
+            return help;
+        }
+
+        // The two black markets in the middle: attack on the left, defense on the right (INTERFACE.md 3.3), with their
+        // buttons at their level (ARB-71): "Recycler" in each half's header, "Passer le marché" above the middle.
+        private static (MarketDisplay Market, Button RecycleAttack, Button RecycleDefense, Button EndMarket) BuildMarket(Transform ui)
         {
             // 1180 wide: the panels of the opponents at the ends of the arc stay clear of it.
             Image root = UiBuilder.Box(UiBuilder.Fixed<Image>(ui, "Marché noir", new Vector2(0.5f, 0.5f), new Vector2(0f, -20f), new Vector2(1180f, 210f)), new Color(0f, 0f, 0f, 0.35f));
-            (RectTransform attackRow, TMP_Text attackLabel, TMP_Text attackDeck) = MarketHalf(root.transform, "ATK", 0f, 0.5f);
-            (RectTransform defenseRow, TMP_Text defenseLabel, TMP_Text defenseDeck) = MarketHalf(root.transform, "DEF", 0.5f, 1f);
+            (RectTransform attackRow, TMP_Text attackLabel, TMP_Text attackDeck, Button recycleAttack) = MarketHalf(root.transform, "ATK", 0f, 0.5f);
+            (RectTransform defenseRow, TMP_Text defenseLabel, TMP_Text defenseDeck, Button recycleDefense) = MarketHalf(root.transform, "DEF", 0.5f, 1f);
+            (Button endMarket, TMP_Text endLabel) = UiBuilder.Button(root.transform, "Passer le marché", new Vector2(0.5f, 1f), new Vector2(0f, 46f), new Vector2(220f, 40f));
+            endLabel.fontSize = 18f;
             MarketDisplay market = root.gameObject.AddComponent<MarketDisplay>();
             market.Assign(attackRow, defenseRow, attackLabel, defenseLabel, attackDeck, defenseDeck, 133f);
-            return market;
+            return (market, recycleAttack, recycleDefense, endMarket);
         }
 
-        private static (RectTransform Row, TMP_Text Label, TMP_Text Deck) MarketHalf(Transform parent, string name, float from, float to)
+        private static (RectTransform Row, TMP_Text Label, TMP_Text Deck, Button Recycle) MarketHalf(Transform parent, string name, float from, float to)
         {
             RectTransform half = UiBuilder.Part<RectTransform>(parent, name, new Vector2(from, 0f), new Vector2(to, 1f), Vector2.zero, Vector2.zero);
             TMP_Text label = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(half, "Titre", new Vector2(0f, 1f), new Vector2(16f, -6f), new Vector2(200f, 28f)), 22f, FontStyles.Bold, TextAlignmentOptions.Left);
             TMP_Text deck = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(half, "Pioche", Vector2.one, new Vector2(-16f, -8f), new Vector2(200f, 24f)), 16f, FontStyles.Normal, TextAlignmentOptions.Right);
             deck.color = Muted;
+            (Button recycle, TMP_Text recycleLabel) = UiBuilder.Button(half, "Recycler", new Vector2(0.5f, 1f), new Vector2(0f, -4f), new Vector2(140f, 30f));
+            recycleLabel.fontSize = 16f;
             HorizontalLayoutGroup row = UiBuilder.Part<HorizontalLayoutGroup>(half, "Cartes", Vector2.zero, Vector2.one, new Vector2(10f, 8f), new Vector2(-10f, -38f));
             row.spacing = 10f;
             row.childAlignment = TextAnchor.MiddleCenter;
@@ -220,11 +278,13 @@ namespace Vortex.Editor
             row.childControlHeight = true;
             row.childForceExpandWidth = false;
             row.childForceExpandHeight = false;
-            return ((RectTransform)row.transform, label, deck);
+            return ((RectTransform)row.transform, label, deck, recycle);
         }
 
-        // The player's own seat at the bottom: modifiers on each side of the ship, figures under it (INTERFACE.md 3.2).
-        private static SeatDisplay BuildPlayerPanel(Transform ui)
+        // The player's own seat at the bottom: modifiers on each side of the ship, figures under it (INTERFACE.md 3.2), the
+        // crew actions in a half-circle above the ship (3.4), the combo above the attack card, the overcharge token
+        // armable by a tap (ARB-67).
+        private static (SeatDisplay Seat, ActionButton[] Actions, Button Combo, Button Overcharge, Graphic OverchargeGlow) BuildPlayerPanel(Transform ui)
         {
             RectTransform root = UiBuilder.Fixed<RectTransform>(ui, "Joueur", new Vector2(0.5f, 0f), Vector2.zero, new Vector2(1100f, 320f));
             root.gameObject.AddComponent<CanvasGroup>();
@@ -239,14 +299,53 @@ namespace Vortex.Editor
             Image[] rounds = Enumerable.Range(0, 4)
                 .Select(i => Disc(stats.transform, "Technologie " + (i + 1), new Vector2(0.5f, 1f), new Vector2(-54f + (i * 30f), -74f), 24f))
                 .ToArray();
+            Image glow = Disc(stats.transform, "Surcharge armée", new Vector2(0.5f, 1f), new Vector2(86f, -70f), 32f);
+            glow.color = new Color32(255, 214, 102, 255);
+            glow.enabled = false;
             Image overcharge = Disc(stats.transform, "Surcharge", new Vector2(0.5f, 1f), new Vector2(90f, -74f), 24f);
+            overcharge.raycastTarget = true;
+            Button overchargeButton = overcharge.gameObject.AddComponent<Button>();
             TMP_Text statuses = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root, "Effets", new Vector2(0.5f, 0f), new Vector2(0f, 128f), new Vector2(560f, 28f)), 16f, FontStyles.Normal, TextAlignmentOptions.Center);
             statuses.color = Muted;
             GameObject leader = Tag(root, new Vector2(0.5f, 0f), new Vector2(0f, 160f));
 
+            (Button combo, TMP_Text comboLabel) = UiBuilder.Button(root, "Combo", new Vector2(0.5f, 0f), new Vector2(-340f, 244f), new Vector2(150f, 40f));
+            comboLabel.fontStyle = FontStyles.Bold;
+
+            // The ship stands a quarter of the screen up (GameDirector), that is 270 units above the panel's bottom.
+            var ship = new Vector2(0f, 270f);
+            CrewAction[] order = { CrewAction.Attack, CrewAction.Sabotage, CrewAction.RerollShield, CrewAction.Overcharge, CrewAction.DefensivePosture };
+            float[] angles = { 160f, 125f, 90f, 55f, 20f };
+            var actions = new ActionButton[order.Length];
+            for (int i = 0; i < order.Length; i++)
+            {
+                float angle = angles[i] * Mathf.Deg2Rad;
+                Vector2 place = ship + (new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * 125f);
+                actions[i] = BuildAction(root, order[i], place);
+            }
+
             SeatDisplay seat = root.gameObject.AddComponent<SeatDisplay>();
             seat.Assign(name, hp, shield, statuses, overcharge, rounds, attack, defense, highlight, leader, root.GetComponent<CanvasGroup>());
-            return seat;
+            return (seat, actions, combo, overchargeButton, glow);
+        }
+
+        // One action: a disc with the pictogram, or its short name while the icon is missing.
+        private static ActionButton BuildAction(Transform parent, CrewAction action, Vector2 centre)
+        {
+            Image disc = UiBuilder.Fixed<Image>(parent, "Action " + action, new Vector2(0.5f, 0f), Vector2.zero, new Vector2(56f, 56f));
+            disc.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            disc.rectTransform.anchoredPosition = centre;
+            disc.sprite = UiBuilder.Disc;
+            disc.color = new Color(0.1f, 0.12f, 0.2f, 0.95f);
+            disc.raycastTarget = true;
+            CanvasGroup group = disc.gameObject.AddComponent<CanvasGroup>();
+            Image icon = UiBuilder.Part<Image>(disc.transform, "Pictogramme", Vector2.zero, Vector2.one, new Vector2(8f, 8f), new Vector2(-8f, -8f));
+            icon.preserveAspect = true;
+            icon.raycastTarget = false;
+            TMP_Text shortName = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(disc.transform, "Nom court", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), 16f, FontStyles.Bold, TextAlignmentOptions.Center);
+            ActionButton button = disc.gameObject.AddComponent<ActionButton>();
+            button.Assign(action, icon, shortName, group);
+            return button;
         }
 
         // Round, event, doom countdown and result, at the top centre (INTERFACE.md 3.8).
