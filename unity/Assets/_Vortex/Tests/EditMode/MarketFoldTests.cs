@@ -34,12 +34,14 @@ namespace Vortex.Tests.EditMode
                 Assume.That(director.Controls.CanEndMarket, Is.True, "The person's market.");
                 Assert.That(market.Open, Is.True);
                 Assert.That(shape.localScale.x, Is.EqualTo(1f), "Fully open once it has moved.");
+                Rect openMarket = CardAnchor.ScreenRectOf(shape);
 
                 director.Controls.EndMarket();
                 Wait(director);
                 Assume.That(director.Controls.CanEndMarket, Is.False, "The person's actions, after the market.");
                 Assert.That(market.Open, Is.False, "Folded after the market phase.");
                 Assert.That(shape.localScale.x, Is.EqualTo(folded).Within(0.001f));
+                Assert.That(CardAnchor.ScreenRectOf(director.Controls.ActivationZone), Is.EqualTo(openMarket), "A card is still used by a drop in the middle, where the open market was.");
 
                 market.Toggle();
                 director.Advance(1f);
