@@ -77,9 +77,9 @@ namespace Vortex.Tests.EditMode
                 _director.Advance(2f);
                 if (Controls.Offered && !Controls.CanEndMarket)
                 {
-                    if (Controls.Decision.gameObject.activeSelf && Controls.Decision.Options.Count > 0)
+                    if (TableAnswers.Answer(Controls))
                     {
-                        Controls.Decision.Choose(0);
+                        // A decision, answered on the table (ARB-82).
                     }
                     else
                     {

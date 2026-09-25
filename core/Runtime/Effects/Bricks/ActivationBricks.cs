@@ -173,7 +173,10 @@ namespace Vortex.Core.Effects.Bricks
         }
     }
 
-    /// <summary>Chooses one modifier of an opponent, then steals it (into the holder's matching slot) or destroys it.</summary>
+    /// <summary>
+    /// Chooses one modifier of an opponent, then steals it (into the holder's matching slot) or destroys it. Both answers
+    /// name the card; "steal" also names the holder, where the card goes (a client offers them as places to drop it).
+    /// </summary>
     internal sealed class StealOrDestroyOpponentModifier : ActivationBrick
     {
         public override string Name => nameof(StealOrDestroyOpponentModifier);
@@ -185,7 +188,11 @@ namespace Vortex.Core.Effects.Bricks
             int target = game.AskPlayer(self.Holder, "steal.opponent", self.Id, OpponentsWithModifiers(game, self));
             CardInstance card = game.AskCard(self.Holder, DecisionKind.ChooseModifier, "steal.card", self.Id, game.Player(target).Modifiers().ToList())!;
             CardSlot slot = game.Definition(card).Slot;
-            var options = new List<DecisionOption> { new DecisionOption { Key = "steal" }, new DecisionOption { Key = "destroy" } };
+            var options = new List<DecisionOption>
+            {
+                new DecisionOption { Key = "steal", CardUid = card.Uid, Player = self.Holder },
+                new DecisionOption { Key = "destroy", CardUid = card.Uid },
+            };
             if (game.Ask(self.Holder, DecisionKind.ChooseOption, "steal.or.destroy", self.Id, options) == "steal")
             {
                 game.MoveModifier(target, slot, self.Holder, self);
@@ -441,7 +448,8 @@ namespace Vortex.Core.Effects.Bricks
 
     /// <summary>
     /// Every shield moves one seat in the chosen direction among the alive players whose shield the holder may
-    /// modify; the others keep theirs and are skipped.
+    /// modify; the others keep theirs and are skipped. Each direction names the seat that would receive the holder's
+    /// shield (a client offers that neighbour to choose the direction).
     /// </summary>
     internal sealed class RotateShields : ActivationBrick
     {
@@ -451,9 +459,13 @@ namespace Vortex.Core.Effects.Bricks
 
         public override void Activate(Game game, EffectSource self)
         {
-            var options = new List<DecisionOption> { new DecisionOption { Key = "clockwise", Number = 1 }, new DecisionOption { Key = "counterclockwise", Number = -1 } };
-            bool clockwise = game.Ask(self.Holder, DecisionKind.ChooseDirection, "rotate.direction", self.Id, options) == "clockwise";
             List<int> seats = Participants(game, self);
+            var options = new List<DecisionOption>
+            {
+                new DecisionOption { Key = "clockwise", Number = 1, Player = Receiver(seats, self.Holder, clockwise: true) },
+                new DecisionOption { Key = "counterclockwise", Number = -1, Player = Receiver(seats, self.Holder, clockwise: false) },
+            };
+            bool clockwise = game.Ask(self.Holder, DecisionKind.ChooseDirection, "rotate.direction", self.Id, options) == "clockwise";
             List<int> values = seats.Select(game.ShieldOf).ToList();
             int n = seats.Count;
             for (int i = 0; i < n; i++)
@@ -467,6 +479,14 @@ namespace Vortex.Core.Effects.Bricks
         private static List<int> Participants(Game game, EffectSource self)
         {
             return game.AliveFrom(0).Where(p => game.CanChangeShield(self.Holder, p)).ToList();
+        }
+
+        // The participant after the holder in the direction (seats in increasing order are clockwise), wrapping around.
+        private static int Receiver(List<int> seats, int holder, bool clockwise)
+        {
+            return clockwise
+                ? seats.Where(s => s > holder).DefaultIfEmpty(seats[0]).First()
+                : seats.Where(s => s < holder).DefaultIfEmpty(seats[seats.Count - 1]).Last();
         }
     }
 

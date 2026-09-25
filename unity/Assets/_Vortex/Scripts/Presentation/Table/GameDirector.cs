@@ -217,6 +217,7 @@ namespace Vortex.Client.Presentation
             PlaceSeats();
             market.Bind(_context);
             market.SetPurchase(controls.CanBuy, controls.Buy, controls.ExplainBuy, controls.HideHelp, MarkLoss);
+            market.SetCardTap(uid => controls.ChooseCard(uid));
             banner.Bind(_context);
             log.Bind(_context);
             playback.Bind(_context, _player);
@@ -489,6 +490,18 @@ namespace Vortex.Client.Presentation
         void IControlsHost.ShowTargets(IReadOnlyCollection<int>? seats) => ShowTargets(seats);
 
         /// <inheritdoc/>
+        void IControlsHost.MarkCards(IReadOnlyDictionary<int, Color>? marks)
+        {
+            Func<int, Color?> mark = uid => marks != null && marks.TryGetValue(uid, out Color color) ? color : (Color?)null;
+            foreach (SeatDisplay seat in _seats.Values)
+            {
+                seat.MarkCards(mark);
+            }
+
+            market.MarkCards(mark);
+        }
+
+        /// <inheritdoc/>
         CommandPreview? IControlsHost.Preview(int seat, Command command) => _session?.Preview(seat, command);
 
         /// <inheritdoc/>
@@ -520,10 +533,11 @@ namespace Vortex.Client.Presentation
             return -1;
         }
 
-        // While an action is aimed, the seats it may target light up and the others dim.
+        // While an action is aimed, or a decision offers seats, those light up and the others dim; the viewer's own seat
+        // only takes part when it is offered.
         private void ShowTargets(IReadOnlyCollection<int>? targets)
         {
-            foreach (KeyValuePair<int, SeatDisplay> seat in _seats.Where(s => s.Key != _viewer))
+            foreach (KeyValuePair<int, SeatDisplay> seat in _seats.Where(s => s.Key != _viewer || (targets != null && targets.Contains(_viewer)) || targets is null))
             {
                 seat.Value.ShowTargeting(targets is null ? (bool?)null : targets.Contains(seat.Key));
             }
@@ -613,6 +627,7 @@ namespace Vortex.Client.Presentation
             _seats[_viewer] = playerSeat;
             playerSeat.Bind(_context!);
             playerSeat.SetCardUse(controls.CanUse, controls.UseCard, controls.ExplainUse, controls.HideHelp);
+            AnswerOn(playerSeat, _viewer);
 
             IReadOnlyList<int> opponents = SeatLayout.Opponents(count, _viewer);
             for (int i = 0; i < opponents.Count; i++)
@@ -625,8 +640,19 @@ namespace Vortex.Client.Presentation
                 panel.name = "Adversaire " + (opponents[i] + 1).ToString(CultureInfo.InvariantCulture);
                 panel.gameObject.AddComponent<ScreenAnchor>().Follow(ship, view, opponentPanelOffset);
                 panel.Bind(_context!);
+
+                // Another player's card is dragged only to answer a decision (steal or destroy, ARB-82).
+                panel.SetCardUse(controls.CanUse, controls.UseCard);
+                AnswerOn(panel, opponents[i]);
                 _seats[opponents[i]] = panel;
             }
+        }
+
+        // A decision is answered by touching a seat's panel or one of its cards (ARB-82).
+        private void AnswerOn(SeatDisplay panel, int seat)
+        {
+            panel.Tapped = () => controls.ChooseSeat(seat);
+            panel.SetCardTap(uid => controls.ChooseCard(uid));
         }
 
         // The point of the table (the y = 0 plane) seen at a screen position, so the layout is set in screen terms.
