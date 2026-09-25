@@ -126,6 +126,7 @@ namespace Vortex.Editor
 
             // Foreground: the decision window, the help bubble and the aim line stay above the 3D cards.
             CommandPanel decision = BuildChoicePanel(front.transform, "Décision", new Vector2(0.5f, 0.5f), new Vector2(0f, 60f), 720f, 3);
+            DecisionBoard board = BuildDecisionBoard(front.transform);
             HelpBubble help = BuildHelp(front.transform);
             Image aimLine = UiBuilder.Fixed<Image>(front.transform, "Visée", new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(10f, 8f));
             aimLine.rectTransform.pivot = new Vector2(0f, 0.5f);
@@ -154,6 +155,7 @@ namespace Vortex.Editor
                 (RectTransform)player.transform,
                 middle);
             controls.AssignArc(player.GetComponent<ActionArc>());
+            controls.AssignBoard(board);
 
             var director = new GameObject("Partie", typeof(GameDirector)).GetComponent<GameDirector>();
             director.Assign(
@@ -299,6 +301,49 @@ namespace Vortex.Editor
         }
 
         // The help shown next to what the pointer is on: a small panel whose height follows its text.
+        // A decision answered on the table (INTERFACE.md 3.6, ARB-82): its question above the middle, with no button; eight
+        // die faces for a number; up to three places in the middle for the cards it shows (events, the card that asks).
+        private static DecisionBoard BuildDecisionBoard(Transform parent)
+        {
+            RectTransform root = UiBuilder.Part<RectTransform>(parent, "Décision sur la table", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            Image panel = UiBuilder.Box(UiBuilder.Fixed<Image>(root, "Question", new Vector2(0.5f, 0.5f), new Vector2(0f, 104f), new Vector2(900f, 48f)), new Color(0.02f, 0.03f, 0.07f, 0.9f));
+            TMP_Text question = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(panel.transform, "Texte", Vector2.zero, Vector2.one, new Vector2(12f, 2f), new Vector2(-12f, -2f)), 20f, FontStyles.Bold, TextAlignmentOptions.Center);
+            question.enableAutoSizing = true;
+            question.fontSizeMin = 13f;
+            question.fontSizeMax = 20f;
+            question.color = new Color32(255, 214, 102, 255);
+
+            // Die faces: a diamond like the die of the table, the number upright on it.
+            const float face = 64f;
+            const float gap = 12f;
+            var faces = new Button[8];
+            for (int i = 0; i < faces.Length; i++)
+            {
+                float x = (i - (faces.Length - 1) / 2f) * (face + gap);
+                Image area = UiBuilder.Fixed<Image>(root, "Face " + (i + 1), new Vector2(0.5f, 0.5f), new Vector2(x, 20f), new Vector2(face, face));
+                area.color = Color.clear;
+                Image diamond = UiBuilder.Box(UiBuilder.Fixed<Image>(area.transform, "Losange", new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(face * 0.72f, face * 0.72f)), new Color32(236, 238, 245, 255));
+                diamond.rectTransform.localRotation = Quaternion.Euler(0f, 0f, 45f);
+                TMP_Text number = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(area.transform, "Chiffre", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), 26f, FontStyles.Bold, TextAlignmentOptions.Center);
+                number.color = new Color32(20, 22, 34, 255);
+                faces[i] = area.gameObject.AddComponent<Button>();
+                faces[i].targetGraphic = diamond;
+                ColorBlock colors = faces[i].colors;
+                colors.disabledColor = new Color(1f, 1f, 1f, 0.2f);
+                faces[i].colors = colors;
+            }
+
+            var middle = new RectTransform[3];
+            for (int i = 0; i < middle.Length; i++)
+            {
+                middle[i] = UiBuilder.Fixed<RectTransform>(root, "Carte au centre " + (i + 1), new Vector2(0.5f, 0.5f), new Vector2(0f, -10f), new Vector2(130f, 180f));
+            }
+
+            DecisionBoard board = root.gameObject.AddComponent<DecisionBoard>();
+            board.Assign(panel.gameObject, question, faces, middle);
+            return board;
+        }
+
         private static HelpBubble BuildHelp(Transform parent)
         {
             Image bubble = UiBuilder.Box(UiBuilder.Fixed<Image>(parent, "Aide", new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(420f, 60f)), new Color(0.02f, 0.03f, 0.07f, 0.95f));

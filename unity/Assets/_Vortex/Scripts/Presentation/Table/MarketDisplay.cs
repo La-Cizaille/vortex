@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -45,6 +46,7 @@ namespace Vortex.Client.Presentation
         private Action<CardSlot, int, RectTransform>? _refused;
         private Action? _released;
         private Action<CardSlot, bool>? _holding;
+        private Action<int>? _tap;
         private bool? _marketTime;
         private float _unfolded;
 
@@ -115,6 +117,28 @@ namespace Vortex.Client.Presentation
             _holding = holding;
         }
 
+        /// <summary>Sets what a touch of a market card does, given its uid (a decision's answer, ARB-82).</summary>
+        public void SetCardTap(Action<int> tap)
+        {
+            _tap = tap;
+            foreach (CardHolder holder in _attack.Concat(_defense))
+            {
+                Tap(holder);
+            }
+        }
+
+        /// <summary>Marks each market card with the colour <paramref name="mark"/> gives its uid, or gives it back its own.</summary>
+        public void MarkCards(Func<int, Color?> mark)
+        {
+            foreach (CardHolder holder in _attack.Concat(_defense))
+            {
+                if (_context != null && holder.Card != null && holder.Shown != null)
+                {
+                    holder.Card.Mark(mark(holder.Shown.Uid), _context.Theme);
+                }
+            }
+        }
+
         /// <summary>Shows both markets as the table model has them.</summary>
         public void Show(TableModel table, bool redrawCards = false)
         {
@@ -153,6 +177,18 @@ namespace Vortex.Client.Presentation
             defenseLabel = defenseTitle;
             attackDeck = attackDeckLabel;
             defenseDeck = defenseDeckLabel;
+        }
+
+        private void Tap(CardHolder holder)
+        {
+            Action<int>? tap = _tap;
+            holder.OnTap = tap is null ? null : () =>
+            {
+                if (holder.Shown != null)
+                {
+                    tap(holder.Shown.Uid);
+                }
+            };
         }
 
         private void SetOpen(bool open, bool instant = false)
@@ -213,6 +249,7 @@ namespace Vortex.Client.Presentation
                     }
                 }
 
+                Tap(holder);
                 row.Add(holder);
             }
 

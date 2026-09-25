@@ -111,9 +111,9 @@ namespace Vortex.Tests.EditMode
                     }
                 }
 
-                if (controls.Decision.gameObject.activeSelf && controls.Decision.Options.Count > 0)
+                if (TableAnswers.Answer(controls))
                 {
-                    controls.Decision.Choose(0);
+                    // A decision, answered on the table (ARB-82).
                 }
                 else if (controls.CanEndMarket)
                 {
