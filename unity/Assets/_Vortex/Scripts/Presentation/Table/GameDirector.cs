@@ -38,6 +38,8 @@ namespace Vortex.Client.Presentation
         [SerializeField] private GameLogDisplay log = null!;
         [SerializeField] private PlaybackControls playback = null!;
         [SerializeField] private CommandPanel commands = null!;
+        [SerializeField] private PlayerControls controls = null!;
+        [SerializeField] private IconCatalog icons = null!;
         [SerializeField] private CardZoom zoom = null!;
         [SerializeField] private Transform shipRow = null!;
         [SerializeField] private Transform tableCentre = null!;
@@ -62,8 +64,10 @@ namespace Vortex.Client.Presentation
         [SerializeField] private Vector2 opponentPanelOffset = new Vector2(0f, -45f);
 
         [Header("Partie de test (en attendant les menus)")]
-        [Tooltip("Mode test : le siège 1 est joué par vous, à l'aide du panneau des coups ; les autres sièges par des bots.")]
+        [Tooltip("Le siège 1 est joué par vous (gestes à la souris ou au doigt), les autres par des bots.")]
         [SerializeField] private bool humanFirstSeat = true;
+        [Tooltip("Mode test : affiche aussi le panneau qui liste tous les coups permis, un bouton par coup.")]
+        [SerializeField] private bool showCommandPanel;
         [SerializeField, Range(2, 5)] private int seatCount = 5;
         [SerializeField] private BotLevel botLevel = BotLevel.Normal;
         [Tooltip("0 : une graine différente à chaque partie.")]
@@ -83,6 +87,7 @@ namespace Vortex.Client.Presentation
         private GameLogFormatter? _log;
         private CommandLabels? _labels;
         private PanelState _panel;
+        private bool _controlsOffered;
         private int _viewer;
         private float _wait;
         private bool _dirty;
@@ -106,6 +111,16 @@ namespace Vortex.Client.Presentation
             get => humanFirstSeat;
             set => humanFirstSeat = value;
         }
+
+        /// <summary>Test mode: the panel listing every allowed move is shown too.</summary>
+        public bool ShowCommandPanel
+        {
+            get => showCommandPanel;
+            set => showCommandPanel = value;
+        }
+
+        /// <summary>The controls of the person playing.</summary>
+        public PlayerControls Controls => controls;
 
         /// <summary>Seat displays by seat number.</summary>
         public IReadOnlyDictionary<int, SeatDisplay> Seats => _seats;
@@ -133,6 +148,8 @@ namespace Vortex.Client.Presentation
             _viewer = 0;
             view.backgroundColor = theme.Background;
             _model = TableModel.From(_session.View, _session.Rules);
+            controls.Bind(_context, _labels, icons, _session.Rules.DefensivePostureBonus > 0, SeatAt, Submit, ShowTargets);
+            _controlsOffered = false;
 
             _player = new EventPlayer(type => feedback.For(type), this) { Speed = theme.PlaybackSpeed };
             _player.EventStarted += OnEventStarted;
@@ -140,6 +157,7 @@ namespace Vortex.Client.Presentation
 
             PlaceSeats();
             market.Bind(_context);
+            market.SetPurchase(controls.CanBuy, controls.Buy);
             banner.Bind(_context);
             log.Bind(_context);
             playback.Bind(_context, _player);
@@ -169,11 +187,13 @@ namespace Vortex.Client.Presentation
 
             if (_player.IsPlaying)
             {
+                WithdrawControls();
                 return;
             }
 
             if (_session.IsOver)
             {
+                WithdrawControls();
                 SetPanel(PanelState.Hidden);
                 return;
             }
@@ -181,11 +201,13 @@ namespace Vortex.Client.Presentation
             if (!_session.IsBotTurn)
             {
                 // A person's turn, or a person's decision during another seat's command.
-                SetPanel(PanelState.Choices);
+                OfferControls();
+                SetPanel(showCommandPanel ? PanelState.Choices : PanelState.Hidden);
                 return;
             }
 
-            SetPanel(PanelState.Waiting);
+            WithdrawControls();
+            SetPanel(showCommandPanel ? PanelState.Waiting : PanelState.Hidden);
             _wait += deltaTime * _player.Speed;
             if (_wait < botPause)
             {
@@ -261,8 +283,64 @@ namespace Vortex.Client.Presentation
             commands.Show(heading, choices);
         }
 
+        private void OfferControls()
+        {
+            if (_controlsOffered)
+            {
+                return;
+            }
+
+            int actor = _session!.Actor;
+            controls.Offer(actor, _session.View, _session.LegalCommands(actor), _session.Decision);
+            _controlsOffered = true;
+        }
+
+        private void WithdrawControls()
+        {
+            if (_controlsOffered)
+            {
+                controls.Withdraw();
+                _controlsOffered = false;
+            }
+        }
+
+        // The opponent under a screen position (their panel, or near their ship), or -1: where an aimed action lands.
+        private int SeatAt(Vector2 screen)
+        {
+            foreach (KeyValuePair<int, SeatDisplay> seat in _seats)
+            {
+                if (seat.Key != _viewer && CardAnchor.ScreenRectOf((RectTransform)seat.Value.transform).Contains(screen))
+                {
+                    return seat.Key;
+                }
+            }
+
+            float reach = 0.07f * view.pixelHeight;
+            foreach (KeyValuePair<int, Transform> ship in _ships)
+            {
+                if (ship.Key != _viewer && Vector2.Distance(view.WorldToScreenPoint(ship.Value.position), screen) < reach)
+                {
+                    return ship.Key;
+                }
+            }
+
+            return -1;
+        }
+
+        // While an action is aimed, the seats it may target light up and the others dim.
+        private void ShowTargets(IReadOnlyCollection<int>? targets)
+        {
+            foreach (KeyValuePair<int, SeatDisplay> seat in _seats.Where(s => s.Key != _viewer))
+            {
+                seat.Value.ShowTargeting(targets is null ? (bool?)null : targets.Contains(seat.Key));
+            }
+
+            _dirty = true;
+        }
+
         private void Submit(int seat, Command command)
         {
+            WithdrawControls();
             SetPanel(PanelState.Hidden);
             SessionResult result = _session!.Submit(seat, command);
             if (!result.Accepted)
@@ -341,6 +419,7 @@ namespace Vortex.Client.Presentation
             viewerShip.localScale = Vector3.one * viewerShipScale;
             _seats[_viewer] = playerSeat;
             playerSeat.Bind(_context!);
+            playerSeat.SetCardUse(controls.CanUse, controls.UseCard);
 
             IReadOnlyList<int> opponents = SeatLayout.Opponents(count, _viewer);
             for (int i = 0; i < opponents.Count; i++)
@@ -449,6 +528,13 @@ namespace Vortex.Client.Presentation
             cardRoot = cards;
             zoom = cardZoom;
             foreground = foregroundLayer;
+        }
+
+        /// <summary>Wires the controls of the person playing and the pictograms (editor setup).</summary>
+        public void AssignControls(PlayerControls playerControls, IconCatalog iconCatalog)
+        {
+            controls = playerControls;
+            icons = iconCatalog;
         }
 
         /// <summary>Wires the command panel of the test mode (editor setup).</summary>

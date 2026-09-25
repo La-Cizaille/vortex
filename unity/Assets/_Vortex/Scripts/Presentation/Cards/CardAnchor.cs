@@ -19,6 +19,9 @@ namespace Vortex.Client.Presentation
         private CardDisplay? _card;
         private float _depth;
 
+        /// <summary>While true, the card stays where it is put (it is being dragged); it goes back to its place after.</summary>
+        public bool Held { get; set; }
+
         /// <summary>The place followed, in screen pixels of the camera, as last placed.</summary>
         public Rect ScreenRect { get; private set; }
 
@@ -36,7 +39,7 @@ namespace Vortex.Client.Presentation
         /// <summary>Moves the card over its place now.</summary>
         public void Place()
         {
-            if (_slot == null || _view == null || _card == null)
+            if (_slot == null || _view == null || _card == null || Held)
             {
                 return;
             }

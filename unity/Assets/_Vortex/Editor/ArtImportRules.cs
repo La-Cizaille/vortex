@@ -97,9 +97,15 @@ namespace Vortex.Editor
 
         private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
         {
-            if (new[] { importedAssets, deletedAssets, movedAssets, movedFromAssetPaths }.Any(paths => paths.Any(p => IsIn(p, CardsFolder))))
+            string[][] changes = { importedAssets, deletedAssets, movedAssets, movedFromAssetPaths };
+            if (changes.Any(paths => paths.Any(p => IsIn(p, CardsFolder))))
             {
                 ThemeAssets.SyncCardArt();
+            }
+
+            if (changes.Any(paths => paths.Any(p => IsIn(p, IconsFolder))))
+            {
+                ThemeAssets.SyncIcons();
             }
         }
 

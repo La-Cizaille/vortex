@@ -1,5 +1,7 @@
+using System;
 using UnityEngine;
 using Vortex.Core.Projection;
+using Object = UnityEngine.Object;
 
 namespace Vortex.Client.Presentation
 {
@@ -12,6 +14,7 @@ namespace Vortex.Client.Presentation
         private readonly RectTransform _slot;
         private readonly RectTransform? _clip;
         private CardDisplay? _card;
+        private CardView? _shown;
         private int _uid = -1;
 
         /// <summary>Creates a holder over a place of the interface; outside <paramref name="clip"/>, its card is hidden.</summary>
@@ -20,6 +23,15 @@ namespace Vortex.Client.Presentation
             _slot = slot;
             _clip = clip;
         }
+
+        /// <summary>
+        /// Whether the card shown can be dragged now (null: never). Set it, with <see cref="OnDrop"/>, before the first
+        /// card is shown.
+        /// </summary>
+        public Func<CardView, bool>? CanDrag { get; set; }
+
+        /// <summary>What a drop of the card at a screen position does; returns false when refused (the card goes back).</summary>
+        public Func<CardView, Vector2, bool>? OnDrop { get; set; }
 
         /// <summary>The card shown, or null.</summary>
         public CardDisplay? Card => _card != null && _card.gameObject.activeSelf ? _card : null;
@@ -34,6 +46,7 @@ namespace Vortex.Client.Presentation
             }
 
             CardDisplay shown = Ensure(context);
+            _shown = card;
             if (redraw || card.Uid != _uid)
             {
                 shown.Show(context.Face(card.CardId), context.Theme, context.Art);
@@ -60,6 +73,7 @@ namespace Vortex.Client.Presentation
                 _card.gameObject.SetActive(false);
             }
 
+            _shown = null;
             _uid = -1;
         }
 
@@ -92,6 +106,15 @@ namespace Vortex.Client.Presentation
                 if (context.Zoom != null)
                 {
                     _card.gameObject.AddComponent<CardHover>().Bind(context.Zoom);
+                }
+
+                if (OnDrop != null)
+                {
+                    _card.gameObject.AddComponent<CardDrag>().Bind(
+                        () => _shown != null && CanDrag != null && CanDrag(_shown),
+                        screen => _shown != null && OnDrop(_shown, screen),
+                        context.View,
+                        context.CardDepth - 1f);
                 }
             }
 
