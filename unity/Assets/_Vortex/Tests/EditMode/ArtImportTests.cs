@@ -166,6 +166,55 @@ namespace Vortex.Tests.EditMode
             Assert.That(body.localScale, Is.EqualTo(Vector3.one));
         }
 
+        [Test]
+        public void Every_ship_model_follows_the_art_conventions()
+        {
+            // docs/ASSETS.md §2: about 2 m long and 2.4 m wide at most, 5,000 triangles at most, three materials at
+            // most including the seat paint, and no rotation or scale on arrival.
+            string[] paths = AssetDatabase.FindAssets("t:Model", new[] { ArtImportRules.ShipsFolder })
+                .Select(AssetDatabase.GUIDToAssetPath)
+                .ToArray();
+            if (paths.Length == 0)
+            {
+                Assert.Ignore("No ship model yet.");
+                return;
+            }
+
+            foreach (string path in paths)
+            {
+                var model = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                foreach (Transform part in model.GetComponentsInChildren<Transform>())
+                {
+                    Assert.That(Quaternion.Angle(part.localRotation, Quaternion.identity), Is.LessThan(0.01f), path + ": " + part.name + " arrives without rotation.");
+                    Assert.That(part.localScale, Is.EqualTo(Vector3.one), path + ": " + part.name + " arrives at scale 1.");
+                }
+
+                MeshFilter[] meshes = model.GetComponentsInChildren<MeshFilter>();
+                Bounds bounds = meshes[0].sharedMesh.bounds;
+                foreach (MeshFilter mesh in meshes)
+                {
+                    bounds.Encapsulate(mesh.sharedMesh.bounds);
+                }
+
+                Assert.That(bounds.size.x, Is.LessThanOrEqualTo(2.4f), path + ": width.");
+                Assert.That(bounds.size.z, Is.InRange(1.5f, 2.5f), path + ": length, nose along +Z.");
+                Assert.That(bounds.size.z, Is.GreaterThan(bounds.size.y), path + ": lies flat, top along +Y.");
+                Assert.That(meshes.Sum(mesh => Triangles(mesh.sharedMesh)), Is.LessThanOrEqualTo(5000), path + ": triangle budget.");
+
+                string[] materials = model.GetComponentsInChildren<Renderer>()
+                    .SelectMany(renderer => renderer.sharedMaterials)
+                    .Select(material => material.name)
+                    .Distinct()
+                    .ToArray();
+                Assert.That(materials.Length, Is.LessThanOrEqualTo(3), path + ": " + string.Join(", ", materials));
+                Assert.That(materials, Has.Some.StartsWith(ShipCatalog.SeatMaterialName), path + ": a part takes the seat colour.");
+            }
+        }
+
+        // Every material of a mesh is a sub-mesh of its own.
+        private static int Triangles(Mesh mesh) =>
+            Enumerable.Range(0, mesh.subMeshCount).Sum(subMesh => (int)mesh.GetIndexCount(subMesh) / 3);
+
         private static string PathOf(string id) => ArtImportRules.CardsFolder + "/" + id + ".png";
     }
 }

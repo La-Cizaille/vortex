@@ -144,6 +144,12 @@ La chaîne de production est décrite dans l'ADR-0016, les visuels à créer et 
 3. Dans Unity, associer le modèle à un siège ou au vaisseau par défaut dans `Theme/ShipCatalog`.
 4. Vérifier le résultat dans la scène Galerie, ou avec `tools/Capture-Unity.ps1`.
 
+**Le vaisseau Sillage** (ARB-84) se construit aussi par script : forme, chanfreins, dépliage UV, puis les textures (lignes de panneaux, teintes, usure, relief) calculées par Blender dans `art-src/ships/`. Changer une proportion, c'est changer un nombre dans `tools/blender/build_ship_sillage.py` et relancer les deux commandes :
+```
+blender --background --factory-startup --disable-autoexec --python tools/blender/build_ship_sillage.py -- art-src/ships/Ship_Sillage.blend
+blender --background --disable-autoexec art-src/ships/Ship_Sillage.blend --python tools/blender/export_unity.py -- unity/Assets/_Vortex/Art/Ships/Ship_Sillage.fbx --budget 5000
+```
+
 **Le corps de carte** se construit par script, puis s'exporte comme un vaisseau. Unity le prend seul comme corps de `Prefabs/Card.prefab` :
 ```
 blender --background --factory-startup --disable-autoexec --python tools/blender/build_card.py -- art-src/cards/Card.blend

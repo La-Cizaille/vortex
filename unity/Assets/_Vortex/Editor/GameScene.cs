@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 using Vortex.Client.Content;
 using Vortex.Client.Menus;
@@ -88,6 +89,9 @@ namespace Vortex.Editor
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.fieldOfView = 45f;
             camera.transform.SetPositionAndRotation(new Vector3(0f, 9f, -11f), Quaternion.Euler(38f, 0f, 0f));
+
+            // Post-processing on, for the Bloom that makes the glowing parts of the models shine (ASSETS section 2).
+            camera.GetUniversalAdditionalCameraData().renderPostProcessing = true;
 
             // Pointer events on 3D objects (cards), next to those of the interface.
             camera.gameObject.AddComponent<PhysicsRaycaster>();
