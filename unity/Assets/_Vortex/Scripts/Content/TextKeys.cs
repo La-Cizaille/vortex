@@ -332,6 +332,15 @@ namespace Vortex.Client.Content
         /// <summary>Banner when the view turns to a person. {0}: name.</summary>
         public const string TurnOf = "turn.of";
 
+        /// <summary>Local game menu: time of a turn. {0}: the time chosen.</summary>
+        public const string LocalTurnTime = "local.turn-time";
+
+        /// <summary>Local game menu: turns are not timed.</summary>
+        public const string LocalTurnTimeOff = "local.turn-time-off";
+
+        /// <summary>Local game menu: a turn time. {0}: seconds.</summary>
+        public const string LocalTurnTimeSeconds = "local.turn-time-seconds";
+
         /// <summary>A refusal with what forbids it. {0}: the reason, {1}: the card or status.</summary>
         public const string RefusalSource = "refusal.with-source";
 
@@ -487,6 +496,9 @@ namespace Vortex.Client.Content
             Add(GameOverMenu, "Menu");
             Add(TurnOf, "Tour de {0}");
             Add(RefusalSource, "{0} Cause : {1}.");
+            Add(LocalTurnTime, "Temps de tour : {0}");
+            Add(LocalTurnTimeOff, "illimité");
+            Add(LocalTurnTimeSeconds, "{0} s");
             Add(Refusal(CommandErrorCode.GameOver), "La partie est terminée.");
             Add(Refusal(CommandErrorCode.DecisionPending), "Une décision est en attente.");
             Add(Refusal(CommandErrorCode.NoDecisionPending), "Aucune décision n'est en attente.");

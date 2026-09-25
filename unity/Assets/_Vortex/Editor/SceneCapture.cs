@@ -41,6 +41,7 @@ namespace Vortex.Editor
             (Camera camera, RenderTexture target) = Prepare();
             GameDirector director = Object.FindAnyObjectByType<GameDirector>();
             director.HumanFirstSeat = human;
+            director.TurnSeconds = int.TryParse(Environment.GetEnvironmentVariable("VORTEX_TURN_SECONDS"), out int turn) ? turn : 0;
             director.Begin();
             for (int frame = 0; frame < 50000 && (toTheEnd ? !director.GameOver.Shown : director.Model!.Outcome == null); frame++)
             {

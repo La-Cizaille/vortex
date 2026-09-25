@@ -23,6 +23,7 @@ namespace Vortex.Client.Session
         private const ulong PreviewStream = 0x9E3779B97F4A7C15UL;
         private readonly GameEngine _engine;
         private readonly Pcg32 _guesses;
+        private readonly IBot _standIn;
         private readonly Dictionary<int, IBot> _bots = new Dictionary<int, IBot>();
         private GameState _state;
         private GameView _view;
@@ -43,6 +44,9 @@ namespace Vortex.Client.Session
 
             // Previews guess the hidden information with a generator of their own (ADR-0018), never the game's.
             _guesses = Pcg32.Seeded(seed, PreviewStream);
+
+            // Answers for a person whose time is up (ARB-80): a generic bot, which never reads hidden information.
+            _standIn = BotFactory.Create(BotLevel.Normal, (seed * 31UL) + 97UL);
             _state = start.State;
             _view = GameView.Of(_state);
             OpeningEvents = start.Events;
@@ -105,6 +109,26 @@ namespace Vortex.Client.Session
             }
 
             return SessionResult.From(result);
+        }
+
+        /// <summary>
+        /// The time of <paramref name="seat"/> is up (turn timer, ARB-80): plays one step for it. A decision awaited from the
+        /// seat is answered with the choice a bot judges best for it; otherwise its turn simply ends: the market phase is
+        /// left, then the turn is ended, or, when the turn cannot end yet (an imposed crew action), a bot plays the step
+        /// the rules require. Call it again, once the events are played, until the seat no longer has to act.
+        /// </summary>
+        public SessionResult Expire(int seat)
+        {
+            if (seat != Actor)
+            {
+                throw new InvalidOperationException("Only the seat that has to act can run out of time.");
+            }
+
+            IReadOnlyList<Command> legal = LegalCommands(seat);
+            Command? step = _state.Pending != null
+                ? null
+                : legal.FirstOrDefault(c => c.Type == CommandType.EndMarket) ?? legal.FirstOrDefault(c => c.Type == CommandType.EndTurn);
+            return Submit(seat, step ?? _standIn.Choose(_engine, _state, seat, legal));
         }
 
         /// <summary>Lets the bot whose turn it is play one command. Call it when the presentation is idle, to pace bots.</summary>

@@ -168,3 +168,11 @@ Le game designer a joué le prototype complet (menus, gestes, aperçus). Le jeu 
 |---|---|---|---|
 | ARB-74 | Comment disposer les actions d'équipage autour du vaisseau ? | **Un arc de cercle centré sur le vaisseau**, avec les actions d'attaque d'un côté (Attaque, Surcharge) et les actions de bouclier de l'autre (Reparamétrage, Sabotage). Mise en œuvre : attaque à gauche, du côté de la carte ATK, et bouclier à droite, du côté de la carte DEF ; sur chaque côté, l'action qui vise un adversaire est à l'extrémité et celle qui concerne son propre vaisseau vers le haut ; la Posture défensive (option) rejoint le côté bouclier. L'arc reste centré quelles que soient les options. | INTERFACE §3.4, `ActionArc` |
 | ARB-75 | Le journal doit-il garder toute la partie ? | **Oui : on peut remonter le journal.** Il garde les 300 dernières lignes, défile à la molette, au doigt ou avec sa barre, et ne suit les nouvelles lignes que si l'on est en bas. | INTERFACE §3.8, `GameLogDisplay` |
+
+## 2026-09-25 : fin de l'interface du prototype
+
+Le game designer a tranché les questions ouvertes d'INTERFACE §7 et les derniers points d'interface, sur les recommandations proposées. Les numéros ARB-76 à ARB-79 sont pris par l'atelier Blender.
+
+| # | Question | Décision | Appliqué dans |
+|---|---|---|---|
+| ARB-80 | Temps de tour limité (ARB-70) : durée, expiration, décisions, réglage par défaut ? | **Durée réglable** dans le menu de partie locale : illimitée, 60, 90 ou 120 secondes. **Pas de limite par défaut en partie locale** ; la limite servira surtout en ligne. **À l'expiration**, le tour s'arrête simplement : fin du marché, puis fin de tour ; aucun coup n'est joué à la place du joueur. Seule une action imposée par une carte est jouée, car le tour ne peut pas finir sans elle. **Une décision demandée pendant le tour d'un autre joueur** a 15 secondes ; ensuite, le choix qu'un bot juge le meilleur pour ce joueur est pris à sa place. Le temps ne court que lorsque le joueur peut agir : ni pendant les animations, ni pendant la pause. | INTERFACE §3.9, `TurnClock`, `TurnTimerDisplay`, `LocalHotSeatSession.Expire` |

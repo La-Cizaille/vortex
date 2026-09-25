@@ -121,9 +121,12 @@ Disposition à 5 joueurs, vue du joueur dont c'est le tour :
 
 ### 3.9 Temps de tour limité (ARB-70)
 
-- Le tour d'un joueur a une **durée limitée**, que l'on peut **désactiver** pour les tests.
-- Le temps qui reste se voit, par exemple un anneau qui se vide autour du vaisseau ou du bouton « Fin de tour ». Il s'entend aussi : un signal sonore dans les dernières secondes.
-- Durée, comportement à l'expiration et temps de réponse aux décisions : questions ouvertes (§7).
+- Le tour d'un joueur a une **durée limitée**, que l'on peut **désactiver** (ARB-80) :
+  - la durée se choisit dans le menu de partie locale : illimitée (par défaut), 60, 90 ou 120 secondes ;
+  - le temps ne court que lorsque le joueur peut agir : ni pendant les animations, ni pendant la pause.
+- Le temps qui reste se voit au-dessus du bouton « Fin de tour » : les secondes et une barre qui se vide. Dans les dix dernières secondes, il passe à la couleur d'alerte et fait entendre un tic chaque seconde.
+- **À l'expiration**, le tour s'arrête simplement : fin du marché, puis fin de tour. Seule une action imposée par une carte est jouée, car le tour ne peut pas finir sans elle.
+- **Une décision demandée pendant le tour d'un autre joueur** a 15 secondes. Ensuite, le choix qu'un bot juge le meilleur pour ce joueur est pris à sa place.
 
 ## 4. Point de vue
 
@@ -168,11 +171,7 @@ Chaque geste envoie une commande du moteur à la session. Le moteur la valide : 
 
 ## 7. Questions ouvertes
 
-Sur le temps de tour limité (§3.9, ARB-70) :
-1. **Durée** d'un tour : fixe (par exemple 60 secondes) ou réglable dans le menu de la partie ?
-2. **À l'expiration** : le tour se termine simplement (fin du marché, puis fin de tour), ou un bot joue le reste du tour à la place du joueur ?
-3. **Décisions** demandées pendant le tour d'un autre (coup critique, déviation…) : un délai plus court, par exemple 15 secondes, puis un choix par défaut ?
-4. **Réglage** : activé par défaut dans une partie normale, désactivé dans le mode test ?
+Aucune pour l'instant : les questions sur le temps de tour limité sont tranchées (ARB-80).
 
 ## 8. Ce qui est construit
 
@@ -183,6 +182,7 @@ Sur le temps de tour limité (§3.9, ARB-70) :
 | M4.4, mode test | Le siège 1 est joué par une personne, les autres par des bots (niveau « normal » par défaut). Un panneau en bas à droite liste les coups que le moteur autorise, un bouton par coup, ainsi que les réponses quand une carte demande un choix. C'est un outil provisoire : il disparaîtra quand les gestes seront là. Réglages : objet `Partie` de la scène `Game`, rubrique *Partie de test*. |
 | M4.5, lisibilité | Après le premier playtest : **zoom** sur toute carte de la table (marché, panneaux, cartes du joueur). À la souris, la carte s'agrandit au survol ; sur écran tactile, tant que le doigt est posé dessus (l'appui long viendra avec le glisser-déposer). **Dés animés** : chaque lancer (attaque, ou dé d'un effet) s'affiche au centre, roule puis s'arrête sur les valeurs du moteur, avec le total gardé. |
 | M4.5, gestes (première partie) | **Fait** : les actions d'équipage en demi-cercle au-dessus du vaisseau, avec leur pictogramme (un nom court en attendant l'icône) ; un toucher pour Reparamétrage, Surcharge et Posture, un glisser vers un adversaire pour Attaque et Sabotage, avec les cibles permises allumées et les autres estompées ; une aide au survol de chaque action ; « Recycler » dans l'en-tête de chaque marché et « Passer le marché » au-dessus ; l'achat en glissant une carte du marché vers son vaisseau, l'utilisation en glissant une de ses cartes au centre ; le bouton de combo ; le jeton de surcharge armé d'un toucher (ARB-67) ; « Fin de tour », qui s'allume quand il ne reste rien d'autre à faire ; une fenêtre pour chaque décision ; la fiche d'un adversaire agrandie au survol. Le panneau du mode test reste disponible, désactivé par défaut. **Reste à faire** : les choix faits directement sur la table, le temps de tour limité (en attente des réponses d'INTERFACE §7). |
+| M4.5, temps de tour | **Fait** (ARB-80) : durée réglable dans le menu de partie locale, sans limite par défaut ; barre et secondes au-dessus de « Fin de tour », alerte et tic dans les dix dernières secondes ; tour terminé tout seul à l'expiration ; 15 secondes pour une décision demandée pendant le tour d'un autre, puis choix d'un bot. |
 | M4.5, deuxième playtest | **Fait** : actions en arc centré, attaque à gauche et bouclier à droite (ARB-74) ; journal qu'on peut remonter (ARB-75) ; plus de clignotement de la carte agrandie quand on pointe les cartes d'un adversaire. |
 | M4.5, détails de la table | **Fait** : l'événement de la manche s'agrandit au survol du bandeau (ou à l'appui long, §3.8) ; pendant qu'on glisse une carte du marché, la carte qu'elle remplacerait prend un cadre rouge (§3.3, couleur *Loss* du thème) ; avec l'option « fantômes », l'épave d'un joueur éliminé porte la mention « Fantôme : choisit l'événement » (§3.1). |
 | M4.5, raisons des refus | **Fait** : ce que le moteur refuse dit pourquoi (§1, §3.4, §3.5). Une action éteinte l'explique dans son aide. Pendant la visée, un adversaire qui ne peut pas être visé donne la raison, avec le nom de la carte ou de l'effet qui le protège. Une carte qu'on ne peut pas acheter ou utiliser maintenant donne la raison quand on essaie de la glisser. La raison vient toujours du moteur (`GameEngine.Explain`), jamais de l'interface. |
