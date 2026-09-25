@@ -8,8 +8,20 @@ namespace Vortex.Client.Presentation
     /// <summary>What a card view shows, whatever the kind of card: modifier, event or technology.</summary>
     public readonly struct CardFace
     {
+        /// <summary>Icon of an attack modifier's slot, in the icon catalog (docs/ASSETS.md section 3).</summary>
+        public const string AttackIcon = "Slot_ATK";
+
+        /// <summary>Icon of a defense modifier's slot.</summary>
+        public const string DefenseIcon = "Slot_DEF";
+
+        /// <summary>Icon of an event.</summary>
+        public const string EventIcon = "Slot_EVT";
+
+        /// <summary>Icon of a technology.</summary>
+        public const string TechnologyIcon = "Slot_TECH";
+
         /// <summary>Creates a face.</summary>
-        public CardFace(string id, string title, string badge, string usage, string text, TechColor color)
+        public CardFace(string id, string title, string badge, string usage, string text, TechColor color, string badgeIcon = "")
         {
             Id = id;
             Title = title;
@@ -17,6 +29,7 @@ namespace Vortex.Client.Presentation
             Usage = usage;
             Text = text;
             Color = color;
+            BadgeIcon = badgeIcon;
         }
 
         /// <summary>Content id, which also names the illustration.</summary>
@@ -27,6 +40,9 @@ namespace Vortex.Client.Presentation
 
         /// <summary>Short kind shown in the card's disc: "ATK", "DEF", or the kind of an event or a technology.</summary>
         public string Badge { get; }
+
+        /// <summary>Name of the icon shown in the disc instead of <see cref="Badge"/>, when the icon catalog has it.</summary>
+        public string BadgeIcon { get; }
 
         /// <summary>Usage of a modifier ("Durable", "Usage unique"...), or the kind of an event or a technology.</summary>
         public string Usage { get; }
@@ -55,7 +71,7 @@ namespace Vortex.Client.Presentation
                 CardUsage.Triggered => TextKeys.UsageTriggered,
                 _ => TextKeys.UsageDurable,
             });
-            return new CardFace(card.Id, CardText.ToPlainText(card.Name), slot, usage, card.Text, card.Color);
+            return new CardFace(card.Id, CardText.ToPlainText(card.Name), slot, usage, card.Text, card.Color, card.Slot == CardSlot.Attack ? AttackIcon : DefenseIcon);
         }
 
         /// <summary>Face of an event.</summary>
@@ -66,7 +82,7 @@ namespace Vortex.Client.Presentation
                 throw new ArgumentNullException(nameof(gameEvent));
             }
 
-            return new CardFace(gameEvent.Id, CardText.ToPlainText(gameEvent.Name), texts.Get(TextKeys.BadgeEvent), texts.Get(TextKeys.KindEvent), gameEvent.Text, TechColor.Neutral);
+            return new CardFace(gameEvent.Id, CardText.ToPlainText(gameEvent.Name), texts.Get(TextKeys.BadgeEvent), texts.Get(TextKeys.KindEvent), gameEvent.Text, TechColor.Neutral, EventIcon);
         }
 
         /// <summary>Face of a technology.</summary>
@@ -77,7 +93,7 @@ namespace Vortex.Client.Presentation
                 throw new ArgumentNullException(nameof(technology));
             }
 
-            return new CardFace(technology.Id, CardText.ToPlainText(technology.Name), texts.Get(TextKeys.BadgeTechnology), texts.Get(TextKeys.KindTechnology), technology.Text, technology.Color);
+            return new CardFace(technology.Id, CardText.ToPlainText(technology.Name), texts.Get(TextKeys.BadgeTechnology), texts.Get(TextKeys.KindTechnology), technology.Text, technology.Color, TechnologyIcon);
         }
     }
 }

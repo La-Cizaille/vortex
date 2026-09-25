@@ -234,6 +234,34 @@ namespace Vortex.Tests.EditMode
         }
 
         [Test]
+        public void A_card_shows_its_slot_icon_or_else_the_short_text()
+        {
+            // The icons of tools/blender/build_icons.py are in the icons folder (ARB-86); a name without an image
+            // falls back to the short text, so a missing icon never blocks the game.
+            var theme = AssetDatabase.LoadAssetAtPath<ThemeSettings>(ThemeAssets.ThemePath);
+            var catalog = AssetDatabase.LoadAssetAtPath<CardArtCatalog>(ThemeAssets.CardArtPath);
+            var icons = AssetDatabase.LoadAssetAtPath<IconCatalog>(ThemeAssets.IconsPath);
+            foreach (string icon in new[] { CardFace.AttackIcon, CardFace.DefenseIcon, CardFace.EventIcon, CardFace.TechnologyIcon })
+            {
+                Assert.That(icons.Find(icon), Is.Not.Null, icon + " is in the icon catalog.");
+            }
+
+            var card = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(ThemeAssets.CardPrefabPath)).GetComponent<CardDisplay>();
+            try
+            {
+                card.Show(new CardFace("X_001", "Nom", "ATK", "Durable", "Texte", TechColor.Red, CardFace.AttackIcon), theme, catalog);
+                Assert.That(card.ShowsBadgeIcon, Is.True);
+
+                card.Show(new CardFace("X_002", "Nom", "ATK", "Durable", "Texte", TechColor.Red, "Slot_Missing"), theme, catalog);
+                Assert.That(card.ShowsBadgeIcon, Is.False, "Without its image, the disc shows the short text.");
+            }
+            finally
+            {
+                Object.DestroyImmediate(card.gameObject);
+            }
+        }
+
+        [Test]
         public void Every_ship_model_follows_the_art_conventions()
         {
             // docs/ASSETS.md §2: about 2 m long and 2.4 m wide at most, 5,000 triangles at most, three materials at
