@@ -99,6 +99,17 @@ namespace Vortex.Core.Tests.Support
         }
     }
 
+    /// <summary>Permission "cibler": opponents cannot aim a crew action at the holder.</summary>
+    internal sealed class TestUntargetable : Effect
+    {
+        public override string Name => "TestUntargetable";
+
+        public override bool CanTarget(Game game, EffectSource self, int actor, int target, CrewAction action)
+        {
+            return target != self.Holder || actor == self.Holder;
+        }
+    }
+
     /// <summary>Advantage (+1) or disadvantage (-1) on attacks made (+) or suffered (-) by the holder.</summary>
     internal sealed class TestAdvantage : Effect
     {

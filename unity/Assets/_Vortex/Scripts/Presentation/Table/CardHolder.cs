@@ -33,6 +33,12 @@ namespace Vortex.Client.Presentation
         /// <summary>What a drop of the card at a screen position does; returns false when refused (the card goes back).</summary>
         public Func<CardView, Vector2, bool>? OnDrop { get; set; }
 
+        /// <summary>Explains a drag that is not allowed now, next to the place (null: nothing to say).</summary>
+        public Action<CardView, RectTransform>? OnRefused { get; set; }
+
+        /// <summary>Takes the explanation back when the pointer is released.</summary>
+        public Action? OnReleased { get; set; }
+
         /// <summary>The card shown, or null.</summary>
         public CardDisplay? Card => _card != null && _card.gameObject.activeSelf ? _card : null;
 
@@ -114,7 +120,15 @@ namespace Vortex.Client.Presentation
                         () => _shown != null && CanDrag != null && CanDrag(_shown),
                         screen => _shown != null && OnDrop(_shown, screen),
                         context.View,
-                        context.CardDepth - 1f);
+                        context.CardDepth - 1f,
+                        () =>
+                        {
+                            if (_shown != null)
+                            {
+                                OnRefused?.Invoke(_shown, _slot);
+                            }
+                        },
+                        () => OnReleased?.Invoke());
                 }
             }
 

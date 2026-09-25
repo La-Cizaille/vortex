@@ -58,9 +58,17 @@ namespace Vortex.Core.Rules
     {
         /// <summary>Creates the error.</summary>
         public CommandError(CommandErrorCode code, string message)
+            : this(code, message, null, null)
+        {
+        }
+
+        /// <summary>Creates the error of a move an effect forbids (a refused permission, RULES B4).</summary>
+        public CommandError(CommandErrorCode code, string message, SourceKind? sourceKind, string? sourceId)
         {
             Code = code;
             Message = message;
+            SourceKind = sourceKind;
+            SourceId = sourceId;
         }
 
         /// <summary>Machine-readable reason.</summary>
@@ -68,6 +76,12 @@ namespace Vortex.Core.Rules
 
         /// <summary>Developer-facing explanation (not localized).</summary>
         public string Message { get; }
+
+        /// <summary>Kind of the effect whose permission refused the move, or null when no effect did.</summary>
+        public SourceKind? SourceKind { get; }
+
+        /// <summary>Card id, status kind, event id or technology id of that effect, or null.</summary>
+        public string? SourceId { get; }
 
         /// <inheritdoc/>
         public override string ToString() => Code + ": " + Message;

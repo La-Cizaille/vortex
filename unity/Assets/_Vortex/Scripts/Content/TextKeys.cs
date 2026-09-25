@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Vortex.Core.Bots;
 using Vortex.Core.Commands;
 using Vortex.Core.Events;
+using Vortex.Core.Rules;
 using Vortex.Core.State;
 
 namespace Vortex.Client.Content
@@ -328,6 +329,9 @@ namespace Vortex.Client.Content
         /// <summary>Banner when the view turns to a person. {0}: name.</summary>
         public const string TurnOf = "turn.of";
 
+        /// <summary>A refusal with what forbids it. {0}: the reason, {1}: the card or status.</summary>
+        public const string RefusalSource = "refusal.with-source";
+
         /// <summary>Every key with its default text.</summary>
         public static readonly IReadOnlyList<KeyValuePair<string, string>> Defaults = BuildDefaults();
 
@@ -351,6 +355,9 @@ namespace Vortex.Client.Content
 
         /// <summary>Help of a crew action, shown when its button is hovered.</summary>
         public static string ActionHelp(CrewAction action) => "action.help." + action;
+
+        /// <summary>Why the engine refuses a move, by its refusal code.</summary>
+        public static string Refusal(CommandErrorCode code) => "refusal." + code;
 
         /// <summary>Name of a bot level in the local game menu.</summary>
         public static string BotLevelName(BotLevel level) => "bot.level." + level;
@@ -475,6 +482,31 @@ namespace Vortex.Client.Content
             Add(GameOverReplay, "Rejouer");
             Add(GameOverMenu, "Menu");
             Add(TurnOf, "Tour de {0}");
+            Add(RefusalSource, "{0} Cause : {1}.");
+            Add(Refusal(CommandErrorCode.GameOver), "La partie est terminée.");
+            Add(Refusal(CommandErrorCode.DecisionPending), "Une décision est en attente.");
+            Add(Refusal(CommandErrorCode.NoDecisionPending), "Aucune décision n'est en attente.");
+            Add(Refusal(CommandErrorCode.NotYourDecision), "Cette décision revient à un autre joueur.");
+            Add(Refusal(CommandErrorCode.WrongDecision), "Cette décision n'est plus valable.");
+            Add(Refusal(CommandErrorCode.InvalidOption), "Ce choix n'est pas proposé.");
+            Add(Refusal(CommandErrorCode.NotYourTurn), "Ce n'est pas votre tour.");
+            Add(Refusal(CommandErrorCode.WrongPhase), "Pas à ce moment du tour.");
+            Add(Refusal(CommandErrorCode.InvalidMarketCard), "Cette carte n'est plus au marché.");
+            Add(Refusal(CommandErrorCode.CannotRecycleAfterPick), "Pas de recyclage après avoir pris une carte.");
+            Add(Refusal(CommandErrorCode.NoPicksLeft), "Vous avez déjà pris votre carte ce tour.");
+            Add(Refusal(CommandErrorCode.InvalidCard), "Cette carte n'est pas à vous.");
+            Add(Refusal(CommandErrorCode.CardNotActivatable), "Cette carte ne peut pas être utilisée maintenant.");
+            Add(Refusal(CommandErrorCode.NoTechnologyCombo), "Vos deux modificateurs ne forment pas de combo.");
+            Add(Refusal(CommandErrorCode.NoCrewActionLeft), "Plus d'action d'équipage ce tour.");
+            Add(Refusal(CommandErrorCode.CrewActionAlreadyUsed), "Action déjà faite ce tour.");
+            Add(Refusal(CommandErrorCode.ForcedActionRequired), "Une action vous est imposée ce tour.");
+            Add(Refusal(CommandErrorCode.InvalidTarget), "Cible impossible.");
+            Add(Refusal(CommandErrorCode.TargetNotAllowed), "Cible protégée contre vous.");
+            Add(Refusal(CommandErrorCode.NoOvercharge), "Pas de jeton de surcharge.");
+            Add(Refusal(CommandErrorCode.OverchargeFull), "Jeton de surcharge déjà au maximum.");
+            Add(Refusal(CommandErrorCode.ShieldChangeNotAllowed), "Son bouclier ne peut pas être modifié.");
+            Add(Refusal(CommandErrorCode.MalformedCommand), "Coup impossible.");
+            Add(Refusal(CommandErrorCode.ActionNotAvailable), "Action désactivée par les règles de la partie.");
             Add(BotLevelName(BotLevel.Random), "Aléatoire");
             Add(BotLevelName(BotLevel.Naive), "Naïf");
             Add(BotLevelName(BotLevel.Normal), "Normal");

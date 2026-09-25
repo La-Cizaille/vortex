@@ -194,7 +194,7 @@ namespace Vortex.Client.Presentation
 
             PlaceSeats();
             market.Bind(_context);
-            market.SetPurchase(controls.CanBuy, controls.Buy);
+            market.SetPurchase(controls.CanBuy, controls.Buy, controls.ExplainBuy, controls.HideHelp);
             banner.Bind(_context);
             log.Bind(_context);
             playback.Bind(_context, _player);
@@ -421,6 +421,9 @@ namespace Vortex.Client.Presentation
         /// <inheritdoc/>
         int IControlsHost.SeatAt(Vector2 screen) => SeatAt(screen);
 
+        /// <inheritdoc/>
+        CommandError? IControlsHost.Explain(int seat, Command command) => _session?.Explain(seat, command);
+
         // The opponent under a screen position (their panel, or near their ship), or -1: where an aimed action lands.
         private int SeatAt(Vector2 screen)
         {
@@ -536,7 +539,7 @@ namespace Vortex.Client.Presentation
             viewerShip.localScale = Vector3.one * viewerShipScale;
             _seats[_viewer] = playerSeat;
             playerSeat.Bind(_context!);
-            playerSeat.SetCardUse(controls.CanUse, controls.UseCard);
+            playerSeat.SetCardUse(controls.CanUse, controls.UseCard, controls.ExplainUse, controls.HideHelp);
 
             IReadOnlyList<int> opponents = SeatLayout.Opponents(count, _viewer);
             for (int i = 0; i < opponents.Count; i++)

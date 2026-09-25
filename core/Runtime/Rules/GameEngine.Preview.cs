@@ -160,10 +160,10 @@ namespace Vortex.Core.Rules
         // Each source's total per sample (0 where it added nothing), sources in order of first appearance.
         private static List<BonusPreview> Bonuses(List<AttackInfo> attacks)
         {
-            var sources = new List<(BonusOrigin Origin, string? Id)>();
+            var sources = new List<(SourceKind Kind, string? Id)>();
             foreach (ValueShare share in attacks.SelectMany(a => a.Bonuses))
             {
-                (BonusOrigin, string?) key = KeyOf(share.Source);
+                (SourceKind, string?) key = SourceKinds.Of(share.Source);
                 if (!sources.Contains(key))
                 {
                     sources.Add(key);
@@ -171,19 +171,9 @@ namespace Vortex.Core.Rules
             }
 
             return sources
-                .Select(key => new BonusPreview(key.Origin, key.Id, Estimate.Of(attacks.Select(a => a.Bonuses.Where(b => KeyOf(b.Source) == key).Sum(b => b.Amount)).ToList())))
+                .Select(key => new BonusPreview(key.Kind, key.Id, Estimate.Of(attacks.Select(a => a.Bonuses.Where(b => SourceKinds.Of(b.Source) == key).Sum(b => b.Amount)).ToList())))
                 .ToList();
         }
-
-        private static (BonusOrigin Origin, string? Id) KeyOf(EffectSource? source) => source is null
-            ? (BonusOrigin.Rule, null)
-            : (source.Origin switch
-            {
-                EffectOrigin.Card => BonusOrigin.Card,
-                EffectOrigin.Status => BonusOrigin.Status,
-                EffectOrigin.Event => BonusOrigin.Event,
-                _ => BonusOrigin.Technology,
-            }, source.Id);
 
         private static double Share(List<AttackInfo> attacks, Func<AttackInfo, bool> predicate)
         {

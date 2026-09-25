@@ -77,10 +77,11 @@ namespace Vortex.Client.Presentation
         public Image OverchargeToken => overcharge;
 
         /// <summary>
-        /// Lets the person use one of their cards by dragging it to the middle (INTERFACE.md 3.5). Set it right after
+        /// Lets the person use one of their cards by dragging it to the middle (INTERFACE.md 3.5); a card that cannot be used
+        /// now says why (<paramref name="refused"/>, taken back by <paramref name="released"/>). Set it right after
         /// <see cref="Bind"/>, before the first show.
         /// </summary>
-        public void SetCardUse(Func<int, bool> canUse, Func<int, Vector2, bool> use)
+        public void SetCardUse(Func<int, bool> canUse, Func<int, Vector2, bool> use, Action<int, RectTransform>? refused = null, Action? released = null)
         {
             foreach (CardHolder? holder in new[] { _attack, _defense })
             {
@@ -88,6 +89,8 @@ namespace Vortex.Client.Presentation
                 {
                     holder.CanDrag = card => canUse(card.Uid);
                     holder.OnDrop = (card, screen) => use(card.Uid, screen);
+                    holder.OnRefused = refused is null ? null : (card, place) => refused(card.Uid, place);
+                    holder.OnReleased = released;
                 }
             }
         }

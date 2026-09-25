@@ -47,6 +47,7 @@ namespace Vortex.Client.Presentation
         private TableContext? _context;
         private CommandLabels? _labels;
         private PreviewText? _previewText;
+        private RefusalText? _refusals;
         private IControlsHost? _host;
         private HoverHelp? _comboHelp;
         private HoverHelp? _overchargeHelp;
@@ -102,6 +103,7 @@ namespace Vortex.Client.Presentation
 
             TextTable texts = context.Texts;
             _previewText = new PreviewText(context, rules.DieFaces);
+            _refusals = new RefusalText(context);
             bool postureEnabled = rules.DefensivePostureBonus > 0;
             foreach (ActionButton button in actions)
             {
@@ -321,7 +323,35 @@ namespace Vortex.Client.Presentation
         public void EndMarket() => SubmitFirst(c => c.Type == CommandType.EndMarket);
 
         /// <summary>Shows the help of an action.</summary>
-        public void ShowActionHelp(CrewAction action, RectTransform about) => help.Show(_context!.Texts.Get(TextKeys.ActionHelp(action)), about);
+        /// <remarks>An action the engine does not allow now also says why (INTERFACE.md 1).</remarks>
+        public void ShowActionHelp(CrewAction action, RectTransform about)
+        {
+            string text = _context!.Texts.Get(TextKeys.ActionHelp(action));
+            ActionButton? button = actions.FirstOrDefault(a => a.Action == action);
+            string? reason = button != null && !button.Available ? ReasonFor(action) : null;
+            help.Show(reason is null ? text : text + "\n" + reason, about);
+        }
+
+        /// <summary>
+        /// Why the aimed action may not go to <paramref name="target"/> (a protected or eliminated opponent), or null when it
+        /// may; the reason comes from the engine.
+        /// </summary>
+        public string? ReasonOn(CrewAction action, int target)
+        {
+            if (target < 0 || _host is null || _refusals is null || !ActionButton.NeedsTargetFor(action))
+            {
+                return null;
+            }
+
+            Command command = action == CrewAction.Attack ? Command.Attack(target, OverchargeArmed) : Command.Sabotage(target);
+            return _refusals.Describe(_host.Explain(_seat, command));
+        }
+
+        /// <summary>Explains, next to the card, why the player's card <paramref name="uid"/> cannot be used now.</summary>
+        public void ExplainUse(int uid, RectTransform place) => Explain(Command.ActivateCard(uid), place);
+
+        /// <summary>Explains, next to the card, why the market card at <paramref name="index"/> cannot be taken now.</summary>
+        public void ExplainBuy(CardSlot slot, int index, RectTransform place) => Explain(Command.PickMarket(slot, index), place);
 
         /// <summary>Hides the help.</summary>
         public void HideHelp() => help.Hide();
@@ -389,6 +419,42 @@ namespace Vortex.Client.Presentation
 
         private static bool Contains(RectTransform zone, Vector2 screen) => CardAnchor.ScreenRectOf(zone).Contains(screen);
 
+        private void Explain(Command command, RectTransform place)
+        {
+            string? reason = _host is null || _refusals is null ? null : _refusals.Describe(_host.Explain(_seat, command));
+            if (reason != null)
+            {
+                help.Show(reason, place);
+            }
+        }
+
+        // Why an action is not allowed now: an action without target as it would be sent, an aimed one at the first alive
+        // opponent (when every opponent is refused, they are refused for the same kind of reason).
+        private string? ReasonFor(CrewAction action)
+        {
+            if (_host is null || _refusals is null)
+            {
+                return null;
+            }
+
+            int target = -1;
+            if (ActionButton.NeedsTargetFor(action) && _view != null)
+            {
+                PlayerView? opponent = _view.Players.FirstOrDefault(p => p.Seat != _seat && !p.Eliminated);
+                target = opponent?.Seat ?? -1;
+            }
+
+            Command command = action switch
+            {
+                CrewAction.Attack => Command.Attack(target, OverchargeArmed),
+                CrewAction.Sabotage => Command.Sabotage(target),
+                CrewAction.RerollShield => Command.RerollShield(OverchargeArmed),
+                CrewAction.Overcharge => Command.Overcharge(),
+                _ => Command.DefensivePosture(),
+            };
+            return _refusals.Describe(_host.Explain(_seat, command));
+        }
+
         private HoverHelp HelpOn(Button button, Func<string?> text)
         {
             HoverHelp hover = button.TryGetComponent(out HoverHelp existing) ? existing : button.gameObject.AddComponent<HoverHelp>();
@@ -433,7 +499,9 @@ namespace Vortex.Client.Presentation
             }
 
             _aimedAt = target;
-            string? text = PreviewOn(_aiming.Value, target);
+
+            // Over a seat the action may target: what it would do; over another one: why not.
+            string? text = PreviewOn(_aiming.Value, target) ?? ReasonOn(_aiming.Value, target);
             RectTransform? panel = text is null ? null : _host!.SeatPanel(target);
             if (text is null || panel == null)
             {

@@ -119,28 +119,45 @@ namespace Vortex.Core.Rules
                 return Run(state, player, command, Array.Empty<string>(), 0);
             }
 
-            if (command.Type != CommandType.AnswerDecision)
+            CommandError? answerError = CheckAnswer(pending, player, command);
+            if (answerError != null)
             {
-                return EngineResult.Rejected(state, CommandErrorCode.DecisionPending, "A decision is pending.");
-            }
-
-            if (player != pending.Decision.Player)
-            {
-                return EngineResult.Rejected(state, CommandErrorCode.NotYourDecision, "The pending decision belongs to another player.");
-            }
-
-            if (command.DecisionId != pending.Decision.Id)
-            {
-                return EngineResult.Rejected(state, CommandErrorCode.WrongDecision, "Unknown or stale decision id.");
-            }
-
-            if (!pending.Decision.Accepts(command.Option))
-            {
-                return EngineResult.Rejected(state, CommandErrorCode.InvalidOption, "The answer is not one of the options.");
+                return EngineResult.Rejected(state, answerError.Code, answerError.Message);
             }
 
             var answers = new List<string>(pending.Answers) { command.Option! };
             return Run(state, pending.Player, pending.Command, answers, pending.DeliveredEvents);
+        }
+
+        /// <summary>
+        /// Why <paramref name="player"/> may not submit <paramref name="command"/> now, or null when it is legal: the reason
+        /// shown next to a move the interface greys out (INTERFACE.md 1). When an effect forbids the move, the error names
+        /// it (<see cref="CommandError.SourceKind"/>, <see cref="CommandError.SourceId"/>). Validation reads public
+        /// information only, and <paramref name="state"/> is not changed.
+        /// </summary>
+        public CommandError? Explain(GameState state, int player, Command command)
+        {
+            if (state is null)
+            {
+                throw new ArgumentNullException(nameof(state));
+            }
+
+            if (command is null)
+            {
+                throw new ArgumentNullException(nameof(command));
+            }
+
+            if (state.Outcome != null)
+            {
+                return new CommandError(CommandErrorCode.GameOver, "The game is over.");
+            }
+
+            if (state.Pending != null)
+            {
+                return CheckAnswer(state.Pending, player, command);
+            }
+
+            return new Game(state.Clone(), Data, Config, _catalog, Array.Empty<string>()).Validate(player, command);
         }
 
         /// <summary>
@@ -237,6 +254,27 @@ namespace Vortex.Core.Rules
             var game = new Game(state.Clone(), Data, Config, _catalog, Array.Empty<string>());
             List<int> attackers = state.Players.Where(p => p.Seat != target && !p.Eliminated).Select(p => p.Seat).ToList();
             return attackers.Count == 0 ? state.Players[target].Shield : attackers.Average(a => game.PreviewEffectiveShield(target, a));
+        }
+
+        // What a command must be while a decision is pending: the answer of its player, to that decision, among its options.
+        private static CommandError? CheckAnswer(PendingState pending, int player, Command command)
+        {
+            if (command.Type != CommandType.AnswerDecision)
+            {
+                return new CommandError(CommandErrorCode.DecisionPending, "A decision is pending.");
+            }
+
+            if (player != pending.Decision.Player)
+            {
+                return new CommandError(CommandErrorCode.NotYourDecision, "The pending decision belongs to another player.");
+            }
+
+            if (command.DecisionId != pending.Decision.Id)
+            {
+                return new CommandError(CommandErrorCode.WrongDecision, "Unknown or stale decision id.");
+            }
+
+            return pending.Decision.Accepts(command.Option) ? null : new CommandError(CommandErrorCode.InvalidOption, "The answer is not one of the options.");
         }
 
         // Every command shape that could be legal for the player; validation filters them.

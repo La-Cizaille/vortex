@@ -449,3 +449,53 @@ MonoBehaviour:
     Text: Fort
   - Key: help.combo-ready
     Text: "Combo : vos deux modificateurs sont d\xE9fauss\xE9s et vous obtenez {0}. {1}"
+  - Key: refusal.with-source
+    Text: '{0} Cause : {1}.'
+  - Key: refusal.GameOver
+    Text: "La partie est termin\xE9e."
+  - Key: refusal.DecisionPending
+    Text: "Une d\xE9cision est en attente."
+  - Key: refusal.NoDecisionPending
+    Text: "Aucune d\xE9cision n'est en attente."
+  - Key: refusal.NotYourDecision
+    Text: "Cette d\xE9cision revient \xE0 un autre joueur."
+  - Key: refusal.WrongDecision
+    Text: "Cette d\xE9cision n'est plus valable."
+  - Key: refusal.InvalidOption
+    Text: "Ce choix n'est pas propos\xE9."
+  - Key: refusal.NotYourTurn
+    Text: Ce n'est pas votre tour.
+  - Key: refusal.WrongPhase
+    Text: "Pas \xE0 ce moment du tour."
+  - Key: refusal.InvalidMarketCard
+    Text: "Cette carte n'est plus au march\xE9."
+  - Key: refusal.CannotRecycleAfterPick
+    Text: "Pas de recyclage apr\xE8s avoir pris une carte."
+  - Key: refusal.NoPicksLeft
+    Text: "Vous avez d\xE9j\xE0 pris votre carte ce tour."
+  - Key: refusal.InvalidCard
+    Text: "Cette carte n'est pas \xE0 vous."
+  - Key: refusal.CardNotActivatable
+    Text: "Cette carte ne peut pas \xEAtre utilis\xE9e maintenant."
+  - Key: refusal.NoTechnologyCombo
+    Text: Vos deux modificateurs ne forment pas de combo.
+  - Key: refusal.NoCrewActionLeft
+    Text: "Plus d'action d'\xE9quipage ce tour."
+  - Key: refusal.CrewActionAlreadyUsed
+    Text: "Action d\xE9j\xE0 faite ce tour."
+  - Key: refusal.ForcedActionRequired
+    Text: "Une action vous est impos\xE9e ce tour."
+  - Key: refusal.InvalidTarget
+    Text: Cible impossible.
+  - Key: refusal.TargetNotAllowed
+    Text: "Cible prot\xE9g\xE9e contre vous."
+  - Key: refusal.NoOvercharge
+    Text: Pas de jeton de surcharge.
+  - Key: refusal.OverchargeFull
+    Text: "Jeton de surcharge d\xE9j\xE0 au maximum."
+  - Key: refusal.ShieldChangeNotAllowed
+    Text: "Son bouclier ne peut pas \xEAtre modifi\xE9."
+  - Key: refusal.MalformedCommand
+    Text: Coup impossible.
+  - Key: refusal.ActionNotAvailable
+    Text: "Action d\xE9sactiv\xE9e par les r\xE8gles de la partie."
