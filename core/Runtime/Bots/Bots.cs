@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Vortex.Core.Commands;
 using Vortex.Core.Dice;
+using Vortex.Core.Projection;
 using Vortex.Core.Rules;
 using Vortex.Core.State;
 
@@ -302,21 +303,7 @@ namespace Vortex.Core.Bots
 
         // Hidden information (deck orders, generator state) is replaced by the bot's own guess.
         // Only valid when no command is suspended.
-        private GameState Determinize(GameState state)
-        {
-            GameState guess = state.Clone();
-            guess.Rng = Pcg32.Seeded(((ulong)_rng.NextUInt() << 32) | _rng.NextUInt(), 1);
-
-            // Canonical order first, so the guess depends only on what is visible (the pile contents are
-            // public knowledge through the card list; their order is not).
-            guess.AttackMarket.Deck.Sort((a, b) => a.Uid.CompareTo(b.Uid));
-            guess.DefenseMarket.Deck.Sort((a, b) => a.Uid.CompareTo(b.Uid));
-            guess.EventDeck.Sort(StringComparer.Ordinal);
-            Shuffle(guess.AttackMarket.Deck);
-            Shuffle(guess.DefenseMarket.Deck);
-            Shuffle(guess.EventDeck);
-            return guess;
-        }
+        private GameState Determinize(GameState state) => HiddenInformation.Guess(state, _rng);
 
         // Finishes the bot's own turn with a default policy; decisions (anyone's) are answered at random.
         private GameState Rollout(GameEngine engine, GameState state, int seat)
@@ -366,17 +353,6 @@ namespace Vortex.Core.Bots
                 .OrderBy(c => state.Players[c.Target].Hp)
                 .FirstOrDefault();
             return attack ?? Command.EndTurn();
-        }
-
-        private void Shuffle<T>(List<T> list)
-        {
-            for (int i = list.Count - 1; i > 0; i--)
-            {
-                int j = _rng.NextInt(i + 1);
-                T tmp = list[i];
-                list[i] = list[j];
-                list[j] = tmp;
-            }
         }
     }
 }
