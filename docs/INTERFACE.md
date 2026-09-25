@@ -1,6 +1,6 @@
 # Interface du prototype (M4)
 
-Ce document décrit ce que le joueur voit et comment il agit, dans une partie et hors partie. Il fixe les décisions du game designer (ARB-59 à ARB-67 dans [`ARBITRAGES.md`](ARBITRAGES.md)) ; la manière de le construire est dans [ADR-0014](adr/0014-presentation-par-evenements.md) et [ADR-0015](adr/0015-scene-de-jeu.md).
+Ce document décrit ce que le joueur voit et comment il agit, dans une partie et hors partie. Il fixe les décisions du game designer (ARB-59 à ARB-75 et ARB-80 à ARB-82 dans [`ARBITRAGES.md`](ARBITRAGES.md)) ; la manière de le construire est dans [ADR-0014](adr/0014-presentation-par-evenements.md) et [ADR-0015](adr/0015-scene-de-jeu.md).
 
 Il décrit une **disposition et des comportements**, pas un style : couleurs, formes, polices et animations restent libres et se règlent dans Unity, sans code (voir [`CONTRIBUTING.md`](CONTRIBUTING.md#ajouter-ou-modifier-un-visuel-à-partir-du-jalon-m4)).
 
@@ -30,22 +30,22 @@ Disposition à 5 joueurs, vue du joueur dont c'est le tour :
 
 ```text
 +----------------------------------------------------------------------+
-|                 Joueur 3    [ Manche 7 ]    Joueur 4                 |
-|   Joueur 2                  [ Événement ]                 Joueur 5   |
-|   joue après moi            [ Fin des temps : 9 ]    joue avant moi  |
+|                       [ Manche 7 - Événement ]              [Pause]  |
+|                       [ Fin des temps : 9    ]                       |
+|                 Joueur 3  [marché réduit]  Joueur 4                  |
+|                           [ Marché ]                                 |
+|   Joueur 2          [ question d'une décision ]           Joueur 5   |
+|   joue après moi          [ dés du lancer ]          joue avant moi  |
 |                                                                      |
-|            +---------------- Marché noir ----------------+           |
-|            |   ATK : 5 cartes      |     DEF : 5 cartes  |           |
-|            |     [Recycler]        |       [Recycler]    |           |
-|            +---------------------------------------------+           |
-|                         (SAB)  (REP)  (SUR)                          |
-|                     (ATQ)                  (POS)                     |
-|  [Journal]     [ATK]   [Combo]   VAISSEAU   o surcharge  [DEF]       |
-|                          PV 30 - Bouclier 5 - ( )( )( )              |
-|                                                  [Accélérer / passer]|
-|                                                  [Fin de tour]       |
+|                        (SUR)          (REP)                          |
+|                    (ATQ)                  (SAB)                      |
+|                [Combo]      VAISSEAU     o surcharge                 |
+|               [ATK]                          [DEF]    [temps: 1:30]  |
+|  [Journal]           PV 30 - Bouclier 5 - ( )( )( )    [Fin de tour] |
 +----------------------------------------------------------------------+
 ```
+
+Pendant ma phase de marché, le marché noir s'ouvre au centre de la table (3.3). La Posture défensive, quand l'option est activée, prend place dans l'arc entre Reparamétrage et Sabotage (3.4).
 
 ### 3.1 Adversaires
 
@@ -73,8 +73,8 @@ Disposition à 5 joueurs, vue du joueur dont c'est le tour :
 
 - **Au centre de l'écran** : marché ATK à gauche, marché DEF à droite. Zoom sur une carte au survol.
 - **Acheter** : glisser une carte du marché vers mon vaisseau. Pendant le glisser, on voit la carte que je vais perdre.
-- **Recycler** : un bouton sous chaque moitié.
-- **Passer le marché** : un bouton.
+- **Recycler** : un bouton dans l'en-tête de chaque moitié (ARB-71).
+- **Passer le marché** : un bouton au-dessus du marché.
 - **Réduit** (ARB-81) : en dehors de ma phase de marché, le marché est réduit en une bande de miniatures sous le bandeau de manche. Il s'ouvre tout seul au début de ma phase de marché et se réduit à sa fin.
   - Le bouton « Marché », sous la bande, l'ouvre pour le consulter ; « Réduire le marché » le replie. Ce choix tient jusqu'au prochain changement de phase.
   - Le zoom au survol fonctionne dans les deux états.
@@ -85,17 +85,14 @@ Disposition à 5 joueurs, vue du joueur dont c'est le tour :
 - **Au survol**, une fenêtre précise l'effet de l'action, tel qu'il s'appliquerait maintenant (par exemple : Reparamétrage à 2 dés avec la surcharge).
 - **Actions avec une cible** (Attaque, Sabotage) : glisser l'icône vers un adversaire.
 - **Actions sans cible** (Reparamétrage, Surcharge, Posture défensive) : un simple toucher.
-- **Aperçu pendant le glisser**, calculé par le moteur :
-  - Attaque : les dés lancés (par exemple « 2d8, avantage »), le détail des bonus et malus, le bouclier effectif de la cible et la fourchette de dégâts. Un bonus qui dépend du jet (par exemple « +3 si la somme est paire ») est affiché comme conditionnel. Si le jeton de surcharge est armé, l'aperçu montre l'attaque surchargée.
-  - Sabotage : le bouclier actuel de la cible.
-  - Réalisation (M4.5, ADR-0018) : l'aperçu s'affiche dans la bulle d'aide, près de la cible survolée. Il est calculé en jouant le coup un grand nombre de fois sur des parties supposées, sans jamais utiliser le hasard de la partie. Il donne :
-    - pour une attaque : les dés, chaque bonus ou malus avec sa source, le bouclier effectif de la cible, les dégâts (fourchette et moyenne), les chances de toucher, de critique et de détruire la cible ; il signale aussi une déviation possible et les PV que l'attaquant peut perdre en retour ;
-    - pour un sabotage : le bouclier de la cible maintenant et après la relance.
+- **Aperçu pendant le glisser**, calculé par le moteur (ADR-0018) : il s'affiche dans la bulle d'aide, près de la cible survolée. Il est calculé en jouant le coup un grand nombre de fois sur des parties supposées, sans jamais utiliser le hasard de la partie. Il donne :
+  - pour une attaque : les dés (par exemple « 2d8, avantage »), chaque bonus ou malus avec sa source, le bouclier effectif de la cible, les dégâts (fourchette et moyenne), les chances de toucher, de critique et de détruire la cible ; il signale aussi une déviation possible et les PV que l'attaquant peut perdre en retour. Si le jeton de surcharge est armé, c'est l'attaque surchargée ;
+  - pour un sabotage : le bouclier de la cible maintenant et après la relance.
 
-    Un bonus qui dépend du jet est affiché comme une fourchette (« −1 à +3 »), et non par sa condition. Les chances sont des estimations, arrondies à 5 %.
+  Un bonus qui dépend du jet est affiché comme une fourchette (« −1 à +3 »), et non par sa condition. Les chances sont des estimations, arrondies à 5 %.
 - **Cibles interdites** (protégées par une carte, ou imposées par une autre) : grisées pendant le glisser, avec la raison au survol.
 - **Deux actions dans le tour** (technologie Casino Cosmique) : l'action déjà faite s'éteint, les autres restent disponibles.
-- **Action imposée** (Mutinerie) : seules l'action et la cible imposées restent allumées, avec un cadenas.
+- **Action imposée** (Mutinerie) : seules l'action et la cible imposées restent allumées. Un cadenas viendra avec les icônes (M5).
 
 ### 3.5 Cartes à utiliser
 
@@ -178,30 +175,28 @@ Chaque geste envoie une commande du moteur à la session. Le moteur la valide : 
 | Toucher Reparamétrage | `RerollShield(surcharge armée)` |
 | Toucher Surcharge | `Overcharge` |
 | Toucher Posture défensive (option) | `DefensivePosture` |
-| Choisir dans une décision | `AnswerDecision(décision, choix)` |
+| Toucher une fiche, une carte, une face de d8 ou un événement allumés par une décision (3.6) | `AnswerDecision(décision, choix)` |
+| Glisser la carte d'une décision « voler ou détruire » vers son vaisseau ou au centre | `AnswerDecision(décision, voler ou détruire)` |
 | Bouton « Fin de tour » | `EndTurn` |
 
 ## 7. Questions ouvertes
 
-Aucune pour l'instant : les questions sur le temps de tour limité sont tranchées (ARB-80).
+Aucune pour l'instant. Les dernières (temps de tour, marché réduit, choix sur la table) sont tranchées : ARB-80 à ARB-82.
 
 ## 8. Ce qui est construit
 
+Tout ce qui précède est construit, sauf ce que la dernière ligne annonce pour M5.
+
 | Étape | Ce qui marche |
 |---|---|
-| M4.3 | Cartes, visuels provisoires, galerie. |
-| M4.4 | La table (scène `Game`) : bandeau, adversaires en arc dans l'ordre du tour, marché noir, vaisseau et cartes du joueur, jetons de Tourment, technologies, surcharge, effets temporaires, tour en cours, épave d'un joueur éliminé, marqueur du leader (option), journal, vitesse de lecture. Des bots jouent une partie entière qu'on regarde. |
-| M4.4, mode test | Le siège 1 est joué par une personne, les autres par des bots (niveau « normal » par défaut). Un panneau en bas à droite liste les coups que le moteur autorise, un bouton par coup, ainsi que les réponses quand une carte demande un choix. C'est un outil provisoire : il disparaîtra quand les gestes seront là. Réglages : objet `Partie` de la scène `Game`, rubrique *Partie de test*. |
-| M4.5, lisibilité | Après le premier playtest : **zoom** sur toute carte de la table (marché, panneaux, cartes du joueur). À la souris, la carte s'agrandit au survol ; sur écran tactile, tant que le doigt est posé dessus (l'appui long viendra avec le glisser-déposer). **Dés animés** : chaque lancer (attaque, ou dé d'un effet) s'affiche au centre, roule puis s'arrête sur les valeurs du moteur, avec le total gardé. |
-| M4.5, gestes (première partie) | **Fait** : les actions d'équipage en demi-cercle au-dessus du vaisseau, avec leur pictogramme (un nom court en attendant l'icône) ; un toucher pour Reparamétrage, Surcharge et Posture, un glisser vers un adversaire pour Attaque et Sabotage, avec les cibles permises allumées et les autres estompées ; une aide au survol de chaque action ; « Recycler » dans l'en-tête de chaque marché et « Passer le marché » au-dessus ; l'achat en glissant une carte du marché vers son vaisseau, l'utilisation en glissant une de ses cartes au centre ; le bouton de combo ; le jeton de surcharge armé d'un toucher (ARB-67) ; « Fin de tour », qui s'allume quand il ne reste rien d'autre à faire ; une fenêtre pour chaque décision ; la fiche d'un adversaire agrandie au survol. Le panneau du mode test reste disponible, désactivé par défaut. **Reste à faire** : les choix faits directement sur la table, le temps de tour limité (en attente des réponses d'INTERFACE §7). |
-| M4.5, marché réduit | **Fait** (ARB-81) : bande de miniatures sous le bandeau en dehors de ma phase de marché, ouverture automatique à ma phase de marché, bouton « Marché » pour le consulter. |
-| M4.5, choix sur la table | **Fait** (ARB-82) : question en bandeau sans bouton ; fiches et cartes allumées ; faces de d8 pour un nombre ; événements fantômes au centre ; actions imposées sur l'arc ; voler en glissant vers son vaisseau, détruire en glissant au centre ; passer en touchant la carte grise ou sa fiche. Les autres boutons restent. |
-| M4.5, temps de tour | **Fait** (ARB-80) : durée réglable dans le menu de partie locale, sans limite par défaut ; barre et secondes au-dessus de « Fin de tour », alerte et tic dans les dix dernières secondes ; tour terminé tout seul à l'expiration ; 15 secondes pour une décision demandée pendant le tour d'un autre, puis choix d'un bot. |
-| M4.5, deuxième playtest | **Fait** : actions en arc centré, attaque à gauche et bouclier à droite (ARB-74) ; journal qu'on peut remonter (ARB-75) ; plus de clignotement de la carte agrandie quand on pointe les cartes d'un adversaire. |
-| M4.5, détails de la table | **Fait** : l'événement de la manche s'agrandit au survol du bandeau (ou à l'appui long, §3.8) ; pendant qu'on glisse une carte du marché, la carte qu'elle remplacerait prend un cadre rouge (§3.3, couleur *Loss* du thème) ; avec l'option « fantômes », l'épave d'un joueur éliminé porte la mention « Fantôme : choisit l'événement » (§3.1). |
-| M4.5, raisons des refus | **Fait** : ce que le moteur refuse dit pourquoi (§1, §3.4, §3.5). Une action éteinte l'explique dans son aide. Pendant la visée, un adversaire qui ne peut pas être visé donne la raison, avec le nom de la carte ou de l'effet qui le protège. Une carte qu'on ne peut pas acheter ou utiliser maintenant donne la raison quand on essaie de la glisser. La raison vient toujours du moteur (`GameEngine.Explain`), jamais de l'interface. |
-| M4.5, appui long | **Fait** : sur écran tactile, l'appui long remplace le survol (§1) : carte agrandie, aide d'une action, fiche d'un adversaire agrandie. Un simple toucher ne montre rien de tout cela, et relâcher le doigt après un appui long ne déclenche pas le bouton. Le jeton de surcharge et le bouton de combo s'expliquent aussi au survol ou à l'appui long ; le combo, une fois jouable, nomme la technologie obtenue et son effet (§3.2). |
-| M4.5, aperçus | **Fait** : l'aperçu d'une attaque ou d'un sabotage pendant la visée, calculé par le moteur sur des parties supposées (§3.4, ADR-0018). |
-| M4.5, gestes (suite) | Priorités retenues après le premier playtest (ARB-71) : boutons de recyclage au niveau du marché (§3.3) ; actions d'équipage au niveau du vaisseau, avec des pictogrammes reconnaissables (§3.4) ; informations d'un adversaire au survol (§3.1) ; glisser-déposer et aperçus (§3.4 à §3.7) ; temps de tour limité (§3.9). |
-| M4.6, menus | **Fait** (ADR-0019) : scène `Menu`, ouverte en premier, avec l'accueil (« Trouver une partie » et « Social » grisés, « Quitter » hors téléphone), la partie locale (2 à 5 joueurs, 5 par défaut ; chaque siège humain ou bot, avec son niveau et un nom), le menu de développement (options de règles et graine, absent des builds publiés) et les options (vitesse des animations ; plein écran et résolution sous Windows). En partie : la pause (reprendre, recommencer, options, quitter), la fenêtre de fin de partie (« Rejouer », « Menu ») et le pivot de la vue vers chaque humain au début de son tour, avec le bandeau « Tour de X » (§4). |
-| M5 | À venir (ARB-72) : modèles 3D (Blender, ADR-0016, [`ASSETS.md`](ASSETS.md)), fond stellaire animé (étoiles qui scintillent, planètes), audio (effets, signaux du temps de tour, musique). |
+| M4.3, habillage | Cartes, visuels provisoires générés, galerie. |
+| M4.4, table | La scène `Game` : bandeau, adversaires en arc dans l'ordre du tour, marché noir, vaisseau et cartes du joueur, jetons de Tourment, technologies, surcharge, effets temporaires, tour en cours, épave d'un joueur éliminé, marqueur du leader (option), journal, vitesse de lecture. Le panneau qui liste tous les coups autorisés reste un outil de développement, désactivé par défaut (objet `Partie`, *Show Command Panel*). |
+| M4.5, lisibilité | Zoom sur toute carte de la table ; dés animés sur les valeurs du moteur ; cartes en objets 3D (ARB-73) ; appui long au doigt à la place du survol ; événement de la manche agrandi au survol du bandeau ; carte qu'un achat remplacerait marquée en rouge ; mention « Fantôme » sur l'épave (option). |
+| M4.5, gestes | Actions d'équipage en arc centré sur le vaisseau, attaque à gauche et bouclier à droite (ARB-71, ARB-74) ; achat et utilisation d'une carte par glisser ; combo ; jeton de surcharge armé d'un toucher (ARB-67) ; « Fin de tour » qui s'allume quand il ne reste rien à faire ; aperçus calculés par le moteur (ADR-0018) ; raison de chaque refus, donnée par le moteur ; fiche d'un adversaire agrandie au survol, sans clignotement. |
+| M4.5, journal | Panneau repliable qu'on peut remonter ; il ne suit les nouvelles lignes que si l'on est en bas (ARB-75). |
+| M4.5, marché réduit | Bande sous le bandeau en dehors de ma phase de marché, ouverte d'elle-même à ma phase de marché, bouton « Marché » pour la consulter (ARB-81). |
+| M4.5, décisions | Prises sur la table, sans bouton (ARB-82) : question en bandeau, fiches et cartes allumées, faces de d8, événements au centre, actions imposées sur l'arc, voler ou détruire en glissant, passer en touchant la carte grise ou sa fiche. |
+| M4.5, temps de tour | Durée réglable (illimitée par défaut), barre et secondes au-dessus de « Fin de tour », alerte et tic dans les dix dernières secondes, fin de tour à l'expiration, 15 secondes pour une décision hors de son tour (ARB-80). |
+| M4.6, menus | Scène `Menu` ouverte en premier (ADR-0019) : accueil, partie locale, menu de développement (absent des builds publiés), options ; en partie, pause, fin de partie et pivot de la vue vers chaque humain (« Tour de X »). |
+| M4.7, vérification | Parties complètes à 2, 3, 4 et 5 joueurs, une personne aux gestes contre des bots, sans erreur ; une image déposée change la carte sans code (`MilestoneTests`). |
+| M5, à venir | Modèles 3D (Blender, ADR-0016, [`ASSETS.md`](ASSETS.md)), icônes (effets temporaires, texte des cartes, cadenas de l'action imposée), fond stellaire animé, audio (le tic du temps de tour est aujourd'hui un bip généré), builds Android et Windows (ARB-72). |
