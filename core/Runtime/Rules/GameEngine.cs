@@ -21,7 +21,7 @@ namespace Vortex.Core.Rules
     /// command from that state with all answers so far; since randomness comes from the state's own generator,
     /// the run reaches the same point and continues. The state is therefore serializable at any time.
     /// </remarks>
-    public sealed class GameEngine
+    public sealed partial class GameEngine
     {
         private const ulong RngStream = 0xDA3E39CB94B95BDBUL;
         private const int MaxNameLength = 24;

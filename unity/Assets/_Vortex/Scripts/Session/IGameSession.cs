@@ -37,6 +37,12 @@ namespace Vortex.Client.Session
 
         /// <summary>Submits a command. An illegal command is refused with a typed error and changes nothing.</summary>
         SessionResult Submit(int seat, Command command);
+
+        /// <summary>
+        /// What a command of the seat would likely do, estimated by the engine on guessed games (ADR-0018): it never
+        /// reveals a coming die or draw. Null when the command is not legal now.
+        /// </summary>
+        CommandPreview? Preview(int seat, Command command);
     }
 
     /// <summary>Outcome of a submitted command.</summary>

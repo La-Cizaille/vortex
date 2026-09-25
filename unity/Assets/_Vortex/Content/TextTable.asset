@@ -329,3 +329,39 @@ MonoBehaviour:
     Text: 'Surcharge : touchez pour gagner un jeton de surcharge (un au plus).'
   - Key: action.help.DefensivePosture
     Text: "Posture d\xE9fensive : touchez pour renforcer votre bouclier jusqu'\xE0 votre prochain tour."
+  - Key: preview.dice
+    Text: "D\xE9s : {0}d{1}"
+  - Key: preview.dice-kept
+    Text: "D\xE9s : {0}d{1}, les {2} meilleurs gard\xE9s"
+  - Key: preview.advantage
+    Text: ', avec avantage'
+  - Key: preview.disadvantage
+    Text: ", avec d\xE9savantage"
+  - Key: preview.shield
+    Text: 'Bouclier de la cible : {0}'
+  - Key: preview.bonuses
+    Text: 'Bonus : {0}'
+  - Key: preview.bonus-item
+    Text: '{1} {0}'
+  - Key: preview.bonus-rule
+    Text: "r\xE8gle de la partie"
+  - Key: preview.damage
+    Text: "D\xE9g\xE2ts : {0}, {1} en moyenne"
+  - Key: preview.damage-exact
+    Text: "D\xE9g\xE2ts : {0}"
+  - Key: preview.chances
+    Text: "Touche : {0} \xB7 critique : {1}"
+  - Key: preview.chances-destroyed
+    Text: "Touche : {0} \xB7 critique : {1} \xB7 d\xE9truit : {2}"
+  - Key: preview.redirect
+    Text: "La cible peut d\xE9vier l'attaque."
+  - Key: preview.self-loss
+    Text: "Vous pouvez perdre jusqu'\xE0 {0} PV."
+  - Key: preview.sabotage
+    Text: "Bouclier de la cible : {0} maintenant, {1} en moyenne apr\xE8s ({2})"
+  - Key: preview.range
+    Text: "{0} \xE0 {1}"
+  - Key: preview.percent
+    Text: "{0}\_%"
+  - Key: preview.decimal
+    Text: ','

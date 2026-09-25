@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using Vortex.Client.Content;
 using Vortex.Client.Theme;
 using Vortex.Core.Commands;
+using Vortex.Core.Config;
 using Vortex.Core.Content;
 using Vortex.Core.Decisions;
 using Vortex.Core.Projection;
@@ -41,15 +42,16 @@ namespace Vortex.Client.Presentation
         [SerializeField] private RectTransform activationZone = null!;
 
         private readonly List<Command> _legal = new List<Command>();
+        private readonly Dictionary<Command, string?> _previews = new Dictionary<Command, string?>();
         private TableContext? _context;
         private CommandLabels? _labels;
-        private Func<Vector2, int>? _seatAt;
-        private Action<int, Command>? _submit;
-        private Action<IReadOnlyCollection<int>?>? _showTargets;
+        private PreviewText? _previewText;
+        private IControlsHost? _host;
         private GameView? _view;
         private DecisionRequest? _decision;
         private CrewAction? _aiming;
         private RectTransform? _aimFrom;
+        private int _aimedAt = -1;
         private int _seat = -1;
 
         /// <summary>True while the person can act (their turn, or their decision), false while others play.</summary>
@@ -70,22 +72,28 @@ namespace Vortex.Client.Presentation
         /// <summary>The decision window (tests choose from it).</summary>
         public CommandPanel Decision => decision;
 
+        /// <summary>The help bubble (tests read the preview in it).</summary>
+        public HelpBubble Help => help;
+
         /// <summary>Connects the controls to a game.</summary>
         /// <param name="context">Theme, texts and cards of the game.</param>
         /// <param name="labels">Words for the decision answers.</param>
         /// <param name="icons">Pictograms of the actions.</param>
-        /// <param name="postureEnabled">Whether the defensive posture rule option is on (its button shows only then).</param>
-        /// <param name="seatAt">The opponent seat at a screen position, or -1.</param>
-        /// <param name="submit">Sends a command of a seat to the session.</param>
-        /// <param name="showTargets">Highlights the seats a dragged action may target (null: back to normal).</param>
-        public void Bind(TableContext context, CommandLabels labels, IconCatalog icons, bool postureEnabled, Func<Vector2, int> seatAt, Action<int, Command> submit, Action<IReadOnlyCollection<int>?> showTargets)
+        /// <param name="rules">Public rules of the game: the defensive posture button shows only when its option is on, the dice faces are named in previews.</param>
+        /// <param name="host">The table: seats under the pointer, commands sent, targets lit, previews.</param>
+        public void Bind(TableContext context, CommandLabels labels, IconCatalog icons, GameConfig rules, IControlsHost host)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _labels = labels ?? throw new ArgumentNullException(nameof(labels));
-            _seatAt = seatAt ?? throw new ArgumentNullException(nameof(seatAt));
-            _submit = submit ?? throw new ArgumentNullException(nameof(submit));
-            _showTargets = showTargets ?? throw new ArgumentNullException(nameof(showTargets));
+            _host = host ?? throw new ArgumentNullException(nameof(host));
+            if (rules is null)
+            {
+                throw new ArgumentNullException(nameof(rules));
+            }
+
             TextTable texts = context.Texts;
+            _previewText = new PreviewText(context, rules.DieFaces);
+            bool postureEnabled = rules.DefensivePostureBonus > 0;
             foreach (ActionButton button in actions)
             {
                 button.gameObject.SetActive(button.Action != CrewAction.DefensivePosture || postureEnabled);
@@ -118,6 +126,7 @@ namespace Vortex.Client.Presentation
             _decision = pending;
             _legal.Clear();
             _legal.AddRange(legal ?? throw new ArgumentNullException(nameof(legal)));
+            _previews.Clear();
             Offered = true;
 
             bool turn = pending is null;
@@ -162,6 +171,7 @@ namespace Vortex.Client.Presentation
         {
             Offered = false;
             _legal.Clear();
+            _previews.Clear();
             _decision = null;
             foreach (ActionButton button in actions)
             {
@@ -192,18 +202,24 @@ namespace Vortex.Client.Presentation
         {
             _aiming = action;
             _aimFrom = from;
+            _aimedAt = -1;
             HideHelp();
-            _showTargets!(_legal.Where(c => c.Type == TypeOf(action)).Select(c => c.Target).Distinct().ToList());
+            _host!.ShowTargets(_legal.Where(c => c.Type == TypeOf(action)).Select(c => c.Target).Distinct().ToList());
             Aim(screen);
         }
 
-        /// <summary>Follows the pointer while aiming: a line from the action to the pointer.</summary>
+        /// <summary>
+        /// Follows the pointer while aiming: a line from the action to the pointer, and over a seat the action may target,
+        /// what it would likely do there (ADR-0018).
+        /// </summary>
         public void Aim(Vector2 screen)
         {
             if (_aiming is null || _aimFrom == null)
             {
                 return;
             }
+
+            AimAt(_host!.SeatAt(screen));
 
             Rect from = CardAnchor.ScreenRectOf(_aimFrom);
             var parent = (RectTransform)aimLine.parent;
@@ -223,7 +239,28 @@ namespace Vortex.Client.Presentation
         {
             CrewAction? action = _aiming;
             CancelAim();
-            return action.HasValue && _seatAt != null && UseActionOn(action.Value, _seatAt(screen));
+            return action.HasValue && _host != null && UseActionOn(action.Value, _host.SeatAt(screen));
+        }
+
+        /// <summary>
+        /// The preview of the aimed action on <paramref name="target"/> (shown in the help bubble next to its panel), or
+        /// null when the action may not go there. Computed once per offer and command.
+        /// </summary>
+        public string? PreviewOn(CrewAction action, int target)
+        {
+            Command? command = target >= 0 ? Pick(_legal, TypeOf(action), target, OverchargeArmed) : null;
+            if (command is null || _host is null || _view is null || _previewText is null)
+            {
+                return null;
+            }
+
+            if (!_previews.TryGetValue(command, out string? text))
+            {
+                text = _previewText.Describe(_host.Preview(_seat, command), command, _view, _seat);
+                _previews[command] = text;
+            }
+
+            return text;
         }
 
         /// <summary>Whether the market card at <paramref name="index"/> can be bought now (dragged).</summary>
@@ -335,21 +372,43 @@ namespace Vortex.Client.Presentation
 
         private bool Send(Command? command)
         {
-            if (command is null || !Offered || _submit is null)
+            if (command is null || !Offered || _host is null)
             {
                 return false;
             }
 
-            _submit(_seat, command);
+            _host.Submit(_seat, command);
             return true;
+        }
+
+        // Over a new seat while aiming: its preview next to its panel, or nothing.
+        private void AimAt(int target)
+        {
+            if (target == _aimedAt || _aiming is null)
+            {
+                return;
+            }
+
+            _aimedAt = target;
+            string? text = PreviewOn(_aiming.Value, target);
+            RectTransform? panel = text is null ? null : _host!.SeatPanel(target);
+            if (text is null || panel == null)
+            {
+                HideHelp();
+                return;
+            }
+
+            help.Show(text, panel);
         }
 
         private void CancelAim()
         {
             _aiming = null;
             _aimFrom = null;
+            _aimedAt = -1;
             aimLine.gameObject.SetActive(false);
-            _showTargets?.Invoke(null);
+            _host?.ShowTargets(null);
+            HideHelp();
         }
     }
 }

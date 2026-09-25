@@ -38,11 +38,17 @@ namespace Vortex.Core.Effects
         /// <summary>Dice kept for the attack value.</summary>
         public List<int> Kept { get; } = new List<int>();
 
+        /// <summary>1 when the dice were thrown with advantage, -1 with disadvantage, 0 otherwise (RULES B4).</summary>
+        public int NetAdvantage { get; set; }
+
         /// <summary>At least one kept die shows the highest face (RULES A6 step 5).</summary>
         public bool Critical { get; set; }
 
         /// <summary>Attack value after modifiers (step 6).</summary>
         public int Value { get; set; }
+
+        /// <summary>What each effect (or the base rules) added to the attack value (step 6), for previews.</summary>
+        public List<ValueShare> Bonuses { get; } = new List<ValueShare>();
 
         /// <summary>Target's effective shield (step 7).</summary>
         public int EffectiveShield { get; set; }

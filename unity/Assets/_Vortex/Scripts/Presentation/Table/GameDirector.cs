@@ -10,6 +10,7 @@ using Vortex.Core.Bots;
 using Vortex.Core.Commands;
 using Vortex.Core.Content;
 using Vortex.Core.Events;
+using Vortex.Core.Rules;
 
 namespace Vortex.Client.Presentation
 {
@@ -18,7 +19,7 @@ namespace Vortex.Client.Presentation
     /// around the viewer, plays the engine events one by one, and lets bots play when the presentation is idle. The
     /// displays follow each event through the <see cref="TableModel"/>, then resync on the final public view.
     /// </summary>
-    public sealed class GameDirector : MonoBehaviour, IFeedbackStage
+    public sealed class GameDirector : MonoBehaviour, IFeedbackStage, IControlsHost
     {
         [Header("Contenu et habillage")]
         [SerializeField] private GameContent content = null!;
@@ -148,7 +149,7 @@ namespace Vortex.Client.Presentation
             _viewer = 0;
             view.backgroundColor = theme.Background;
             _model = TableModel.From(_session.View, _session.Rules);
-            controls.Bind(_context, _labels, icons, _session.Rules.DefensivePostureBonus > 0, SeatAt, Submit, ShowTargets);
+            controls.Bind(_context, _labels, icons, _session.Rules, this);
             _controlsOffered = false;
 
             _player = new EventPlayer(type => feedback.For(type), this) { Speed = theme.PlaybackSpeed };
@@ -303,6 +304,21 @@ namespace Vortex.Client.Presentation
                 _controlsOffered = false;
             }
         }
+
+        /// <inheritdoc/>
+        RectTransform? IControlsHost.SeatPanel(int seat) => _seats.TryGetValue(seat, out SeatDisplay display) ? (RectTransform)display.transform : null;
+
+        /// <inheritdoc/>
+        void IControlsHost.Submit(int seat, Command command) => Submit(seat, command);
+
+        /// <inheritdoc/>
+        void IControlsHost.ShowTargets(IReadOnlyCollection<int>? seats) => ShowTargets(seats);
+
+        /// <inheritdoc/>
+        CommandPreview? IControlsHost.Preview(int seat, Command command) => _session?.Preview(seat, command);
+
+        /// <inheritdoc/>
+        int IControlsHost.SeatAt(Vector2 screen) => SeatAt(screen);
 
         // The opponent under a screen position (their panel, or near their ship), or -1: where an aimed action lands.
         private int SeatAt(Vector2 screen)

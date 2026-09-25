@@ -22,6 +22,12 @@ namespace Vortex.Core.Effects
         private int? _cap;
         private int? _floor;
 
+        /// <summary>Effect whose modifications are being registered (set by the calculation); null for the base rules.</summary>
+        public EffectSource? Source { get; set; }
+
+        /// <summary>When set, every addition is also recorded here with its source (previews, ADR-0018).</summary>
+        public List<ValueShare>? Shares { get; set; }
+
         /// <summary>1. Replace the base value. The last replacement registered wins (RULES B4).</summary>
         public void Replace(int value)
         {
@@ -32,6 +38,10 @@ namespace Vortex.Core.Effects
         public void Add(int amount)
         {
             _addition += amount;
+            if (amount != 0)
+            {
+                Shares?.Add(new ValueShare(Source, amount));
+            }
         }
 
         /// <summary>3. Multiply. Multipliers compound: two ×2 give ×4.</summary>
@@ -119,5 +129,21 @@ namespace Vortex.Core.Effects
 
             public Action? OnApplied { get; }
         }
+    }
+
+    /// <summary>An amount one effect (or the base rules, when <see cref="Source"/> is null) added to a calculated value.</summary>
+    internal readonly struct ValueShare
+    {
+        public ValueShare(EffectSource? source, int amount)
+        {
+            Source = source;
+            Amount = amount;
+        }
+
+        /// <summary>Effect that added it, or null for the base rules.</summary>
+        public EffectSource? Source { get; }
+
+        /// <summary>Amount added (negative: subtracted).</summary>
+        public int Amount { get; }
     }
 }

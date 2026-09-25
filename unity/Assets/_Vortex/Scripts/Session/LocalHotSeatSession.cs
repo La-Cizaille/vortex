@@ -5,6 +5,7 @@ using Vortex.Core.Bots;
 using Vortex.Core.Commands;
 using Vortex.Core.Config;
 using Vortex.Core.Decisions;
+using Vortex.Core.Dice;
 using Vortex.Core.Events;
 using Vortex.Core.Projection;
 using Vortex.Core.Rules;
@@ -19,7 +20,9 @@ namespace Vortex.Client.Session
     /// </summary>
     public sealed class LocalHotSeatSession : IGameSession
     {
+        private const ulong PreviewStream = 0x9E3779B97F4A7C15UL;
         private readonly GameEngine _engine;
+        private readonly Pcg32 _guesses;
         private readonly Dictionary<int, IBot> _bots = new Dictionary<int, IBot>();
         private GameState _state;
         private GameView _view;
@@ -37,6 +40,9 @@ namespace Vortex.Client.Session
             }
 
             EngineResult start = engine.NewGame(seed, seats.Select(s => s.Name).ToList());
+
+            // Previews guess the hidden information with a generator of their own (ADR-0018), never the game's.
+            _guesses = Pcg32.Seeded(seed, PreviewStream);
             _state = start.State;
             _view = GameView.Of(_state);
             OpeningEvents = start.Events;
@@ -76,6 +82,9 @@ namespace Vortex.Client.Session
 
         /// <inheritdoc/>
         public IReadOnlyList<Command> LegalCommands(int seat) => _engine.LegalCommands(_state, seat);
+
+        /// <inheritdoc/>
+        public CommandPreview? Preview(int seat, Command command) => _engine.Preview(_state, seat, command, _guesses);
 
         /// <inheritdoc/>
         public SessionResult Submit(int seat, Command command)

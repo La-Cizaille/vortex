@@ -1,10 +1,12 @@
 using System;
 using System.IO;
+using System.Linq;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 using Vortex.Client.Gallery;
 using Vortex.Client.Presentation;
+using Vortex.Core.Commands;
 using Object = UnityEngine.Object;
 
 namespace Vortex.Editor
@@ -22,14 +24,16 @@ namespace Vortex.Editor
         /// <summary>
         /// Bots play the game scene until the requested round, then the table is rendered. With VORTEX_HUMAN=1, the first
         /// seat is a person's: the table is rendered on their turn, with the controls offered, after the market or, with
-        /// VORTEX_PHASE=market, during it.
+        /// VORTEX_PHASE=market, during it. VORTEX_PHASE=aim shows an attack being aimed at the first opponent it may target,
+        /// with the engine's preview next to it (ADR-0018).
         /// </summary>
         public static void Game()
         {
             string output = Output();
             int round = int.TryParse(Environment.GetEnvironmentVariable("VORTEX_ROUND"), out int value) ? Math.Clamp(value, 1, 30) : 4;
             bool human = Environment.GetEnvironmentVariable("VORTEX_HUMAN") == "1";
-            bool atMarket = Environment.GetEnvironmentVariable("VORTEX_PHASE") == "market";
+            string? phase = Environment.GetEnvironmentVariable("VORTEX_PHASE");
+            bool atMarket = phase == "market";
             EditorSceneManager.OpenScene(GameScene.ScenePath, OpenSceneMode.Single);
             (Camera camera, RenderTexture target) = Prepare();
             GameDirector director = Object.FindAnyObjectByType<GameDirector>();
@@ -73,6 +77,13 @@ namespace Vortex.Editor
                 tray.Settle();
             }
 
+            if (human && phase == "aim")
+            {
+                // The layers must stand where they are drawn before the pointer positions are read.
+                Settle(camera);
+                AimFirstAttack(director);
+            }
+
             Render(camera, target, output);
         }
 
@@ -84,6 +95,22 @@ namespace Vortex.Editor
             (Camera camera, RenderTexture target) = Prepare();
             Object.FindAnyObjectByType<GalleryController>().Build();
             Render(camera, target, output);
+        }
+
+        // Drags the attack action over the first opponent the engine lets the person attack.
+        private static void AimFirstAttack(GameDirector director)
+        {
+            ActionButton? attack = director.Controls.Actions.FirstOrDefault(a => a.Action == CrewAction.Attack && a.Available);
+            int target = director.Session!.LegalCommands(0).Where(c => c.Type == CommandType.Attack).Select(c => c.Target).DefaultIfEmpty(-1).First();
+            if (attack == null || target < 0)
+            {
+                Debug.LogWarning("Capture: no attack to aim this turn; the table is rendered without it.");
+                return;
+            }
+
+            var from = (RectTransform)attack.transform;
+            director.Controls.BeginAim(CrewAction.Attack, from, CardAnchor.ScreenRectOf(from).center);
+            director.Controls.Aim(CardAnchor.ScreenRectOf((RectTransform)director.Seats[target].transform).center);
         }
 
         private static string Output()
@@ -125,7 +152,24 @@ namespace Vortex.Editor
 
         private static void Render(Camera camera, RenderTexture target, string output)
         {
-            // Layouts and anchors are normally settled over frames; settle them now, a few times for nested layouts.
+            Settle(camera);
+            RenderTexture previous = RenderTexture.active;
+            RenderTexture.active = target;
+            var image = new Texture2D(Width, Height, TextureFormat.RGB24, false);
+            image.ReadPixels(new Rect(0, 0, Width, Height), 0, 0);
+            image.Apply();
+            RenderTexture.active = previous;
+            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(output))!);
+            File.WriteAllBytes(output, image.EncodeToPNG());
+            Object.DestroyImmediate(image);
+            camera.targetTexture = null;
+            Object.DestroyImmediate(target);
+            Debug.Log("Captured " + output);
+        }
+
+        // Layouts and anchors are normally settled over frames; settle them now, a few times for nested layouts.
+        private static void Settle(Camera camera)
+        {
             for (int pass = 0; pass < 3; pass++)
             {
                 Canvas.ForceUpdateCanvases();
@@ -151,19 +195,6 @@ namespace Vortex.Editor
 
                 camera.Render();
             }
-
-            RenderTexture previous = RenderTexture.active;
-            RenderTexture.active = target;
-            var image = new Texture2D(Width, Height, TextureFormat.RGB24, false);
-            image.ReadPixels(new Rect(0, 0, Width, Height), 0, 0);
-            image.Apply();
-            RenderTexture.active = previous;
-            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(output))!);
-            File.WriteAllBytes(output, image.EncodeToPNG());
-            Object.DestroyImmediate(image);
-            camera.targetTexture = null;
-            Object.DestroyImmediate(target);
-            Debug.Log("Captured " + output);
         }
     }
 }

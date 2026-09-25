@@ -85,6 +85,28 @@ namespace Vortex.Tests.EditMode
         }
 
         [Test]
+        public void Aiming_an_attack_over_a_target_shows_the_engine_preview_next_to_it()
+        {
+            ReachActionPhase();
+            Command attack = _director.Session!.LegalCommands(0).First(c => c.Type == CommandType.Attack);
+            string? preview = Controls.PreviewOn(CrewAction.Attack, attack.Target);
+            Assert.That(preview, Does.StartWith("Dés : ").And.Contains("Touche : "));
+            Assert.That(Controls.PreviewOn(CrewAction.Attack, 0), Is.Null, "Not oneself.");
+            Assert.That(Controls.PreviewOn(CrewAction.Attack, -1), Is.Null, "Not the empty table.");
+
+            var from = (RectTransform)Controls.Actions.Single(a => a.Action == CrewAction.Attack).transform;
+            Rect target = CardAnchor.ScreenRectOf((RectTransform)_director.Seats[attack.Target].transform);
+            Controls.BeginAim(CrewAction.Attack, from, CardAnchor.ScreenRectOf(from).center);
+            Assert.That(Controls.Help.Text, Is.Empty, "Nothing before a target is reached.");
+            Controls.Aim(target.center);
+            Assert.That(Controls.Help.Text, Is.EqualTo(preview), "The same preview, computed once per offer.");
+            AssertInside(Controls.Help.Bubble);
+
+            Assert.That(Controls.EndAim(target.center), Is.True);
+            Assert.That(Controls.Help.Text, Is.Empty, "The preview goes with the aim.");
+        }
+
+        [Test]
         public void A_market_card_is_bought_only_when_dropped_on_the_players_side()
         {
             PlayUntilOffered();
@@ -132,6 +154,20 @@ namespace Vortex.Tests.EditMode
             Assert.That(opponent.transform.localScale.x, Is.GreaterThan(1f));
             opponent.OnPointerExit(null!);
             Assert.That(opponent.transform.localScale.x, Is.EqualTo(1f));
+        }
+
+        // The bubble lies inside the layer it is drawn on (the screen).
+        private static void AssertInside(RectTransform bubble)
+        {
+            var layer = (RectTransform)bubble.parent;
+            var corners = new Vector3[4];
+            bubble.GetWorldCorners(corners);
+            foreach (Vector3 corner in corners)
+            {
+                Vector3 local = layer.InverseTransformPoint(corner);
+                Assert.That(local.x, Is.InRange(layer.rect.xMin - 0.5f, layer.rect.xMax + 0.5f), "Inside horizontally.");
+                Assert.That(local.y, Is.InRange(layer.rect.yMin - 0.5f, layer.rect.yMax + 0.5f), "Inside vertically.");
+            }
         }
 
         private void PlayUntilOffered()
