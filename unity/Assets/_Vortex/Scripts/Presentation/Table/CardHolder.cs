@@ -45,6 +45,12 @@ namespace Vortex.Client.Presentation
         /// <summary>Learns when the card is pointed at (true) and left (false).</summary>
         public Action<bool>? OnPointed { get; set; }
 
+        /// <summary>What a touch of the card does (a decision's answer, ARB-82), or null.</summary>
+        public Action? OnTap { get; set; }
+
+        /// <summary>The card of the table shown, or null (nothing, or a face that is not on the table).</summary>
+        public CardView? Shown => _shown;
+
         /// <summary>The card shown, or null.</summary>
         public CardDisplay? Card => _card != null && _card.gameObject.activeSelf ? _card : null;
 
@@ -74,6 +80,7 @@ namespace Vortex.Client.Presentation
             CardDisplay shown = Ensure(context);
             shown.Show(face, context.Theme, context.Art);
             shown.ShowTorments(0);
+            _shown = null;
             _uid = -1;
         }
 
@@ -122,6 +129,7 @@ namespace Vortex.Client.Presentation
                     hover.Pointed = pointed => OnPointed?.Invoke(pointed);
                 }
 
+                _card.gameObject.AddComponent<CardTap>().Tapped = () => OnTap?.Invoke();
                 if (OnDrop != null)
                 {
                     _card.gameObject.AddComponent<CardDrag>().Bind(

@@ -44,9 +44,9 @@ namespace Vortex.Tests.EditMode
                 }
 
                 gestures++;
-                if (Controls.Decision.gameObject.activeSelf && Controls.Decision.Options.Count > 0)
+                if (TableAnswers.Answer(Controls))
                 {
-                    Controls.Decision.Choose(0);
+                    // A decision, answered on the table (ARB-82).
                 }
                 else if (Controls.CanEndMarket)
                 {

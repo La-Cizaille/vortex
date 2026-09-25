@@ -383,6 +383,21 @@ namespace Vortex.Client.Content
         /// <summary>Question of a decision, by its engine prompt key (e.g. <c>critical.discard</c>).</summary>
         public static string Decision(string prompt) => "decision." + prompt;
 
+        /// <summary>
+        /// Optional gesture hint after the question of a decision answered on the table (ARB-82), by its engine prompt key;
+        /// only questions whose gesture is not obvious have one.
+        /// </summary>
+        public static string DecisionHint(string prompt) => "decision.hint." + prompt;
+
+        /// <summary>How to decline a decision: touch the card that asks ({0}: its name).</summary>
+        public const string DecisionPassCard = "decision.pass.card";
+
+        /// <summary>How to decline a decision: touch one's own panel.</summary>
+        public const string DecisionPassSeat = "decision.pass.seat";
+
+        /// <summary>How to decline a decision: touch the card shown in the middle in grey.</summary>
+        public const string DecisionPassMiddle = "decision.pass.middle";
+
         /// <summary>Word for a decision answer, by its engine key (e.g. <c>yes</c>, <c>clockwise</c>).</summary>
         public static string Option(string key) => "option." + key;
 
@@ -572,6 +587,11 @@ namespace Vortex.Client.Content
             Add(Decision("torment.market"), "Sur quelle carte du marché poser le Tourment ?");
             Add(Decision("torment.place"), "Sur quel modificateur poser le Tourment ?");
             Add(Decision("torment.target"), "Quel joueur reçoit le Tourment ?");
+            Add(DecisionHint("rotate.direction"), "Touchez le voisin qui reçoit votre bouclier.");
+            Add(DecisionHint("steal.or.destroy"), "Glissez la carte vers votre vaisseau pour la voler, ou au centre de la table pour la détruire.");
+            Add(DecisionPassCard, "Touchez {0} en gris pour passer.");
+            Add(DecisionPassSeat, "Touchez votre fiche pour passer.");
+            Add(DecisionPassMiddle, "Touchez la carte grise au centre pour passer.");
 
             Add(Option("yes"), "Oui");
             Add(Option("no"), "Non");

@@ -14,9 +14,9 @@ namespace Vortex.Client.Presentation
     /// Shows one seat (INTERFACE.md 3.1 and 3.2): name, HP, shield, overcharge, technologies obtained, its two modifiers
     /// with their Torment tokens, its temporary effects, whose turn it is, the HP leader marker (leader bounty option)
     /// and the eliminated state. The same component fills the opponent panel and the player's own panel; only their
-    /// layout differs.
+    /// layout differs. Touching the panel, or one of its cards, answers a decision that offers them (ARB-82).
     /// </summary>
-    public sealed class SeatDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
+    public sealed class SeatDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler
     {
         [SerializeField] private TMP_Text playerName = null!;
         [SerializeField] private TMP_Text hp = null!;
@@ -82,6 +82,39 @@ namespace Vortex.Client.Presentation
             _defense = null;
         }
 
+        /// <summary>What a touch of the panel does (a decision's answer), or null.</summary>
+        public Action? Tapped { get; set; }
+
+        /// <summary>Sets what a touch of one of the seat's cards does, given its uid. Set it right after <see cref="Bind"/>.</summary>
+        public void SetCardTap(Action<int> tap)
+        {
+            foreach (CardHolder? holder in new[] { _attack, _defense })
+            {
+                if (holder != null)
+                {
+                    holder.OnTap = () =>
+                    {
+                        if (holder.Shown != null)
+                        {
+                            tap(holder.Shown.Uid);
+                        }
+                    };
+                }
+            }
+        }
+
+        /// <summary>Marks each card of the seat with the colour <paramref name="mark"/> gives its uid, or gives it back its own.</summary>
+        public void MarkCards(Func<int, Color?> mark)
+        {
+            foreach (CardHolder? holder in new[] { _attack, _defense })
+            {
+                if (_context != null && holder?.Card != null && holder.Shown != null)
+                {
+                    holder.Card.Mark(mark(holder.Shown.Uid), _context.Theme);
+                }
+            }
+        }
+
         /// <summary>The overcharge token (the player's own is a button that arms it).</summary>
         public Image OverchargeToken => overcharge;
 
@@ -140,6 +173,9 @@ namespace Vortex.Client.Presentation
 
         /// <inheritdoc/>
         public void OnPointerUp(PointerEventData eventData) => Intent.Up(eventData);
+
+        /// <inheritdoc/>
+        public void OnPointerClick(PointerEventData eventData) => Tapped?.Invoke();
 
         /// <summary>Advances a long press, and closes the panel once nothing of it is pointed at (the frame loop, or tests).</summary>
         public void Tick(float deltaTime)

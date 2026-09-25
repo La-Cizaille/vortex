@@ -511,3 +511,13 @@ MonoBehaviour:
     Text: "March\xE9"
   - Key: button.market-fold
     Text: "R\xE9duire le march\xE9"
+  - Key: decision.hint.rotate.direction
+    Text: "Touchez le voisin qui re\xE7oit votre bouclier."
+  - Key: decision.hint.steal.or.destroy
+    Text: "Glissez la carte vers votre vaisseau pour la voler, ou au centre de la table pour la d\xE9truire."
+  - Key: decision.pass.card
+    Text: Touchez {0} en gris pour passer.
+  - Key: decision.pass.seat
+    Text: Touchez votre fiche pour passer.
+  - Key: decision.pass.middle
+    Text: Touchez la carte grise au centre pour passer.

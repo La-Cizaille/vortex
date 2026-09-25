@@ -242,6 +242,7 @@ Quand la carte qui porte un effet quitte son emplacement, tous ses effets « tan
 - Un choix revient au **propriétaire de l'effet**, sauf si le texte désigne un autre joueur (par exemple « la cible choisit »).
 - Un choix se fait parmi les options **légales** seulement. S'il n'y en a aucune, l'effet ne fait rien.
 - En ligne (phase 2), tout choix a un délai et une option par défaut.
+- Chaque option d'un choix nomme ce qu'elle désigne : un joueur, une carte, un nombre, un contenu (un événement). Une option qui mène quelque part le nomme aussi : « voler » nomme la carte et le joueur qui la reçoit, « détruire » la carte seule ; un sens de rotation nomme le voisin qui reçoit le bouclier du porteur. Le client peut ainsi faire répondre sur la table sans connaître aucune carte (ARB-82).
 
 ## B7. Ordre de résolution
 
