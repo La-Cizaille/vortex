@@ -41,6 +41,7 @@ namespace Vortex.Client.Presentation
         [SerializeField] private RectTransform aimLine = null!;
         [SerializeField] private RectTransform purchaseZone = null!;
         [SerializeField] private RectTransform activationZone = null!;
+        [SerializeField] private ActionArc? arc;
 
         private readonly List<Command> _legal = new List<Command>();
         private readonly Dictionary<Command, string?> _previews = new Dictionary<Command, string?>();
@@ -109,6 +110,12 @@ namespace Vortex.Client.Presentation
             {
                 button.gameObject.SetActive(button.Action != CrewAction.DefensivePosture || postureEnabled);
                 button.Bind(this, icons.Find(IconName(button.Action)), texts.Get(TextKeys.ActionShort(button.Action)));
+            }
+
+            // The arc is laid out once the rule options have shown or hidden the defensive posture.
+            if (arc != null)
+            {
+                arc.Arrange();
             }
 
             comboLabel.text = texts.Get(TextKeys.ButtonCombo);
@@ -385,6 +392,9 @@ namespace Vortex.Client.Presentation
             CrewAction.Overcharge => "Action_Surcharge",
             _ => "Action_Posture",
         };
+
+        /// <summary>Wires the arc that lays the actions out (editor setup).</summary>
+        public void AssignArc(ActionArc actionArc) => arc = actionArc;
 
         /// <summary>Wires the parts of the layout (editor setup).</summary>
         public void Assign(ActionButton[] actionButtons, Button comboButton, Image comboImage, TMP_Text comboText, Button endTurnButton, Image endTurnImage, TMP_Text endTurnText, Button endMarketButton, TMP_Text endMarketText, Button recycleAttackButton, Button recycleDefenseButton, Button overchargeButton, Graphic overchargeArmed, CommandPanel decisionWindow, HelpBubble helpBubble, RectTransform line, RectTransform purchase, RectTransform activation)

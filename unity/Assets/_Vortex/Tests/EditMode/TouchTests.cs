@@ -91,6 +91,7 @@ namespace Vortex.Tests.EditMode
             opponent.Tick(Long);
             Assert.That(opponent.transform.localScale.x, Is.GreaterThan(1f));
             opponent.OnPointerUp(Finger());
+            opponent.Tick(0f);
             Assert.That(opponent.transform.localScale.x, Is.EqualTo(1f));
         }
 

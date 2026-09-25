@@ -159,3 +159,12 @@ Le game designer a précisé ses attentes pour les prochaines étapes, après le
 | ARB-71 | Quelles priorités pour les gestes (M4.5) ? | Les boutons de recyclage au niveau du marché noir ; les actions d'équipage au niveau du vaisseau, avec des pictogrammes reconnaissables ; les informations d'un adversaire au survol de la souris ; le temps de tour limité (ARB-70). Les trois premiers points confirment INTERFACE §3.1, §3.3 et §3.4 : le panneau du mode test les regroupe aujourd'hui en bas à droite, c'est provisoire. | INTERFACE §8, feuille de route du README |
 | ARB-72 | Que mettre dans les finitions (M5) ? | L'**audio** et un **fond stellaire animé**, en plus des modèles 3D (ADR-0016). | INTERFACE §8, ASSETS §2 à §4, feuille de route du README |
 | ARB-73 | Les cartes doivent-elles rester des éléments d'interface 2D (ADR-0015) ? | **Non : les cartes sont aussi des assets 3D**, comme les vaisseaux (consigne du designer, 2026-09-25). Blender est mis de côté pour l'instant, avec des assets modifiables dans Unity. | ADR-0017, `Card.prefab`, INTERFACE §2 |
+
+## 2026-09-25 : deuxième playtest (prototype complet)
+
+Le game designer a joué le prototype complet (menus, gestes, aperçus). Le jeu est jugé « globalement très fonctionnel » ; ses remarques portent sur la forme.
+
+| # | Question | Décision | Appliqué dans |
+|---|---|---|---|
+| ARB-74 | Comment disposer les actions d'équipage autour du vaisseau ? | **Un arc de cercle centré sur le vaisseau**, avec les actions d'attaque d'un côté (Attaque, Surcharge) et les actions de bouclier de l'autre (Reparamétrage, Sabotage). Mise en œuvre : attaque à gauche, du côté de la carte ATK, et bouclier à droite, du côté de la carte DEF ; sur chaque côté, l'action qui vise un adversaire est à l'extrémité et celle qui concerne son propre vaisseau vers le haut ; la Posture défensive (option) rejoint le côté bouclier. L'arc reste centré quelles que soient les options. | INTERFACE §3.4, `ActionArc` |
+| ARB-75 | Le journal doit-il garder toute la partie ? | **Oui : on peut remonter le journal.** Il garde les 300 dernières lignes, défile à la molette, au doigt ou avec sa barre, et ne suit les nouvelles lignes que si l'on est en bas. | INTERFACE §3.8, `GameLogDisplay` |

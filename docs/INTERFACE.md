@@ -79,7 +79,7 @@ Disposition à 5 joueurs, vue du joueur dont c'est le tour :
 
 ### 3.4 Actions d'équipage
 
-- Elles apparaissent **en demi-cercle au-dessus de mon vaisseau**, chacune avec une icône simple : Attaque, Sabotage, Reparamétrage, Surcharge, et Posture défensive si l'option est activée.
+- Elles apparaissent **en arc de cercle centré au-dessus de mon vaisseau** (ARB-74), chacune avec une icône simple : à gauche les actions d'attaque (Attaque à l'extrémité, Surcharge), à droite les actions de bouclier (Reparamétrage, Posture défensive si l'option est activée, Sabotage à l'extrémité).
 - **Au survol**, une fenêtre précise l'effet de l'action, tel qu'il s'appliquerait maintenant (par exemple : Reparamétrage à 2 dés avec la surcharge).
 - **Actions avec une cible** (Attaque, Sabotage) : glisser l'icône vers un adversaire.
 - **Actions sans cible** (Reparamétrage, Surcharge, Posture défensive) : un simple toucher.
@@ -116,7 +116,7 @@ Disposition à 5 joueurs, vue du joueur dont c'est le tour :
 ### 3.8 Informations de partie
 
 - **En haut au centre** : le numéro de manche, l'événement en cours (agrandi au survol) et le compte à rebours de la Fin des temps.
-- **Journal** : un panneau repliable, fermé par défaut, qui dit qui a fait quoi et avec quels jets de dés.
+- **Journal** : un panneau repliable, fermé par défaut, qui dit qui a fait quoi et avec quels jets de dés. On peut le remonter (molette, doigt ou barre) ; il ne suit les nouvelles lignes que si l'on est en bas (ARB-75).
 - **Animations** : chaque événement du moteur est montré à son tour (ADR-0014). Un bouton « accélérer / passer » est disponible pendant qu'elles se jouent, et la vitesse par défaut se règle dans les options.
 
 ### 3.9 Temps de tour limité (ARB-70)
@@ -183,6 +183,7 @@ Sur le temps de tour limité (§3.9, ARB-70) :
 | M4.4, mode test | Le siège 1 est joué par une personne, les autres par des bots (niveau « normal » par défaut). Un panneau en bas à droite liste les coups que le moteur autorise, un bouton par coup, ainsi que les réponses quand une carte demande un choix. C'est un outil provisoire : il disparaîtra quand les gestes seront là. Réglages : objet `Partie` de la scène `Game`, rubrique *Partie de test*. |
 | M4.5, lisibilité | Après le premier playtest : **zoom** sur toute carte de la table (marché, panneaux, cartes du joueur). À la souris, la carte s'agrandit au survol ; sur écran tactile, tant que le doigt est posé dessus (l'appui long viendra avec le glisser-déposer). **Dés animés** : chaque lancer (attaque, ou dé d'un effet) s'affiche au centre, roule puis s'arrête sur les valeurs du moteur, avec le total gardé. |
 | M4.5, gestes (première partie) | **Fait** : les actions d'équipage en demi-cercle au-dessus du vaisseau, avec leur pictogramme (un nom court en attendant l'icône) ; un toucher pour Reparamétrage, Surcharge et Posture, un glisser vers un adversaire pour Attaque et Sabotage, avec les cibles permises allumées et les autres estompées ; une aide au survol de chaque action ; « Recycler » dans l'en-tête de chaque marché et « Passer le marché » au-dessus ; l'achat en glissant une carte du marché vers son vaisseau, l'utilisation en glissant une de ses cartes au centre ; le bouton de combo ; le jeton de surcharge armé d'un toucher (ARB-67) ; « Fin de tour », qui s'allume quand il ne reste rien d'autre à faire ; une fenêtre pour chaque décision ; la fiche d'un adversaire agrandie au survol. Le panneau du mode test reste disponible, désactivé par défaut. **Reste à faire** : les choix faits directement sur la table, le temps de tour limité (en attente des réponses d'INTERFACE §7). |
+| M4.5, deuxième playtest | **Fait** : actions en arc centré, attaque à gauche et bouclier à droite (ARB-74) ; journal qu'on peut remonter (ARB-75) ; plus de clignotement de la carte agrandie quand on pointe les cartes d'un adversaire. |
 | M4.5, détails de la table | **Fait** : l'événement de la manche s'agrandit au survol du bandeau (ou à l'appui long, §3.8) ; pendant qu'on glisse une carte du marché, la carte qu'elle remplacerait prend un cadre rouge (§3.3, couleur *Loss* du thème) ; avec l'option « fantômes », l'épave d'un joueur éliminé porte la mention « Fantôme : choisit l'événement » (§3.1). |
 | M4.5, raisons des refus | **Fait** : ce que le moteur refuse dit pourquoi (§1, §3.4, §3.5). Une action éteinte l'explique dans son aide. Pendant la visée, un adversaire qui ne peut pas être visé donne la raison, avec le nom de la carte ou de l'effet qui le protège. Une carte qu'on ne peut pas acheter ou utiliser maintenant donne la raison quand on essaie de la glisser. La raison vient toujours du moteur (`GameEngine.Explain`), jamais de l'interface. |
 | M4.5, appui long | **Fait** : sur écran tactile, l'appui long remplace le survol (§1) : carte agrandie, aide d'une action, fiche d'un adversaire agrandie. Un simple toucher ne montre rien de tout cela, et relâcher le doigt après un appui long ne déclenche pas le bouton. Le jeton de surcharge et le bouton de combo s'expliquent aussi au survol ou à l'appui long ; le combo, une fois jouable, nomme la technologie obtenue et son effet (§3.2). |

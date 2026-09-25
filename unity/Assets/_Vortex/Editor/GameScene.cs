@@ -148,6 +148,7 @@ namespace Vortex.Editor
                 aimLine.rectTransform,
                 (RectTransform)player.transform,
                 (RectTransform)market.transform);
+            controls.AssignArc(player.GetComponent<ActionArc>());
 
             var director = new GameObject("Partie", typeof(GameDirector)).GetComponent<GameDirector>();
             director.Assign(
@@ -352,17 +353,15 @@ namespace Vortex.Editor
             (Button combo, TMP_Text comboLabel) = UiBuilder.Button(root, "Combo", new Vector2(0.5f, 0f), new Vector2(-340f, 244f), new Vector2(150f, 40f));
             comboLabel.fontStyle = FontStyles.Bold;
 
-            // The ship stands a quarter of the screen up (GameDirector), that is 270 units above the panel's bottom.
-            var ship = new Vector2(0f, 270f);
-            CrewAction[] order = { CrewAction.Attack, CrewAction.Sabotage, CrewAction.RerollShield, CrewAction.Overcharge, CrewAction.DefensivePosture };
-            float[] angles = { 160f, 125f, 90f, 55f, 20f };
-            var actions = new ActionButton[order.Length];
-            for (int i = 0; i < order.Length; i++)
-            {
-                float angle = angles[i] * Mathf.Deg2Rad;
-                Vector2 place = ship + (new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * 125f);
-                actions[i] = BuildAction(root, order[i], place);
-            }
+            // The actions, on an arc centred above the ship (ActionArc lays them out, playtest 2): attack actions on the
+            // left, beside the attack card, shield actions on the right; aimed actions at the ends, own ones near the top.
+            ActionButton[] attackSide = { BuildAction(root, CrewAction.Attack), BuildAction(root, CrewAction.Overcharge) };
+            ActionButton[] shieldSide = { BuildAction(root, CrewAction.RerollShield), BuildAction(root, CrewAction.DefensivePosture), BuildAction(root, CrewAction.Sabotage) };
+            ActionArc arc = root.gameObject.AddComponent<ActionArc>();
+            arc.Assign(attackSide, shieldSide);
+            shieldSide[1].gameObject.SetActive(false);
+            arc.Arrange();
+            ActionButton[] actions = attackSide.Concat(shieldSide).ToArray();
 
             SeatDisplay seat = root.gameObject.AddComponent<SeatDisplay>();
             seat.Assign(name, hp, shield, statuses, overcharge, rounds, attack, defense, highlight, leader, root.GetComponent<CanvasGroup>());
@@ -370,11 +369,10 @@ namespace Vortex.Editor
         }
 
         // One action: a disc with the pictogram, or its short name while the icon is missing.
-        private static ActionButton BuildAction(Transform parent, CrewAction action, Vector2 centre)
+        private static ActionButton BuildAction(Transform parent, CrewAction action)
         {
             Image disc = UiBuilder.Fixed<Image>(parent, "Action " + action, new Vector2(0.5f, 0f), Vector2.zero, new Vector2(56f, 56f));
             disc.rectTransform.pivot = new Vector2(0.5f, 0.5f);
-            disc.rectTransform.anchoredPosition = centre;
             disc.sprite = UiBuilder.Disc;
             disc.color = new Color(0.1f, 0.12f, 0.2f, 0.95f);
             disc.raycastTarget = true;
@@ -408,10 +406,41 @@ namespace Vortex.Editor
         {
             RectTransform root = UiBuilder.Part<RectTransform>(ui, "Journal", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             (Button toggle, TMP_Text toggleLabel) = UiBuilder.Button(root, "Bouton", Vector2.zero, new Vector2(20f, 20f), new Vector2(160f, 48f));
-            Image panel = UiBuilder.Box(UiBuilder.Fixed<Image>(root, "Panneau", Vector2.zero, new Vector2(20f, 76f), new Vector2(500f, 300f)), Panel);
-            TMP_Text lines = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(panel.transform, "Lignes", Vector2.zero, Vector2.one, new Vector2(14f, 10f), new Vector2(-14f, -10f)), 15f, FontStyles.Normal, TextAlignmentOptions.BottomLeft);
+            Image panel = UiBuilder.Box(UiBuilder.Fixed<Image>(root, "Panneau", Vector2.zero, new Vector2(20f, 76f), new Vector2(500f, 300f)), Panel, receivesPointer: true);
+
+            // A scroll view (wheel, drag or bar): the lines grow downwards from the top and the view follows the last one.
+            RectTransform view = UiBuilder.Part<RectTransform>(panel.transform, "Vue", Vector2.zero, Vector2.one, new Vector2(14f, 10f), new Vector2(-26f, -10f));
+            view.gameObject.AddComponent<RectMask2D>();
+            TMP_Text lines = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(view, "Lignes", new Vector2(0f, 1f), Vector2.one, Vector2.zero, Vector2.zero), 15f, FontStyles.Normal, TextAlignmentOptions.TopLeft);
+            lines.rectTransform.pivot = new Vector2(0.5f, 1f);
+            lines.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            GameObject barObject = DefaultControls.CreateScrollbar(new DefaultControls.Resources());
+            barObject.name = "Barre";
+            var barShape = (RectTransform)barObject.transform;
+            barShape.SetParent(panel.transform, false);
+            barShape.anchorMin = new Vector2(1f, 0f);
+            barShape.anchorMax = Vector2.one;
+            barShape.pivot = new Vector2(1f, 0.5f);
+            barShape.offsetMin = new Vector2(-18f, 10f);
+            barShape.offsetMax = new Vector2(-8f, -10f);
+            Scrollbar bar = barObject.GetComponent<Scrollbar>();
+            bar.direction = Scrollbar.Direction.BottomToTop;
+            barObject.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.06f);
+            bar.handleRect.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.3f);
+
+            ScrollRect scroll = panel.gameObject.AddComponent<ScrollRect>();
+            scroll.viewport = view;
+            scroll.content = lines.rectTransform;
+            scroll.horizontal = false;
+            scroll.vertical = true;
+            scroll.movementType = ScrollRect.MovementType.Clamped;
+            scroll.scrollSensitivity = 30f;
+            scroll.verticalScrollbar = bar;
+            scroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide;
+
             GameLogDisplay log = root.gameObject.AddComponent<GameLogDisplay>();
-            log.Assign(panel.gameObject, lines, toggle, toggleLabel);
+            log.Assign(panel.gameObject, lines, toggle, toggleLabel, scroll);
             return log;
         }
 
