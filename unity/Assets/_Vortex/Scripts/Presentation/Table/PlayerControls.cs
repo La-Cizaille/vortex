@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -47,6 +48,8 @@ namespace Vortex.Client.Presentation
         private CommandLabels? _labels;
         private PreviewText? _previewText;
         private IControlsHost? _host;
+        private HoverHelp? _comboHelp;
+        private HoverHelp? _overchargeHelp;
         private GameView? _view;
         private DecisionRequest? _decision;
         private CrewAction? _aiming;
@@ -74,6 +77,12 @@ namespace Vortex.Client.Presentation
 
         /// <summary>The help bubble (tests read the preview in it).</summary>
         public HelpBubble Help => help;
+
+        /// <summary>The help of the combo button (hover, or a long press).</summary>
+        public HoverHelp? ComboHelp => _comboHelp;
+
+        /// <summary>The help of the overcharge token (hover, or a long press).</summary>
+        public HoverHelp? OverchargeHelp => _overchargeHelp;
 
         /// <summary>Connects the controls to a game.</summary>
         /// <param name="context">Theme, texts and cards of the game.</param>
@@ -108,12 +117,28 @@ namespace Vortex.Client.Presentation
                 recycle.GetComponentInChildren<TMP_Text>().text = texts.Get(TextKeys.ButtonRecycle);
             }
 
-            Listen(combo, () => SubmitFirst(c => c.Type == CommandType.ActivateTechnology));
+            // The combo and the overcharge token explain themselves on hover, or after a long press on a touch screen; the
+            // click that follows a long press does nothing.
+            _comboHelp = HelpOn(combo, ComboText);
+            _overchargeHelp = HelpOn(overcharge, () => texts.Get(TextKeys.HelpOvercharge));
+            Listen(combo, () =>
+            {
+                if (!_comboHelp.WasHeld)
+                {
+                    SubmitFirst(c => c.Type == CommandType.ActivateTechnology);
+                }
+            });
             Listen(endTurn, EndTurn);
             Listen(endMarket, EndMarket);
             Listen(recycleAttack, () => SubmitFirst(c => c.Type == CommandType.RecycleMarket && c.Slot == CardSlot.Attack));
             Listen(recycleDefense, () => SubmitFirst(c => c.Type == CommandType.RecycleMarket && c.Slot == CardSlot.Defense));
-            Listen(overcharge, ToggleOvercharge);
+            Listen(overcharge, () =>
+            {
+                if (!_overchargeHelp.WasHeld)
+                {
+                    ToggleOvercharge();
+                }
+            });
             OverchargeArmed = false;
             Withdraw();
         }
@@ -363,6 +388,24 @@ namespace Vortex.Client.Presentation
         }
 
         private static bool Contains(RectTransform zone, Vector2 screen) => CardAnchor.ScreenRectOf(zone).Contains(screen);
+
+        private HoverHelp HelpOn(Button button, Func<string?> text)
+        {
+            HoverHelp hover = button.TryGetComponent(out HoverHelp existing) ? existing : button.gameObject.AddComponent<HoverHelp>();
+            hover.Bind(text, help);
+            return hover;
+        }
+
+        // The combo's help: once a combo is ready, the technology it gives and what it does (INTERFACE.md 3.2).
+        private string ComboText()
+        {
+            TextTable texts = _context!.Texts;
+            PlayerView? me = _view != null && _seat >= 0 && _seat < _view.Players.Count ? _view.Players[_seat] : null;
+            CardFace? ready = combo.interactable && me?.AttackSlot != null ? _context.Technology(TechOf(me.AttackSlot)) : null;
+            return ready is CardFace technology
+                ? string.Format(CultureInfo.InvariantCulture, texts.Get(TextKeys.HelpComboReady), technology.Title, CardText.ToPlainText(technology.Text))
+                : texts.Get(TextKeys.HelpCombo);
+        }
 
         private TechColor TechOf(CardView card) => _context!.Face(card.CardId).Color;
 

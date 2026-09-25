@@ -4,7 +4,7 @@ Jeu de combat de vaisseaux spatiaux au tour par tour, en chacun pour soi, de 2 �
 
 Adaptation numérique d'un jeu de société. Cibles : **Android** et **Windows**. Style 3D simple, pensé pour le mobile.
 
-> État : **M4, prototype Unity**. M0 à M3 et l'équilibrage des règles de base sont terminés : moteur complet, 54 modificateurs, 8 événements, 4 technologies, bots, simulateur, mode standard à 5 joueurs réglé. La table de jeu est jouable en **mode test** contre des bots (M4.4), avec zoom sur les cartes et dés animés. Prochaines étapes : les gestes (M4.5), les menus (M4.6), puis l'atelier Blender (M5). La feuille de route est plus bas.
+> État : **M4, prototype Unity**. M0 à M3 et l'équilibrage des règles de base sont terminés : moteur complet, 54 modificateurs, 8 événements, 4 technologies, bots, simulateur, mode standard à 5 joueurs réglé. Le prototype se joue de bout en bout : menus, partie locale de 2 à 5 joueurs (humains et bots), gestes à la souris ou au doigt, aperçu des attaques calculé par le moteur, cartes en 3D. Restent pour M4.5 le temps de tour limité et les choix faits sur la table (en attente d'arbitrage), puis l'atelier Blender et le son (M5). La feuille de route est plus bas.
 
 ## Structure du dépôt
 
@@ -100,9 +100,9 @@ Le premier lance les tests Unity. Le deuxième crée les assets de base qui manq
 | M4.2 | Session de jeu et lecture des événements (ADR-0014) | Fait |
 | M4.3 | Habillage : thème, catalogues d'illustrations, visuels provisoires générés, import automatique, scène Galerie | Fait |
 | M4.4 | Table et affichage : scène de jeu, adversaires, vaisseau, marché, informations de partie ; les bots jouent et tout se voit | Fait |
-| M4.5 | Interactions : zoom sur les cartes, dés animés, cartes en 3D, premiers gestes, aperçus calculés par le moteur (faits) ; recyclage au niveau du marché ; actions d'équipage au niveau du vaisseau, avec des pictogrammes ; informations d'un adversaire au survol ; glisser-déposer et aperçus calculés par le moteur ; décisions, combo, fin de tour ; temps de tour limité et désactivable (ARB-70, ARB-71) | En cours |
+| M4.5 | Interactions : zoom sur les cartes, dés animés, cartes en 3D, premiers gestes, aperçus calculés par le moteur, appui long au doigt (faits) ; recyclage au niveau du marché ; actions d'équipage au niveau du vaisseau, avec des pictogrammes ; informations d'un adversaire au survol ; glisser-déposer et aperçus calculés par le moteur ; décisions, combo, fin de tour ; temps de tour limité et désactivable (ARB-70, ARB-71) | En cours |
 | M4.6 | Menus : accueil, partie locale, options, pause, fin de partie, menu de développement ; vue qui pivote entre humains | Fait |
-| M4.7 | Vérification : parties complètes à 2, 3 et 5 joueurs, sans erreur ; remplacer une image change le visuel sans code | À faire |
+| M4.7 | Vérification : parties complètes à 2, 3, 4 et 5 joueurs, jouées par une personne contre des bots, sans erreur ; une image déposée change la carte sans code (tests `MilestoneTests`) | Fait |
 
 ## Licence
 

@@ -8,10 +8,11 @@ namespace Vortex.Client.Presentation
 {
     /// <summary>
     /// One crew action of the half-circle above the player's ship (INTERFACE.md 3.4): its pictogram, or a short name while
-    /// the icon is missing; a help on hover; a tap for the actions without a target, a drag towards an opponent for the
-    /// others. What happens is decided by <see cref="PlayerControls"/>, from the engine's legal commands.
+    /// the icon is missing; a help on hover (a long press on a touch screen); a tap for the actions without a target, a
+    /// drag towards an opponent for the others. What happens is decided by <see cref="PlayerControls"/>, from the engine's
+    /// legal commands.
     /// </summary>
-    public sealed class ActionButton : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler
+    public sealed class ActionButton : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
     {
         [SerializeField] private CrewAction action;
         [SerializeField] private Image icon = null!;
@@ -20,6 +21,7 @@ namespace Vortex.Client.Presentation
         [SerializeField, Range(0f, 1f)] private float unavailableAlpha = 0.3f;
 
         private PlayerControls? _controls;
+        private HoverIntent? _intent;
 
         /// <summary>The action of the button.</summary>
         public CrewAction Action => action;
@@ -37,6 +39,7 @@ namespace Vortex.Client.Presentation
         public void Bind(PlayerControls controls, Sprite? pictogram, string abbreviation)
         {
             _controls = controls;
+            _intent = new HoverIntent(ShowHelp, HideHelp);
             icon.sprite = pictogram;
             icon.enabled = pictogram != null;
             shortName.richText = false;
@@ -54,7 +57,8 @@ namespace Vortex.Client.Presentation
         /// <inheritdoc/>
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (_controls != null && Available && !NeedsTarget)
+            // A long press only shows the help: lifting the finger afterwards does not use the action.
+            if (_controls != null && Available && !NeedsTarget && !(_intent?.WasHeld ?? false))
             {
                 _controls.UseAction(action);
             }
@@ -63,6 +67,7 @@ namespace Vortex.Client.Presentation
         /// <inheritdoc/>
         public void OnBeginDrag(PointerEventData eventData)
         {
+            _intent?.Cancel();
             if (_controls == null || !Available || !NeedsTarget || eventData == null)
             {
                 if (eventData != null)
@@ -95,7 +100,23 @@ namespace Vortex.Client.Presentation
         }
 
         /// <inheritdoc/>
-        public void OnPointerEnter(PointerEventData eventData)
+        public void OnPointerEnter(PointerEventData eventData) => _intent?.Enter(eventData);
+
+        /// <inheritdoc/>
+        public void OnPointerExit(PointerEventData eventData) => _intent?.Exit(eventData);
+
+        /// <inheritdoc/>
+        public void OnPointerDown(PointerEventData eventData) => _intent?.Down(eventData);
+
+        /// <inheritdoc/>
+        public void OnPointerUp(PointerEventData eventData) => _intent?.Up(eventData);
+
+        /// <summary>Advances a long press (the frame loop, or tests).</summary>
+        public void Tick(float deltaTime) => _intent?.Tick(deltaTime);
+
+        private void Update() => Tick(Time.unscaledDeltaTime);
+
+        private void ShowHelp()
         {
             if (_controls != null)
             {
@@ -103,8 +124,7 @@ namespace Vortex.Client.Presentation
             }
         }
 
-        /// <inheritdoc/>
-        public void OnPointerExit(PointerEventData eventData)
+        private void HideHelp()
         {
             if (_controls != null)
             {

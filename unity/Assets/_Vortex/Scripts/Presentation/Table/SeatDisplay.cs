@@ -15,7 +15,7 @@ namespace Vortex.Client.Presentation
     /// and the eliminated state. The same component fills the opponent panel and the player's own panel; only their
     /// layout differs.
     /// </summary>
-    public sealed class SeatDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+    public sealed class SeatDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
     {
         [SerializeField] private TMP_Text playerName = null!;
         [SerializeField] private TMP_Text hp = null!;
@@ -39,6 +39,7 @@ namespace Vortex.Client.Presentation
         private CardHolder? _defense;
         private bool _eliminated;
         private bool? _target;
+        private HoverIntent? _intent;
 
         /// <summary>HP text shown (tests).</summary>
         public string HpText => hp.text;
@@ -104,17 +105,19 @@ namespace Vortex.Client.Presentation
         }
 
         /// <inheritdoc/>
-        public void OnPointerEnter(PointerEventData eventData)
-        {
-            if (hoverScale > 1f)
-            {
-                transform.localScale = Vector3.one * hoverScale;
-                transform.SetAsLastSibling();
-            }
-        }
+        public void OnPointerEnter(PointerEventData eventData) => Intent.Enter(eventData);
 
         /// <inheritdoc/>
-        public void OnPointerExit(PointerEventData eventData) => transform.localScale = Vector3.one;
+        public void OnPointerExit(PointerEventData eventData) => Intent.Exit(eventData);
+
+        /// <inheritdoc/>
+        public void OnPointerDown(PointerEventData eventData) => Intent.Down(eventData);
+
+        /// <inheritdoc/>
+        public void OnPointerUp(PointerEventData eventData) => Intent.Up(eventData);
+
+        /// <summary>Advances a long press (the frame loop, or tests).</summary>
+        public void Tick(float deltaTime) => Intent.Tick(deltaTime);
 
         /// <summary>Shows a seat as the table model has it now.</summary>
         public void Show(SeatModel seat, TableModel table, bool redrawCards = false)
@@ -166,6 +169,28 @@ namespace Vortex.Client.Presentation
             _eliminated = seat.Eliminated;
             ApplyAlpha();
         }
+
+        // Hovering (a long press on a touch screen) grows the panel so its cards can be read (INTERFACE.md 3.1).
+        private HoverIntent Intent => _intent ??= new HoverIntent(Grow, Shrink);
+
+        private void Update()
+        {
+            if (_intent != null)
+            {
+                _intent.Tick(Time.unscaledDeltaTime);
+            }
+        }
+
+        private void Grow()
+        {
+            if (hoverScale > 1f)
+            {
+                transform.localScale = Vector3.one * hoverScale;
+                transform.SetAsLastSibling();
+            }
+        }
+
+        private void Shrink() => transform.localScale = Vector3.one;
 
         /// <summary>Wires the parts of the layout (editor setup).</summary>
         public void Assign(TMP_Text nameLabel, TMP_Text hpLabel, TMP_Text shieldLabel, TMP_Text statusLabel, Image overchargeToken, Image[] technologyRounds, RectTransform attack, RectTransform defense, Graphic highlight, GameObject leader, CanvasGroup canvasGroup, float growOnHover = 1f)
