@@ -19,19 +19,52 @@ namespace Vortex.Editor
         private const int Width = 1920;
         private const int Height = 1080;
 
-        /// <summary>Five bots play the game scene until the requested round, then the table is rendered.</summary>
+        /// <summary>
+        /// Bots play the game scene until the requested round, then the table is rendered. With VORTEX_HUMAN=1, the first
+        /// seat is a person's: the table is rendered on their turn, with the controls offered, after the market or, with
+        /// VORTEX_PHASE=market, during it.
+        /// </summary>
         public static void Game()
         {
             string output = Output();
             int round = int.TryParse(Environment.GetEnvironmentVariable("VORTEX_ROUND"), out int value) ? Math.Clamp(value, 1, 30) : 4;
+            bool human = Environment.GetEnvironmentVariable("VORTEX_HUMAN") == "1";
+            bool atMarket = Environment.GetEnvironmentVariable("VORTEX_PHASE") == "market";
             EditorSceneManager.OpenScene(GameScene.ScenePath, OpenSceneMode.Single);
             (Camera camera, RenderTexture target) = Prepare();
             GameDirector director = Object.FindAnyObjectByType<GameDirector>();
-            director.HumanFirstSeat = false;
+            director.HumanFirstSeat = human;
             director.Begin();
-            for (int frame = 0; frame < 50000 && director.Model!.Outcome == null && !(director.Model.Round >= round && director.IsPlaying); frame++)
+            for (int frame = 0; frame < 50000 && director.Model!.Outcome == null; frame++)
             {
                 director.Advance(0.2f);
+                bool reached = director.Model.Round >= round;
+                if (!human && reached && director.IsPlaying)
+                {
+                    break;
+                }
+
+                if (human && director.Controls.Offered)
+                {
+                    // The person's turn: rendered at the market or after it, once the round is reached.
+                    if (reached && director.Controls.CanEndMarket == atMarket && !director.Controls.Decision.gameObject.activeSelf)
+                    {
+                        break;
+                    }
+
+                    if (director.Controls.Decision.gameObject.activeSelf)
+                    {
+                        director.Controls.Decision.Choose(0);
+                    }
+                    else if (director.Controls.CanEndMarket)
+                    {
+                        director.Controls.EndMarket();
+                    }
+                    else
+                    {
+                        director.Controls.EndTurn();
+                    }
+                }
             }
 
             // Dice trays are animated by the frame loop, which does not run here: show their result.

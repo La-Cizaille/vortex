@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Vortex.Client.Content;
 
@@ -14,7 +15,7 @@ namespace Vortex.Client.Presentation
     /// and the eliminated state. The same component fills the opponent panel and the player's own panel; only their
     /// layout differs.
     /// </summary>
-    public sealed class SeatDisplay : MonoBehaviour
+    public sealed class SeatDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         [SerializeField] private TMP_Text playerName = null!;
         [SerializeField] private TMP_Text hp = null!;
@@ -28,10 +29,16 @@ namespace Vortex.Client.Presentation
         [SerializeField] private GameObject leaderMarker = null!;
         [SerializeField] private CanvasGroup group = null!;
         [SerializeField, Range(0f, 1f)] private float eliminatedAlpha = 0.35f;
+        [Tooltip("Agrandissement de la fiche au survol (1 : aucun). Réservé aux adversaires.")]
+        [SerializeField, Min(1f)] private float hoverScale = 1f;
+        [Tooltip("Transparence d'une fiche qui ne peut pas être visée pendant qu'on vise.")]
+        [SerializeField, Range(0f, 1f)] private float notTargetAlpha = 0.4f;
 
         private TableContext? _context;
         private CardHolder? _attack;
         private CardHolder? _defense;
+        private bool _eliminated;
+        private bool? _target;
 
         /// <summary>HP text shown (tests).</summary>
         public string HpText => hp.text;
@@ -54,6 +61,50 @@ namespace Vortex.Client.Presentation
                 leaderLabel.text = context.Texts.Get(TextKeys.SeatLeader);
             }
         }
+
+        /// <summary>The overcharge token (the player's own is a button that arms it).</summary>
+        public Image OverchargeToken => overcharge;
+
+        /// <summary>
+        /// Lets the person use one of their cards by dragging it to the middle (INTERFACE.md 3.5). Set it right after
+        /// <see cref="Bind"/>, before the first show.
+        /// </summary>
+        public void SetCardUse(Func<int, bool> canUse, Func<int, Vector2, bool> use)
+        {
+            foreach (CardHolder? holder in new[] { _attack, _defense })
+            {
+                if (holder != null)
+                {
+                    holder.CanDrag = card => canUse(card.Uid);
+                    holder.OnDrop = (card, screen) => use(card.Uid, screen);
+                }
+            }
+        }
+
+        /// <summary>While an action is aimed: true lights the seat as a target, false dims it, null is back to normal.</summary>
+        public void ShowTargeting(bool? target)
+        {
+            _target = target;
+            ApplyAlpha();
+            if (target == true && _context != null)
+            {
+                turnHighlight.color = _context.Theme.Overcharge;
+                turnHighlight.enabled = true;
+            }
+        }
+
+        /// <inheritdoc/>
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (hoverScale > 1f)
+            {
+                transform.localScale = Vector3.one * hoverScale;
+                transform.SetAsLastSibling();
+            }
+        }
+
+        /// <inheritdoc/>
+        public void OnPointerExit(PointerEventData eventData) => transform.localScale = Vector3.one;
 
         /// <summary>Shows a seat as the table model has it now.</summary>
         public void Show(SeatModel seat, TableModel table, bool redrawCards = false)
@@ -95,15 +146,21 @@ namespace Vortex.Client.Presentation
             _attack.Show(seat.AttackCard, _context, redrawCards);
             _defense.Show(seat.DefenseCard, _context, redrawCards);
 
-            turnHighlight.color = theme.Highlight;
-            turnHighlight.enabled = table.Outcome is null && table.CurrentPlayer == seat.Seat && !seat.Eliminated;
+            if (_target != true)
+            {
+                turnHighlight.color = theme.Highlight;
+                turnHighlight.enabled = table.Outcome is null && table.CurrentPlayer == seat.Seat && !seat.Eliminated;
+            }
+
             leaderMarker.SetActive(table.LeaderBounty > 0 && table.SoleHpLeader == seat.Seat);
-            group.alpha = seat.Eliminated ? eliminatedAlpha : 1f;
+            _eliminated = seat.Eliminated;
+            ApplyAlpha();
         }
 
         /// <summary>Wires the parts of the layout (editor setup).</summary>
-        public void Assign(TMP_Text nameLabel, TMP_Text hpLabel, TMP_Text shieldLabel, TMP_Text statusLabel, Image overchargeToken, Image[] technologyRounds, RectTransform attack, RectTransform defense, Graphic highlight, GameObject leader, CanvasGroup canvasGroup)
+        public void Assign(TMP_Text nameLabel, TMP_Text hpLabel, TMP_Text shieldLabel, TMP_Text statusLabel, Image overchargeToken, Image[] technologyRounds, RectTransform attack, RectTransform defense, Graphic highlight, GameObject leader, CanvasGroup canvasGroup, float growOnHover = 1f)
         {
+            hoverScale = growOnHover;
             playerName = nameLabel;
             hp = hpLabel;
             shield = shieldLabel;
@@ -118,5 +175,7 @@ namespace Vortex.Client.Presentation
         }
 
         private static Color Dim(Color color) => new Color(color.r, color.g, color.b, 0.25f);
+
+        private void ApplyAlpha() => group.alpha = _eliminated ? eliminatedAlpha : (_target == false ? notTargetAlpha : 1f);
     }
 }

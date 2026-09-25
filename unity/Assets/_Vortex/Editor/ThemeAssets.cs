@@ -29,6 +29,9 @@ namespace Vortex.Editor
         /// <summary>Ship of each seat.</summary>
         public const string ShipsPath = "Assets/_Vortex/Theme/ShipCatalog.asset";
 
+        /// <summary>Icons by name, filled from the icons folder.</summary>
+        public const string IconsPath = "Assets/_Vortex/Theme/IconCatalog.asset";
+
         /// <summary>Interface texts.</summary>
         public const string TextsPath = "Assets/_Vortex/Content/TextTable.asset";
 
@@ -59,9 +62,11 @@ namespace Vortex.Editor
             Ensure<ThemeSettings>(ThemePath);
             Ensure<CardArtCatalog>(CardArtPath);
             Ensure<ShipCatalog>(ShipsPath);
+            Ensure<IconCatalog>(IconsPath);
             EnsureTexts();
             EnsureCardPrefab();
             SyncCardArt();
+            SyncIcons();
         }
 
         /// <summary>
@@ -100,6 +105,33 @@ namespace Vortex.Editor
             }
 
             if (catalog.Replace(art))
+            {
+                EditorUtility.SetDirty(catalog);
+                AssetDatabase.SaveAssetIfDirty(catalog);
+            }
+        }
+
+        /// <summary>Rebuilds the icon catalog from the icons folder: each sprite under its file name.</summary>
+        public static void SyncIcons()
+        {
+            IconCatalog catalog = AssetDatabase.LoadAssetAtPath<IconCatalog>(IconsPath);
+            if (catalog == null)
+            {
+                return;
+            }
+
+            var icons = new List<(string Name, Sprite Sprite)>();
+            foreach (string guid in AssetDatabase.FindAssets("t:Texture2D", new[] { ArtImportRules.IconsFolder }))
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+                if (sprite != null)
+                {
+                    icons.Add((Path.GetFileNameWithoutExtension(path), sprite));
+                }
+            }
+
+            if (catalog.Replace(icons))
             {
                 EditorUtility.SetDirty(catalog);
                 AssetDatabase.SaveAssetIfDirty(catalog);

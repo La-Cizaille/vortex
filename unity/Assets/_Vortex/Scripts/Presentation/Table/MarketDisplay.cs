@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Vortex.Client.Content;
+using Vortex.Core.Content;
 using Vortex.Core.Projection;
 
 namespace Vortex.Client.Presentation
@@ -28,6 +29,8 @@ namespace Vortex.Client.Presentation
         private readonly List<CardHolder> _attack = new List<CardHolder>();
         private readonly List<CardHolder> _defense = new List<CardHolder>();
         private TableContext? _context;
+        private Func<CardSlot, int, bool>? _canBuy;
+        private Func<CardSlot, int, Vector2, bool>? _buy;
 
         /// <summary>Cards shown in the attack market (tests).</summary>
         public int AttackCardCount => Count(_attack);
@@ -43,6 +46,16 @@ namespace Vortex.Client.Presentation
             defenseLabel.text = context.Texts.Get(TextKeys.SlotDefense);
         }
 
+        /// <summary>
+        /// Lets the person buy a card by dragging it (INTERFACE.md 3.3): whether a card can be dragged now, and what a drop
+        /// does. Set it right after <see cref="Bind"/>, before the first show.
+        /// </summary>
+        public void SetPurchase(Func<CardSlot, int, bool> canBuy, Func<CardSlot, int, Vector2, bool> buy)
+        {
+            _canBuy = canBuy;
+            _buy = buy;
+        }
+
         /// <summary>Shows both markets as the table model has them.</summary>
         public void Show(TableModel table, bool redrawCards = false)
         {
@@ -56,8 +69,8 @@ namespace Vortex.Client.Presentation
                 throw new ArgumentNullException(nameof(table));
             }
 
-            ShowRow(_attack, attackRow, table.AttackMarket, redrawCards);
-            ShowRow(_defense, defenseRow, table.DefenseMarket, redrawCards);
+            ShowRow(_attack, attackRow, CardSlot.Attack, table.AttackMarket, redrawCards);
+            ShowRow(_defense, defenseRow, CardSlot.Defense, table.DefenseMarket, redrawCards);
             attackDeck.text = string.Format(CultureInfo.InvariantCulture, _context.Texts.Get(TextKeys.MarketDeck), table.AttackMarket.DeckCount);
             defenseDeck.text = string.Format(CultureInfo.InvariantCulture, _context.Texts.Get(TextKeys.MarketDeck), table.DefenseMarket.DeckCount);
         }
@@ -88,11 +101,19 @@ namespace Vortex.Client.Presentation
             return count;
         }
 
-        private void ShowRow(List<CardHolder> row, RectTransform parent, MarketView market, bool redraw)
+        private void ShowRow(List<CardHolder> row, RectTransform parent, CardSlot slot, MarketView market, bool redraw)
         {
             while (row.Count < market.Visible.Count)
             {
-                row.Add(new CardHolder(NewPlace(parent)));
+                int index = row.Count;
+                var holder = new CardHolder(NewPlace(parent));
+                if (_buy != null && _canBuy != null)
+                {
+                    holder.CanDrag = _ => _canBuy(slot, index);
+                    holder.OnDrop = (_, screen) => _buy(slot, index, screen);
+                }
+
+                row.Add(holder);
             }
 
             for (int i = 0; i < row.Count; i++)

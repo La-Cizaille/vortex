@@ -34,7 +34,8 @@ namespace Vortex.Client.Presentation
 
         private void OnDisable() => HideZoom();
 
-        private void HideZoom()
+        /// <summary>Hides the enlarged copy if it shows this card (when a drag starts, for instance).</summary>
+        public void HideZoom()
         {
             if (_zoom != null && _card != null)
             {

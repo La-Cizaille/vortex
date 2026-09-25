@@ -63,8 +63,9 @@ namespace Vortex.Tests.EditMode
             {
                 GameDirector director = scene.GetRootGameObjects().Select(o => o.GetComponent<GameDirector>()).Single(d => d != null);
                 director.HumanFirstSeat = true;
+                director.ShowCommandPanel = true;
                 director.Begin();
-                CommandPanel panel = Object.FindAnyObjectByType<CommandPanel>(FindObjectsInactive.Include);
+                CommandPanel panel = Object.FindObjectsByType<CommandPanel>(FindObjectsInactive.Include).Single(p => p.name.StartsWith("Coups", System.StringComparison.Ordinal));
                 int choices = 0;
                 int frames = 0;
                 while ((!director.Session!.IsOver || director.IsPlaying) && frames < 100000)
