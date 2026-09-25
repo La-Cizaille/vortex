@@ -2,18 +2,18 @@
 
 Usage, without opening Blender's window:
 
-    blender --background art-src/ships/Ship_Faucon.blend --python tools/blender/export_unity.py -- \
+    blender --background --disable-autoexec art-src/ships/Ship_Faucon.blend --python tools/blender/export_unity.py -- \
         unity/Assets/_Vortex/Art/Ships/Ship_Faucon.fbx --budget 5000
+
+(--disable-autoexec keeps the .blend file from running the scripts it may embed.)
 
 What it does:
 - checks the scene first and refuses to export when a check fails: metric units at scale 1 (1 Blender unit =
   1 metre = 1 Unity unit), object scales applied, triangle count within the budget;
 - exports the meshes (with their modifiers applied) and empties, never cameras or lights, with the axis
   conversion Unity expects (Y up, -Z forward) and the transforms baked in, so objects arrive in Unity without
-  rotation or scale;
-- copies the textures next to the FBX file.
-
-Not yet run on a real model: validate the orientation on the first export (docs/ASSETS.md, "Conventions").
+  rotation or scale: Blender's -Y becomes Unity's +Z (checked on the first export, 2026-09-25);
+- copies the textures into a <name>.fbm folder next to the FBX file, where Unity links them to the materials.
 """
 
 import argparse

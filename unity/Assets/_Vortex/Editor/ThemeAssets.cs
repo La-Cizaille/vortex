@@ -38,6 +38,15 @@ namespace Vortex.Editor
         /// <summary>The card, a 3D object (ADR-0017).</summary>
         public const string CardPrefabPath = "Assets/_Vortex/Prefabs/Card.prefab";
 
+        /// <summary>The modelled card body (docs/ASSETS.md section 2); without it, the body is a box.</summary>
+        public const string CardModelPath = ArtImportRules.CardModelsFolder + "/Card.fbx";
+
+        /// <summary>Path of the body inside the card prefab.</summary>
+        public const string CardBodyPath = "Visuel/Corps";
+
+        /// <summary>Size of a card: 1 x 1.4, 0.02 thick (ADR-0017).</summary>
+        public static readonly Vector3 CardSize = new Vector3(1f, 1.4f, 0.02f);
+
         /// <summary>Body of the cards (tinted with their technology colour).</summary>
         public const string CardBodyMaterialPath = "Assets/_Vortex/Theme/Materials/CardBody.mat";
 
@@ -65,8 +74,42 @@ namespace Vortex.Editor
             Ensure<IconCatalog>(IconsPath);
             EnsureTexts();
             EnsureCardPrefab();
+            SyncCardBody();
             SyncCardArt();
             SyncIcons();
+        }
+
+        /// <summary>
+        /// Gives the card prefab the modelled body when <see cref="CardModelPath"/> exists, or the box otherwise. The
+        /// model must have the size of a card, since the face and the collider are laid out for it.
+        /// </summary>
+        public static void SyncCardBody()
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(CardPrefabPath);
+            Transform? body = prefab != null ? prefab.transform.Find(CardBodyPath) : null;
+            if (body == null || !body.TryGetComponent(out MeshFilter filter))
+            {
+                return;
+            }
+
+            Mesh model = AssetDatabase.LoadAssetAtPath<Mesh>(CardModelPath);
+            Mesh mesh = model != null ? model : Resources.GetBuiltinResource<Mesh>("Cube.fbx");
+            Vector3 scale = model != null ? Vector3.one : CardSize;
+            if (model != null && Vector3.Distance(model.bounds.size, CardSize) > 0.01f)
+            {
+                Debug.LogWarning(CardModelPath + " mesure " + model.bounds.size.ToString("F3") + " : une carte mesure " + CardSize.ToString("F3")
+                    + " (docs/ASSETS.md §2). La face de la carte risque de déborder.");
+            }
+
+            if (filter.sharedMesh == mesh && body.localScale == scale)
+            {
+                return;
+            }
+
+            using var editing = new PrefabUtility.EditPrefabContentsScope(CardPrefabPath);
+            Transform edited = editing.prefabContentsRoot.transform.Find(CardBodyPath);
+            edited.GetComponent<MeshFilter>().sharedMesh = mesh;
+            edited.localScale = scale;
         }
 
         /// <summary>
@@ -227,16 +270,15 @@ namespace Vortex.Editor
             // A 1 x 1.4 card, 0.02 thick (ADR-0017). The front faces -Z, like Unity's quads and TextMeshPro texts, so a
             // card turned like the camera shows its front to it. Everything visible is under "Visuel", so that the card
             // can be hidden without being destroyed; the box collider takes pointer events.
-            var size = new Vector2(1f, 1.4f);
-            const float Thickness = 0.02f;
+            var size = new Vector2(CardSize.x, CardSize.y);
             var root = new GameObject("Card", typeof(CardDisplay), typeof(BoxCollider));
             var area = root.GetComponent<BoxCollider>();
-            area.size = new Vector3(size.x, size.y, Thickness);
+            area.size = CardSize;
             Transform visual = new GameObject("Visuel").transform;
             visual.SetParent(root.transform, false);
 
-            // The body: a box for now, which a modelled card (rounded corners, bevel) can replace in the prefab.
-            Renderer frame = Primitive(PrimitiveType.Cube, visual, "Corps", Vector3.zero, Vector3.zero, new Vector3(size.x, size.y, Thickness), body);
+            // The body: a box, which the modelled card (rounded corners and rim) replaces when there is one (SyncCardBody).
+            Renderer frame = Primitive(PrimitiveType.Cube, visual, "Corps", Vector3.zero, Vector3.zero, CardSize, body);
             Renderer background = Primitive(PrimitiveType.Quad, visual, "Fond", new Vector3(0f, 0f, -0.011f), Vector3.zero, new Vector3(0.94f, 1.34f, 1f), face);
             const float ArtWidth = 0.86f;
             const float ArtHeight = ArtWidth * 9f / 16f;

@@ -159,3 +159,14 @@ Le game designer a précisé ses attentes pour les prochaines étapes, après le
 | ARB-71 | Quelles priorités pour les gestes (M4.5) ? | Les boutons de recyclage au niveau du marché noir ; les actions d'équipage au niveau du vaisseau, avec des pictogrammes reconnaissables ; les informations d'un adversaire au survol de la souris ; le temps de tour limité (ARB-70). Les trois premiers points confirment INTERFACE §3.1, §3.3 et §3.4 : le panneau du mode test les regroupe aujourd'hui en bas à droite, c'est provisoire. | INTERFACE §8, feuille de route du README |
 | ARB-72 | Que mettre dans les finitions (M5) ? | L'**audio** et un **fond stellaire animé**, en plus des modèles 3D (ADR-0016). | INTERFACE §8, ASSETS §2 à §4, feuille de route du README |
 | ARB-73 | Les cartes doivent-elles rester des éléments d'interface 2D (ADR-0015) ? | **Non : les cartes sont aussi des assets 3D**, comme les vaisseaux (consigne du designer, 2026-09-25). Blender est mis de côté pour l'instant, avec des assets modifiables dans Unity. | ADR-0017, `Card.prefab`, INTERFACE §2 |
+
+## 2026-09-25 : premier atelier Blender
+
+Le game designer a tranché les questions ouvertes d'ASSETS §5 avant le premier atelier Blender, mené en parallèle du prototype.
+
+| # | Question | Décision | Appliqué dans |
+|---|---|---|---|
+| ARB-76 | Vaisseaux : cinq modèles distincts, ou un modèle recoloré à la couleur de chaque siège ? | **Un modèle recoloré d'abord.** Le jeu peint à la couleur du siège le matériau nommé `Siege` ; les autres matériaux gardent leurs couleurs. Des modèles distincts par siège pourront s'ajouter ensuite, le catalogue des vaisseaux les accepte déjà. | ASSETS §2, `ShipCatalog.PaintSeat` |
+| ARB-77 | Style des modèles : low-poly à couleurs unies, ou textures peintes ? | **Low-poly texturé, avec des lumières.** Réponse du designer : « j'aimerais bien de la texture et des lumières, est-ce faisable en low poly ? ». C'est faisable : la forme reste low-poly (budget de triangles inchangé), le détail vient des textures (couleur, relief), et les parties lumineuses sont des matériaux émissifs que l'effet *Bloom* fait rayonner dans Unity. Vérifié sur un modèle d'essai passé par l'export. | ASSETS §2, `ArtImportRules.ConfigureModelTexture` |
+| ARB-78 | Version de Blender : 4.5 LTS ou 5.2 ? | **5.2 LTS**, déjà installée : c'est la LTS du moment, comme le demande l'ADR-0016. Le script d'export y a tourné sans changement. | ADR-0016, CONTRIBUTING (Blender) |
+| ARB-79 | Autoriser Blender MCP à télécharger des ressources CC0 depuis Poly Haven ? | **Pas pour l'instant.** Aucune ressource externe n'est nécessaire, donc aucune surface d'entrée de plus. Question à rouvrir pour le fond étoilé si besoin. | ASSETS §5, SECURITY §4 (inchangé) |

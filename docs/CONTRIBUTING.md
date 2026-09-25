@@ -124,7 +124,7 @@ Chaque commande se lance avec `powershell -ExecutionPolicy Bypass -File <script>
 La chaîne de production est décrite dans l'ADR-0016, les visuels à créer et leurs formats dans [`ASSETS.md`](ASSETS.md).
 
 **Installer, une fois par poste**
-1. Blender LTS 4.5 : `winget install BlenderFoundation.Blender.LTS.4.5`. La 5.2 est possible, c'est une question ouverte d'ASSETS §5.
+1. Blender 5.2 LTS (ARB-78) : `winget install BlenderFoundation.Blender`. Si `blender` n'est pas dans le `PATH`, les commandes ci-dessous prennent le chemin complet de `blender.exe`.
 2. L'extension Blender MCP, dans la même version que le serveur de `.mcp.json` : `uvx --from mcp-for-blender==2.0.4 mcp-for-blender install-addon`. Puis, dans Blender : *Edit → Preferences → Add-ons*, activer **MCP for Blender**.
 3. Dans les préférences de l'extension :
    - laisser la télémétrie **décochée** ;
@@ -137,10 +137,16 @@ La chaîne de production est décrite dans l'ADR-0016, les visuels à créer et 
 3. Arrêter le serveur de l'extension à la fin de l'atelier : il n'a pas d'authentification.
 
 **Du modèle au jeu**
-1. Enregistrer la source dans `art-src/` (par exemple `art-src/ships/Ship_Faucon.blend`). Elle est stockée avec Git LFS.
-2. Exporter : `blender --background art-src/ships/Ship_Faucon.blend --python tools/blender/export_unity.py -- unity/Assets/_Vortex/Art/Ships/Ship_Faucon.fbx`. Le script refuse d'exporter si l'échelle n'est pas appliquée ou si le budget de triangles est dépassé.
+1. Enregistrer la source dans `art-src/` (par exemple `art-src/ships/Ship_Faucon.blend`). Elle est stockée avec Git LFS. Pour un vaisseau, la peinture qui prend la couleur du siège est le matériau `Siege` ; les textures suivent les noms d'[`ASSETS.md`](ASSETS.md) §2 (`_BaseColor`, `_Normal`, `_Emission`).
+2. Exporter : `blender --background --disable-autoexec art-src/ships/Ship_Faucon.blend --python tools/blender/export_unity.py -- unity/Assets/_Vortex/Art/Ships/Ship_Faucon.fbx`. Le script refuse d'exporter si l'échelle n'est pas appliquée ou si le budget de triangles est dépassé. `--disable-autoexec` empêche le `.blend` de lancer ses scripts embarqués.
 3. Dans Unity, associer le modèle à un siège ou au vaisseau par défaut dans `Theme/ShipCatalog`.
 4. Vérifier le résultat dans la scène Galerie, ou avec `tools/Capture-Unity.ps1`.
+
+**Le corps de carte** se construit par script, puis s'exporte comme un vaisseau. Unity le prend seul comme corps de `Prefabs/Card.prefab` :
+```
+blender --background --factory-startup --disable-autoexec --python tools/blender/build_card.py -- art-src/cards/Card.blend
+blender --background --disable-autoexec art-src/cards/Card.blend --python tools/blender/export_unity.py -- unity/Assets/_Vortex/Art/Cards3D/Card.fbx --budget 500
+```
 
 ## Fusion des fichiers Unity
 Ajouter UnityYAMLMerge dans votre configuration Git locale (le chemin dépend de votre version d'Unity) :

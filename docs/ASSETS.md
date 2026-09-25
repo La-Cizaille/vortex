@@ -15,20 +15,26 @@ La chaîne de production (Blender, export, versions) est décrite dans [ADR-0016
 
 **Conventions de modélisation**
 - **Échelle** : 1 unité Blender = 1 mètre = 1 unité Unity. Unités métriques, échelle 1 (réglage par défaut de Blender). Échelle des objets appliquée (*Object → Apply → Scale*).
-- **Orientation** : le dessus vers +Z, l'avant (le nez d'un vaisseau) vers −Y, c'est-à-dire face à la vue de face de Blender (pavé numérique 1). Après l'export, l'avant doit pointer vers +Z dans Unity, car le jeu tourne chaque vaisseau vers le centre de la table par cet axe. **À confirmer au premier export**, en regardant le vaisseau dans la scène Galerie.
+- **Orientation** : le dessus vers +Z, l'avant (le nez d'un vaisseau) vers −Y, c'est-à-dire face à la vue de face de Blender (pavé numérique 1). Après l'export, l'avant pointe vers +Z dans Unity, l'axe par lequel le jeu tourne chaque vaisseau vers le centre de la table. **Vérifié au premier export** (2026-09-25) : −Y de Blender devient +Z dans Unity, +Z devient +Y, +X devient −X, sans rotation ni changement d'échelle sur l'objet importé.
 - **Origine** : au centre du vaisseau. Le jeu pose l'origine sur le plan de la table.
-- **Matériaux** : un ou deux par modèle. Deux styles possibles (question ouverte 2) :
-  - couleurs unies (palette) ;
-  - textures peintes : PNG, 1024×1024 au plus, couleur de base plus éventuellement une carte de normales.
+- **Style** : low-poly texturé (ARB-77). La forme reste simple (budget de triangles ci-dessous) ; le détail vient des textures, et les parties lumineuses brillent dans le jeu.
+- **Matériaux** : trois au plus par modèle, rendus en URP Lit.
+  - `Siege` : la peinture que le jeu teinte à la couleur du siège (ARB-76). Sa texture doit rester **claire, en niveaux de gris** : la couleur du siège la multiplie. Les copies faites par Blender (`Siege.001`) comptent aussi.
+  - Les autres matériaux (par exemple `Coque`, `Feux`) gardent leurs couleurs.
+  - **Lumières** : une partie lumineuse (réacteurs, hublots, feux) est un matériau **émissif**. Dans Blender, *Emission Color* avec une *Emission Strength* supérieure à 1 ; Unity le reçoit en émission HDR, que l'effet *Bloom* fait rayonner. Le Bloom est coupé aujourd'hui : il s'allumera avec le premier vaisseau, avec un seuil au-dessus de 1 pour que seules les parties émissives rayonnent (pas les textes blancs des cartes). Les lampes de Blender ne sont pas exportées : l'éclairage de la scène se règle dans Unity.
+- **Textures** : PNG, 1024×1024 au plus pour un vaisseau. Elles se nomment d'après le modèle :
+  - `<Modèle>_BaseColor.png` : couleur de base ;
+  - `<Modèle>_Normal.png` : relief (carte de normales). Le suffixe `_Normal` est **obligatoire** : c'est lui qui la fait importer comme carte de normales ;
+  - `<Modèle>_Emission.png` : facultative, pour dessiner les lumières.
 
-  Le rendu est URP Lit.
-- **Pas de caméra ni de lumière** dans le fichier exporté, **pas d'animation** pour l'instant : le vaisseau est statique (INTERFACE §3.2).
+  L'export les copie dans le dossier `<Modèle>.fbm/`, à côté du FBX. Unity relie seul la couleur de base et le relief aux matériaux (vérifié le 2026-09-25 ; la texture d'émission reste à vérifier au premier vaisseau), puis leur applique des réglages mobiles (mipmaps, ASTC 6×6 sur Android).
+- **Pas de caméra ni de lumière** dans le fichier exporté, **pas d'animation** pour l'instant : le vaisseau est statique (INTERFACE §3.2). Unity l'importe sans composant d'animation.
 - **Export** : `tools/blender/export_unity.py`, qui vérifie l'échelle et le budget de triangles avant d'écrire le FBX.
 
 | Visuel | Nombre | Rôle dans le jeu | Taille, budget | Fichiers | Priorité |
 |---|---|---|---|---|---|
-| **Vaisseau** | 5, un par siège, ou 1 modèle recoloré par siège (question ouverte 1) | Un par joueur autour de la table ; celui du joueur est au premier plan | Environ 2 m de long, 2,4 m d'envergure au plus (comme le vaisseau provisoire) ; 5 000 triangles au plus | `art-src/ships/Ship_<Nom>.blend` exporté en `Art/Ships/Ship_<Nom>.fbx`, puis associé à un siège dans `Theme/ShipCatalog` | 1 |
-| **Carte** | 1 modèle | Le corps de toutes les cartes (ADR-0017) ; la face (illustration, textes) est posée dessus par le jeu | 1 × 1,4 m, 0,02 m d'épaisseur ; coins arrondis et biseau bienvenus ; face avant vers −Y, comme un vaisseau ; 500 triangles au plus | `art-src/cards/Card.blend` exporté en `Art/Cards3D/Card.fbx`, puis placé comme corps dans `Prefabs/Card.prefab` | 2 |
+| **Vaisseau** | 1, recoloré par le jeu à la couleur de chaque siège (ARB-76). Des modèles distincts par siège pourront s'ajouter ensuite | Un par joueur autour de la table ; celui du joueur est au premier plan | Environ 2 m de long, 2,4 m d'envergure au plus (comme le vaisseau provisoire) ; 5 000 triangles au plus | `art-src/ships/Ship_<Nom>.blend` exporté en `Art/Ships/Ship_<Nom>.fbx`, puis associé à un siège dans `Theme/ShipCatalog` | 1 |
+| **Carte** | 1 modèle, **fait** : 332 triangles, coins et bords arrondis | Le corps de toutes les cartes (ADR-0017) ; la face (illustration, textes) est posée dessus par le jeu | 1 × 1,4 m, 0,02 m d'épaisseur ; debout (largeur selon X, hauteur selon Z) ; face avant vers **+Y**, à l'inverse d'un vaisseau, car la face d'une carte regarde la caméra (−Z dans Unity) ; 500 triangles au plus | `art-src/cards/Card.blend`, construit par `tools/blender/build_card.py` et exporté en `Art/Cards3D/Card.fbx`. Le jeu en fait tout seul le corps de `Prefabs/Card.prefab` ; sans lui, le corps redevient une boîte | 2 |
 | Épave | 0 à 1 | Vaisseau d'un joueur éliminé | Aujourd'hui, le jeu grise et incline le vaisseau lui-même : un modèle dédié est facultatif | `Ship_<Nom>_Epave` | 3 |
 | Dé à 8 faces (d8) | 1 | Un dé en 3D pourra remplacer les dés 2D actuels | Octaèdre d'environ 0,5 m, faces numérotées de 1 à 8 ; 500 triangles au plus | `art-src/dice/D8.blend` exporté en `Art/Dice/D8.fbx` | 3 |
 | Planètes, décor | 2 à 3 | Arrière-plan spatial (INTERFACE §2, pas nécessaire au prototype) | Sphères de 2 000 triangles au plus, texture équirectangulaire de 2048×1024 | `art-src/props/Planet_<Nom>.blend` exporté en `Art/Props/` | 3 |
@@ -58,8 +64,6 @@ Les icônes, les cadres, le fond et le logo ne sont pas encore branchés dans le
 
 ## 5. Questions ouvertes pour l'atelier Blender
 
-1. **Vaisseaux** : cinq modèles distincts (un par siège), ou un modèle que le jeu recolore à la couleur du siège ? Le second demande une petite convention (un matériau nommé `Siege`, teinté par le jeu), à coder lors de l'atelier.
-2. **Style** : low-poly à couleurs unies, rapide à produire et cohérent sur mobile, ou textures peintes ?
-3. **Version de Blender** : la LTS 4.5, stable et pleinement compatible avec Blender MCP (recommandée), ou la 5.2, plus récente ?
-4. **Ressources libres** : autoriser Blender MCP à télécharger des ressources CC0 depuis Poly Haven (ciels, textures) ? Les autres sources restent désactivées.
-5. **Illustrations** : qui les réalise (toi, un illustrateur, un outil de génération) ? La réponse fixe les droits d'utilisation à noter dans `art-src/LICENCES.md`.
+Les quatre premières questions ont été tranchées le 2026-09-25 : un vaisseau recoloré par siège (ARB-76), un style low-poly texturé avec des parties lumineuses (ARB-77), Blender 5.2 LTS (ARB-78), aucun téléchargement de ressources pour l'instant (ARB-79).
+
+1. **Illustrations** : qui les réalise (toi, un illustrateur, un outil de génération) ? La réponse fixe les droits d'utilisation à noter dans `art-src/LICENCES.md`.

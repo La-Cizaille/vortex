@@ -82,7 +82,7 @@ Mesures :
 - télémétrie coupée des deux côtés ;
 - intégrations de téléchargement de Blender MCP **désactivées** ; une ressource libre n'entre qu'avec sa source et sa licence notées (`art-src/LICENCES.md`) ;
 - serveurs MCP démarrés uniquement quand on en a besoin, et en écoute sur localhost seulement ;
-- Blender garde *Auto Run Python Scripts* désactivé : un `.blend` ne lance pas de script à l'ouverture ;
+- Blender garde *Auto Run Python Scripts* désactivé : un `.blend` ne lance pas de script à l'ouverture ; les commandes sans fenêtre (export, construction d'un modèle) passent en plus `--disable-autoexec`, qui l'impose quelles que soient les préférences du poste ;
 - aucun secret dans les projets ouverts par ces outils.
 
 ## 5. Builds
