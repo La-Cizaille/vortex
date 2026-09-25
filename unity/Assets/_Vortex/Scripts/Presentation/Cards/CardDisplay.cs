@@ -57,6 +57,7 @@ namespace Vortex.Client.Presentation
         public void Show(CardFace face, ThemeSettings theme, CardArtCatalog catalog)
         {
             Face = face;
+            Marked = false;
             Color color = theme.Technology(face.Color);
             Paint(frame, color, null);
             Paint(background, theme.CardBackground, null);
@@ -74,6 +75,19 @@ namespace Vortex.Client.Presentation
             {
                 body.spriteAsset = theme.TextIcons;
             }
+        }
+
+        /// <summary>True while the card's frame is marked.</summary>
+        public bool Marked { get; private set; }
+
+        /// <summary>
+        /// Marks the frame with <paramref name="color"/> (the card a purchase would replace), or gives it back its
+        /// technology colour with null.
+        /// </summary>
+        public void Mark(Color? color, ThemeSettings theme)
+        {
+            Marked = color.HasValue;
+            Paint(frame, color ?? theme.Technology(Face.Color), null);
         }
 
         /// <summary>Shows the Torment tokens on the card (RULES A7); the badge is hidden when there is none.</summary>

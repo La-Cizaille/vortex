@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Vortex.Client.Content;
+using Vortex.Core.Content;
 
 namespace Vortex.Client.Presentation
 {
@@ -43,6 +44,9 @@ namespace Vortex.Client.Presentation
 
         /// <summary>HP text shown (tests).</summary>
         public string HpText => hp.text;
+
+        /// <summary>Status line shown (tests): effects in play, or the wreck's marker.</summary>
+        public string StatusText => statuses.text;
 
         /// <summary>The attack modifier shown, or null.</summary>
         public CardDisplay? AttackCard => _attack?.Card;
@@ -92,6 +96,19 @@ namespace Vortex.Client.Presentation
                     holder.OnRefused = refused is null ? null : (card, place) => refused(card.Uid, place);
                     holder.OnReleased = released;
                 }
+            }
+        }
+
+        /// <summary>
+        /// While a market card of <paramref name="slot"/> is dragged, marks the card of that slot, which the purchase would
+        /// replace (INTERFACE.md 3.3); false gives it back its colour.
+        /// </summary>
+        public void MarkLoss(CardSlot slot, bool marked)
+        {
+            CardDisplay? card = slot == CardSlot.Attack ? AttackCard : DefenseCard;
+            if (_context != null && card != null && card.gameObject.activeSelf)
+            {
+                card.Mark(marked ? _context.Theme.Loss : (Color?)null, _context.Theme);
             }
         }
 
@@ -156,7 +173,7 @@ namespace Vortex.Client.Presentation
 
             statuses.richText = false;
             statuses.text = seat.Eliminated
-                ? texts.Get(TextKeys.SeatEliminated)
+                ? texts.Get(table.GhostsChooseEvent ? TextKeys.SeatGhost : TextKeys.SeatEliminated)
                 : string.Join(" · ", seat.Statuses.Where(s => s.Active).Select(s => texts.Get(TextKeys.Status(s.Kind))).Distinct());
 
             _attack.Show(seat.AttackCard, _context, redrawCards);

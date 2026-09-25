@@ -52,7 +52,30 @@ namespace Vortex.Client.Presentation
             _card.gameObject.SetActive(true);
             _card.Show(source.Face, _context.Theme, _context.Art);
             _card.ShowTorments(source.Torments);
-            Place(source);
+            CardAnchor? anchor = source.GetComponent<CardAnchor>();
+            Place(anchor != null ? anchor.ScreenRect : new Rect(_context.View.WorldToScreenPoint(source.transform.position), Vector2.zero));
+        }
+
+        /// <summary>Shows a card of the content that is not on the table (the event of the round), beside a screen area.</summary>
+        public void ShowFace(CardFace face, Rect pointed)
+        {
+            if (_context is null)
+            {
+                return;
+            }
+
+            if (_card == null)
+            {
+                _card = Instantiate(_context.CardPrefab, _context.CardRoot, false);
+                _card.name = "Carte agrandie";
+                _card.SetPointable(false);
+            }
+
+            Source = null;
+            _card.gameObject.SetActive(true);
+            _card.Show(face, _context.Theme, _context.Art);
+            _card.ShowTorments(0);
+            Place(pointed);
         }
 
         /// <summary>Hides the zoom if it shows <paramref name="source"/>.</summary>
@@ -74,12 +97,10 @@ namespace Vortex.Client.Presentation
             }
         }
 
-        // Beside the source, on the side of the screen with more room, kept inside the screen.
-        private void Place(CardDisplay source)
+        // Beside what is pointed, on the side of the screen with more room, kept inside the screen.
+        private void Place(Rect pointed)
         {
             Camera view = _context!.View;
-            CardAnchor? anchor = source.GetComponent<CardAnchor>();
-            Rect pointed = anchor != null ? anchor.ScreenRect : new Rect(view.WorldToScreenPoint(source.transform.position), Vector2.zero);
             float height = screenHeight * view.pixelHeight;
             float width = height * _card!.Size.x / _card.Size.y;
             float gap = margin * view.pixelHeight;

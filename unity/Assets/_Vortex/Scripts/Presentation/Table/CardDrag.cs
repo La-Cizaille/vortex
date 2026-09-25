@@ -17,6 +17,7 @@ namespace Vortex.Client.Presentation
         private Func<Vector2, bool>? _onDrop;
         private Action? _refused;
         private Action? _released;
+        private Action<bool>? _holding;
         private Camera? _view;
         private float _depth;
 
@@ -25,14 +26,16 @@ namespace Vortex.Client.Presentation
 
         /// <summary>
         /// Sets when a drag is allowed and what a drop does; <paramref name="refused"/> explains a drag that is not allowed,
-        /// and <paramref name="released"/> takes the explanation back when the pointer is released.
+        /// and <paramref name="released"/> takes the explanation back when the pointer is released; <paramref name="holding"/>
+        /// learns when the card is taken (true) and put down (false).
         /// </summary>
-        public void Bind(Func<bool> canDrag, Func<Vector2, bool> onDrop, Camera view, float depth, Action? refused = null, Action? released = null)
+        public void Bind(Func<bool> canDrag, Func<Vector2, bool> onDrop, Camera view, float depth, Action? refused = null, Action? released = null, Action<bool>? holding = null)
         {
             _canDrag = canDrag;
             _onDrop = onDrop;
             _refused = refused;
             _released = released;
+            _holding = holding;
             _view = view;
             _depth = depth;
         }
@@ -61,6 +64,7 @@ namespace Vortex.Client.Presentation
             }
 
             Follow(eventData.position);
+            _holding?.Invoke(true);
         }
 
         /// <inheritdoc/>
@@ -92,6 +96,7 @@ namespace Vortex.Client.Presentation
             CardAnchor anchor = GetComponent<CardAnchor>();
             anchor.Held = false;
             anchor.Place();
+            _holding?.Invoke(false);
             return accepted;
         }
 

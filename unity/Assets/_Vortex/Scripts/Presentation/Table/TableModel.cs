@@ -32,6 +32,7 @@ namespace Vortex.Client.Presentation
             DoomRound = rules.ForPlayers(_seats.Count)?.DoomRound ?? 0;
             TechnologiesToWin = rules.TechnologiesToWin;
             LeaderBounty = rules.LeaderBounty;
+            GhostsChooseEvent = rules.GhostsChooseEvent;
         }
 
         /// <summary>The seats, in table order.</summary>
@@ -63,6 +64,9 @@ namespace Vortex.Client.Presentation
 
         /// <summary>Bonus against the sole HP leader (rule option; 0 when disabled).</summary>
         public int LeaderBounty { get; }
+
+        /// <summary>Whether eliminated players choose the round's event (rule option, RULES A4.1): their wreck says so.</summary>
+        public bool GhostsChooseEvent { get; }
 
         /// <summary>Rounds left before the doom event (0 once it has come or when there is none).</summary>
         public int RoundsBeforeDoom => DoomRound > Round ? DoomRound - Round : 0;

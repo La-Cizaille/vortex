@@ -194,7 +194,7 @@ namespace Vortex.Client.Presentation
 
             PlaceSeats();
             market.Bind(_context);
-            market.SetPurchase(controls.CanBuy, controls.Buy, controls.ExplainBuy, controls.HideHelp);
+            market.SetPurchase(controls.CanBuy, controls.Buy, controls.ExplainBuy, controls.HideHelp, MarkLoss);
             banner.Bind(_context);
             log.Bind(_context);
             playback.Bind(_context, _player);
@@ -298,6 +298,15 @@ namespace Vortex.Client.Presentation
                     botLevel))
                 .ToList(),
             seed);
+
+        // While a market card is dragged, the viewer's card it would replace is marked (INTERFACE.md 3.3).
+        private void MarkLoss(CardSlot slot, bool held)
+        {
+            if (_seats.TryGetValue(_viewer, out SeatDisplay seat))
+            {
+                seat.MarkLoss(slot, held);
+            }
+        }
 
         // The options were changed from the pause menu: the new default speed applies at once.
         private void ApplyOptions(UserOptions options)

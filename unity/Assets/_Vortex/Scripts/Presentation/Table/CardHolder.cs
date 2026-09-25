@@ -39,6 +39,9 @@ namespace Vortex.Client.Presentation
         /// <summary>Takes the explanation back when the pointer is released.</summary>
         public Action? OnReleased { get; set; }
 
+        /// <summary>Learns when the card shown is taken (true) and put down (false).</summary>
+        public Action<CardView, bool>? OnHolding { get; set; }
+
         /// <summary>The card shown, or null.</summary>
         public CardDisplay? Card => _card != null && _card.gameObject.activeSelf ? _card : null;
 
@@ -128,7 +131,14 @@ namespace Vortex.Client.Presentation
                                 OnRefused?.Invoke(_shown, _slot);
                             }
                         },
-                        () => OnReleased?.Invoke());
+                        () => OnReleased?.Invoke(),
+                        held =>
+                        {
+                            if (_shown != null)
+                            {
+                                OnHolding?.Invoke(_shown, held);
+                            }
+                        });
                 }
             }
 

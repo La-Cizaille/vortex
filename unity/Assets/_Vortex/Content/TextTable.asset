@@ -499,3 +499,5 @@ MonoBehaviour:
     Text: Coup impossible.
   - Key: refusal.ActionNotAvailable
     Text: "Action d\xE9sactiv\xE9e par les r\xE8gles de la partie."
+  - Key: seat.ghost
+    Text: "Fant\xF4me : choisit l'\xE9v\xE9nement"
