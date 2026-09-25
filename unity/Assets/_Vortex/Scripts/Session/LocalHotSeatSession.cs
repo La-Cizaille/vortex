@@ -87,6 +87,9 @@ namespace Vortex.Client.Session
         public CommandPreview? Preview(int seat, Command command) => _engine.Preview(_state, seat, command, _guesses);
 
         /// <inheritdoc/>
+        public CommandError? Explain(int seat, Command command) => _engine.Explain(_state, seat, command);
+
+        /// <inheritdoc/>
         public SessionResult Submit(int seat, Command command)
         {
             if (command is null)

@@ -57,7 +57,7 @@ namespace Vortex.Core.Tests.Engine
             AttackPreview bonus = Preview(s, me, Command.Attack(foe)).Attack!;
             Assert.That(bonus.Bonus.IsExact && bonus.Bonus.Min == 4, Is.True);
             BonusPreview source = bonus.Bonuses.Single();
-            Assert.That((source.Origin, source.Id, source.Amount.Min, source.Amount.Max), Is.EqualTo((BonusOrigin.Card, "A_901", 4, 4)), "Each bonus says where it comes from.");
+            Assert.That((source.Origin, source.Id, source.Amount.Min, source.Amount.Max), Is.EqualTo((SourceKind.Card, "A_901", 4, 4)), "Each bonus says where it comes from.");
             Assert.That(bonus.Hit, Is.EqualTo(1.0), "1d8 + 4 against 4 always hits.");
 
             s.Equip(me, "A_902");
@@ -78,7 +78,7 @@ namespace Vortex.Core.Tests.Engine
             s.P(me).Hp = 20;
             s.P((me + 2) % 3).Hp = 20;
             BonusPreview bounty = Preview(s, me, Command.Attack(leader)).Attack!.Bonuses.Single();
-            Assert.That((bounty.Origin, bounty.Id, bounty.Amount.Min), Is.EqualTo((BonusOrigin.Rule, (string?)null, 2)));
+            Assert.That((bounty.Origin, bounty.Id, bounty.Amount.Min), Is.EqualTo((SourceKind.Rule, (string?)null, 2)));
         }
 
         [Test]

@@ -361,7 +361,8 @@ namespace Vortex.Core.Rules
                         return sabotageError;
                     }
 
-                    return CanChangeShield(player, command.Target) ? null : Error(CommandErrorCode.ShieldChangeNotAllowed, "This shield cannot be modified by this player.");
+                    EffectSource? keeper = Refuser((e, s) => e.CanChangeShield(this, s, player, command.Target));
+                    return keeper is null ? null : Refused(CommandErrorCode.ShieldChangeNotAllowed, "This shield cannot be modified by this player.", keeper);
 
                 case CommandType.DefensivePosture:
                     return null;
@@ -378,7 +379,8 @@ namespace Vortex.Core.Rules
                 return Error(CommandErrorCode.InvalidTarget, "The target must be an alive opponent.");
             }
 
-            return CanTarget(player, target, action) ? null : Error(CommandErrorCode.TargetNotAllowed, "This target cannot be chosen.");
+            EffectSource? protector = Refuser((e, s) => e.CanTarget(this, s, player, target, action));
+            return protector is null ? null : Refused(CommandErrorCode.TargetNotAllowed, "This target cannot be chosen.", protector);
         }
 
         private void PerformCrewAction(int player, Command command)
@@ -434,5 +436,12 @@ namespace Vortex.Core.Rules
         private static CommandError WrongPhase() => new CommandError(CommandErrorCode.WrongPhase, "Not allowed in the current phase.");
 
         private static CommandError Error(CommandErrorCode code, string message) => new CommandError(code, message);
+
+        // A move forbidden by an effect: the error names it, so the interface can say what protects the target.
+        private static CommandError Refused(CommandErrorCode code, string message, EffectSource refuser)
+        {
+            (SourceKind kind, string? id) = SourceKinds.Of(refuser);
+            return new CommandError(code, message, kind, id);
+        }
     }
 }

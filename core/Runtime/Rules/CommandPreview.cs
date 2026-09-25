@@ -102,7 +102,7 @@ namespace Vortex.Core.Rules
     /// <summary>What one source adds to the attack value; 0 in the samples where it adds nothing.</summary>
     public sealed class BonusPreview
     {
-        internal BonusPreview(BonusOrigin origin, string? id, Estimate amount)
+        internal BonusPreview(SourceKind origin, string? id, Estimate amount)
         {
             Origin = origin;
             Id = id;
@@ -110,32 +110,13 @@ namespace Vortex.Core.Rules
         }
 
         /// <summary>Kind of source.</summary>
-        public BonusOrigin Origin { get; }
+        public SourceKind Origin { get; }
 
         /// <summary>Card id, status kind, event id or technology id; null for the base rules.</summary>
         public string? Id { get; }
 
         /// <summary>Amount added (negative: a malus).</summary>
         public Estimate Amount { get; }
-    }
-
-    /// <summary>Where a bonus comes from.</summary>
-    public enum BonusOrigin
-    {
-        /// <summary>The base rules (a rule option).</summary>
-        Rule = 0,
-
-        /// <summary>An equipped modifier card.</summary>
-        Card = 1,
-
-        /// <summary>A status, often left by a card already used.</summary>
-        Status = 2,
-
-        /// <summary>The event of the round.</summary>
-        Event = 3,
-
-        /// <summary>A technology.</summary>
-        Technology = 4,
     }
 
     /// <summary>Lowest, highest and average value seen over the samples.</summary>

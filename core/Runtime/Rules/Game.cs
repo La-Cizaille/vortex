@@ -350,17 +350,20 @@ namespace Vortex.Core.Rules
         }
 
         /// <summary>Permission: false as soon as one active effect refuses (RULES B4).</summary>
-        public bool Permits(Func<Effect, EffectSource, bool> permission)
+        public bool Permits(Func<Effect, EffectSource, bool> permission) => Refuser(permission) == null;
+
+        /// <summary>The first active effect that refuses a permission (RULES B7 order), or null when all allow it.</summary>
+        public EffectSource? Refuser(Func<Effect, EffectSource, bool> permission)
         {
             foreach (KeyValuePair<Effect, EffectSource> pair in ActiveEffects())
             {
                 if (!permission(pair.Key, pair.Value))
                 {
-                    return false;
+                    return pair.Value;
                 }
             }
 
-            return true;
+            return null;
         }
 
         // ---------------------------------------------------------------- Statuses

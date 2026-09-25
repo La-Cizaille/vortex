@@ -22,5 +22,8 @@ namespace Vortex.Client.Presentation
 
         /// <summary>What a command would likely do, computed by the engine (ADR-0018), or null.</summary>
         CommandPreview? Preview(int seat, Command command);
+
+        /// <summary>Why a command is refused now, or null (ADR-0015: the reason comes from the engine).</summary>
+        CommandError? Explain(int seat, Command command);
     }
 }

@@ -31,6 +31,8 @@ namespace Vortex.Client.Presentation
         private TableContext? _context;
         private Func<CardSlot, int, bool>? _canBuy;
         private Func<CardSlot, int, Vector2, bool>? _buy;
+        private Action<CardSlot, int, RectTransform>? _refused;
+        private Action? _released;
 
         /// <summary>Cards shown in the attack market (tests).</summary>
         public int AttackCardCount => Count(_attack);
@@ -47,13 +49,16 @@ namespace Vortex.Client.Presentation
         }
 
         /// <summary>
-        /// Lets the person buy a card by dragging it (INTERFACE.md 3.3): whether a card can be dragged now, and what a drop
-        /// does. Set it right after <see cref="Bind"/>, before the first show.
+        /// Lets the person buy a card by dragging it (INTERFACE.md 3.3): whether a card can be dragged now, what a drop does,
+        /// and why a card cannot be taken now (<paramref name="refused"/>, taken back by <paramref name="released"/>). Set it
+        /// right after <see cref="Bind"/>, before the first show.
         /// </summary>
-        public void SetPurchase(Func<CardSlot, int, bool> canBuy, Func<CardSlot, int, Vector2, bool> buy)
+        public void SetPurchase(Func<CardSlot, int, bool> canBuy, Func<CardSlot, int, Vector2, bool> buy, Action<CardSlot, int, RectTransform>? refused = null, Action? released = null)
         {
             _canBuy = canBuy;
             _buy = buy;
+            _refused = refused;
+            _released = released;
         }
 
         /// <summary>Shows both markets as the table model has them.</summary>
@@ -111,6 +116,12 @@ namespace Vortex.Client.Presentation
                 {
                     holder.CanDrag = _ => _canBuy(slot, index);
                     holder.OnDrop = (_, screen) => _buy(slot, index, screen);
+                    if (_refused != null)
+                    {
+                        Action<CardSlot, int, RectTransform> refused = _refused;
+                        holder.OnRefused = (_, place) => refused(slot, index, place);
+                        holder.OnReleased = _released;
+                    }
                 }
 
                 row.Add(holder);

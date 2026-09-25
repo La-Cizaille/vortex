@@ -105,12 +105,7 @@ namespace Vortex.Client.Presentation
             return attack.Bonus.IsExact && attack.Bonus.Min == 0 ? null : Format(TextKeys.PreviewBonuses, Signed(attack.Bonus));
         }
 
-        private string Name(BonusPreview bonus) => bonus.Origin switch
-        {
-            BonusOrigin.Rule => _texts.Get(TextKeys.PreviewBonusRule),
-            BonusOrigin.Status => _texts.Get(TextKeys.Status(bonus.Id ?? string.Empty)),
-            _ => _context.Face(bonus.Id ?? string.Empty).Title,
-        };
+        private string Name(BonusPreview bonus) => SourceNames.Of(_context, bonus.Origin, bonus.Id);
 
         private string Format(string key, params object[] values) => string.Format(CultureInfo.InvariantCulture, _texts.Get(key), values);
 

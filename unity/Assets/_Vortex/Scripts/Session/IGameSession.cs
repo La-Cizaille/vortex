@@ -43,6 +43,9 @@ namespace Vortex.Client.Session
         /// reveals a coming die or draw. Null when the command is not legal now.
         /// </summary>
         CommandPreview? Preview(int seat, Command command);
+
+        /// <summary>Why the seat may not submit a command now, or null when it may (the reason shown next to a greyed-out move).</summary>
+        CommandError? Explain(int seat, Command command);
     }
 
     /// <summary>Outcome of a submitted command.</summary>
