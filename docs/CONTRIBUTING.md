@@ -150,10 +150,10 @@ blender --background --factory-startup --disable-autoexec --python tools/blender
 blender --background --disable-autoexec art-src/ships/Ship_Sillage.blend --python tools/blender/export_unity.py -- unity/Assets/_Vortex/Art/Ships/Ship_Sillage.fbx --budget 5000
 ```
 
-**Le corps de carte** se construit par script, puis s'exporte comme un vaisseau. Unity le prend seul comme corps de `Prefabs/Card.prefab` :
+**La carte** (ARB-85) se construit par script, avec ses textures de métal brossé, puis s'exporte comme un vaisseau. Unity en fait seul le corps de `Prefabs/Card.prefab`, crée ses matériaux de métal (`Theme/Materials/CardFrame`, `CardPanel`, `CardTrim`, `CardGem`, qui t'appartiennent ensuite) et place l'illustration et les textes sur les repères `Zone_*` du modèle. Pour déplacer une zone, change son nombre dans `build_card.py` et relance :
 ```
 blender --background --factory-startup --disable-autoexec --python tools/blender/build_card.py -- art-src/cards/Card.blend
-blender --background --disable-autoexec art-src/cards/Card.blend --python tools/blender/export_unity.py -- unity/Assets/_Vortex/Art/Cards3D/Card.fbx --budget 500
+blender --background --disable-autoexec art-src/cards/Card.blend --python tools/blender/export_unity.py -- unity/Assets/_Vortex/Art/Cards3D/Card.fbx --budget 1000
 ```
 
 ## Fusion des fichiers Unity

@@ -5,7 +5,7 @@ Les fichiers de travail des visuels : scènes Blender (`.blend`), images en calq
 | Dossier | Contenu | Exporté vers |
 |---|---|---|
 | `ships/` | Un fichier `.blend` par vaisseau, nommé comme son export (`Ship_Faucon.blend`), et ses textures (`Ship_Faucon_BaseColor.png`, `Ship_Faucon_Normal.png`). `Ship_Sillage` est construit par `tools/blender/build_ship_sillage.py` | `unity/Assets/_Vortex/Art/Ships/Ship_Faucon.fbx` |
-| `cards/` | Le corps des cartes (`Card.blend`), construit par `tools/blender/build_card.py` | `unity/Assets/_Vortex/Art/Cards3D/Card.fbx` |
+| `cards/` | Le modèle des cartes (`Card.blend`) et ses textures de métal brossé, construits par `tools/blender/build_card.py` | `unity/Assets/_Vortex/Art/Cards3D/Card.fbx` |
 | `dice/` | Le dé à 8 faces | `unity/Assets/_Vortex/Art/Dice/` |
 | `props/` | Décor : planètes, station… | `unity/Assets/_Vortex/Art/Props/` |
 | `images/` | Sources des illustrations et icônes (calques, formats de travail) | `unity/Assets/_Vortex/Art/Cards/`, `Art/Icons/` |

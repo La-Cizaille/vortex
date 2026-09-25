@@ -44,8 +44,8 @@ namespace Vortex.Editor
         /// <summary>Path of the body inside the card prefab.</summary>
         public const string CardBodyPath = "Visuel/Corps";
 
-        /// <summary>Size of a card: 1 x 1.4, 0.02 thick (ADR-0017).</summary>
-        public static readonly Vector3 CardSize = new Vector3(1f, 1.4f, 0.02f);
+        /// <summary>Size of a card: 1 x 1.4, 0.04 thick overall with its raised parts (ADR-0017, ARB-85).</summary>
+        public static readonly Vector3 CardSize = new Vector3(1f, 1.4f, 0.04f);
 
         /// <summary>Body of the cards (tinted with their technology colour).</summary>
         public const string CardBodyMaterialPath = "Assets/_Vortex/Theme/Materials/CardBody.mat";
@@ -74,42 +74,9 @@ namespace Vortex.Editor
             Ensure<IconCatalog>(IconsPath);
             EnsureTexts();
             EnsureCardPrefab();
-            SyncCardBody();
+            CardPrefabSync.Sync();
             SyncCardArt();
             SyncIcons();
-        }
-
-        /// <summary>
-        /// Gives the card prefab the modelled body when <see cref="CardModelPath"/> exists, or the box otherwise. The
-        /// model must have the size of a card, since the face and the collider are laid out for it.
-        /// </summary>
-        public static void SyncCardBody()
-        {
-            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(CardPrefabPath);
-            Transform? body = prefab != null ? prefab.transform.Find(CardBodyPath) : null;
-            if (body == null || !body.TryGetComponent(out MeshFilter filter))
-            {
-                return;
-            }
-
-            Mesh model = AssetDatabase.LoadAssetAtPath<Mesh>(CardModelPath);
-            Mesh mesh = model != null ? model : Resources.GetBuiltinResource<Mesh>("Cube.fbx");
-            Vector3 scale = model != null ? Vector3.one : CardSize;
-            if (model != null && Vector3.Distance(model.bounds.size, CardSize) > 0.01f)
-            {
-                Debug.LogWarning(CardModelPath + " mesure " + model.bounds.size.ToString("F3") + " : une carte mesure " + CardSize.ToString("F3")
-                    + " (docs/ASSETS.md §2). La face de la carte risque de déborder.");
-            }
-
-            if (filter.sharedMesh == mesh && body.localScale == scale)
-            {
-                return;
-            }
-
-            using var editing = new PrefabUtility.EditPrefabContentsScope(CardPrefabPath);
-            Transform edited = editing.prefabContentsRoot.transform.Find(CardBodyPath);
-            edited.GetComponent<MeshFilter>().sharedMesh = mesh;
-            edited.localScale = scale;
         }
 
         /// <summary>
@@ -267,9 +234,10 @@ namespace Vortex.Editor
             Material back = EnsureMaterial(CardBackMaterialPath, new Color32(30, 34, 62, 255));
             Material badgeColour = EnsureMaterial(CardBadgeMaterialPath, new Color32(150, 40, 60, 255));
 
-            // A 1 x 1.4 card, 0.02 thick (ADR-0017). The front faces -Z, like Unity's quads and TextMeshPro texts, so a
-            // card turned like the camera shows its front to it. Everything visible is under "Visuel", so that the card
-            // can be hidden without being destroyed; the box collider takes pointer events.
+            // A 1 x 1.4 card (ADR-0017). The front faces -Z, like Unity's quads and TextMeshPro texts, so a card turned like
+            // the camera shows its front to it. Everything visible is under "Visuel", so that the card can be hidden
+            // without being destroyed; the box collider takes pointer events. The parts are laid out by CardPrefabSync,
+            // from the card model when there is one.
             var size = new Vector2(CardSize.x, CardSize.y);
             var root = new GameObject("Card", typeof(CardDisplay), typeof(BoxCollider));
             var area = root.GetComponent<BoxCollider>();
@@ -277,30 +245,28 @@ namespace Vortex.Editor
             Transform visual = new GameObject("Visuel").transform;
             visual.SetParent(root.transform, false);
 
-            // The body: a box, which the modelled card (rounded corners and rim) replaces when there is one (SyncCardBody).
             Renderer frame = Primitive(PrimitiveType.Cube, visual, "Corps", Vector3.zero, Vector3.zero, CardSize, body);
-            Renderer background = Primitive(PrimitiveType.Quad, visual, "Fond", new Vector3(0f, 0f, -0.011f), Vector3.zero, new Vector3(0.94f, 1.34f, 1f), face);
-            const float ArtWidth = 0.86f;
-            const float ArtHeight = ArtWidth * 9f / 16f;
-            Renderer art = Primitive(PrimitiveType.Quad, visual, "Illustration", new Vector3(0f, 0.65f - (ArtHeight / 2f), -0.012f), Vector3.zero, new Vector3(ArtWidth, ArtHeight, 1f), face);
-            Primitive(PrimitiveType.Quad, visual, "Dos", new Vector3(0f, 0f, 0.011f), new Vector3(0f, 180f, 0f), new Vector3(0.96f, 1.36f, 1f), back);
+            Renderer background = Primitive(PrimitiveType.Quad, visual, "Fond", Vector3.zero, Vector3.zero, new Vector3(0.94f, 1.34f, 1f), face);
+            Renderer art = Primitive(PrimitiveType.Quad, visual, "Illustration", Vector3.zero, Vector3.zero, Vector3.one, face);
+            Primitive(PrimitiveType.Quad, visual, "Dos", Vector3.zero, new Vector3(0f, 180f, 0f), new Vector3(0.96f, 1.36f, 1f), back);
 
-            TMP_Text title = Text3D(visual, "Nom", new Vector2(0f, 0.1f), new Vector2(0.86f, 0.1f), 0.4f, 1f, FontStyles.Bold, TextAlignmentOptions.Center);
+            TMP_Text title = Text3D(visual, "Nom", Vector2.zero, Vector2.one, 0.4f, 1f, FontStyles.Bold, TextAlignmentOptions.Center);
             title.textWrappingMode = TextWrappingModes.NoWrap;
-            TMP_Text caption = Text3D(visual, "Type", new Vector2(0f, 0.01f), new Vector2(0.86f, 0.07f), 0.3f, 0.55f, FontStyles.Normal, TextAlignmentOptions.Center);
-            TMP_Text text = Text3D(visual, "Texte", new Vector2(0f, -0.34f), new Vector2(0.84f, 0.56f), 0.25f, 0.62f, FontStyles.Normal, TextAlignmentOptions.TopLeft);
-            TMP_Text id = Text3D(visual, "Identifiant", new Vector2(0.24f, -0.655f), new Vector2(0.4f, 0.05f), 0.2f, 0.4f, FontStyles.Normal, TextAlignmentOptions.Right);
+            TMP_Text slot = Text3D(visual, "Emplacement", Vector2.zero, Vector2.one, 0.3f, 0.9f, FontStyles.Bold, TextAlignmentOptions.Center);
+            slot.textWrappingMode = TextWrappingModes.NoWrap;
+            TMP_Text usage = Text3D(visual, "Usage", Vector2.zero, Vector2.one, 0.3f, 0.55f, FontStyles.Normal, TextAlignmentOptions.Center);
+            TMP_Text text = Text3D(visual, "Texte", Vector2.zero, Vector2.one, 0.25f, 0.62f, FontStyles.Normal, TextAlignmentOptions.TopLeft);
+            TMP_Text id = Text3D(visual, "Identifiant", Vector2.zero, Vector2.one, 0.2f, 0.4f, FontStyles.Normal, TextAlignmentOptions.Right);
 
             // Torment tokens: a disc with the count, over the top right corner, large enough to read on a small card.
             var badge = new GameObject("Tourments");
             badge.transform.SetParent(visual, false);
-            badge.transform.localPosition = new Vector3(0.42f, 0.62f, -0.02f);
             Primitive(PrimitiveType.Cylinder, badge.transform, "Disque", Vector3.zero, new Vector3(90f, 0f, 0f), new Vector3(0.3f, 0.004f, 0.3f), badgeColour);
             TMP_Text torments = Text3D(badge.transform, "Nombre", Vector2.zero, new Vector2(0.3f, 0.26f), 0.5f, 1.6f, FontStyles.Bold, TextAlignmentOptions.Center);
             torments.transform.localPosition = new Vector3(0f, 0f, -0.006f);
             badge.SetActive(false);
 
-            root.GetComponent<CardDisplay>().Assign(frame, background, art, title, caption, text, id, badge, torments, visual.gameObject, area, size);
+            root.GetComponent<CardDisplay>().Assign(frame, -1, -1, background, art, title, slot, usage, text, id, badge, torments, visual.gameObject, area, size);
             Directory.CreateDirectory(Path.GetDirectoryName(CardPrefabPath)!);
             PrefabUtility.SaveAsPrefabAsset(root, CardPrefabPath);
             Object.DestroyImmediate(root);
@@ -323,7 +289,7 @@ namespace Vortex.Editor
             return material;
         }
 
-        private static Renderer Primitive(PrimitiveType type, Transform parent, string name, Vector3 position, Vector3 rotation, Vector3 scale, Material material)
+        internal static Renderer Primitive(PrimitiveType type, Transform parent, string name, Vector3 position, Vector3 rotation, Vector3 scale, Material material)
         {
             GameObject part = GameObject.CreatePrimitive(type);
             part.name = name;
@@ -339,7 +305,7 @@ namespace Vortex.Editor
         }
 
         // A world-space TextMeshPro label, sized by its rectangle; auto-sizing keeps long texts inside it.
-        private static TMP_Text Text3D(Transform parent, string name, Vector2 position, Vector2 size, float minSize, float maxSize, FontStyles style, TextAlignmentOptions alignment)
+        internal static TMP_Text Text3D(Transform parent, string name, Vector2 position, Vector2 size, float minSize, float maxSize, FontStyles style, TextAlignmentOptions alignment)
         {
             var holder = new GameObject(name);
             holder.transform.SetParent(parent, false);

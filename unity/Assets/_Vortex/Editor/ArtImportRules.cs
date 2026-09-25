@@ -42,6 +42,12 @@ namespace Vortex.Editor
         /// <summary>End of a normal map's file name (<c>Ship_Faucon_Normal.png</c>), docs/ASSETS.md section 2.</summary>
         public const string NormalMapSuffix = "_Normal";
 
+        /// <summary>
+        /// Suffix of a metal map (metalness in red, smoothness in alpha, as URP Lit reads it): data, not a colour, so it is
+        /// read without the sRGB conversion (docs/ASSETS.md section 2).
+        /// </summary>
+        public const string MetallicSmoothnessSuffix = "_MetallicSmoothness";
+
         /// <summary>Settings of a new illustration: a sprite without mipmaps, compressed (ASTC 6x6 on Android).</summary>
         public static void ConfigureCardTexture(TextureImporter importer)
         {
@@ -103,8 +109,10 @@ namespace Vortex.Editor
                 throw new ArgumentNullException(nameof(importer));
             }
 
-            bool normalMap = Path.GetFileNameWithoutExtension(fileName).EndsWith(NormalMapSuffix, StringComparison.Ordinal);
+            string name = Path.GetFileNameWithoutExtension(fileName);
+            bool normalMap = name.EndsWith(NormalMapSuffix, StringComparison.Ordinal);
             importer.textureType = normalMap ? TextureImporterType.NormalMap : TextureImporterType.Default;
+            importer.sRGBTexture = !normalMap && !name.EndsWith(MetallicSmoothnessSuffix, StringComparison.Ordinal);
             importer.mipmapEnabled = true;
             importer.maxTextureSize = ModelTextureMaxSize;
             importer.textureCompression = TextureImporterCompression.Compressed;
@@ -155,7 +163,7 @@ namespace Vortex.Editor
 
             if (changes.Any(paths => paths.Any(p => IsIn(p, CardModelsFolder))))
             {
-                ThemeAssets.SyncCardBody();
+                CardPrefabSync.Sync();
             }
         }
 

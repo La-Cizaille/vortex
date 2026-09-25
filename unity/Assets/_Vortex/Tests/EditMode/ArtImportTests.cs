@@ -4,7 +4,9 @@ using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 using Vortex.Client.Content;
+using Vortex.Client.Presentation;
 using Vortex.Client.Theme;
+using Vortex.Core.Content;
 using Vortex.Editor;
 
 namespace Vortex.Tests.EditMode
@@ -95,9 +97,10 @@ namespace Vortex.Tests.EditMode
             }
         }
 
-        [TestCase("__test_BaseColor", TextureImporterType.Default)]
-        [TestCase("__test_Normal", TextureImporterType.NormalMap)]
-        public void A_model_texture_is_mipmapped_and_a_normal_map_is_known_by_its_name(string name, TextureImporterType type)
+        [TestCase("__test_BaseColor", TextureImporterType.Default, true)]
+        [TestCase("__test_Normal", TextureImporterType.NormalMap, false)]
+        [TestCase("__test_MetallicSmoothness", TextureImporterType.Default, false)]
+        public void A_model_texture_is_mipmapped_and_a_normal_or_metal_map_is_known_by_its_name(string name, TextureImporterType type, bool colour)
         {
             string path = ArtImportRules.ShipsFolder + "/" + name + ".png";
             Assume.That(File.Exists(path), Is.False);
@@ -110,6 +113,7 @@ namespace Vortex.Tests.EditMode
 
                 var importer = (TextureImporter)AssetImporter.GetAtPath(path);
                 Assert.That(importer.textureType, Is.EqualTo(type));
+                Assert.That(importer.sRGBTexture, Is.EqualTo(colour), "Only a colour is read with the sRGB conversion.");
                 Assert.That(importer.mipmapEnabled, Is.True);
                 Assert.That(importer.maxTextureSize, Is.EqualTo(ArtImportRules.ModelTextureMaxSize));
                 Assert.That(importer.GetPlatformTextureSettings("Android").format, Is.EqualTo(TextureImporterFormat.ASTC_6x6));
@@ -152,18 +156,81 @@ namespace Vortex.Tests.EditMode
             var model = AssetDatabase.LoadAssetAtPath<GameObject>(ThemeAssets.CardModelPath);
             Mesh mesh = AssetDatabase.LoadAssetAtPath<Mesh>(ThemeAssets.CardModelPath);
             Assert.That(model, Is.Not.Null);
-            Assert.That(Vector3.Distance(mesh.bounds.size, ThemeAssets.CardSize), Is.LessThan(0.001f), "1 x 1.4 x 0.02, width along X and height along Y.");
+            Assert.That(Vector3.Distance(mesh.bounds.size, ThemeAssets.CardSize), Is.LessThan(0.001f), "1 x 1.4 x 0.04, width along X and height along Y.");
             Assert.That(mesh.bounds.center.magnitude, Is.LessThan(0.001f), "Origin at the centre of the card.");
-            Assert.That(mesh.GetIndexCount(0) / 3, Is.LessThanOrEqualTo(500), "Triangle budget (docs/ASSETS.md §2).");
+            Assert.That(Triangles(mesh), Is.LessThanOrEqualTo(1000), "Triangle budget (docs/ASSETS.md §2).");
             foreach (Transform part in model.GetComponentsInChildren<Transform>())
             {
+                // A zone's scale is its size (ARB-85); every other part arrives at scale 1.
                 Assert.That(Quaternion.Angle(part.localRotation, Quaternion.identity), Is.LessThan(0.01f), part.name + " arrives without rotation.");
-                Assert.That(part.localScale, Is.EqualTo(Vector3.one), part.name + " arrives at scale 1.");
+                if (!part.name.StartsWith(CardPrefabSync.ZonePrefix, System.StringComparison.Ordinal))
+                {
+                    Assert.That(part.localScale, Is.EqualTo(Vector3.one), part.name + " arrives at scale 1.");
+                }
             }
 
             Transform body = AssetDatabase.LoadAssetAtPath<GameObject>(ThemeAssets.CardPrefabPath).transform.Find(ThemeAssets.CardBodyPath);
             Assert.That(body.GetComponent<MeshFilter>().sharedMesh, Is.SameAs(mesh));
             Assert.That(body.localScale, Is.EqualTo(Vector3.one));
+        }
+
+        [Test]
+        public void The_card_model_places_the_illustration_and_the_texts_on_the_card()
+        {
+            // The model's Zone_* empties say where each part goes (ARB-85); the prefab follows them.
+            var model = AssetDatabase.LoadAssetAtPath<GameObject>(ThemeAssets.CardModelPath);
+            Transform visual = AssetDatabase.LoadAssetAtPath<GameObject>(ThemeAssets.CardPrefabPath).transform.Find("Visuel");
+            Transform[] zones = model.GetComponentsInChildren<Transform>(true);
+            foreach (string part in CardPrefabSync.Zoned)
+            {
+                Transform zone = zones.Single(candidate => candidate.name == CardPrefabSync.ZonePrefix + part);
+                Transform placed = visual.Find(part);
+                Assert.That(Vector2.Distance(placed.localPosition, zone.position), Is.LessThan(0.001f), part + " sits on its zone.");
+                Assert.That(placed.localPosition.z, Is.LessThan(zone.position.z), part + " lies in front of the surface.");
+                if (part != "Tourments")
+                {
+                    // The Torment badge overhangs the corner on purpose, to be read on a small card.
+                    Assert.That(Mathf.Abs(zone.position.x) + (zone.lossyScale.x / 2f), Is.LessThanOrEqualTo(0.5f), part + " stays on the card.");
+                }
+            }
+
+            Assert.That(visual.Find("Fond").gameObject.activeSelf, Is.False, "The model has panels of its own.");
+            var illustration = visual.Find("Illustration");
+            Assert.That(illustration.localScale.x / illustration.localScale.y, Is.EqualTo(16f / 9f).Within(0.01f), "Illustrations stay 16:9 (docs/ASSETS.md §3).");
+        }
+
+        [TestCase(TechColor.Blue)]
+        [TestCase(TechColor.Green)]
+        [TestCase(TechColor.Yellow)]
+        public void A_technology_card_gem_glows_above_the_bloom_threshold_and_a_mark_colours_the_trims(TechColor color)
+        {
+            var theme = AssetDatabase.LoadAssetAtPath<ThemeSettings>(ThemeAssets.ThemePath);
+            var catalog = AssetDatabase.LoadAssetAtPath<CardArtCatalog>(ThemeAssets.CardArtPath);
+            var card = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(ThemeAssets.CardPrefabPath)).GetComponent<CardDisplay>();
+            try
+            {
+                Renderer body = card.transform.Find(ThemeAssets.CardBodyPath).GetComponent<Renderer>();
+                int gem = System.Array.FindIndex(body.sharedMaterials, material => material.name == "CardGem");
+                Assume.That(gem, Is.GreaterThanOrEqualTo(0), "The card model is in the project.");
+                var block = new MaterialPropertyBlock();
+
+                card.Show(new CardFace("X_001", "Nom", "ATK", "Durable", "Texte", color), theme, catalog);
+                body.GetPropertyBlock(block, gem);
+                Vector4 glow = block.GetVector("_EmissionColor");
+                Assert.That(Mathf.Max(glow.x, glow.y, glow.z), Is.GreaterThan(1.5f), "Every technology's gem blooms alike.");
+                Assert.That(card.TrimColor, Is.EqualTo(theme.Technology(color)));
+
+                card.Mark(theme.Loss, theme);
+                Assert.That(card.TrimColor, Is.EqualTo(theme.Loss), "A marked card shows it on its trims.");
+
+                card.Show(new CardFace("X_002", "Nom", "ÉVT", "Événement", "Texte", TechColor.Neutral), theme, catalog);
+                body.GetPropertyBlock(block, gem);
+                Assert.That((Vector3)block.GetVector("_EmissionColor"), Is.EqualTo(Vector3.zero), "A neutral card's gem is off.");
+            }
+            finally
+            {
+                Object.DestroyImmediate(card.gameObject);
+            }
         }
 
         [Test]

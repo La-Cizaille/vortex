@@ -521,3 +521,7 @@ MonoBehaviour:
     Text: Touchez votre fiche pour passer.
   - Key: decision.pass.middle
     Text: Touchez la carte grise au centre pour passer.
+  - Key: card.badge.event
+    Text: "\xC9VT"
+  - Key: card.badge.technology
+    Text: TECH

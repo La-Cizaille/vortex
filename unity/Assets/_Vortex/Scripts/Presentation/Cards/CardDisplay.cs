@@ -2,14 +2,16 @@ using System.Globalization;
 using TMPro;
 using UnityEngine;
 using Vortex.Client.Theme;
+using Vortex.Core.Content;
 
 namespace Vortex.Client.Presentation
 {
     /// <summary>
-    /// A card as a 3D object (ADR-0017): a body in its technology colour, its illustration (or a generated placeholder
-    /// tinted with that colour), its name, kind, text and id, and its Torment tokens. The front faces the card's -Z axis,
-    /// the back its +Z axis. The look lives in the Card prefab and its materials, which the designer edits freely (a
-    /// modelled body can replace the box); this component only fills them.
+    /// A card as a 3D object (ADR-0017): its body, its illustration (or a generated placeholder tinted with its technology
+    /// colour), its name, slot badge, usage, text and id, and its Torment tokens. The front faces the card's -Z axis, the
+    /// back its +Z axis. The modelled body (ARB-85) has trims and a gem in the technology colour; the box that stands in
+    /// for it takes that colour whole. The look lives in the Card prefab and its materials, which the designer edits
+    /// freely; this component only fills them.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class CardDisplay : MonoBehaviour
@@ -17,11 +19,18 @@ namespace Vortex.Client.Presentation
         private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
         private static readonly int BaseMap = Shader.PropertyToID("_BaseMap");
         private static readonly int BaseMapTransform = Shader.PropertyToID("_BaseMap_ST");
+        private static readonly int EmissionColor = Shader.PropertyToID("_EmissionColor");
 
+        [Tooltip("Corps de la carte : le modèle, ou la boîte qui le remplace.")]
         [SerializeField] private Renderer frame = null!;
-        [SerializeField] private Renderer background = null!;
+        [Tooltip("Matériau des liserés dans le corps (-1 : la boîte, teinte en entier).")]
+        [SerializeField] private int trimSlot = -1;
+        [Tooltip("Matériau de la gemme dans le corps (-1 : pas de gemme).")]
+        [SerializeField] private int gemSlot = -1;
+        [SerializeField] private Renderer? background;
         [SerializeField] private Renderer art = null!;
         [SerializeField] private TMP_Text title = null!;
+        [SerializeField] private TMP_Text? badge;
         [SerializeField] private TMP_Text caption = null!;
         [SerializeField] private TMP_Text body = null!;
         [SerializeField] private TMP_Text id = null!;
@@ -53,24 +62,41 @@ namespace Vortex.Client.Presentation
         /// <summary>False while the card is hidden (for instance, scrolled out of view).</summary>
         public bool Visible => visual.activeSelf;
 
+        /// <summary>True for the modelled body, whose name and text lie on light panels.</summary>
+        public bool Modelled => trimSlot >= 0;
+
+        /// <summary>Colour of the trims (or of the whole box): the technology colour, or the colour marking the card.</summary>
+        public Color TrimColor { get; private set; }
+
         /// <summary>Shows a card with the current theme.</summary>
         public void Show(CardFace face, ThemeSettings theme, CardArtCatalog catalog)
         {
             Face = face;
             Marked = false;
             Color color = theme.Technology(face.Color);
-            Paint(frame, color, null);
-            Paint(background, theme.CardBackground, null);
+            PaintTrims(color, theme);
+            PaintGem(face.Color == TechColor.Neutral ? (Color?)null : color, theme);
+            if (background != null)
+            {
+                Paint(background, theme.CardBackground, null);
+            }
 
             CardArt cardArt = catalog.ArtFor(face.Id);
             Paint(art, cardArt.IsPlaceholder ? color : Color.white, cardArt.Sprite);
             ShowsPlaceholder = cardArt.IsPlaceholder;
 
-            // Names and ids are plain text; only the card text is rich text, converted by CardText.
-            Label(title, face.Title, theme.TitleFont, theme.Text, richText: false);
-            Label(caption, face.Caption, theme.BodyFont, theme.MutedText, richText: false);
+            // Names and ids are plain text; only the card text is rich text, converted by CardText. On the modelled
+            // body, the name and the text lie on light panels, the badge and the usage on dark metal.
+            Color ink = Modelled ? theme.CardInk : theme.Text;
+            Label(title, face.Title, theme.TitleFont, ink, richText: false);
+            if (badge != null)
+            {
+                Label(badge, face.Badge, theme.TitleFont, theme.Text, richText: false);
+            }
+
+            Label(caption, badge != null ? face.Usage : face.Caption, theme.BodyFont, Modelled ? theme.Text : theme.MutedText, richText: false);
             Label(id, face.Id, theme.BodyFont, theme.MutedText, richText: false);
-            Label(body, CardText.ToRichText(face.Text, theme.HasTextIcon), theme.BodyFont, theme.Text, richText: true);
+            Label(body, CardText.ToRichText(face.Text, theme.HasTextIcon), theme.BodyFont, ink, richText: true);
             if (theme.TextIcons != null)
             {
                 body.spriteAsset = theme.TextIcons;
@@ -81,13 +107,13 @@ namespace Vortex.Client.Presentation
         public bool Marked { get; private set; }
 
         /// <summary>
-        /// Marks the frame with <paramref name="color"/> (the card a purchase would replace), or gives it back its
-        /// technology colour with null.
+        /// Marks the trims with <paramref name="color"/> (the card a purchase would replace, a card a decision offers),
+        /// or gives them back the technology colour with null.
         /// </summary>
         public void Mark(Color? color, ThemeSettings theme)
         {
             Marked = color.HasValue;
-            Paint(frame, color ?? theme.Technology(Face.Color), null);
+            PaintTrims(color ?? theme.Technology(Face.Color), theme);
         }
 
         /// <summary>Shows the Torment tokens on the card (RULES A7); the badge is hidden when there is none.</summary>
@@ -122,13 +148,19 @@ namespace Vortex.Client.Presentation
             pointerArea.enabled = pointable && visual.activeSelf;
         }
 
-        /// <summary>Wires the prefab's parts (editor setup).</summary>
-        public void Assign(Renderer frameRenderer, Renderer backgroundRenderer, Renderer artRenderer, TMP_Text titleLabel, TMP_Text captionLabel, TMP_Text bodyLabel, TMP_Text idLabel, GameObject torments, TMP_Text tormentLabel, GameObject visualRoot, Collider area, Vector2 cardSize)
+        /// <summary>
+        /// Wires the prefab's parts (editor setup). <paramref name="trims"/> and <paramref name="gem"/> are the material
+        /// indices of the trims and the gem in the body, or -1 for the box, painted whole.
+        /// </summary>
+        public void Assign(Renderer frameRenderer, int trims, int gem, Renderer? backgroundRenderer, Renderer artRenderer, TMP_Text titleLabel, TMP_Text? badgeLabel, TMP_Text captionLabel, TMP_Text bodyLabel, TMP_Text idLabel, GameObject torments, TMP_Text tormentLabel, GameObject visualRoot, Collider area, Vector2 cardSize)
         {
             frame = frameRenderer;
+            trimSlot = trims;
+            gemSlot = gem;
             background = backgroundRenderer;
             art = artRenderer;
             title = titleLabel;
+            badge = badgeLabel;
             caption = captionLabel;
             body = bodyLabel;
             id = idLabel;
@@ -137,6 +169,50 @@ namespace Vortex.Client.Presentation
             visual = visualRoot;
             pointerArea = area;
             size = cardSize;
+        }
+
+        // The trims glow a little in their colour, under the Bloom threshold, so they stay crisp. The box takes the
+        // colour whole.
+        private void PaintTrims(Color color, ThemeSettings theme)
+        {
+            TrimColor = color;
+            if (trimSlot < 0)
+            {
+                Paint(frame, color, null);
+                return;
+            }
+
+            PaintSlot(trimSlot, color, color.linear * theme.CardTrimGlow);
+        }
+
+        // A technology card's gem glows in its colour, its brightest channel brought to the same level for every colour
+        // (above the Bloom threshold); a neutral card's gem is dark and off.
+        private void PaintGem(Color? color, ThemeSettings theme)
+        {
+            if (gemSlot < 0)
+            {
+                return;
+            }
+
+            Color glow = Color.black;
+            if (color.HasValue)
+            {
+                Color linear = color.Value.linear;
+                glow = linear * (theme.CardGemGlow / Mathf.Max(linear.maxColorComponent, 0.001f));
+            }
+
+            PaintSlot(gemSlot, color ?? theme.Wreck, glow);
+        }
+
+        // One material of the body, through a property block of its own: every card shares the same materials. The
+        // emission is given in linear space, as the shader reads it: SetColor would take an HDR colour for an sRGB one.
+        private void PaintSlot(int slot, Color color, Color linearEmission)
+        {
+            _block ??= new MaterialPropertyBlock();
+            frame.GetPropertyBlock(_block, slot);
+            _block.SetColor(BaseColor, color);
+            _block.SetVector(EmissionColor, new Vector4(linearEmission.r, linearEmission.g, linearEmission.b, 1f));
+            frame.SetPropertyBlock(_block, slot);
         }
 
         // Colours and textures go through a property block: every card shares the same materials.

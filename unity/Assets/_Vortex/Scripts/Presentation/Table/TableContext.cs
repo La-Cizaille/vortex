@@ -69,6 +69,6 @@ namespace Vortex.Client.Presentation
 
         /// <summary>The face of a content id (modifier, event or technology).</summary>
         public CardFace Face(string id) =>
-            _faces.TryGetValue(id, out CardFace face) ? face : new CardFace(id, id, string.Empty, string.Empty, TechColor.Neutral);
+            _faces.TryGetValue(id, out CardFace face) ? face : new CardFace(id, id, string.Empty, string.Empty, string.Empty, TechColor.Neutral);
     }
 }

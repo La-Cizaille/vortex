@@ -13,11 +13,14 @@ What it does:
 - exports the meshes (with their modifiers applied) and empties, never cameras or lights, with the axis
   conversion Unity expects (Y up, -Z forward) and the transforms baked in, so objects arrive in Unity without
   rotation or scale: Blender's -Y becomes Unity's +Z (checked on the first export, 2026-09-25);
-- copies the textures into a <name>.fbm folder next to the FBX file, where Unity links them to the materials.
+- copies the textures into a <name>.fbm folder next to the FBX file, where Unity links them to the materials. The
+  FBX exporter only copies an image plugged straight into the shader; every other image the file uses (through a tint
+  or a maths node) is copied there too, so that the game's own materials can use it.
 """
 
 import argparse
 import os
+import shutil
 import sys
 
 import bpy
@@ -92,7 +95,21 @@ def main():
         path_mode="COPY",
         embed_textures=False,
     )
+    copy_other_images(output)
     print("Exported %d triangles to %s" % (total, output))
+
+
+def copy_other_images(output):
+    folder = os.path.splitext(output)[0] + ".fbm"
+    for image in bpy.data.images:
+        if image.users == 0 or image.source != "FILE" or image.packed_file is not None:
+            continue
+        source = bpy.path.abspath(image.filepath)
+        target = os.path.join(folder, os.path.basename(source))
+        if os.path.isfile(source) and os.path.normcase(os.path.abspath(source)) != os.path.normcase(os.path.abspath(target)):
+            os.makedirs(folder, exist_ok=True)
+            shutil.copyfile(source, target)
+            print("Copied " + os.path.basename(source))
 
 
 if __name__ == "__main__":
