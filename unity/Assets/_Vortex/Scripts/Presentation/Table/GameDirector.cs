@@ -13,6 +13,7 @@ using Vortex.Core.Content;
 using Vortex.Core.Events;
 using Vortex.Core.Projection;
 using Vortex.Core.Rules;
+using Vortex.Core.State;
 
 namespace Vortex.Client.Presentation
 {
@@ -160,6 +161,9 @@ namespace Vortex.Client.Presentation
             set => turnSeconds = value > 0 ? value : 0;
         }
 
+        /// <summary>The black market (tests).</summary>
+        public MarketDisplay Market => market;
+
         /// <summary>Test mode: the panel listing every allowed move is shown too.</summary>
         public bool ShowCommandPanel
         {
@@ -239,6 +243,7 @@ namespace Vortex.Client.Presentation
             }
 
             announcement.Tick(deltaTime);
+            market.Tick(deltaTime);
             _player.Tick(deltaTime);
 
             // Displays are redrawn once per frame at most: skipping can start hundreds of events in one frame.
@@ -255,6 +260,8 @@ namespace Vortex.Client.Presentation
                 return;
             }
 
+            // The market opens for the person's market phase and folds after it (ARB-81).
+            market.Follow(!_session.IsOver && !_session.IsBotTurn && _session.Decision == null && _session.View.Phase == TurnPhase.Market);
             if (_session.IsOver)
             {
                 WithdrawControls();

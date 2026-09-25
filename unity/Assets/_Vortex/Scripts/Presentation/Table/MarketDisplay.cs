@@ -13,7 +13,8 @@ namespace Vortex.Client.Presentation
     /// <summary>
     /// The two black markets in the middle of the table (INTERFACE.md 3.3): attack on the left, defense on the right,
     /// with the cards left in each deck. A place is added to a row for each visible card, so the market size comes from
-    /// the rules, not from the layout.
+    /// the rules, not from the layout. Outside the person's market phase, the market folds into a strip under the round
+    /// banner, and a button opens it again (ARB-81); its 3D cards follow their places, so they shrink with it.
     /// </summary>
     public sealed class MarketDisplay : MonoBehaviour
     {
@@ -25,6 +26,16 @@ namespace Vortex.Client.Presentation
         [SerializeField] private TMP_Text defenseDeck = null!;
         [Tooltip("Hauteur d'une carte du marché, en unités d'interface (référence 1920 x 1080).")]
         [SerializeField, Min(10f)] private float cardHeight = 133f;
+        [Tooltip("Position du marché ouvert, au milieu de la table.")]
+        [SerializeField] private Vector2 openPosition = new Vector2(0f, -20f);
+        [Tooltip("Position du marché replié, sous le bandeau de manche.")]
+        [SerializeField] private Vector2 foldedPosition = new Vector2(0f, 368f);
+        [Tooltip("Échelle du marché replié.")]
+        [SerializeField, Range(0.2f, 1f)] private float foldedScale = 0.4f;
+        [Tooltip("Durée du repli et de l'ouverture, en secondes.")]
+        [SerializeField, Min(0f)] private float foldSeconds = 0.25f;
+        [SerializeField] private Button toggle = null!;
+        [SerializeField] private TMP_Text toggleLabel = null!;
 
         private readonly List<CardHolder> _attack = new List<CardHolder>();
         private readonly List<CardHolder> _defense = new List<CardHolder>();
@@ -34,6 +45,8 @@ namespace Vortex.Client.Presentation
         private Action<CardSlot, int, RectTransform>? _refused;
         private Action? _released;
         private Action<CardSlot, bool>? _holding;
+        private bool? _marketTime;
+        private float _unfolded;
 
         /// <summary>Cards shown in the attack market (tests).</summary>
         public int AttackCardCount => Count(_attack);
@@ -41,12 +54,50 @@ namespace Vortex.Client.Presentation
         /// <summary>Cards shown in the defense market (tests).</summary>
         public int DefenseCardCount => Count(_defense);
 
-        /// <summary>Prepares the display for a game.</summary>
+        /// <summary>Whether the market is open, or opening; false while it is folded, or folding (ARB-81).</summary>
+        public bool Open { get; private set; }
+
+        /// <summary>Prepares the display for a game; the market starts folded.</summary>
         public void Bind(TableContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             attackLabel.text = context.Texts.Get(TextKeys.SlotAttack);
             defenseLabel.text = context.Texts.Get(TextKeys.SlotDefense);
+            toggle.onClick.RemoveAllListeners();
+            toggle.onClick.AddListener(Toggle);
+            _marketTime = null;
+            SetOpen(false, instant: true);
+        }
+
+        /// <summary>
+        /// Follows the game: the market opens when the person's market phase starts, and folds when it ends. In between,
+        /// the person's own choice (<see cref="Toggle"/>) stands.
+        /// </summary>
+        public void Follow(bool marketTime)
+        {
+            if (_marketTime == marketTime)
+            {
+                return;
+            }
+
+            _marketTime = marketTime;
+            SetOpen(marketTime);
+        }
+
+        /// <summary>Opens the folded market, or folds the open one (the button).</summary>
+        public void Toggle() => SetOpen(!Open);
+
+        /// <summary>Moves the market towards its open or folded place (called every frame by the director).</summary>
+        public void Tick(float deltaTime)
+        {
+            float target = Open ? 1f : 0f;
+            if (_unfolded == target)
+            {
+                return;
+            }
+
+            _unfolded = foldSeconds <= 0f ? target : Mathf.MoveTowards(_unfolded, target, deltaTime / foldSeconds);
+            Place();
         }
 
         /// <summary>
@@ -83,6 +134,15 @@ namespace Vortex.Client.Presentation
             defenseDeck.text = string.Format(CultureInfo.InvariantCulture, _context.Texts.Get(TextKeys.MarketDeck), table.DefenseMarket.DeckCount);
         }
 
+        /// <summary>Wires the button that opens and folds the market (editor setup).</summary>
+        public void AssignToggle(Button button, TMP_Text label, Vector2 open, Vector2 folded)
+        {
+            toggle = button;
+            toggleLabel = label;
+            openPosition = open;
+            foldedPosition = folded;
+        }
+
         /// <summary>Wires the parts of the layout (editor setup).</summary>
         public void Assign(RectTransform attack, RectTransform defense, TMP_Text attackTitle, TMP_Text defenseTitle, TMP_Text attackDeckLabel, TMP_Text defenseDeckLabel, float height)
         {
@@ -93,6 +153,26 @@ namespace Vortex.Client.Presentation
             defenseLabel = defenseTitle;
             attackDeck = attackDeckLabel;
             defenseDeck = defenseDeckLabel;
+        }
+
+        private void SetOpen(bool open, bool instant = false)
+        {
+            Open = open;
+            toggleLabel.text = _context!.Texts.Get(open ? TextKeys.ButtonMarketFold : TextKeys.ButtonMarketOpen);
+            if (instant)
+            {
+                _unfolded = open ? 1f : 0f;
+                Place();
+            }
+        }
+
+        // Between the folded strip (0) and the open market (1), smoothed at both ends.
+        private void Place()
+        {
+            float t = Mathf.SmoothStep(0f, 1f, _unfolded);
+            var shape = (RectTransform)transform;
+            shape.anchoredPosition = Vector2.Lerp(foldedPosition, openPosition, t);
+            shape.localScale = Vector3.one * Mathf.Lerp(foldedScale, 1f, t);
         }
 
         private static int Count(List<CardHolder> row)

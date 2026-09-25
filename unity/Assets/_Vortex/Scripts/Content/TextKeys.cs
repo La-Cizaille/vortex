@@ -149,6 +149,12 @@ namespace Vortex.Client.Content
         /// <summary>Button leaving the market phase.</summary>
         public const string ButtonEndMarket = "button.end-market";
 
+        /// <summary>Button opening the folded market (ARB-81).</summary>
+        public const string ButtonMarketOpen = "button.market-open";
+
+        /// <summary>Button folding the open market (ARB-81).</summary>
+        public const string ButtonMarketFold = "button.market-fold";
+
         /// <summary>Button recycling a market.</summary>
         public const string ButtonRecycle = "button.recycle";
 
@@ -433,6 +439,8 @@ namespace Vortex.Client.Content
             Add(OptionMarket, "marché");
             Add(ButtonEndTurn, "Fin de tour");
             Add(ButtonEndMarket, "Passer le marché");
+            Add(ButtonMarketOpen, "Marché");
+            Add(ButtonMarketFold, "Réduire le marché");
             Add(ButtonRecycle, "Recycler");
             Add(ButtonCombo, "Combo");
             Add(HelpOvercharge, "Surcharge : touchez le jeton pour l'armer. La prochaine attaque ou le prochain reparamétrage la dépense (un dé de plus). Touchez de nouveau pour la désarmer.");
