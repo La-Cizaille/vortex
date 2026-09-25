@@ -153,7 +153,8 @@ namespace Vortex.Tests.EditMode
             opponent.OnPointerEnter(null!);
             Assert.That(opponent.transform.localScale.x, Is.GreaterThan(1f));
             opponent.OnPointerExit(null!);
-            Assert.That(opponent.transform.localScale.x, Is.EqualTo(1f));
+            opponent.Tick(0f);
+            Assert.That(opponent.transform.localScale.x, Is.EqualTo(1f), "Closed at the next frame.");
         }
 
         // The bubble lies inside the layer it is drawn on (the screen).

@@ -4,6 +4,7 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Non publié]
 ### Ajouté
+- **Deuxième playtest** (ARB-74, ARB-75) : les actions d'équipage forment un arc centré sur le vaisseau, attaque à gauche (Attaque, Surcharge) et bouclier à droite (Reparamétrage, Posture, Sabotage), disposé par `ActionArc` dont les réglages (centre, rayon, ouverture, écart entre les côtés) sont dans l'inspecteur ; le journal garde 300 lignes et défile, en ne suivant les nouvelles lignes que si l'on est en bas. Tests `PlaytestTwoTests`.
 - **Détails de la table** (INTERFACE §3.1, §3.3, §3.8) : le bandeau agrandit l'événement de la manche au survol ou à l'appui long (`CardZoom.ShowFace`) ; en glissant une carte du marché, la carte que l'achat remplacerait prend un cadre rouge (`CardDisplay.Mark`, couleur `Loss` du thème) ; avec l'option « fantômes », l'épave d'un éliminé l'indique. Tests `TableDetailsTests`.
 - **Raisons des refus** (INTERFACE §1, §3.4, §3.5). `GameEngine.Explain` dit pourquoi un coup est refusé, sans le jouer ; quand une carte ou un statut l'interdit, l'erreur le nomme (`CommandError.SourceKind`, `SourceId`). Une action éteinte l'explique dans son aide ; pendant la visée, un adversaire protégé donne la raison et ce qui le protège ; une carte qu'on ne peut pas acheter ou utiliser maintenant le dit quand on essaie de la glisser. Tests `ExplainTests` et `ReasonsTests`.
 - **M4.7, vérification** : `MilestoneTests` joue une partie complète à 2, 3, 4 et 5 joueurs, une personne aux gestes contre des bots, jusqu'à la fenêtre de fin de partie ; toute erreur écrite dans la console fait échouer le test. Une image déposée dans `Art/Cards/` apparaît sur la carte 3D de la galerie, sans aucun code.
@@ -57,6 +58,7 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 - Le rapport d'équilibrage identifie le contenu par l'empreinte des quatre fichiers de contenu, et non plus du seul `cards.json`. L'option `--samples` est remplacée par `--bot`.
 
 ### Corrigé
+- La carte agrandie clignotait quand on pointait une carte d'un adversaire : en passant de sa fiche à sa carte (un objet 3D hors de la fiche), la fiche se refermait, la carte s'éloignait du pointeur, et la fiche se rouvrait. La fiche reste ouverte tant qu'elle ou l'une de ses cartes est pointée, et ne se referme qu'à l'image suivante.
 - Recommencer une partie laissait les cartes 3D des panneaux de sièges dans la scène : `SeatDisplay.Release` les détruit désormais avant chaque nouvelle disposition (test `Restarting_leaves_no_card_behind`).
 
 ### Sécurité

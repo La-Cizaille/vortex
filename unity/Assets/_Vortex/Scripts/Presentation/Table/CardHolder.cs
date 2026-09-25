@@ -42,6 +42,9 @@ namespace Vortex.Client.Presentation
         /// <summary>Learns when the card shown is taken (true) and put down (false).</summary>
         public Action<CardView, bool>? OnHolding { get; set; }
 
+        /// <summary>Learns when the card is pointed at (true) and left (false).</summary>
+        public Action<bool>? OnPointed { get; set; }
+
         /// <summary>The card shown, or null.</summary>
         public CardDisplay? Card => _card != null && _card.gameObject.activeSelf ? _card : null;
 
@@ -114,7 +117,9 @@ namespace Vortex.Client.Presentation
                 _card.gameObject.AddComponent<CardAnchor>().Follow(_slot, context.View, context.CardDepth, _clip);
                 if (context.Zoom != null)
                 {
-                    _card.gameObject.AddComponent<CardHover>().Bind(context.Zoom);
+                    CardHover hover = _card.gameObject.AddComponent<CardHover>();
+                    hover.Bind(context.Zoom);
+                    hover.Pointed = pointed => OnPointed?.Invoke(pointed);
                 }
 
                 if (OnDrop != null)
