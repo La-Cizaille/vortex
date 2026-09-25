@@ -15,6 +15,7 @@ namespace Vortex.Client.Presentation
     public sealed class TableContext
     {
         private readonly Dictionary<string, CardFace> _faces;
+        private readonly Dictionary<TechColor, CardFace> _technologies;
 
         /// <summary>Creates the context of a game.</summary>
         public TableContext(ThemeSettings theme, CardArtCatalog art, TextTable texts, GameData data, CardDisplay cardPrefab, Transform cardRoot, Camera view, float cardDepth, CardZoom? zoom = null)
@@ -36,6 +37,7 @@ namespace Vortex.Client.Presentation
                 .Concat(data.Events.Select(e => CardFace.Of(e, texts)))
                 .Concat(data.Technologies.Select(t => CardFace.Of(t, texts)))
                 .ToDictionary(f => f.Id, StringComparer.Ordinal);
+            _technologies = data.Technologies.GroupBy(t => t.Color).ToDictionary(g => g.Key, g => _faces[g.First().Id]);
         }
 
         /// <summary>Colours and fonts.</summary>
@@ -61,6 +63,9 @@ namespace Vortex.Client.Presentation
 
         /// <summary>Distance of the cards from the camera: nearer than the interface plane, so they show in front of it.</summary>
         public float CardDepth { get; }
+
+        /// <summary>The technology of a colour (the one a combo of that colour gives), or null for none.</summary>
+        public CardFace? Technology(TechColor color) => _technologies.TryGetValue(color, out CardFace face) ? face : null;
 
         /// <summary>The face of a content id (modifier, event or technology).</summary>
         public CardFace Face(string id) =>
