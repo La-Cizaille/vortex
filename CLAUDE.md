@@ -13,7 +13,7 @@ The user is a security professional: security, optimisation, and clean documenta
 - Card data: `core/Runtime/Data/{cards,events,technologies}.json` is the **source of truth** (ADR-0008): printed text + ruling per card. `docs/CARDS.md` is generated from it (never hand-edit).
 - Decisions: `docs/adr/`. Add an ADR for any structural decision.
 - Art: `docs/ASSETS.md` lists every visual to create with its format (scale, orientation, budgets, names); pipeline in ADR-0016.
-- Client interface: `docs/INTERFACE.md` (screen layout, gestures, menus; designer rulings ARB-59 to ARB-66). The interface holds no rules: legal targets come from the session's legal commands, previews are computed by the engine (ADR-0015).
+- Client interface: `docs/INTERFACE.md` (screen layout, gestures, menus, decisions on the table; designer rulings ARB-59 to ARB-75 and ARB-80 to ARB-82). The interface holds no rules: legal targets come from the session's legal commands, previews are computed by the engine (ADR-0015).
 - Rulings not covered by RULES.md: **ask the user**, do not guess; then record the answer in the card's `ruling` (card-specific) or RULES.md part A/B (generic), **and** log it in `docs/ARBITRAGES.md` (new `ARB-xx` entry: question, decision, reason, where applied; entries are never rewritten). Unanswered questions live in RULES.md "Questions ouvertes".
 - Rule changes under study: generic `config.json` options whose default keeps the current rule (ADR-0011); tried through variant files, never by editing content.
 
