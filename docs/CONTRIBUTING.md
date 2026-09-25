@@ -134,7 +134,8 @@ La chaîne de production est décrite dans l'ADR-0016, les visuels à créer et 
 
 **Travailler avec l'assistant**
 1. Ouvrir Blender, appuyer sur `N` dans la vue 3D, ouvrir l'onglet **MCP for Blender** et cliquer sur **Start MCP Server**. L'extension écoute alors sur 127.0.0.1:9876.
-2. Démarrer Claude Code à la racine du dépôt, puis approuver le serveur `blender` de `.mcp.json`. Il tourne en **mode sûr** (`BLENDER_MCP_SAFE_MODE=1`) : chaque script est contrôlé avant de s'exécuter.
+2. Démarrer Claude Code à la racine du dépôt, puis approuver le serveur `blender` de `.mcp.json`. Par défaut, il tourne en **mode sûr** (`BLENDER_MCP_SAFE_MODE=1`) : chaque script est contrôlé avant de s'exécuter. Ce contrôle refuse aussi des scripts inoffensifs (lire un script depuis un fichier, passer une fonction en paramètre) : chaque essai doit alors être renvoyé en entier.
+   Pour le lever sur son poste (ARB-83, risque décrit dans [SECURITY.md](SECURITY.md) §4) : `setx BLENDER_MCP_SAFE_MODE 0` dans un terminal, puis quitter et relancer Claude Code, qui ne lit son environnement qu'au démarrage. Pour revenir au mode sûr : `reg delete HKCU\Environment /v BLENDER_MCP_SAFE_MODE /f`, puis relancer Claude Code.
 3. Arrêter le serveur de l'extension à la fin de l'atelier : il n'a pas d'authentification.
 
 **Du modèle au jeu**
