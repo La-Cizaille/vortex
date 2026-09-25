@@ -83,6 +83,10 @@ namespace Vortex.Editor
 
             SeatRow[] rows = Enumerable.Range(1, Seats).Select(n => BuildSeatRow(window.transform, n)).ToArray();
 
+            // Time of a turn (ARB-80), not timed by default.
+            HorizontalLayoutGroup timing = MenuBuilder.Row(window.transform, "Temps de tour", 60f);
+            Button turnTime = MenuBuilder.Button(timing.transform, "Temps de tour", 56f, 420f);
+
             HorizontalLayoutGroup actions = MenuBuilder.Row(window.transform, "Actions", 72f);
             actions.padding = new RectOffset(0, 0, 12, 0);
             Button back = MenuBuilder.Button(actions.transform, "Retour", 64f, 220f);
@@ -105,6 +109,7 @@ namespace Vortex.Editor
 
             LocalGameMenu menu = window.gameObject.AddComponent<LocalGameMenu>();
             menu.Assign(title, fewer, more, players, rows, back, launch, development, devMenu);
+            menu.AssignTurnTime(turnTime);
             window.gameObject.SetActive(false);
             return menu;
         }
