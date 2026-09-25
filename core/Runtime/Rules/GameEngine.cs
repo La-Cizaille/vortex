@@ -23,8 +23,10 @@ namespace Vortex.Core.Rules
     /// </remarks>
     public sealed partial class GameEngine
     {
+        /// <summary>Longest player name accepted (printable characters only).</summary>
+        public const int MaxNameLength = 24;
+
         private const ulong RngStream = 0xDA3E39CB94B95BDBUL;
-        private const int MaxNameLength = 24;
         private readonly IEffectCatalog _catalog;
 
         /// <summary>Creates an engine for validated content and configuration.</summary>

@@ -365,3 +365,85 @@ MonoBehaviour:
     Text: "{0}\_%"
   - Key: preview.decimal
     Text: ','
+  - Key: menu.title
+    Text: VORTEX
+  - Key: menu.local-game
+    Text: Partie locale
+  - Key: menu.find-game
+    Text: "Trouver une partie (bient\xF4t)"
+  - Key: menu.options
+    Text: Options
+  - Key: menu.social
+    Text: "Social (bient\xF4t)"
+  - Key: menu.quit
+    Text: Quitter
+  - Key: menu.back
+    Text: Retour
+  - Key: local.title
+    Text: Partie locale
+  - Key: local.players
+    Text: 'Joueurs : {0}'
+  - Key: local.launch
+    Text: Lancer la partie
+  - Key: local.development
+    Text: "D\xE9veloppement"
+  - Key: local.seat
+    Text: "Si\xE8ge {0}"
+  - Key: local.human
+    Text: Humain
+  - Key: local.bot
+    Text: Bot
+  - Key: local.name
+    Text: Nom
+  - Key: dev.title
+    Text: "D\xE9veloppement (absent des builds publi\xE9s)"
+  - Key: dev.posture
+    Text: "Posture d\xE9fensive : {0}"
+  - Key: dev.bounty
+    Text: 'Prime sur le leader : {0}'
+  - Key: dev.ghosts
+    Text: "Les \xE9limin\xE9s choisissent l'\xE9v\xE9nement : {0}"
+  - Key: dev.seed
+    Text: 'Graine (vide : au hasard)'
+  - Key: dev.off
+    Text: non
+  - Key: dev.bonus
+    Text: +{0}
+  - Key: common.yes
+    Text: oui
+  - Key: common.no
+    Text: non
+  - Key: options.title
+    Text: Options
+  - Key: options.speed
+    Text: "Vitesse des animations : \xD7{0}"
+  - Key: options.full-screen
+    Text: "Plein \xE9cran : {0}"
+  - Key: options.resolution
+    Text: "R\xE9solution : {0} \xD7 {1}"
+  - Key: pause.button
+    Text: Pause
+  - Key: pause.title
+    Text: Pause
+  - Key: pause.resume
+    Text: Reprendre
+  - Key: pause.restart
+    Text: Recommencer
+  - Key: pause.options
+    Text: Options
+  - Key: pause.quit
+    Text: Quitter la partie
+  - Key: game-over.replay
+    Text: Rejouer
+  - Key: game-over.menu
+    Text: Menu
+  - Key: turn.of
+    Text: Tour de {0}
+  - Key: bot.level.Random
+    Text: "Al\xE9atoire"
+  - Key: bot.level.Naive
+    Text: "Na\xEFf"
+  - Key: bot.level.Normal
+    Text: Normal
+  - Key: bot.level.Strong
+    Text: Fort

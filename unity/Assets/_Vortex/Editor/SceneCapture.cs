@@ -5,6 +5,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 using Vortex.Client.Gallery;
+using Vortex.Client.Menus;
 using Vortex.Client.Presentation;
 using Vortex.Core.Commands;
 using Object = UnityEngine.Object;
@@ -25,7 +26,8 @@ namespace Vortex.Editor
         /// Bots play the game scene until the requested round, then the table is rendered. With VORTEX_HUMAN=1, the first
         /// seat is a person's: the table is rendered on their turn, with the controls offered, after the market or, with
         /// VORTEX_PHASE=market, during it. VORTEX_PHASE=aim shows an attack being aimed at the first opponent it may target,
-        /// with the engine's preview next to it (ADR-0018).
+        /// with the engine's preview next to it (ADR-0018). VORTEX_PHASE=pause shows the pause menu, and VORTEX_PHASE=end
+        /// plays the game to its end and shows the end of game panel.
         /// </summary>
         public static void Game()
         {
@@ -34,15 +36,16 @@ namespace Vortex.Editor
             bool human = Environment.GetEnvironmentVariable("VORTEX_HUMAN") == "1";
             string? phase = Environment.GetEnvironmentVariable("VORTEX_PHASE");
             bool atMarket = phase == "market";
+            bool toTheEnd = phase == "end";
             EditorSceneManager.OpenScene(GameScene.ScenePath, OpenSceneMode.Single);
             (Camera camera, RenderTexture target) = Prepare();
             GameDirector director = Object.FindAnyObjectByType<GameDirector>();
             director.HumanFirstSeat = human;
             director.Begin();
-            for (int frame = 0; frame < 50000 && director.Model!.Outcome == null; frame++)
+            for (int frame = 0; frame < 50000 && (toTheEnd ? !director.GameOver.Shown : director.Model!.Outcome == null); frame++)
             {
                 director.Advance(0.2f);
-                bool reached = director.Model.Round >= round;
+                bool reached = !toTheEnd && director.Model!.Round >= round;
                 if (!human && reached && director.IsPlaying)
                 {
                     break;
@@ -77,11 +80,45 @@ namespace Vortex.Editor
                 tray.Settle();
             }
 
+            if (phase == "pause")
+            {
+                director.Pause.Open();
+            }
+
             if (human && phase == "aim")
             {
                 // The layers must stand where they are drawn before the pointer positions are read.
                 Settle(camera);
                 AimFirstAttack(director);
+            }
+
+            Render(camera, target, output);
+        }
+
+        /// <summary>
+        /// Renders the menu scene: the home screen, or with VORTEX_PHASE the local game menu (local), its development menu
+        /// (dev) or the options (options).
+        /// </summary>
+        public static void Menu()
+        {
+            string output = Output();
+            string? phase = Environment.GetEnvironmentVariable("VORTEX_PHASE");
+            EditorSceneManager.OpenScene(MenuScene.ScenePath, OpenSceneMode.Single);
+            (Camera camera, RenderTexture target) = Prepare();
+            MainMenu menu = Object.FindAnyObjectByType<MainMenu>();
+            menu.Setup(_ => { });
+            if (phase == "local" || phase == "dev")
+            {
+                menu.ShowLocalGame();
+            }
+
+            if (phase == "dev")
+            {
+                menu.LocalGame.Development!.gameObject.SetActive(true);
+            }
+            else if (phase == "options")
+            {
+                menu.ShowOptions();
             }
 
             Render(camera, target, output);

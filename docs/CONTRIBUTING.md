@@ -81,6 +81,8 @@ Le code ne référence **jamais** un asset directement : tout passe par les cata
 | Le vaisseau d'un joueur éliminé, le cadre du tour, le jeton de surcharge | `Theme/ThemeSettings` | Couleurs *Wreck*, *Highlight* et *Overcharge*. |
 | Les dés | `Presentation/Feedback/Dice`, `Prefabs/DiceTray.prefab` | Le retour visuel `Dice` règle la durée du lancer, le temps d'affichage du résultat et l'endroit où il apparaît ; le prefab règle l'apparence des dés. Les faces qui défilent pendant le lancer sont décoratives : le résultat vient toujours du moteur. |
 | La taille de la carte agrandie | Objet `Zoom` de la scène `Game` | Réglages *Screen Height*, *Depth* et *Margin* du composant `CardZoom`. |
+| Les menus (accueil, partie locale, développement, options) | `Scenes/Menu.unity` | Les fenêtres et les boutons sont des objets de la scène : les déplacer ou les redimensionner. Le code ne fait que les remplir (textes de `Content/TextTable`) et les brancher. |
+| Les fenêtres de la partie (pause, fin de partie, « Tour de X ») | Scène `Game`, calque `Premier plan` | Même principe ; la durée du bandeau « Tour de X » se règle dans son composant `TurnAnnouncement`. |
 | La réaction à un événement du jeu (attaque, soin, élimination…) | `Presentation/Feedback/DefaultFeedbackProfile` | Le profil dit quoi jouer pour chaque type d'événement (ADR-0014). On crée un retour visuel (*Create → Vortex → Retours visuels*), par exemple un `PrefabFeedback` qui fait apparaître des particules ou une séquence Timeline sur le vaisseau visé, puis on le branche dans le profil. |
 
 **Scène Galerie** (`Scenes/Gallery.unity`) : en mode Play, elle montre toutes les cartes, tous les événements, toutes les technologies et le vaisseau de chaque siège, avec le thème et les illustrations du moment. Elle sert à régler l'apparence sans jouer une partie ; elle ne fait pas partie du jeu livré.
@@ -113,7 +115,7 @@ Ces scripts lancent Unity en mode batch : l'éditeur doit être **fermé** (ils 
 |---|---|
 | `tools/Test-Unity.ps1 [-Platform PlayMode]` | Lance les tests Unity et affiche le résumé. |
 | `tools/Update-UnityAssets.ps1` | Crée les assets de base qui manquent (thème, catalogues, prefabs, scènes, textes) et complète la table des textes. Ne remplace jamais un asset existant : pour en régénérer un, le supprimer d'abord. |
-| `tools/Capture-Unity.ps1 -Scene Game\|Gallery -Out <fichier.png> [-Round N] [-Human [-Phase Actions\|Market\|Aim]]` | Enregistre une image 1920×1080 de la table (des bots jouent jusqu'à la manche demandée) ou de la galerie. Avec `-Human`, le premier siège est une personne : l'image montre son tour, après le marché, pendant (`-Phase Market`), ou pendant la visée d'une attaque avec son aperçu (`-Phase Aim`). Pratique pour vérifier une disposition, une illustration ou un modèle en contexte. |
+| `tools/Capture-Unity.ps1 -Scene Game\|Gallery\|Menu -Out <fichier.png> [-Round N] [-Human] [-Phase …]` | Enregistre une image 1920×1080 de la table (des bots jouent jusqu'à la manche demandée), de la galerie ou du menu. Table : avec `-Human`, le premier siège est une personne, et l'image montre son tour après le marché, pendant (`-Phase Market`), ou pendant la visée d'une attaque avec son aperçu (`-Phase Aim`) ; `-Phase Pause` montre le menu de pause, `-Phase End` la fin de partie. Menu : l'accueil, ou `-Phase Local`, `Dev`, `Options`. Pratique pour vérifier une disposition, une illustration ou un modèle en contexte. |
 
 Chaque commande se lance avec `powershell -ExecutionPolicy Bypass -File <script>`.
 

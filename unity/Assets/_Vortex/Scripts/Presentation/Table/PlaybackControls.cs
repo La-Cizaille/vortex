@@ -51,6 +51,9 @@ namespace Vortex.Client.Presentation
         /// <summary>Plays every queued event at once.</summary>
         public void Skip() => _player?.SkipAll();
 
+        /// <summary>Shows the speed again, after it was changed elsewhere (options).</summary>
+        public void Refresh() => ShowSpeed();
+
         /// <summary>Wires the parts of the layout (editor setup).</summary>
         public void Assign(Button speedButton, TMP_Text speedText, Button skipButton, TMP_Text skipText)
         {

@@ -7,6 +7,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 using Vortex.Client.Content;
+using Vortex.Client.Menus;
 using Vortex.Client.Presentation;
 using Vortex.Client.Theme;
 using Vortex.Core.Commands;
@@ -33,7 +34,7 @@ namespace Vortex.Editor
         private static readonly Color SeatBackground = new Color(0.05f, 0.06f, 0.11f, 1f);
         private static readonly Color Muted = new Color32(150, 156, 175, 255);
 
-        /// <summary>Creates the opponent panel and the scene if they do not exist, and lists the scene in the build.</summary>
+        /// <summary>Creates the opponent panel and the scene if they do not exist (<see cref="BuildSceneList"/> lists it in the build).</summary>
         public static void Ensure()
         {
             EnsureSeatPanel();
@@ -42,26 +43,6 @@ namespace Vortex.Editor
                 SceneFiles.Create(ScenePath, Build);
             }
 
-            if (File.Exists(ScenePath))
-            {
-                ListInBuild();
-            }
-        }
-
-        // The game scene first in the build, under its current id (a regenerated scene gets a new one); scenes that no
-        // longer exist are dropped from the list.
-        private static void ListInBuild()
-        {
-            EditorBuildSettingsScene[] current = EditorBuildSettings.scenes;
-            EditorBuildSettingsScene[] wanted = new[] { new EditorBuildSettingsScene(ScenePath, true) }
-                .Concat(current.Where(s => s.path != ScenePath && File.Exists(s.path)))
-                .ToArray();
-            bool same = wanted.Length == current.Length
-                && wanted.Zip(current, (a, b) => a.path == b.path && a.guid == b.guid && a.enabled == b.enabled).All(equal => equal);
-            if (!same)
-            {
-                EditorBuildSettings.scenes = wanted;
-            }
         }
 
         private static void EnsureSeatPanel()
@@ -193,6 +174,65 @@ namespace Vortex.Editor
 
             CardZoom zoom = new GameObject("Zoom", typeof(CardZoom)).GetComponent<CardZoom>();
             director.AssignCards(cards, zoom, foreground);
+
+            // Menus of the game (INTERFACE.md 4 and 5), above everything else: the turn banner, the end of the game, then
+            // the pause menu and its options.
+            TurnAnnouncement announcement = BuildAnnouncement(front.transform);
+            GameOverPanel gameOver = BuildGameOver(front.transform);
+            PauseMenu pause = BuildPause(ui, front.transform);
+            director.AssignMenus(pause, gameOver, announcement);
+        }
+
+        // "Tour de X", in the upper middle of the screen; it never takes the pointer.
+        private static TurnAnnouncement BuildAnnouncement(Transform parent)
+        {
+            Image box = UiBuilder.Box(UiBuilder.Fixed<Image>(parent, "Tour de", new Vector2(0.5f, 0.5f), new Vector2(0f, 170f), new Vector2(900f, 120f)), new Color(0.02f, 0.03f, 0.07f, 0.9f));
+            CanvasGroup group = box.gameObject.AddComponent<CanvasGroup>();
+            group.blocksRaycasts = false;
+            group.interactable = false;
+            TMP_Text text = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(box.transform, "Texte", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), 48f, FontStyles.Bold, TextAlignmentOptions.Center);
+            text.color = new Color32(255, 214, 102, 255);
+            TurnAnnouncement announcement = box.gameObject.AddComponent<TurnAnnouncement>();
+            announcement.Assign(group, text);
+            box.gameObject.SetActive(false);
+            return announcement;
+        }
+
+        // The end of the game: the winner and how, "Rejouer" and "Menu", over a light veil.
+        private static GameOverPanel BuildGameOver(Transform parent)
+        {
+            Image veil = MenuBuilder.Veil(parent, "Fin de partie");
+            veil.color = new Color(0f, 0f, 0f, 0.35f);
+            Image window = MenuBuilder.Window(veil.transform, "Fenêtre", new Vector2(0.5f, 0.5f), new Vector2(0f, -40f), 760f);
+            TMP_Text outcome = MenuBuilder.Line(window.transform, "Résultat", 40f);
+            outcome.fontStyle = FontStyles.Bold;
+            outcome.color = new Color32(255, 214, 102, 255);
+            HorizontalLayoutGroup buttons = MenuBuilder.Row(window.transform, "Boutons", 72f);
+            Button replay = MenuBuilder.Button(buttons.transform, "Rejouer", 64f, 300f, 28f);
+            Button menu = MenuBuilder.Button(buttons.transform, "Menu", 64f, 300f, 28f);
+            GameOverPanel panel = veil.gameObject.AddComponent<GameOverPanel>();
+            panel.Assign(veil.gameObject, outcome, replay, menu);
+            veil.gameObject.SetActive(false);
+            return panel;
+        }
+
+        // The pause button in the top right corner of the table, and the pause menu with its options over a veil.
+        private static PauseMenu BuildPause(Transform table, Transform front)
+        {
+            (Button open, TMP_Text openLabel) = UiBuilder.Button(table, "Pause", new Vector2(1f, 1f), new Vector2(-20f, -20f), new Vector2(160f, 56f));
+            openLabel.fontSize = 22f;
+            Image veil = MenuBuilder.Veil(front, "Pause");
+            Image window = MenuBuilder.Window(veil.transform, "Fenêtre", new Vector2(0.5f, 0.5f), Vector2.zero, 560f);
+            TMP_Text title = MenuBuilder.Title(window.transform, 40f);
+            Button resume = MenuBuilder.Button(window.transform, "Reprendre", 68f);
+            Button restart = MenuBuilder.Button(window.transform, "Recommencer", 68f);
+            Button options = MenuBuilder.Button(window.transform, "Options", 68f);
+            Button quit = MenuBuilder.Button(window.transform, "Quitter", 68f);
+            OptionsMenu optionsMenu = MenuBuilder.Options(veil.transform);
+            PauseMenu pause = veil.gameObject.AddComponent<PauseMenu>();
+            pause.Assign(open, veil.gameObject, window.gameObject, title, resume, restart, options, quit, optionsMenu);
+            veil.gameObject.SetActive(false);
+            return pause;
         }
 
         // A window of choices: a title and one button per choice, three per row; it grows upwards from its anchor. The

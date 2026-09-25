@@ -53,6 +53,7 @@ namespace Vortex.Client.Presentation
         public void Bind(TableContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            Release();
             _attack = new CardHolder(attackSlot);
             _defense = new CardHolder(defenseSlot);
             TMP_Text leaderLabel = leaderMarker.GetComponentInChildren<TMP_Text>(true);
@@ -60,6 +61,15 @@ namespace Vortex.Client.Presentation
             {
                 leaderLabel.text = context.Texts.Get(TextKeys.SeatLeader);
             }
+        }
+
+        /// <summary>Destroys the 3D cards shown (before the display is bound again or goes away): none is left behind.</summary>
+        public void Release()
+        {
+            _attack?.Release();
+            _defense?.Release();
+            _attack = null;
+            _defense = null;
         }
 
         /// <summary>The overcharge token (the player's own is a button that arms it).</summary>

@@ -22,5 +22,6 @@ Un ADR consigne **une** décision structurante : son contexte, les options envis
 | [0016](0016-modeles-3d-blender.md) | Modèles 3D : Blender, export FBX par script, sources versionnées | Accepté |
 | [0017](0017-cartes-3d.md) | Les cartes sont des objets 3D qui suivent la disposition de l'interface | Accepté |
 | [0018](0018-apercus-par-simulation.md) | Les aperçus sont calculés en jouant le coup sur des parties supposées | Accepté |
+| [0019](0019-menus-et-lancement-de-partie.md) | Menus dans une scène à part, partie transmise par un objet de lancement | Accepté |
 
 Modèle : copier un ADR existant et garder les sections *Statut*, *Contexte*, *Options*, *Décision* et *Conséquences*.

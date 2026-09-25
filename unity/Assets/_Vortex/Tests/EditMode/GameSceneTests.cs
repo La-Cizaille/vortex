@@ -116,10 +116,10 @@ namespace Vortex.Tests.EditMode
         }
 
         [Test]
-        public void The_game_scene_is_in_the_build_and_the_gallery_is_not()
+        public void The_game_opens_on_the_menu_and_the_gallery_is_not_in_the_build()
         {
             string[] scenes = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray();
-            Assert.That(scenes, Does.Contain(GameScene.ScenePath));
+            Assert.That(scenes.Take(2), Is.EqualTo(new[] { MenuScene.ScenePath, GameScene.ScenePath }), "The menu first: the game opens on it.");
             Assert.That(scenes, Does.Not.Contain(GalleryScene.ScenePath), "The gallery is a design tool, not part of the game.");
             foreach (EditorBuildSettingsScene listed in EditorBuildSettings.scenes)
             {

@@ -6,7 +6,10 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/_Vortex/Scenes/Menu.unity
+    guid: 67625973f5657964b9e503efb25c9447
+  - enabled: 1
     path: Assets/_Vortex/Scenes/Game.unity
-    guid: 47f57b41e6d318c46ad220b5672e04b8
+    guid: 8a8462242c68b9a469db8022dd7b125e
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

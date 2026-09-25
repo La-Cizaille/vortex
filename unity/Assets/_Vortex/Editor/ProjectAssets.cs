@@ -43,6 +43,8 @@ namespace Vortex.Editor
             EnsureDice();
             GalleryScene.Ensure();
             GameScene.Ensure();
+            MenuScene.Ensure();
+            BuildSceneList.Update();
             AssetDatabase.SaveAssets();
         }
 
