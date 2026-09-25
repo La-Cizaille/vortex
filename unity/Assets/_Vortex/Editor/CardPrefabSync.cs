@@ -4,6 +4,7 @@ using TMPro;
 using UnityEditor;
 using UnityEngine;
 using Vortex.Client.Presentation;
+using Vortex.Client.Theme;
 
 namespace Vortex.Editor
 {
@@ -34,6 +35,7 @@ namespace Vortex.Editor
         public const string GemMaterialPath = "Assets/_Vortex/Theme/Materials/CardGem.mat";
 
         private const string Visual = "Visuel";
+        private const string IconPart = "Pictogramme";
         private const string TrimName = "Lisere";
         private const string GemName = "Gemme";
         private const float Epsilon = 0.0005f;
@@ -187,8 +189,16 @@ namespace Vortex.Editor
                     }
                 }
 
-                return true;
+                Transform? icon = visual.Find(IconPart);
+                return icon != null && icon.GetComponent<SpriteRenderer>() != null && Near(icon.localPosition, IconPosition)
+                    && Mathf.Abs(serialized.FindProperty("badgeIconSize").floatValue - IconSize) < Epsilon
+                    && serialized.FindProperty("icons").objectReferenceValue == AssetDatabase.LoadAssetAtPath<IconCatalog>(ThemeAssets.IconsPath);
             }
+
+            // The slot icon sits in the disc, just in front of the short text it replaces, and fills most of the disc.
+            private Vector3 IconPosition => Place("Emplacement", _zones["Emplacement"].Position) + new Vector3(0f, 0f, -0.0002f);
+
+            private float IconSize => Mathf.Min(_zones["Emplacement"].Size.x, _zones["Emplacement"].Size.y * 1.4f);
 
             public void Apply(Transform root)
             {
@@ -234,6 +244,18 @@ namespace Vortex.Editor
                         shape.sizeDelta = _zones[part].Size;
                     }
                 }
+
+                // The slot icon (ARB-86): a sprite tinted by the card, hidden until a card shows one.
+                Transform? icon = visual.Find(IconPart);
+                if (icon == null)
+                {
+                    icon = new GameObject(IconPart, typeof(SpriteRenderer)).transform;
+                    icon.SetParent(visual, false);
+                    icon.gameObject.SetActive(false);
+                }
+
+                icon.localPosition = IconPosition;
+                root.GetComponent<CardDisplay>().AssignBadgeIcon(icon.GetComponent<SpriteRenderer>(), IconSize, AssetDatabase.LoadAssetAtPath<IconCatalog>(ThemeAssets.IconsPath));
 
                 Transform torments = visual.Find("Tourments");
                 root.GetComponent<CardDisplay>().Assign(

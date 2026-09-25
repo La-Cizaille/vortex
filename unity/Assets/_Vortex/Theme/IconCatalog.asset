@@ -12,4 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3894cc3f283542b45b81a89a2cf69563, type: 3}
   m_Name: IconCatalog
   m_EditorClassIdentifier: Vortex.Client::Vortex.Client.Theme.IconCatalog
-  entries: []
+  entries:
+  - Name: Slot_ATK
+    Sprite: {fileID: 21300000, guid: 694623342bc36e343ac6e4fd771fc2f1, type: 3}
+  - Name: Slot_DEF
+    Sprite: {fileID: 21300000, guid: 07349fcf7afd0cb42913ea2e0fef6d80, type: 3}
+  - Name: Slot_EVT
+    Sprite: {fileID: 21300000, guid: da464c38833b6bc4e9e540d5c5763756, type: 3}
+  - Name: Slot_TECH
+    Sprite: {fileID: 21300000, guid: a646a9d0b71f0ba408c703c61a86201b, type: 3}

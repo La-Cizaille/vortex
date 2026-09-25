@@ -31,6 +31,11 @@ namespace Vortex.Client.Presentation
         [SerializeField] private Renderer art = null!;
         [SerializeField] private TMP_Text title = null!;
         [SerializeField] private TMP_Text? badge;
+        [Tooltip("Icône de l'emplacement dans le disque ; sans icône dans le catalogue, le disque montre le texte court.")]
+        [SerializeField] private SpriteRenderer? badgeIcon;
+        [Tooltip("Côté de l'icône de l'emplacement, en unités de la scène.")]
+        [SerializeField, Min(0f)] private float badgeIconSize = 0.12f;
+        [SerializeField] private IconCatalog? icons;
         [SerializeField] private TMP_Text caption = null!;
         [SerializeField] private TMP_Text body = null!;
         [SerializeField] private TMP_Text id = null!;
@@ -65,6 +70,9 @@ namespace Vortex.Client.Presentation
         /// <summary>True for the modelled body, whose name and text lie on light panels.</summary>
         public bool Modelled => trimSlot >= 0;
 
+        /// <summary>True while the disc shows the slot's icon rather than its short text.</summary>
+        public bool ShowsBadgeIcon => badgeIcon != null && badgeIcon.gameObject.activeSelf;
+
         /// <summary>Colour of the trims (or of the whole box): the technology colour, or the colour marking the card.</summary>
         public Color TrimColor { get; private set; }
 
@@ -93,6 +101,8 @@ namespace Vortex.Client.Presentation
             {
                 Label(badge, face.Badge, theme.TitleFont, theme.Text, richText: false);
             }
+
+            ShowBadgeIcon(face.BadgeIcon, theme);
 
             Label(caption, badge != null ? face.Usage : face.Caption, theme.BodyFont, Modelled ? theme.Text : theme.MutedText, richText: false);
             Label(id, face.Id, theme.BodyFont, theme.MutedText, richText: false);
@@ -169,6 +179,36 @@ namespace Vortex.Client.Presentation
             visual = visualRoot;
             pointerArea = area;
             size = cardSize;
+        }
+
+        /// <summary>Wires the slot icon of the disc and the catalog it comes from (editor setup).</summary>
+        public void AssignBadgeIcon(SpriteRenderer? icon, float iconSize, IconCatalog? catalog)
+        {
+            badgeIcon = icon;
+            badgeIconSize = iconSize;
+            icons = catalog;
+        }
+
+        // The icon, tinted like the text, at the same size whatever the image's resolution; the text hides behind it.
+        private void ShowBadgeIcon(string name, ThemeSettings theme)
+        {
+            Sprite? sprite = icons != null && name.Length > 0 ? icons.Find(name) : null;
+            if (badgeIcon != null)
+            {
+                badgeIcon.gameObject.SetActive(sprite != null);
+                if (sprite != null)
+                {
+                    badgeIcon.sprite = sprite;
+                    badgeIcon.color = theme.Text;
+                    float scale = badgeIconSize / Mathf.Max(sprite.bounds.size.x, sprite.bounds.size.y, 0.001f);
+                    badgeIcon.transform.localScale = new Vector3(scale, scale, 1f);
+                }
+            }
+
+            if (badge != null)
+            {
+                badge.gameObject.SetActive(sprite == null || badgeIcon == null);
+            }
         }
 
         // The trims glow a little in their colour, under the Bloom threshold, so they stay crisp. The box takes the

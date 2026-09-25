@@ -144,6 +144,11 @@ La chaîne de production est décrite dans l'ADR-0016, les visuels à créer et 
 3. Dans Unity, associer le modèle à un siège ou au vaisseau par défaut dans `Theme/ShipCatalog`.
 4. Vérifier le résultat dans la scène Galerie, ou avec `tools/Capture-Unity.ps1`.
 
+**Les icônes d'emplacement** (ARB-86) se dessinent par script, directement dans le dossier des icônes du jeu ; pour en remplacer une, dépose un PNG du même nom (`Slot_ATK.png`…) :
+```
+blender --background --factory-startup --disable-autoexec --python tools/blender/build_icons.py -- unity/Assets/_Vortex/Art/Icons
+```
+
 **Le vaisseau Sillage** (ARB-84) se construit aussi par script : forme, chanfreins, dépliage UV, puis les textures (lignes de panneaux, teintes, usure, relief) calculées par Blender dans `art-src/ships/`. Changer une proportion, c'est changer un nombre dans `tools/blender/build_ship_sillage.py` et relancer les deux commandes :
 ```
 blender --background --factory-startup --disable-autoexec --python tools/blender/build_ship_sillage.py -- art-src/ships/Ship_Sillage.blend
