@@ -6,7 +6,8 @@
     "Vortex.Client",
     "Unity.TextMeshPro",
     "UnityEngine.UI",
-    "Unity.InputSystem"
+    "Unity.InputSystem",
+    "Unity.RenderPipelines.Universal.Runtime"
   ],
   "includePlatforms": [
     "Editor"

@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 using Vortex.Client.Content;
 using Vortex.Client.Gallery;
@@ -39,6 +40,7 @@ namespace Vortex.Editor
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.fieldOfView = 40f;
             camera.transform.position = new Vector3(0f, 0f, -12f);
+            camera.GetUniversalAdditionalCameraData().renderPostProcessing = true; // Bloom on the glowing parts (ASSETS section 2)
             camera.gameObject.AddComponent<PhysicsRaycaster>();
             Transform cards = new GameObject("Cartes 3D").transform;
 

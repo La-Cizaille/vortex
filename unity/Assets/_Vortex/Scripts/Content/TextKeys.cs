@@ -35,6 +35,12 @@ namespace Vortex.Client.Content
         /// <summary>Technology card (card caption).</summary>
         public const string KindTechnology = "card.kind.technology";
 
+        /// <summary>Event card, short, in the card's disc (where a modifier shows ATK or DEF).</summary>
+        public const string BadgeEvent = "card.badge.event";
+
+        /// <summary>Technology card, short, in the card's disc (where a modifier shows ATK or DEF).</summary>
+        public const string BadgeTechnology = "card.badge.technology";
+
         /// <summary>Gallery section: attack modifiers.</summary>
         public const string GalleryAttack = "gallery.attack";
 
@@ -415,6 +421,8 @@ namespace Vortex.Client.Content
             Add(UsageTriggered, "Déclenchement");
             Add(KindEvent, "Événement");
             Add(KindTechnology, "Technologie");
+            Add(BadgeEvent, "ÉVT");
+            Add(BadgeTechnology, "TECH");
             Add(GalleryAttack, "Modificateurs d'attaque");
             Add(GalleryDefense, "Modificateurs de défense");
             Add(GalleryEvents, "Événements");

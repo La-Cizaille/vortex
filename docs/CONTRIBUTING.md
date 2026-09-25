@@ -125,7 +125,7 @@ Chaque commande se lance avec `powershell -ExecutionPolicy Bypass -File <script>
 La chaîne de production est décrite dans l'ADR-0016, les visuels à créer et leurs formats dans [`ASSETS.md`](ASSETS.md).
 
 **Installer, une fois par poste**
-1. Blender LTS 4.5 : `winget install BlenderFoundation.Blender.LTS.4.5`. La 5.2 est possible, c'est une question ouverte d'ASSETS §5.
+1. Blender 5.2 LTS (ARB-78) : `winget install BlenderFoundation.Blender`. Si `blender` n'est pas dans le `PATH`, les commandes ci-dessous prennent le chemin complet de `blender.exe`.
 2. L'extension Blender MCP, dans la même version que le serveur de `.mcp.json` : `uvx --from mcp-for-blender==2.0.4 mcp-for-blender install-addon`. Puis, dans Blender : *Edit → Preferences → Add-ons*, activer **MCP for Blender**.
 3. Dans les préférences de l'extension :
    - laisser la télémétrie **décochée** ;
@@ -134,14 +134,27 @@ La chaîne de production est décrite dans l'ADR-0016, les visuels à créer et 
 
 **Travailler avec l'assistant**
 1. Ouvrir Blender, appuyer sur `N` dans la vue 3D, ouvrir l'onglet **MCP for Blender** et cliquer sur **Start MCP Server**. L'extension écoute alors sur 127.0.0.1:9876.
-2. Démarrer Claude Code à la racine du dépôt, puis approuver le serveur `blender` de `.mcp.json`. Il tourne en **mode sûr** (`BLENDER_MCP_SAFE_MODE=1`) : chaque script est contrôlé avant de s'exécuter.
+2. Démarrer Claude Code à la racine du dépôt, puis approuver le serveur `blender` de `.mcp.json`. Par défaut, il tourne en **mode sûr** (`BLENDER_MCP_SAFE_MODE=1`) : chaque script est contrôlé avant de s'exécuter. Ce contrôle refuse aussi des scripts inoffensifs (lire un script depuis un fichier, passer une fonction en paramètre) : chaque essai doit alors être renvoyé en entier.
+   Pour le lever sur son poste (ARB-83, risque décrit dans [SECURITY.md](SECURITY.md) §4) : `setx BLENDER_MCP_SAFE_MODE 0` dans un terminal, puis quitter et relancer Claude Code, qui ne lit son environnement qu'au démarrage. Pour revenir au mode sûr : `reg delete HKCU\Environment /v BLENDER_MCP_SAFE_MODE /f`, puis relancer Claude Code.
 3. Arrêter le serveur de l'extension à la fin de l'atelier : il n'a pas d'authentification.
 
 **Du modèle au jeu**
-1. Enregistrer la source dans `art-src/` (par exemple `art-src/ships/Ship_Faucon.blend`). Elle est stockée avec Git LFS.
-2. Exporter : `blender --background art-src/ships/Ship_Faucon.blend --python tools/blender/export_unity.py -- unity/Assets/_Vortex/Art/Ships/Ship_Faucon.fbx`. Le script refuse d'exporter si l'échelle n'est pas appliquée ou si le budget de triangles est dépassé.
+1. Enregistrer la source dans `art-src/` (par exemple `art-src/ships/Ship_Faucon.blend`). Elle est stockée avec Git LFS. Pour un vaisseau, la peinture qui prend la couleur du siège est le matériau `Siege` ; les textures suivent les noms d'[`ASSETS.md`](ASSETS.md) §2 (`_BaseColor`, `_Normal`, `_Emission`).
+2. Exporter : `blender --background --disable-autoexec art-src/ships/Ship_Faucon.blend --python tools/blender/export_unity.py -- unity/Assets/_Vortex/Art/Ships/Ship_Faucon.fbx`. Le script refuse d'exporter si l'échelle n'est pas appliquée ou si le budget de triangles est dépassé. `--disable-autoexec` empêche le `.blend` de lancer ses scripts embarqués.
 3. Dans Unity, associer le modèle à un siège ou au vaisseau par défaut dans `Theme/ShipCatalog`.
 4. Vérifier le résultat dans la scène Galerie, ou avec `tools/Capture-Unity.ps1`.
+
+**Le vaisseau Sillage** (ARB-84) se construit aussi par script : forme, chanfreins, dépliage UV, puis les textures (lignes de panneaux, teintes, usure, relief) calculées par Blender dans `art-src/ships/`. Changer une proportion, c'est changer un nombre dans `tools/blender/build_ship_sillage.py` et relancer les deux commandes :
+```
+blender --background --factory-startup --disable-autoexec --python tools/blender/build_ship_sillage.py -- art-src/ships/Ship_Sillage.blend
+blender --background --disable-autoexec art-src/ships/Ship_Sillage.blend --python tools/blender/export_unity.py -- unity/Assets/_Vortex/Art/Ships/Ship_Sillage.fbx --budget 5000
+```
+
+**La carte** (ARB-85) se construit par script, avec ses textures de métal brossé, puis s'exporte comme un vaisseau. Unity en fait seul le corps de `Prefabs/Card.prefab`, crée ses matériaux de métal (`Theme/Materials/CardFrame`, `CardPanel`, `CardTrim`, `CardGem`, qui t'appartiennent ensuite) et place l'illustration et les textes sur les repères `Zone_*` du modèle. Pour déplacer une zone, change son nombre dans `build_card.py` et relance :
+```
+blender --background --factory-startup --disable-autoexec --python tools/blender/build_card.py -- art-src/cards/Card.blend
+blender --background --disable-autoexec art-src/cards/Card.blend --python tools/blender/export_unity.py -- unity/Assets/_Vortex/Art/Cards3D/Card.fbx --budget 1000
+```
 
 ## Fusion des fichiers Unity
 Ajouter UnityYAMLMerge dans votre configuration Git locale (le chemin dépend de votre version d'Unity) :

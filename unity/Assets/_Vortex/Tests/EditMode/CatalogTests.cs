@@ -76,6 +76,36 @@ namespace Vortex.Tests.EditMode
             Object.DestroyImmediate(catalog);
         }
 
+        [TestCase("Siege")]
+        [TestCase("Siege.001")]
+        public void A_ship_model_paints_its_seat_material_in_the_seat_colour(string materialName)
+        {
+            Shader lit = Shader.Find("Universal Render Pipeline/Lit");
+            var hull = new Material(lit) { name = "Coque" };
+            var seatPaint = new Material(lit) { name = materialName };
+            GameObject model = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            model.GetComponent<Renderer>().sharedMaterials = new[] { hull, seatPaint };
+            var catalog = ScriptableObject.CreateInstance<ShipCatalog>();
+            catalog.Configure(model);
+            var parent = new GameObject("Parent");
+
+            GameObject ship = catalog.Spawn(3, parent.transform, Color.red);
+
+            var renderer = ship.GetComponent<Renderer>();
+            var block = new MaterialPropertyBlock();
+            renderer.GetPropertyBlock(block, 1);
+            Assert.That(block.GetColor("_BaseColor"), Is.EqualTo(Color.red));
+            renderer.GetPropertyBlock(block, 0);
+            Assert.That(block.isEmpty, Is.True, "The hull keeps the colour of its material.");
+            Assert.That(renderer.sharedMaterials, Is.EqualTo(new[] { hull, seatPaint }), "No material is created for the ship.");
+
+            Object.DestroyImmediate(parent);
+            Object.DestroyImmediate(model);
+            Object.DestroyImmediate(catalog);
+            Object.DestroyImmediate(hull);
+            Object.DestroyImmediate(seatPaint);
+        }
+
         [Test]
         public void A_seat_ship_overrides_the_default_ship()
         {

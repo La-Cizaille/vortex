@@ -24,7 +24,7 @@
       ],
       "env": {
         "DISABLE_TELEMETRY": "true",
-        "BLENDER_MCP_SAFE_MODE": "1",
+        "BLENDER_MCP_SAFE_MODE": "${BLENDER_MCP_SAFE_MODE:-1}",
         "BLENDER_HOST": "127.0.0.1",
         "BLENDER_PORT": "9876"
       }

@@ -196,11 +196,13 @@ namespace Vortex.Editor
         }
 
         // The camera draws into an image of the reference size. An overlay canvas never reaches a render texture, so it
-        // is drawn by the camera too, at 1 unit: in front of the 3D cards and the zoom, as on screen.
+        // is drawn by the camera too, at 1 unit: in front of the 3D cards and the zoom, as on screen. The image is HDR,
+        // as the screen's intermediate image is: URP renders in the format of a target texture, and an 8-bit one would
+        // clip the glowing parts to 1 before Bloom sees them.
         private static (Camera Camera, RenderTexture Target) Prepare()
         {
             Camera camera = Object.FindAnyObjectByType<Camera>();
-            var target = new RenderTexture(Width, Height, 24);
+            var target = new RenderTexture(Width, Height, 24, RenderTextureFormat.DefaultHDR);
             camera.targetTexture = target;
             foreach (Canvas canvas in Object.FindObjectsByType<Canvas>())
             {
@@ -224,12 +226,17 @@ namespace Vortex.Editor
         private static void Render(Camera camera, RenderTexture target, string output)
         {
             Settle(camera);
+
+            // To an 8-bit sRGB image, as the screen shows it.
+            RenderTexture shown = RenderTexture.GetTemporary(Width, Height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
+            Graphics.Blit(target, shown);
             RenderTexture previous = RenderTexture.active;
-            RenderTexture.active = target;
+            RenderTexture.active = shown;
             var image = new Texture2D(Width, Height, TextureFormat.RGB24, false);
             image.ReadPixels(new Rect(0, 0, Width, Height), 0, 0);
             image.Apply();
             RenderTexture.active = previous;
+            RenderTexture.ReleaseTemporary(shown);
             Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(output))!);
             File.WriteAllBytes(output, image.EncodeToPNG());
             Object.DestroyImmediate(image);

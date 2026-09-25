@@ -34,6 +34,14 @@ namespace Vortex.Client.Theme
         [Tooltip("Cadre de la carte qu'un achat remplacerait, pendant qu'on glisse une carte du marché.")]
         [SerializeField] private Color loss = new Color32(229, 57, 53, 255);
 
+        [Header("Cartes")]
+        [Tooltip("Texte posé sur les panneaux clairs des cartes (nom, texte).")]
+        [SerializeField] private Color cardInk = new Color32(22, 24, 30, 255);
+        [Tooltip("Éclat de la gemme d'une carte de technologie : la composante la plus forte de sa couleur est portée à ce niveau, le même pour toutes les couleurs. Au-dessus du seuil du Bloom (1,5), elle rayonne.")]
+        [SerializeField, Min(0f)] private float cardGemGlow = 2.5f;
+        [Tooltip("Éclat des liserés d'une carte (couleur de sa technologie, ou couleur qui la marque) : leur couleur multipliée par ce nombre. Sous le seuil du Bloom (1,5), ils restent nets.")]
+        [SerializeField, Min(0f)] private float cardTrimGlow = 0.8f;
+
         [Header("Sièges")]
         [Tooltip("Couleur de chaque siège, dans l'ordre de la table. Elle teinte les vaisseaux provisoires.")]
         [SerializeField]
@@ -97,6 +105,15 @@ namespace Vortex.Client.Theme
 
         /// <summary>Sprites of the card text icons, or null.</summary>
         public TMP_SpriteAsset? TextIcons => textIcons;
+
+        /// <summary>Text on the light panels of a card.</summary>
+        public Color CardInk => cardInk;
+
+        /// <summary>Emission of a technology card's gem: the level of its colour's brightest channel (Bloom above 1.5).</summary>
+        public float CardGemGlow => cardGemGlow;
+
+        /// <summary>Emission of a card's trims: their colour times this factor.</summary>
+        public float CardTrimGlow => cardTrimGlow;
 
         /// <summary>Default event playback speed.</summary>
         public float PlaybackSpeed => playbackSpeed;
