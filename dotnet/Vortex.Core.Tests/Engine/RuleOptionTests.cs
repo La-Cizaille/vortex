@@ -230,6 +230,18 @@ namespace Vortex.Core.Tests.Engine
             Assert.That(TestContent.Config(leaderBounty: -1).Validate(), Has.Some.Contains("leaderBounty"));
         }
 
+        [Test]
+        public void Rule_options_are_changed_on_a_copy_only()
+        {
+            GameConfig original = TestContent.Config();
+            GameConfig tried = original.WithRuleOptions(defensivePostureBonus: 2, leaderBounty: 3, ghostsChooseEvent: true);
+
+            Assert.That((tried.DefensivePostureBonus, tried.LeaderBounty, tried.GhostsChooseEvent), Is.EqualTo((2, 3, true)));
+            Assert.That((original.DefensivePostureBonus, original.LeaderBounty, original.GhostsChooseEvent), Is.EqualTo((0, 0, false)));
+            Assert.That(Scenario.Json(tried.WithRuleOptions(0, 0, false)), Is.EqualTo(Scenario.Json(original)), "Everything else is kept.");
+            Assert.That(original.WithRuleOptions(99, 0, false).Validate(), Has.Some.Contains("defensivePostureBonus"), "Still validated.");
+        }
+
         // ---------------------------------------------------------------- Ghosts choose the event (RULES A4.1)
 
         [Test]

@@ -127,6 +127,36 @@ namespace Vortex.Core.Config
         /// <summary>Safety limit on decisions requested while resolving a single command.</summary>
         public int MaxDecisionsPerCommand { get; }
 
+        /// <summary>
+        /// The same configuration with other rule options (ADR-0011): the development menu tries them without editing
+        /// the content. The copy is not validated here; the engine validates it when it is created.
+        /// </summary>
+        public GameConfig WithRuleOptions(int defensivePostureBonus, int leaderBounty, bool ghostsChooseEvent)
+        {
+            return new GameConfig(
+                Schema,
+                SchemaVersion,
+                StartingHp,
+                MaxHp,
+                MinShield,
+                MaxShield,
+                DieFaces,
+                MarketSize,
+                MaxOvercharge,
+                CriticalBonusWithoutModifier,
+                TormentValue,
+                EventFrequency,
+                DoomEventId,
+                RoundStartRotation,
+                TechnologiesToWin,
+                PlayerCounts,
+                ReactionDepthLimit,
+                MaxDecisionsPerCommand,
+                defensivePostureBonus,
+                leaderBounty,
+                ghostsChooseEvent);
+        }
+
         /// <summary>Settings for a given number of players, or null when that count is not supported.</summary>
         public PlayerCountSettings? ForPlayers(int players)
         {

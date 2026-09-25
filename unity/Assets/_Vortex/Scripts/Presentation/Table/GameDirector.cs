@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using UnityEngine;
 using Vortex.Client.Content;
+using Vortex.Client.Menus;
 using Vortex.Client.Session;
 using Vortex.Client.Theme;
 using Vortex.Core.Bots;
@@ -17,7 +18,9 @@ namespace Vortex.Client.Presentation
     /// <summary>
     /// Runs a game in the game scene (ADR-0014, ADR-0015): starts a local session, places the ships and the panels
     /// around the viewer, plays the engine events one by one, and lets bots play when the presentation is idle. The
-    /// displays follow each event through the <see cref="TableModel"/>, then resync on the final public view.
+    /// displays follow each event through the <see cref="TableModel"/>, then resync on the final public view. The game
+    /// is the one chosen in the menu (ADR-0019), or the inspector's test game when the scene is opened directly; it can
+    /// be paused, restarted and left, and with several people on the device the view turns to each one's turn.
     /// </summary>
     public sealed class GameDirector : MonoBehaviour, IFeedbackStage, IControlsHost
     {
@@ -50,6 +53,11 @@ namespace Vortex.Client.Presentation
         [Tooltip("Distance des cartes à la caméra : plus près que le plan de l'interface, pour passer devant ses panneaux.")]
         [SerializeField, Min(0.5f)] private float cardDepth = 6f;
 
+        [Header("Menus de la partie")]
+        [SerializeField] private PauseMenu pause = null!;
+        [SerializeField] private GameOverPanel gameOver = null!;
+        [SerializeField] private TurnAnnouncement announcement = null!;
+
         [Header("Disposition (positions à l'écran : 0,0 en bas à gauche, 1,1 en haut à droite)")]
         [Tooltip("Position à l'écran du vaisseau du joueur.")]
         [SerializeField] private Vector2 viewerShipOnScreen = new Vector2(0.5f, 0.25f);
@@ -64,7 +72,7 @@ namespace Vortex.Client.Presentation
         [Tooltip("Décalage du panneau d'un adversaire par rapport à son vaisseau, en unités d'interface.")]
         [SerializeField] private Vector2 opponentPanelOffset = new Vector2(0f, -45f);
 
-        [Header("Partie de test (en attendant les menus)")]
+        [Header("Partie de test (scène ouverte directement, sans passer par le menu)")]
         [Tooltip("Le siège 1 est joué par vous (gestes à la souris ou au doigt), les autres par des bots.")]
         [SerializeField] private bool humanFirstSeat = true;
         [Tooltip("Mode test : affiche aussi le panneau qui liste tous les coups permis, un bouton par coup.")]
@@ -82,6 +90,9 @@ namespace Vortex.Client.Presentation
         private readonly Dictionary<int, SeatDisplay> _seats = new Dictionary<int, SeatDisplay>();
         private readonly HashSet<int> _wrecks = new HashSet<int>();
         private LocalHotSeatSession? _session;
+        private MatchSetup? _setup;
+        private bool _paused;
+        private bool _outcomeShown;
         private EventPlayer? _player;
         private TableModel? _model;
         private TableContext? _context;
@@ -106,6 +117,24 @@ namespace Vortex.Client.Presentation
         /// <summary>True while events are being played.</summary>
         public bool IsPlaying => _player?.IsPlaying ?? false;
 
+        /// <summary>True while the game waits (pause menu open).</summary>
+        public bool Paused => _paused;
+
+        /// <summary>Seat whose side of the table is shown at the bottom.</summary>
+        public int Viewer => _viewer;
+
+        /// <summary>The game being played, or null before <see cref="Begin()"/>.</summary>
+        public MatchSetup? Setup => _setup;
+
+        /// <summary>The pause menu.</summary>
+        public PauseMenu Pause => pause;
+
+        /// <summary>The end of game panel.</summary>
+        public GameOverPanel GameOver => gameOver;
+
+        /// <summary>The "Tour de X" banner.</summary>
+        public TurnAnnouncement Announcement => announcement;
+
         /// <summary>Test mode: the first seat is played by a person through the command panel.</summary>
         public bool HumanFirstSeat
         {
@@ -129,30 +158,37 @@ namespace Vortex.Client.Presentation
         /// <summary>Ships by seat number.</summary>
         public IReadOnlyDictionary<int, Transform> Ships => _ships;
 
-        /// <summary>Starts a new game: bots, and the first seat for a person in test mode (the local game menu comes with M4.6).</summary>
+        /// <summary>
+        /// Starts the game chosen in the menu (<see cref="MatchLauncher"/>), or the inspector's test game when the scene was
+        /// opened directly.
+        /// </summary>
         public void Begin()
         {
+            MatchLauncher? launcher = MatchLauncher.Find();
+            Begin(launcher != null && launcher.Setup != null ? launcher.Setup : TestSetup());
+        }
+
+        /// <summary>Starts a game: its seats, and in development its seed and rule options.</summary>
+        public void Begin(MatchSetup setup)
+        {
+            _setup = setup ?? throw new ArgumentNullException(nameof(setup));
             Clear();
             GameData data = content.LoadData();
             _context = new TableContext(theme, cardArt, texts, data, cardPrefab, cardRoot, view, cardDepth, zoom);
             zoom.Bind(_context);
             _log = new GameLogFormatter(texts, data);
             _labels = new CommandLabels(_context);
-            List<SeatSetup> seats = Enumerable.Range(1, seatCount)
-                .Select(n => new SeatSetup(
-                    string.Format(CultureInfo.InvariantCulture, texts.Get(TextKeys.SeatDefaultName), n),
-                    n == 1 && humanFirstSeat ? SeatKind.Human : SeatKind.Bot,
-                    botLevel))
-                .ToList();
-            ulong gameSeed = seed != 0 ? seed : (ulong)DateTime.UtcNow.Ticks;
-            _session = new LocalHotSeatSession(content.CreateEngine(), gameSeed, seats);
-            _viewer = 0;
+            ulong gameSeed = setup.Seed != 0 ? setup.Seed : (ulong)DateTime.UtcNow.Ticks;
+            _session = new LocalHotSeatSession(content.CreateEngine(setup.Rules), gameSeed, setup.Seats);
+
+            // The first person's side of the table; with bots only, the first seat's.
+            _viewer = Math.Max(0, setup.Seats.ToList().FindIndex(s => s.Kind == SeatKind.Human));
             view.backgroundColor = theme.Background;
             _model = TableModel.From(_session.View, _session.Rules);
             controls.Bind(_context, _labels, icons, _session.Rules, this);
             _controlsOffered = false;
 
-            _player = new EventPlayer(type => feedback.For(type), this) { Speed = theme.PlaybackSpeed };
+            _player = new EventPlayer(type => feedback.For(type), this) { Speed = UserOptions.Load(theme.PlaybackSpeed).Speed };
             _player.EventStarted += OnEventStarted;
             _player.Idle += Resync;
 
@@ -164,6 +200,11 @@ namespace Vortex.Client.Presentation
             playback.Bind(_context, _player);
             commands.Hide();
             _panel = PanelState.Hidden;
+            pause.Bind(texts, theme.PlaybackSpeed, paused => _paused = paused, Restart, ApplyOptions, MatchLauncher.BackToMenu);
+            gameOver.Bind(texts, Restart, MatchLauncher.BackToMenu);
+            announcement.Hide();
+            _paused = false;
+            _outcomeShown = false;
             ShowAll(redrawCards: true);
             _patching = false;
             Play(_session.OpeningEvents);
@@ -172,11 +213,12 @@ namespace Vortex.Client.Presentation
         /// <summary>Advances the playback, then lets a bot play when the presentation is idle (called every frame).</summary>
         public void Advance(float deltaTime)
         {
-            if (_player is null || _session is null)
+            if (_player is null || _session is null || _paused)
             {
                 return;
             }
 
+            announcement.Tick(deltaTime);
             _player.Tick(deltaTime);
 
             // Displays are redrawn once per frame at most: skipping can start hundreds of events in one frame.
@@ -196,12 +238,14 @@ namespace Vortex.Client.Presentation
             {
                 WithdrawControls();
                 SetPanel(PanelState.Hidden);
+                ShowOutcome();
                 return;
             }
 
             if (!_session.IsBotTurn)
             {
                 // A person's turn, or a person's decision during another seat's command.
+                FollowPerson();
                 OfferControls();
                 SetPanel(showCommandPanel ? PanelState.Choices : PanelState.Hidden);
                 return;
@@ -226,6 +270,9 @@ namespace Vortex.Client.Presentation
             Play(result.Events);
         }
 
+        /// <summary>Starts the same game again: same seats, and a new seed unless one was fixed in development.</summary>
+        public void Restart() => Begin(_setup ?? TestSetup());
+
         /// <inheritdoc/>
         public float PlaybackSpeed => _player?.Speed ?? 1f;
 
@@ -241,6 +288,60 @@ namespace Vortex.Client.Presentation
         };
 
         private void Start() => Begin();
+
+        // The inspector's test game: the first seat a person's when set, the others bots.
+        private MatchSetup TestSetup() => new MatchSetup(
+            Enumerable.Range(1, seatCount)
+                .Select(n => new SeatSetup(
+                    string.Format(CultureInfo.InvariantCulture, texts.Get(TextKeys.SeatDefaultName), n),
+                    n == 1 && humanFirstSeat ? SeatKind.Human : SeatKind.Bot,
+                    botLevel))
+                .ToList(),
+            seed);
+
+        // The options were changed from the pause menu: the new default speed applies at once.
+        private void ApplyOptions(UserOptions options)
+        {
+            if (_player != null)
+            {
+                _player.Speed = options.Speed;
+                playback.Refresh();
+            }
+        }
+
+        // Once the last events are played: the winner and how, with "Rejouer" and "Menu".
+        private void ShowOutcome()
+        {
+            if (_outcomeShown || _model is null)
+            {
+                return;
+            }
+
+            _outcomeShown = true;
+            banner.Show(_model);
+            gameOver.Show(banner.OutcomeText);
+        }
+
+        // Several people on this device: the view turns to the person whose turn starts (INTERFACE.md 4). A decision asked
+        // of another person, or a bot's turn, never moves it.
+        private void FollowPerson()
+        {
+            int actor = _session!.Actor;
+            if (_setup!.Humans > 1 && _session.Decision is null && actor >= 0 && actor != _viewer && !_session.IsBot(actor))
+            {
+                TurnViewTo(actor);
+            }
+        }
+
+        private void TurnViewTo(int seat)
+        {
+            WithdrawControls();
+            ClearTable();
+            _viewer = seat;
+            PlaceSeats();
+            ShowAll(redrawCards: true);
+            announcement.Show(string.Format(CultureInfo.InvariantCulture, texts.Get(TextKeys.TurnOf), _model!.Seats[seat].Name));
+        }
 
         private void Update() => Advance(Time.deltaTime);
 
@@ -482,21 +583,31 @@ namespace Vortex.Client.Presentation
                 _player.Idle -= Resync;
             }
 
+            ClearTable();
+            _wait = 0f;
+            _dirty = false;
+        }
+
+        // The ships and the seat panels, with their 3D cards, before the table is laid out again.
+        private void ClearTable()
+        {
             foreach (KeyValuePair<int, Transform> ship in _ships)
             {
                 Discard(ship.Value.gameObject);
             }
 
-            foreach (KeyValuePair<int, SeatDisplay> seat in _seats.Where(s => s.Value != playerSeat))
+            foreach (KeyValuePair<int, SeatDisplay> seat in _seats)
             {
-                Discard(seat.Value.gameObject);
+                seat.Value.Release();
+                if (seat.Value != playerSeat)
+                {
+                    Discard(seat.Value.gameObject);
+                }
             }
 
             _ships.Clear();
             _seats.Clear();
             _wrecks.Clear();
-            _wait = 0f;
-            _dirty = false;
         }
 
         // An eliminated player's ship stays in place as a wreck (INTERFACE.md 3.1): tinted with the wreck colour and
@@ -551,6 +662,14 @@ namespace Vortex.Client.Presentation
         {
             controls = playerControls;
             icons = iconCatalog;
+        }
+
+        /// <summary>Wires the menus of the game: pause, end of game, turn banner (editor setup).</summary>
+        public void AssignMenus(PauseMenu pauseMenu, GameOverPanel gameOverPanel, TurnAnnouncement turnAnnouncement)
+        {
+            pause = pauseMenu;
+            gameOver = gameOverPanel;
+            announcement = turnAnnouncement;
         }
 
         /// <summary>Wires the command panel of the test mode (editor setup).</summary>

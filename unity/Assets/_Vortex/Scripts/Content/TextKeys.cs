@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Vortex.Core.Bots;
 using Vortex.Core.Commands;
 using Vortex.Core.Events;
 using Vortex.Core.State;
@@ -213,6 +214,117 @@ namespace Vortex.Client.Content
         /// <summary>Preview, decimal separator of averages.</summary>
         public const string PreviewDecimal = "preview.decimal";
 
+        /// <summary>Title of the home menu.</summary>
+        public const string MenuTitle = "menu.title";
+
+        /// <summary>Home menu: local game.</summary>
+        public const string MenuLocalGame = "menu.local-game";
+
+        /// <summary>Home menu: online game (not yet available).</summary>
+        public const string MenuFindGame = "menu.find-game";
+
+        /// <summary>Home menu: options.</summary>
+        public const string MenuOptions = "menu.options";
+
+        /// <summary>Home menu: social (not yet available).</summary>
+        public const string MenuSocial = "menu.social";
+
+        /// <summary>Home menu: quit the game (Windows).</summary>
+        public const string MenuQuit = "menu.quit";
+
+        /// <summary>Back to the previous menu.</summary>
+        public const string MenuBack = "menu.back";
+
+        /// <summary>Title of the local game menu.</summary>
+        public const string LocalTitle = "local.title";
+
+        /// <summary>Number of players. {0}: count.</summary>
+        public const string LocalPlayers = "local.players";
+
+        /// <summary>Starts the local game.</summary>
+        public const string LocalLaunch = "local.launch";
+
+        /// <summary>Opens the development menu.</summary>
+        public const string LocalDevelopment = "local.development";
+
+        /// <summary>A seat of the local game. {0}: seat number.</summary>
+        public const string LocalSeat = "local.seat";
+
+        /// <summary>A seat played by a person.</summary>
+        public const string LocalHuman = "local.human";
+
+        /// <summary>A seat played by a bot.</summary>
+        public const string LocalBot = "local.bot";
+
+        /// <summary>Hint of the name field.</summary>
+        public const string LocalName = "local.name";
+
+        /// <summary>Title of the development menu.</summary>
+        public const string DevTitle = "dev.title";
+
+        /// <summary>Defensive posture option. {0}: bonus or off.</summary>
+        public const string DevPosture = "dev.posture";
+
+        /// <summary>Bounty on the leader option. {0}: bonus or off.</summary>
+        public const string DevBounty = "dev.bounty";
+
+        /// <summary>Ghosts choose the event option. {0}: yes or no.</summary>
+        public const string DevGhosts = "dev.ghosts";
+
+        /// <summary>Hint of the seed field.</summary>
+        public const string DevSeed = "dev.seed";
+
+        /// <summary>A rule option switched off.</summary>
+        public const string DevOff = "dev.off";
+
+        /// <summary>A rule option bonus. {0}: bonus.</summary>
+        public const string DevBonus = "dev.bonus";
+
+        /// <summary>Yes.</summary>
+        public const string Yes = "common.yes";
+
+        /// <summary>No.</summary>
+        public const string No = "common.no";
+
+        /// <summary>Title of the options.</summary>
+        public const string OptionsTitle = "options.title";
+
+        /// <summary>Default animation speed. {0}: speed.</summary>
+        public const string OptionsSpeed = "options.speed";
+
+        /// <summary>Full screen (Windows). {0}: yes or no.</summary>
+        public const string OptionsFullScreen = "options.full-screen";
+
+        /// <summary>Screen resolution (Windows). {0}: width, {1}: height.</summary>
+        public const string OptionsResolution = "options.resolution";
+
+        /// <summary>Button opening the pause menu.</summary>
+        public const string PauseButton = "pause.button";
+
+        /// <summary>Title of the pause menu.</summary>
+        public const string PauseTitle = "pause.title";
+
+        /// <summary>Pause menu: resume.</summary>
+        public const string PauseResume = "pause.resume";
+
+        /// <summary>Pause menu: restart the game.</summary>
+        public const string PauseRestart = "pause.restart";
+
+        /// <summary>Pause menu: options.</summary>
+        public const string PauseOptions = "pause.options";
+
+        /// <summary>Pause menu: back to the home menu.</summary>
+        public const string PauseQuit = "pause.quit";
+
+        /// <summary>End of game: play again with the same seats.</summary>
+        public const string GameOverReplay = "game-over.replay";
+
+        /// <summary>End of game: back to the home menu.</summary>
+        public const string GameOverMenu = "game-over.menu";
+
+        /// <summary>Banner when the view turns to a person. {0}: name.</summary>
+        public const string TurnOf = "turn.of";
+
         /// <summary>Every key with its default text.</summary>
         public static readonly IReadOnlyList<KeyValuePair<string, string>> Defaults = BuildDefaults();
 
@@ -236,6 +348,9 @@ namespace Vortex.Client.Content
 
         /// <summary>Help of a crew action, shown when its button is hovered.</summary>
         public static string ActionHelp(CrewAction action) => "action.help." + action;
+
+        /// <summary>Name of a bot level in the local game menu.</summary>
+        public static string BotLevelName(BotLevel level) => "bot.level." + level;
 
         /// <summary>Question of a decision, by its engine prompt key (e.g. <c>critical.discard</c>).</summary>
         public static string Decision(string prompt) => "decision." + prompt;
@@ -318,6 +433,48 @@ namespace Vortex.Client.Content
             Add(PreviewRange, "{0} à {1}");
             Add(PreviewPercent, "{0}" + NoBreakSpace + "%");
             Add(PreviewDecimal, ",");
+
+            Add(MenuTitle, "VORTEX");
+            Add(MenuLocalGame, "Partie locale");
+            Add(MenuFindGame, "Trouver une partie (bientôt)");
+            Add(MenuOptions, "Options");
+            Add(MenuSocial, "Social (bientôt)");
+            Add(MenuQuit, "Quitter");
+            Add(MenuBack, "Retour");
+            Add(LocalTitle, "Partie locale");
+            Add(LocalPlayers, "Joueurs : {0}");
+            Add(LocalLaunch, "Lancer la partie");
+            Add(LocalDevelopment, "Développement");
+            Add(LocalSeat, "Siège {0}");
+            Add(LocalHuman, "Humain");
+            Add(LocalBot, "Bot");
+            Add(LocalName, "Nom");
+            Add(DevTitle, "Développement (absent des builds publiés)");
+            Add(DevPosture, "Posture défensive : {0}");
+            Add(DevBounty, "Prime sur le leader : {0}");
+            Add(DevGhosts, "Les éliminés choisissent l'événement : {0}");
+            Add(DevSeed, "Graine (vide : au hasard)");
+            Add(DevOff, "non");
+            Add(DevBonus, "+{0}");
+            Add(Yes, "oui");
+            Add(No, "non");
+            Add(OptionsTitle, "Options");
+            Add(OptionsSpeed, "Vitesse des animations : ×{0}");
+            Add(OptionsFullScreen, "Plein écran : {0}");
+            Add(OptionsResolution, "Résolution : {0} × {1}");
+            Add(PauseButton, "Pause");
+            Add(PauseTitle, "Pause");
+            Add(PauseResume, "Reprendre");
+            Add(PauseRestart, "Recommencer");
+            Add(PauseOptions, "Options");
+            Add(PauseQuit, "Quitter la partie");
+            Add(GameOverReplay, "Rejouer");
+            Add(GameOverMenu, "Menu");
+            Add(TurnOf, "Tour de {0}");
+            Add(BotLevelName(BotLevel.Random), "Aléatoire");
+            Add(BotLevelName(BotLevel.Naive), "Naïf");
+            Add(BotLevelName(BotLevel.Normal), "Normal");
+            Add(BotLevelName(BotLevel.Strong), "Fort");
 
             Add(ActionShort(CrewAction.Attack), "ATQ");
             Add(ActionShort(CrewAction.Sabotage), "SAB");

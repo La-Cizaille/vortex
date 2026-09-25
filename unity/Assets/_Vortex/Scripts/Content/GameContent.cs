@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Vortex.Client.Session;
 using Vortex.Core.Config;
 using Vortex.Core.Content;
 using Vortex.Core.Rules;
@@ -21,12 +22,15 @@ namespace Vortex.Client.Content
         /// <summary>Loads and validates the cards, events and technologies. Throws <see cref="GameDataException"/> on invalid content.</summary>
         public GameData LoadData() => GameDataLoader.Load(Text(cards, nameof(cards)), Text(events, nameof(events)), Text(technologies, nameof(technologies)));
 
-        /// <summary>Loads and validates the content, then builds a rules engine. Throws <see cref="GameDataException"/> on invalid content.</summary>
-        public GameEngine CreateEngine()
+        /// <summary>
+        /// Loads and validates the content, then builds a rules engine, with other rule options when given (development
+        /// menu, ADR-0011). Throws <see cref="GameDataException"/> on invalid content or options.
+        /// </summary>
+        public GameEngine CreateEngine(RuleOptions? rules = null)
         {
             GameData data = LoadData();
             GameConfig gameConfig = GameDataLoader.LoadConfig(Text(config, nameof(config)), data);
-            return new GameEngine(data, gameConfig);
+            return new GameEngine(data, rules is null ? gameConfig : rules.ApplyTo(gameConfig));
         }
 
         /// <summary>Assigns the four files (editor setup and tests).</summary>
