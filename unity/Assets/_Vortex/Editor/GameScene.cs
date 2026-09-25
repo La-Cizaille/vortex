@@ -109,6 +109,10 @@ namespace Vortex.Editor
             RectTransform foreground = UiBuilder.Part<RectTransform>(front.transform, "Centre", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
 
             RectTransform opponents = UiBuilder.Part<RectTransform>(ui, "Adversaires", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+
+            // The middle of the table, where a card is dropped to be used: where the open market lies, and it stays there
+            // when the market folds (ARB-81). Nothing is drawn, so it catches no pointer.
+            RectTransform middle = UiBuilder.Fixed<RectTransform>(ui, "Centre de la table", new Vector2(0.5f, 0.5f), new Vector2(0f, -20f), new Vector2(1180f, 210f));
             (MarketDisplay market, Button recycleAttack, Button recycleDefense, Button endMarket) = BuildMarket(ui);
             (SeatDisplay player, ActionButton[] actions, Button combo, Button overcharge, Graphic overchargeGlow) = BuildPlayerPanel(ui);
             RoundBanner banner = BuildBanner(ui);
@@ -148,7 +152,7 @@ namespace Vortex.Editor
                 help,
                 aimLine.rectTransform,
                 (RectTransform)player.transform,
-                (RectTransform)market.transform);
+                middle);
             controls.AssignArc(player.GetComponent<ActionArc>());
 
             var director = new GameObject("Partie", typeof(GameDirector)).GetComponent<GameDirector>();

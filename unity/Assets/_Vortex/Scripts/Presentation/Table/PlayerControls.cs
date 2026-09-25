@@ -77,6 +77,9 @@ namespace Vortex.Client.Presentation
         /// <summary>The decision window (tests choose from it).</summary>
         public CommandPanel Decision => decision;
 
+        /// <summary>The middle of the table, where a card is dropped to be used.</summary>
+        public RectTransform ActivationZone => activationZone;
+
         /// <summary>The help bubble (tests read the preview in it).</summary>
         public HelpBubble Help => help;
 
