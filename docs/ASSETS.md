@@ -57,11 +57,11 @@ La chaîne de production (Blender, export, versions) est décrite dans [ADR-0016
 | Logo | 1 | Écran d'accueil (M4.6) | PNG transparent, 2048 px de large | `Art/Brand/Logo.png` | 3 |
 | Icône de l'application | 1 | Android et Windows (M5) | PNG 1024×1024 ; pour Android, deux calques 432×432 (motif et fond) | `Art/Brand/AppIcon.png`, `AppIcon_Foreground.png`, `AppIcon_Background.png` | 4 |
 
-Les icônes, les cadres, le fond et le logo ne sont pas encore branchés dans le jeu. Ils le seront au fil des étapes : les actions en M4.5, le reste en M5. Les déposer dans ces dossiers n'a donc aucun effet visible pour l'instant, mais ils sont prêts.
+Les icônes des actions d'équipage sont branchées : une image déposée remplace aussitôt le nom court de l'action. Les autres icônes, les cadres, le fond et le logo le seront en M5 ; les déposer dans ces dossiers n'a donc pas encore d'effet visible, mais ils sont prêts.
 
 ## 4. Plus tard
 
-- **Sons** (M5, ARB-72) : lancer de dés, impact, bouclier, élimination, achat au marché, fin de tour, signaux du temps de tour (dernières secondes, temps écoulé, ARB-70), musique d'ambiance. Format : WAV 48 kHz pour les effets, OGG pour la musique.
+- **Sons** (M5, ARB-72) : lancer de dés, impact, bouclier, élimination, achat au marché, fin de tour, signaux du temps de tour (dernières secondes, temps écoulé, ARB-70 ; le tic des dix dernières secondes est aujourd'hui un bip généré, remplacé par le son *Timer Tick* de `Theme/ThemeSettings`), musique d'ambiance. Format : WAV 48 kHz pour les effets, OGG pour la musique.
 - **Fond stellaire animé** (M5, ARB-72) : le panorama du §3 sert de base ; le scintillement des étoiles et le mouvement lent des planètes se font dans Unity (particules, shaders), sans autre visuel à fournir.
 
 ## 5. Questions ouvertes pour l'atelier Blender

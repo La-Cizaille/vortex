@@ -54,6 +54,7 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 - M0 : structure du dépôt, règles consolidées (`docs/RULES.md`), architecture, modèle de sécurité, guide de contribution, ADR 0001 à 0006, configuration Git/LFS/EditorConfig, Dependabot.
 
 ### Modifié
+- Documentation remise à jour après la fin de M4 : état et feuille de route du README, INTERFACE (schéma de l'écran, décisions, ce qui est construit), ARCHITECTURE (nouveaux composants de la table, scènes du build), ASSETS (icônes des actions branchées, son du temps de tour).
 - Duel (ARB-68, premier playtest) : quand il ne reste que deux joueurs en vie, la rotation du premier joueur ne s'applique plus ; la manche commence par celui qui n'a pas joué en dernier, pour que personne ne joue deux fois de suite.
 - L'événement `EVT_SURCHARGE_IONIQUE` s'appelle « Surcharge ionique » (ARB-69).
 - `CardView` (client) devient `CardDisplay` : le moteur a déjà une `CardView`. Les noms de cartes et d'événements s'affichent sans leur mise en forme.
