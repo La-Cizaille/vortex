@@ -59,7 +59,15 @@ namespace Vortex.Tests.EditMode
                 PlayUntilOffered();
             }
 
-            Rect market = CardAnchor.ScreenRectOf((RectTransform)Object.FindAnyObjectByType<MarketDisplay>().transform);
+            // The market is folded after the market phase (ARB-81): the person opens it, the cards follow it.
+            _director.Market.Toggle();
+            _director.Advance(1f);
+            foreach (CardAnchor anchor in Object.FindObjectsByType<CardAnchor>())
+            {
+                anchor.Place();
+            }
+
+            Rect market = CardAnchor.ScreenRectOf((RectTransform)_director.Market.transform);
             CardDrag card = Object.FindObjectsByType<CardDrag>().First(d => market.Contains(d.GetComponent<CardAnchor>().ScreenRect.center));
 
             var pointer = new PointerEventData(null);

@@ -312,7 +312,8 @@ namespace Vortex.Editor
         }
 
         // The two black markets in the middle: attack on the left, defense on the right (INTERFACE.md 3.3), with their
-        // buttons at their level (ARB-71): "Recycler" in each half's header, "Passer le marché" above the middle.
+        // buttons at their level (ARB-71): "Recycler" in each half's header, "Passer le marché" above the middle. Outside
+        // the person's market phase, it folds under the round banner; the button under it opens it (ARB-81).
         private static (MarketDisplay Market, Button RecycleAttack, Button RecycleDefense, Button EndMarket) BuildMarket(Transform ui)
         {
             // 1180 wide: the panels of the opponents at the ends of the arc stay clear of it.
@@ -323,6 +324,9 @@ namespace Vortex.Editor
             endLabel.fontSize = 18f;
             MarketDisplay market = root.gameObject.AddComponent<MarketDisplay>();
             market.Assign(attackRow, defenseRow, attackLabel, defenseLabel, attackDeck, defenseDeck, 133f);
+            (Button toggle, TMP_Text toggleLabel) = UiBuilder.Button(ui, "Ouvrir le marché", new Vector2(0.5f, 0.5f), new Vector2(0f, 300f), new Vector2(180f, 36f));
+            toggleLabel.fontSize = 18f;
+            market.AssignToggle(toggle, toggleLabel, new Vector2(0f, -20f), new Vector2(0f, 368f));
             return (market, recycleAttack, recycleDefense, endMarket);
         }
 
