@@ -75,11 +75,13 @@ Disposition à 5 joueurs, vue du joueur dont c'est le tour :
 - **Acheter** : glisser une carte du marché vers mon vaisseau. Pendant le glisser, on voit la carte que je vais perdre.
 - **Recycler** : un bouton sous chaque moitié.
 - **Passer le marché** : un bouton.
-- **Réduit** : une fois la phase de marché terminée, le marché se réduit tout seul en une bande de miniatures. On peut le rouvrir pour le consulter, et le zoom au survol fonctionne toujours.
+- **Réduit** (ARB-81) : en dehors de ma phase de marché, le marché est réduit en une bande de miniatures sous le bandeau de manche. Il s'ouvre tout seul au début de ma phase de marché et se réduit à sa fin.
+  - Le bouton « Marché », sous la bande, l'ouvre pour le consulter ; « Réduire le marché » le replie. Ce choix tient jusqu'au prochain changement de phase.
+  - Le zoom au survol fonctionne dans les deux états.
 
 ### 3.4 Actions d'équipage
 
-- Elles apparaissent **en demi-cercle au-dessus de mon vaisseau**, chacune avec une icône simple : Attaque, Sabotage, Reparamétrage, Surcharge, et Posture défensive si l'option est activée.
+- Elles apparaissent **en arc de cercle centré au-dessus de mon vaisseau** (ARB-74), chacune avec une icône simple : à gauche les actions d'attaque (Attaque à l'extrémité, Surcharge), à droite les actions de bouclier (Reparamétrage, Posture défensive si l'option est activée, Sabotage à l'extrémité).
 - **Au survol**, une fenêtre précise l'effet de l'action, tel qu'il s'appliquerait maintenant (par exemple : Reparamétrage à 2 dés avec la surcharge).
 - **Actions avec une cible** (Attaque, Sabotage) : glisser l'icône vers un adversaire.
 - **Actions sans cible** (Reparamétrage, Surcharge, Posture défensive) : un simple toucher.
@@ -104,9 +106,19 @@ Disposition à 5 joueurs, vue du joueur dont c'est le tour :
 
 ### 3.6 Décisions
 
-- Quand le choix porte sur des **joueurs ou des cartes visibles**, on les touche directement sur la table, où ils sont surlignés.
-- Sinon (une valeur, oui ou non, un sens de rotation), une petite fenêtre s'ouvre au centre.
-- **Quand un autre joueur doit décider pendant mon tour** (il choisit le modificateur détruit par mon critique, il dévie mon attaque…) : une fenêtre « Joueur X doit choisir » s'affiche, sans faire pivoter la vue. Si ce joueur est un bot, il choisit seul et on voit le résultat.
+Une décision se prend **sur la table, sans bouton** (ARB-82). La question s'affiche en bandeau au-dessus du centre (« Joueur X : … »), et ce qui y répond s'allume :
+- **un joueur** : les fiches des joueurs possibles s'allument, les autres s'estompent ; on touche une fiche. Pour un **sens de rotation**, on touche le voisin qui reçoit son bouclier ;
+- **une carte** de la table (un modificateur, une carte du marché) : les cartes possibles ont un cadre allumé ; on touche la carte ;
+- **un nombre** (annonce d'une valeur de dé, points à convertir) : une rangée de faces de d8 au centre, seules les valeurs permises actives ;
+- **un événement** (fantômes) : les deux événements sont montrés au centre ; on touche celui qu'on garde ;
+- **une action d'équipage imposée** : les actions permises de l'arc s'allument ; un toucher, ou un glisser vers la fiche visée ;
+- **voler ou détruire une carte** : la carte s'allume ; on la glisse vers son vaisseau pour la voler, au centre de la table pour la détruire.
+
+**Passer** un choix facultatif : la carte qui propose le choix s'allume en gris, et la toucher veut dire « je passe ». Si elle n'est pas sur la table, on touche sa propre fiche (pour une déviation : garder l'attaque) ; si sa fiche est déjà une réponse, la carte est montrée en gris au centre. Le bandeau dit où toucher.
+
+Seule une décision que la table ne sait pas montrer ouvrirait encore la fenêtre de réponses ; aucune n'est dans ce cas aujourd'hui.
+
+**Quand un autre joueur doit décider pendant mon tour** (il choisit le modificateur détruit par mon critique, il dévie mon attaque…) : en partie locale, le bandeau le nomme et ses réponses s'allument, sans faire pivoter la vue. Si ce joueur est un bot, il choisit seul et on voit le résultat.
 
 ### 3.7 Déroulé du tour
 
@@ -116,14 +128,17 @@ Disposition à 5 joueurs, vue du joueur dont c'est le tour :
 ### 3.8 Informations de partie
 
 - **En haut au centre** : le numéro de manche, l'événement en cours (agrandi au survol) et le compte à rebours de la Fin des temps.
-- **Journal** : un panneau repliable, fermé par défaut, qui dit qui a fait quoi et avec quels jets de dés.
+- **Journal** : un panneau repliable, fermé par défaut, qui dit qui a fait quoi et avec quels jets de dés. On peut le remonter (molette, doigt ou barre) ; il ne suit les nouvelles lignes que si l'on est en bas (ARB-75).
 - **Animations** : chaque événement du moteur est montré à son tour (ADR-0014). Un bouton « accélérer / passer » est disponible pendant qu'elles se jouent, et la vitesse par défaut se règle dans les options.
 
 ### 3.9 Temps de tour limité (ARB-70)
 
-- Le tour d'un joueur a une **durée limitée**, que l'on peut **désactiver** pour les tests.
-- Le temps qui reste se voit, par exemple un anneau qui se vide autour du vaisseau ou du bouton « Fin de tour ». Il s'entend aussi : un signal sonore dans les dernières secondes.
-- Durée, comportement à l'expiration et temps de réponse aux décisions : questions ouvertes (§7).
+- Le tour d'un joueur a une **durée limitée**, que l'on peut **désactiver** (ARB-80) :
+  - la durée se choisit dans le menu de partie locale : illimitée (par défaut), 60, 90 ou 120 secondes ;
+  - le temps ne court que lorsque le joueur peut agir : ni pendant les animations, ni pendant la pause.
+- Le temps qui reste se voit au-dessus du bouton « Fin de tour » : les secondes et une barre qui se vide. Dans les dix dernières secondes, il passe à la couleur d'alerte et fait entendre un tic chaque seconde.
+- **À l'expiration**, le tour s'arrête simplement : fin du marché, puis fin de tour. Seule une action imposée par une carte est jouée, car le tour ne peut pas finir sans elle.
+- **Une décision demandée pendant le tour d'un autre joueur** a 15 secondes. Ensuite, le choix qu'un bot juge le meilleur pour ce joueur est pris à sa place.
 
 ## 4. Point de vue
 
@@ -168,11 +183,7 @@ Chaque geste envoie une commande du moteur à la session. Le moteur la valide : 
 
 ## 7. Questions ouvertes
 
-Sur le temps de tour limité (§3.9, ARB-70) :
-1. **Durée** d'un tour : fixe (par exemple 60 secondes) ou réglable dans le menu de la partie ?
-2. **À l'expiration** : le tour se termine simplement (fin du marché, puis fin de tour), ou un bot joue le reste du tour à la place du joueur ?
-3. **Décisions** demandées pendant le tour d'un autre (coup critique, déviation…) : un délai plus court, par exemple 15 secondes, puis un choix par défaut ?
-4. **Réglage** : activé par défaut dans une partie normale, désactivé dans le mode test ?
+Aucune pour l'instant : les questions sur le temps de tour limité sont tranchées (ARB-80).
 
 ## 8. Ce qui est construit
 
@@ -183,6 +194,10 @@ Sur le temps de tour limité (§3.9, ARB-70) :
 | M4.4, mode test | Le siège 1 est joué par une personne, les autres par des bots (niveau « normal » par défaut). Un panneau en bas à droite liste les coups que le moteur autorise, un bouton par coup, ainsi que les réponses quand une carte demande un choix. C'est un outil provisoire : il disparaîtra quand les gestes seront là. Réglages : objet `Partie` de la scène `Game`, rubrique *Partie de test*. |
 | M4.5, lisibilité | Après le premier playtest : **zoom** sur toute carte de la table (marché, panneaux, cartes du joueur). À la souris, la carte s'agrandit au survol ; sur écran tactile, tant que le doigt est posé dessus (l'appui long viendra avec le glisser-déposer). **Dés animés** : chaque lancer (attaque, ou dé d'un effet) s'affiche au centre, roule puis s'arrête sur les valeurs du moteur, avec le total gardé. |
 | M4.5, gestes (première partie) | **Fait** : les actions d'équipage en demi-cercle au-dessus du vaisseau, avec leur pictogramme (un nom court en attendant l'icône) ; un toucher pour Reparamétrage, Surcharge et Posture, un glisser vers un adversaire pour Attaque et Sabotage, avec les cibles permises allumées et les autres estompées ; une aide au survol de chaque action ; « Recycler » dans l'en-tête de chaque marché et « Passer le marché » au-dessus ; l'achat en glissant une carte du marché vers son vaisseau, l'utilisation en glissant une de ses cartes au centre ; le bouton de combo ; le jeton de surcharge armé d'un toucher (ARB-67) ; « Fin de tour », qui s'allume quand il ne reste rien d'autre à faire ; une fenêtre pour chaque décision ; la fiche d'un adversaire agrandie au survol. Le panneau du mode test reste disponible, désactivé par défaut. **Reste à faire** : les choix faits directement sur la table, le temps de tour limité (en attente des réponses d'INTERFACE §7). |
+| M4.5, marché réduit | **Fait** (ARB-81) : bande de miniatures sous le bandeau en dehors de ma phase de marché, ouverture automatique à ma phase de marché, bouton « Marché » pour le consulter. |
+| M4.5, choix sur la table | **Fait** (ARB-82) : question en bandeau sans bouton ; fiches et cartes allumées ; faces de d8 pour un nombre ; événements fantômes au centre ; actions imposées sur l'arc ; voler en glissant vers son vaisseau, détruire en glissant au centre ; passer en touchant la carte grise ou sa fiche. Les autres boutons restent. |
+| M4.5, temps de tour | **Fait** (ARB-80) : durée réglable dans le menu de partie locale, sans limite par défaut ; barre et secondes au-dessus de « Fin de tour », alerte et tic dans les dix dernières secondes ; tour terminé tout seul à l'expiration ; 15 secondes pour une décision demandée pendant le tour d'un autre, puis choix d'un bot. |
+| M4.5, deuxième playtest | **Fait** : actions en arc centré, attaque à gauche et bouclier à droite (ARB-74) ; journal qu'on peut remonter (ARB-75) ; plus de clignotement de la carte agrandie quand on pointe les cartes d'un adversaire. |
 | M4.5, détails de la table | **Fait** : l'événement de la manche s'agrandit au survol du bandeau (ou à l'appui long, §3.8) ; pendant qu'on glisse une carte du marché, la carte qu'elle remplacerait prend un cadre rouge (§3.3, couleur *Loss* du thème) ; avec l'option « fantômes », l'épave d'un joueur éliminé porte la mention « Fantôme : choisit l'événement » (§3.1). |
 | M4.5, raisons des refus | **Fait** : ce que le moteur refuse dit pourquoi (§1, §3.4, §3.5). Une action éteinte l'explique dans son aide. Pendant la visée, un adversaire qui ne peut pas être visé donne la raison, avec le nom de la carte ou de l'effet qui le protège. Une carte qu'on ne peut pas acheter ou utiliser maintenant donne la raison quand on essaie de la glisser. La raison vient toujours du moteur (`GameEngine.Explain`), jamais de l'interface. |
 | M4.5, appui long | **Fait** : sur écran tactile, l'appui long remplace le survol (§1) : carte agrandie, aide d'une action, fiche d'un adversaire agrandie. Un simple toucher ne montre rien de tout cela, et relâcher le doigt après un appui long ne déclenche pas le bouton. Le jeton de surcharge et le bouton de combo s'expliquent aussi au survol ou à l'appui long ; le combo, une fois jouable, nomme la technologie obtenue et son effet (§3.2). |

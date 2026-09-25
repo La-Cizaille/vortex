@@ -11,7 +11,9 @@ using Vortex.Core.Bots;
 using Vortex.Core.Commands;
 using Vortex.Core.Content;
 using Vortex.Core.Events;
+using Vortex.Core.Projection;
 using Vortex.Core.Rules;
+using Vortex.Core.State;
 
 namespace Vortex.Client.Presentation
 {
@@ -57,6 +59,7 @@ namespace Vortex.Client.Presentation
         [SerializeField] private PauseMenu pause = null!;
         [SerializeField] private GameOverPanel gameOver = null!;
         [SerializeField] private TurnAnnouncement announcement = null!;
+        [SerializeField] private TurnTimerDisplay timer = null!;
 
         [Header("Disposition (positions à l'écran : 0,0 en bas à gauche, 1,1 en haut à droite)")]
         [Tooltip("Position à l'écran du vaisseau du joueur.")]
@@ -81,6 +84,8 @@ namespace Vortex.Client.Presentation
         [SerializeField] private BotLevel botLevel = BotLevel.Normal;
         [Tooltip("0 : une graine différente à chaque partie.")]
         [SerializeField] private ulong seed;
+        [Tooltip("Temps d'un tour en secondes ; 0 : pas de limite (ARB-80).")]
+        [SerializeField, Min(0)] private int turnSeconds;
         [Tooltip("Pause entre deux coups d'un bot, en secondes (divisée par la vitesse de lecture).")]
         [SerializeField, Min(0f)] private float botPause = 0.4f;
 
@@ -93,6 +98,7 @@ namespace Vortex.Client.Presentation
         private MatchSetup? _setup;
         private bool _paused;
         private bool _outcomeShown;
+        private TurnClock _clock = new TurnClock(0f, MatchSetup.DecisionSeconds);
         private EventPlayer? _player;
         private TableModel? _model;
         private TableContext? _context;
@@ -135,12 +141,28 @@ namespace Vortex.Client.Presentation
         /// <summary>The "Tour de X" banner.</summary>
         public TurnAnnouncement Announcement => announcement;
 
+        /// <summary>The time the person who has to act has left (ARB-80).</summary>
+        public TurnClock Clock => _clock;
+
+        /// <summary>The display of that time.</summary>
+        public TurnTimerDisplay Timer => timer;
+
         /// <summary>Test mode: the first seat is played by a person through the command panel.</summary>
         public bool HumanFirstSeat
         {
             get => humanFirstSeat;
             set => humanFirstSeat = value;
         }
+
+        /// <summary>Test game: time of a turn in seconds, 0 for no limit (captures and tests).</summary>
+        public int TurnSeconds
+        {
+            get => turnSeconds;
+            set => turnSeconds = value > 0 ? value : 0;
+        }
+
+        /// <summary>The black market (tests).</summary>
+        public MarketDisplay Market => market;
 
         /// <summary>Test mode: the panel listing every allowed move is shown too.</summary>
         public bool ShowCommandPanel
@@ -195,6 +217,7 @@ namespace Vortex.Client.Presentation
             PlaceSeats();
             market.Bind(_context);
             market.SetPurchase(controls.CanBuy, controls.Buy, controls.ExplainBuy, controls.HideHelp, MarkLoss);
+            market.SetCardTap(uid => controls.ChooseCard(uid));
             banner.Bind(_context);
             log.Bind(_context);
             playback.Bind(_context, _player);
@@ -203,6 +226,8 @@ namespace Vortex.Client.Presentation
             pause.Bind(texts, theme.PlaybackSpeed, paused => _paused = paused, Restart, ApplyOptions, MatchLauncher.BackToMenu);
             gameOver.Bind(texts, Restart, MatchLauncher.BackToMenu);
             announcement.Hide();
+            _clock = new TurnClock(setup.TurnSeconds, MatchSetup.DecisionSeconds);
+            timer.Bind(theme);
             _paused = false;
             _outcomeShown = false;
             ShowAll(redrawCards: true);
@@ -219,6 +244,7 @@ namespace Vortex.Client.Presentation
             }
 
             announcement.Tick(deltaTime);
+            market.Tick(deltaTime);
             _player.Tick(deltaTime);
 
             // Displays are redrawn once per frame at most: skipping can start hundreds of events in one frame.
@@ -231,12 +257,16 @@ namespace Vortex.Client.Presentation
             if (_player.IsPlaying)
             {
                 WithdrawControls();
+                StopClock();
                 return;
             }
 
+            // The market opens for the person's market phase and folds after it (ARB-81).
+            market.Follow(!_session.IsOver && !_session.IsBotTurn && _session.Decision == null && _session.View.Phase == TurnPhase.Market);
             if (_session.IsOver)
             {
                 WithdrawControls();
+                StopClock();
                 SetPanel(PanelState.Hidden);
                 ShowOutcome();
                 return;
@@ -248,10 +278,12 @@ namespace Vortex.Client.Presentation
                 FollowPerson();
                 OfferControls();
                 SetPanel(showCommandPanel ? PanelState.Choices : PanelState.Hidden);
+                FollowClock(deltaTime);
                 return;
             }
 
             WithdrawControls();
+            StopClock();
             SetPanel(showCommandPanel ? PanelState.Waiting : PanelState.Hidden);
             _wait += deltaTime * _player.Speed;
             if (_wait < botPause)
@@ -297,7 +329,40 @@ namespace Vortex.Client.Presentation
                     n == 1 && humanFirstSeat ? SeatKind.Human : SeatKind.Bot,
                     botLevel))
                 .ToList(),
-            seed);
+            seed,
+            turnSeconds: turnSeconds);
+
+        // The time of the person who has to act runs while they can act. When it is up, their turn ends by itself, or a
+        // bot answers their decision (ARB-80); the events of that step play, then the next step follows if needed.
+        private void FollowClock(float deltaTime)
+        {
+            GameView table = _session!.View;
+            _clock.Follow(table.Round, table.CurrentPlayer, _session.Actor, _session.Decision?.Id);
+            _clock.Tick(deltaTime);
+            timer.Show(_clock);
+            if (!_clock.Expired)
+            {
+                return;
+            }
+
+            int actor = _session.Actor;
+            WithdrawControls();
+            SetPanel(PanelState.Hidden);
+            SessionResult result = _session.Expire(actor);
+            if (!result.Accepted)
+            {
+                Debug.LogError("The step played when the time was up was refused: " + result.Error);
+                return;
+            }
+
+            Play(result.Events);
+        }
+
+        private void StopClock()
+        {
+            _clock.Stop();
+            timer.Show(_clock);
+        }
 
         // While a market card is dragged, the viewer's card it would replace is marked (INTERFACE.md 3.3).
         private void MarkLoss(CardSlot slot, bool held)
@@ -425,6 +490,18 @@ namespace Vortex.Client.Presentation
         void IControlsHost.ShowTargets(IReadOnlyCollection<int>? seats) => ShowTargets(seats);
 
         /// <inheritdoc/>
+        void IControlsHost.MarkCards(IReadOnlyDictionary<int, Color>? marks)
+        {
+            Func<int, Color?> mark = uid => marks != null && marks.TryGetValue(uid, out Color color) ? color : (Color?)null;
+            foreach (SeatDisplay seat in _seats.Values)
+            {
+                seat.MarkCards(mark);
+            }
+
+            market.MarkCards(mark);
+        }
+
+        /// <inheritdoc/>
         CommandPreview? IControlsHost.Preview(int seat, Command command) => _session?.Preview(seat, command);
 
         /// <inheritdoc/>
@@ -456,10 +533,11 @@ namespace Vortex.Client.Presentation
             return -1;
         }
 
-        // While an action is aimed, the seats it may target light up and the others dim.
+        // While an action is aimed, or a decision offers seats, those light up and the others dim; the viewer's own seat
+        // only takes part when it is offered.
         private void ShowTargets(IReadOnlyCollection<int>? targets)
         {
-            foreach (KeyValuePair<int, SeatDisplay> seat in _seats.Where(s => s.Key != _viewer))
+            foreach (KeyValuePair<int, SeatDisplay> seat in _seats.Where(s => s.Key != _viewer || (targets != null && targets.Contains(_viewer)) || targets is null))
             {
                 seat.Value.ShowTargeting(targets is null ? (bool?)null : targets.Contains(seat.Key));
             }
@@ -549,6 +627,7 @@ namespace Vortex.Client.Presentation
             _seats[_viewer] = playerSeat;
             playerSeat.Bind(_context!);
             playerSeat.SetCardUse(controls.CanUse, controls.UseCard, controls.ExplainUse, controls.HideHelp);
+            AnswerOn(playerSeat, _viewer);
 
             IReadOnlyList<int> opponents = SeatLayout.Opponents(count, _viewer);
             for (int i = 0; i < opponents.Count; i++)
@@ -561,8 +640,19 @@ namespace Vortex.Client.Presentation
                 panel.name = "Adversaire " + (opponents[i] + 1).ToString(CultureInfo.InvariantCulture);
                 panel.gameObject.AddComponent<ScreenAnchor>().Follow(ship, view, opponentPanelOffset);
                 panel.Bind(_context!);
+
+                // Another player's card is dragged only to answer a decision (steal or destroy, ARB-82).
+                panel.SetCardUse(controls.CanUse, controls.UseCard);
+                AnswerOn(panel, opponents[i]);
                 _seats[opponents[i]] = panel;
             }
+        }
+
+        // A decision is answered by touching a seat's panel or one of its cards (ARB-82).
+        private void AnswerOn(SeatDisplay panel, int seat)
+        {
+            panel.Tapped = () => controls.ChooseSeat(seat);
+            panel.SetCardTap(uid => controls.ChooseCard(uid));
         }
 
         // The point of the table (the y = 0 plane) seen at a screen position, so the layout is set in screen terms.
@@ -675,6 +765,9 @@ namespace Vortex.Client.Presentation
             controls = playerControls;
             icons = iconCatalog;
         }
+
+        /// <summary>Wires the display of the turn time (editor setup).</summary>
+        public void AssignTimer(TurnTimerDisplay turnTimer) => timer = turnTimer;
 
         /// <summary>Wires the menus of the game: pause, end of game, turn banner (editor setup).</summary>
         public void AssignMenus(PauseMenu pauseMenu, GameOverPanel gameOverPanel, TurnAnnouncement turnAnnouncement)

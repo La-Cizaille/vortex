@@ -120,6 +120,16 @@ namespace Vortex.Core.Tests.Bricks
         }
 
         [Test]
+        public void StealOrDestroyOpponentModifier_names_the_card_and_where_a_stolen_card_goes()
+        {
+            (Scenario s, int me, int foe) = Setup(2, ("A_901", B("StealOrDestroyOpponentModifier")));
+            CardInstance theirs = s.Equip(foe, "D_903");
+            EngineResult r = s.MustAccept(me, Command.ActivateCard(s.Equip(me, "A_901").Uid));
+            Assert.That(r.Decision!.Prompt, Is.EqualTo("steal.or.destroy"), "The only opponent and card are chosen without asking.");
+            Assert.That(r.Decision.Options.Select(o => (o.Key, o.CardUid, o.Player)), Is.EqualTo(new[] { ("steal", theirs.Uid, me), ("destroy", theirs.Uid, -1) }));
+        }
+
+        [Test]
         public void RefreshMarketAndPick_recycles_then_equips_the_chosen_card()
         {
             (Scenario s, int me, int _) = Setup(2, ("A_901", B("RefreshMarketAndPick", ("market", "Defense"))));
@@ -240,6 +250,14 @@ namespace Vortex.Core.Tests.Bricks
 
             // Each shield moves to the next seat clockwise: seat 0 receives seat 2's, seat 1 receives seat 0's...
             Assert.That(new[] { s.P(0).Shield, s.P(1).Shield, s.P(2).Shield }, Is.EqualTo(new[] { 3, 1, 2 }));
+        }
+
+        [Test]
+        public void RotateShields_names_the_neighbour_receiving_the_holders_shield_in_each_direction()
+        {
+            (Scenario s, int me, int _) = Setup(4, ("A_901", B("RotateShields")));
+            EngineResult r = s.MustAccept(me, Command.ActivateCard(s.Equip(me, "A_901").Uid));
+            Assert.That(r.Decision!.Options.Select(o => (o.Key, o.Player)), Is.EqualTo(new[] { ("clockwise", (me + 1) % 4), ("counterclockwise", (me + 3) % 4) }));
         }
 
         [Test]

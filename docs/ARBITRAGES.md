@@ -160,6 +160,15 @@ Le game designer a précisé ses attentes pour les prochaines étapes, après le
 | ARB-72 | Que mettre dans les finitions (M5) ? | L'**audio** et un **fond stellaire animé**, en plus des modèles 3D (ADR-0016). | INTERFACE §8, ASSETS §2 à §4, feuille de route du README |
 | ARB-73 | Les cartes doivent-elles rester des éléments d'interface 2D (ADR-0015) ? | **Non : les cartes sont aussi des assets 3D**, comme les vaisseaux (consigne du designer, 2026-09-25). Blender est mis de côté pour l'instant, avec des assets modifiables dans Unity. | ADR-0017, `Card.prefab`, INTERFACE §2 |
 
+## 2026-09-25 : deuxième playtest (prototype complet)
+
+Le game designer a joué le prototype complet (menus, gestes, aperçus). Le jeu est jugé « globalement très fonctionnel » ; ses remarques portent sur la forme.
+
+| # | Question | Décision | Appliqué dans |
+|---|---|---|---|
+| ARB-74 | Comment disposer les actions d'équipage autour du vaisseau ? | **Un arc de cercle centré sur le vaisseau**, avec les actions d'attaque d'un côté (Attaque, Surcharge) et les actions de bouclier de l'autre (Reparamétrage, Sabotage). Mise en œuvre : attaque à gauche, du côté de la carte ATK, et bouclier à droite, du côté de la carte DEF ; sur chaque côté, l'action qui vise un adversaire est à l'extrémité et celle qui concerne son propre vaisseau vers le haut ; la Posture défensive (option) rejoint le côté bouclier. L'arc reste centré quelles que soient les options. | INTERFACE §3.4, `ActionArc` |
+| ARB-75 | Le journal doit-il garder toute la partie ? | **Oui : on peut remonter le journal.** Il garde les 300 dernières lignes, défile à la molette, au doigt ou avec sa barre, et ne suit les nouvelles lignes que si l'on est en bas. | INTERFACE §3.8, `GameLogDisplay` |
+
 ## 2026-09-25 : premier atelier Blender
 
 Le game designer a tranché les questions ouvertes d'ASSETS §5 avant le premier atelier Blender, mené en parallèle du prototype.
@@ -170,3 +179,13 @@ Le game designer a tranché les questions ouvertes d'ASSETS §5 avant le premier
 | ARB-77 | Style des modèles : low-poly à couleurs unies, ou textures peintes ? | **Low-poly texturé, avec des lumières.** Réponse du designer : « j'aimerais bien de la texture et des lumières, est-ce faisable en low poly ? ». C'est faisable : la forme reste low-poly (budget de triangles inchangé), le détail vient des textures (couleur, relief), et les parties lumineuses sont des matériaux émissifs que l'effet *Bloom* fait rayonner dans Unity. Vérifié sur un modèle d'essai passé par l'export. | ASSETS §2, `ArtImportRules.ConfigureModelTexture` |
 | ARB-78 | Version de Blender : 4.5 LTS ou 5.2 ? | **5.2 LTS**, déjà installée : c'est la LTS du moment, comme le demande l'ADR-0016. Le script d'export y a tourné sans changement. | ADR-0016, CONTRIBUTING (Blender) |
 | ARB-79 | Autoriser Blender MCP à télécharger des ressources CC0 depuis Poly Haven ? | **Pas pour l'instant.** Aucune ressource externe n'est nécessaire, donc aucune surface d'entrée de plus. Question à rouvrir pour le fond étoilé si besoin. | ASSETS §5, SECURITY §4 (inchangé) |
+
+## 2026-09-25 : fin de l'interface du prototype
+
+Le game designer a tranché les questions ouvertes d'INTERFACE §7 et les derniers points d'interface, sur les recommandations proposées. Les numéros ARB-76 à ARB-79 sont pris par l'atelier Blender.
+
+| # | Question | Décision | Appliqué dans |
+|---|---|---|---|
+| ARB-80 | Temps de tour limité (ARB-70) : durée, expiration, décisions, réglage par défaut ? | **Durée réglable** dans le menu de partie locale : illimitée, 60, 90 ou 120 secondes. **Pas de limite par défaut en partie locale** ; la limite servira surtout en ligne. **À l'expiration**, le tour s'arrête simplement : fin du marché, puis fin de tour ; aucun coup n'est joué à la place du joueur. Seule une action imposée par une carte est jouée, car le tour ne peut pas finir sans elle. **Une décision demandée pendant le tour d'un autre joueur** a 15 secondes ; ensuite, le choix qu'un bot juge le meilleur pour ce joueur est pris à sa place. Le temps ne court que lorsque le joueur peut agir : ni pendant les animations, ni pendant la pause. | INTERFACE §3.9, `TurnClock`, `TurnTimerDisplay`, `LocalHotSeatSession.Expire` |
+| ARB-81 | Marché réduit (INTERFACE §3.3) : où, quand et comment le rouvrir ? | **Une bande de miniatures sous le bandeau de manche**, à 40 % de sa taille. Le marché est **réduit en dehors de ma phase de marché**, y compris pendant les tours des autres, et **s'ouvre tout seul au début de ma phase de marché**. Un bouton « Marché » sous la bande l'ouvre pour le consulter, puis « Réduire le marché » le replie ; ce choix tient jusqu'au prochain changement de phase. Le zoom au survol fonctionne dans les deux états. | INTERFACE §3.3, `MarketDisplay.Follow`, `MarketDisplay.Toggle` |
+| ARB-82 | Choix faits directement sur la table : plus aucun bouton pour répondre à une décision ? | **Oui, pour les décisions seulement** ; les autres boutons (Fin de tour, Passer le marché, Recycler, Combo, Pause, Journal, Vitesse) restent. La question s'affiche en bandeau, sans bouton, et ce qui y répond s'allume : les fiches des joueurs, les cartes de la table, les actions d'équipage. **a) Nombres** : une rangée de faces de d8 au centre, seules les valeurs permises actives. **b) Choix facultatifs** : la carte qui propose le choix s'allume dans une autre couleur, et la toucher veut dire « je passe » ; si elle n'est pas sur la table, on touche sa propre fiche (pour une déviation : garder l'attaque) ; à défaut, la carte est montrée au centre. **c) Voler ou détruire** : on glisse la carte vers son vaisseau pour la voler, au centre pour la détruire. Un sens de rotation se choisit en touchant le voisin qui reçoit son bouclier ; un événement fantôme, en touchant une des deux cartes montrées au centre. | INTERFACE §3.6, RULES B6, `DecisionChoices`, `DecisionBoard`, `PlayerControls` |

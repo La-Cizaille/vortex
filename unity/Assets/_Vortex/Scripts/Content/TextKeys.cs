@@ -149,6 +149,12 @@ namespace Vortex.Client.Content
         /// <summary>Button leaving the market phase.</summary>
         public const string ButtonEndMarket = "button.end-market";
 
+        /// <summary>Button opening the folded market (ARB-81).</summary>
+        public const string ButtonMarketOpen = "button.market-open";
+
+        /// <summary>Button folding the open market (ARB-81).</summary>
+        public const string ButtonMarketFold = "button.market-fold";
+
         /// <summary>Button recycling a market.</summary>
         public const string ButtonRecycle = "button.recycle";
 
@@ -332,6 +338,15 @@ namespace Vortex.Client.Content
         /// <summary>Banner when the view turns to a person. {0}: name.</summary>
         public const string TurnOf = "turn.of";
 
+        /// <summary>Local game menu: time of a turn. {0}: the time chosen.</summary>
+        public const string LocalTurnTime = "local.turn-time";
+
+        /// <summary>Local game menu: turns are not timed.</summary>
+        public const string LocalTurnTimeOff = "local.turn-time-off";
+
+        /// <summary>Local game menu: a turn time. {0}: seconds.</summary>
+        public const string LocalTurnTimeSeconds = "local.turn-time-seconds";
+
         /// <summary>A refusal with what forbids it. {0}: the reason, {1}: the card or status.</summary>
         public const string RefusalSource = "refusal.with-source";
 
@@ -367,6 +382,21 @@ namespace Vortex.Client.Content
 
         /// <summary>Question of a decision, by its engine prompt key (e.g. <c>critical.discard</c>).</summary>
         public static string Decision(string prompt) => "decision." + prompt;
+
+        /// <summary>
+        /// Optional gesture hint after the question of a decision answered on the table (ARB-82), by its engine prompt key;
+        /// only questions whose gesture is not obvious have one.
+        /// </summary>
+        public static string DecisionHint(string prompt) => "decision.hint." + prompt;
+
+        /// <summary>How to decline a decision: touch the card that asks ({0}: its name).</summary>
+        public const string DecisionPassCard = "decision.pass.card";
+
+        /// <summary>How to decline a decision: touch one's own panel.</summary>
+        public const string DecisionPassSeat = "decision.pass.seat";
+
+        /// <summary>How to decline a decision: touch the card shown in the middle in grey.</summary>
+        public const string DecisionPassMiddle = "decision.pass.middle";
 
         /// <summary>Word for a decision answer, by its engine key (e.g. <c>yes</c>, <c>clockwise</c>).</summary>
         public static string Option(string key) => "option." + key;
@@ -424,6 +454,8 @@ namespace Vortex.Client.Content
             Add(OptionMarket, "marché");
             Add(ButtonEndTurn, "Fin de tour");
             Add(ButtonEndMarket, "Passer le marché");
+            Add(ButtonMarketOpen, "Marché");
+            Add(ButtonMarketFold, "Réduire le marché");
             Add(ButtonRecycle, "Recycler");
             Add(ButtonCombo, "Combo");
             Add(HelpOvercharge, "Surcharge : touchez le jeton pour l'armer. La prochaine attaque ou le prochain reparamétrage la dépense (un dé de plus). Touchez de nouveau pour la désarmer.");
@@ -487,6 +519,9 @@ namespace Vortex.Client.Content
             Add(GameOverMenu, "Menu");
             Add(TurnOf, "Tour de {0}");
             Add(RefusalSource, "{0} Cause : {1}.");
+            Add(LocalTurnTime, "Temps de tour : {0}");
+            Add(LocalTurnTimeOff, "illimité");
+            Add(LocalTurnTimeSeconds, "{0} s");
             Add(Refusal(CommandErrorCode.GameOver), "La partie est terminée.");
             Add(Refusal(CommandErrorCode.DecisionPending), "Une décision est en attente.");
             Add(Refusal(CommandErrorCode.NoDecisionPending), "Aucune décision n'est en attente.");
@@ -552,6 +587,11 @@ namespace Vortex.Client.Content
             Add(Decision("torment.market"), "Sur quelle carte du marché poser le Tourment ?");
             Add(Decision("torment.place"), "Sur quel modificateur poser le Tourment ?");
             Add(Decision("torment.target"), "Quel joueur reçoit le Tourment ?");
+            Add(DecisionHint("rotate.direction"), "Touchez le voisin qui reçoit votre bouclier.");
+            Add(DecisionHint("steal.or.destroy"), "Glissez la carte vers votre vaisseau pour la voler, ou au centre de la table pour la détruire.");
+            Add(DecisionPassCard, "Touchez {0} en gris pour passer.");
+            Add(DecisionPassSeat, "Touchez votre fiche pour passer.");
+            Add(DecisionPassMiddle, "Touchez la carte grise au centre pour passer.");
 
             Add(Option("yes"), "Oui");
             Add(Option("no"), "Non");

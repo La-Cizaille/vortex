@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -13,6 +14,9 @@ namespace Vortex.Client.Presentation
         private CardZoom? _zoom;
         private CardDisplay? _card;
         private HoverIntent? _intent;
+
+        /// <summary>Learns when the card starts (true) and stops (false) being pointed at: its seat panel stays open meanwhile.</summary>
+        public Action<bool>? Pointed { get; set; }
 
         /// <summary>Connects the card to the zoom of the table.</summary>
         public void Bind(CardZoom zoom)
@@ -58,6 +62,8 @@ namespace Vortex.Client.Presentation
             {
                 _zoom.Show(_card);
             }
+
+            Pointed?.Invoke(true);
         }
 
         private void HideCopy()
@@ -66,6 +72,8 @@ namespace Vortex.Client.Presentation
             {
                 _zoom.Hide(_card);
             }
+
+            Pointed?.Invoke(false);
         }
     }
 }

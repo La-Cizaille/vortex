@@ -42,6 +42,15 @@ namespace Vortex.Client.Presentation
         /// <summary>Learns when the card shown is taken (true) and put down (false).</summary>
         public Action<CardView, bool>? OnHolding { get; set; }
 
+        /// <summary>Learns when the card is pointed at (true) and left (false).</summary>
+        public Action<bool>? OnPointed { get; set; }
+
+        /// <summary>What a touch of the card does (a decision's answer, ARB-82), or null.</summary>
+        public Action? OnTap { get; set; }
+
+        /// <summary>The card of the table shown, or null (nothing, or a face that is not on the table).</summary>
+        public CardView? Shown => _shown;
+
         /// <summary>The card shown, or null.</summary>
         public CardDisplay? Card => _card != null && _card.gameObject.activeSelf ? _card : null;
 
@@ -71,6 +80,7 @@ namespace Vortex.Client.Presentation
             CardDisplay shown = Ensure(context);
             shown.Show(face, context.Theme, context.Art);
             shown.ShowTorments(0);
+            _shown = null;
             _uid = -1;
         }
 
@@ -114,9 +124,12 @@ namespace Vortex.Client.Presentation
                 _card.gameObject.AddComponent<CardAnchor>().Follow(_slot, context.View, context.CardDepth, _clip);
                 if (context.Zoom != null)
                 {
-                    _card.gameObject.AddComponent<CardHover>().Bind(context.Zoom);
+                    CardHover hover = _card.gameObject.AddComponent<CardHover>();
+                    hover.Bind(context.Zoom);
+                    hover.Pointed = pointed => OnPointed?.Invoke(pointed);
                 }
 
+                _card.gameObject.AddComponent<CardTap>().Tapped = () => OnTap?.Invoke();
                 if (OnDrop != null)
                 {
                     _card.gameObject.AddComponent<CardDrag>().Bind(

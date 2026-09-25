@@ -17,8 +17,11 @@ namespace Vortex.Client.Presentation
         /// <summary>Sends a command of a seat to the session.</summary>
         void Submit(int seat, Command command);
 
-        /// <summary>Highlights the seats a dragged action may target (null: back to normal).</summary>
+        /// <summary>Highlights the seats a dragged action may target, or a decision offers (null: back to normal).</summary>
         void ShowTargets(IReadOnlyCollection<int>? seats);
+
+        /// <summary>Marks cards of the table (seats and markets) by uid with a colour (null: every card back to normal).</summary>
+        void MarkCards(IReadOnlyDictionary<int, Color>? marks);
 
         /// <summary>What a command would likely do, computed by the engine (ADR-0018), or null.</summary>
         CommandPreview? Preview(int seat, Command command);

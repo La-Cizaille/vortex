@@ -109,6 +109,10 @@ namespace Vortex.Editor
             RectTransform foreground = UiBuilder.Part<RectTransform>(front.transform, "Centre", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
 
             RectTransform opponents = UiBuilder.Part<RectTransform>(ui, "Adversaires", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+
+            // The middle of the table, where a card is dropped to be used: where the open market lies, and it stays there
+            // when the market folds (ARB-81). Nothing is drawn, so it catches no pointer.
+            RectTransform middle = UiBuilder.Fixed<RectTransform>(ui, "Centre de la table", new Vector2(0.5f, 0.5f), new Vector2(0f, -20f), new Vector2(1180f, 210f));
             (MarketDisplay market, Button recycleAttack, Button recycleDefense, Button endMarket) = BuildMarket(ui);
             (SeatDisplay player, ActionButton[] actions, Button combo, Button overcharge, Graphic overchargeGlow) = BuildPlayerPanel(ui);
             RoundBanner banner = BuildBanner(ui);
@@ -117,10 +121,12 @@ namespace Vortex.Editor
             (Button endTurn, TMP_Text endTurnLabel) = UiBuilder.Button(ui, "Fin de tour", new Vector2(1f, 0f), new Vector2(-240f, 20f), new Vector2(220f, 104f));
             endTurnLabel.fontSize = 26f;
             endTurnLabel.fontStyle = FontStyles.Bold;
+            TurnTimerDisplay timer = BuildTimer(ui);
             CommandPanel commands = BuildChoicePanel(ui, "Coups (mode test)", new Vector2(1f, 0f), new Vector2(-20f, 132f), 520f, 3);
 
             // Foreground: the decision window, the help bubble and the aim line stay above the 3D cards.
             CommandPanel decision = BuildChoicePanel(front.transform, "Décision", new Vector2(0.5f, 0.5f), new Vector2(0f, 60f), 720f, 3);
+            DecisionBoard board = BuildDecisionBoard(front.transform);
             HelpBubble help = BuildHelp(front.transform);
             Image aimLine = UiBuilder.Fixed<Image>(front.transform, "Visée", new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(10f, 8f));
             aimLine.rectTransform.pivot = new Vector2(0f, 0.5f);
@@ -147,7 +153,9 @@ namespace Vortex.Editor
                 help,
                 aimLine.rectTransform,
                 (RectTransform)player.transform,
-                (RectTransform)market.transform);
+                middle);
+            controls.AssignArc(player.GetComponent<ActionArc>());
+            controls.AssignBoard(board);
 
             var director = new GameObject("Partie", typeof(GameDirector)).GetComponent<GameDirector>();
             director.Assign(
@@ -181,6 +189,27 @@ namespace Vortex.Editor
             GameOverPanel gameOver = BuildGameOver(front.transform);
             PauseMenu pause = BuildPause(ui, front.transform);
             director.AssignMenus(pause, gameOver, announcement);
+            director.AssignTimer(timer);
+        }
+
+        // The time left, just above the end turn button (INTERFACE.md 3.9): the seconds and a bar that empties.
+        private static TurnTimerDisplay BuildTimer(Transform ui)
+        {
+            RectTransform root = UiBuilder.Fixed<RectTransform>(ui, "Temps de tour", new Vector2(1f, 0f), new Vector2(-240f, 128f), new Vector2(220f, 40f));
+            RectTransform content = UiBuilder.Part<RectTransform>(root, "Contenu", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            Image track = UiBuilder.Box(UiBuilder.Fixed<Image>(content, "Piste", new Vector2(0.5f, 0f), Vector2.zero, new Vector2(220f, 10f)), new Color(1f, 1f, 1f, 0.12f));
+            Image bar = UiBuilder.Part<Image>(track.transform, "Barre", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            bar.sprite = UiBuilder.RoundedBox;
+            bar.type = Image.Type.Filled;
+            bar.fillMethod = Image.FillMethod.Horizontal;
+            bar.fillOrigin = (int)Image.OriginHorizontal.Left;
+            bar.raycastTarget = false;
+            TMP_Text time = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(content, "Secondes", new Vector2(0.5f, 1f), Vector2.zero, new Vector2(220f, 28f)), 22f, FontStyles.Bold, TextAlignmentOptions.Center);
+            AudioSource sound = root.gameObject.AddComponent<AudioSource>();
+            sound.playOnAwake = false;
+            TurnTimerDisplay timer = root.gameObject.AddComponent<TurnTimerDisplay>();
+            timer.Assign(content.gameObject, bar, time, sound);
+            return timer;
         }
 
         // "Tour de X", in the upper middle of the screen; it never takes the pointer.
@@ -272,6 +301,49 @@ namespace Vortex.Editor
         }
 
         // The help shown next to what the pointer is on: a small panel whose height follows its text.
+        // A decision answered on the table (INTERFACE.md 3.6, ARB-82): its question above the middle, with no button; eight
+        // die faces for a number; up to three places in the middle for the cards it shows (events, the card that asks).
+        private static DecisionBoard BuildDecisionBoard(Transform parent)
+        {
+            RectTransform root = UiBuilder.Part<RectTransform>(parent, "Décision sur la table", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            Image panel = UiBuilder.Box(UiBuilder.Fixed<Image>(root, "Question", new Vector2(0.5f, 0.5f), new Vector2(0f, 104f), new Vector2(900f, 48f)), new Color(0.02f, 0.03f, 0.07f, 0.9f));
+            TMP_Text question = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(panel.transform, "Texte", Vector2.zero, Vector2.one, new Vector2(12f, 2f), new Vector2(-12f, -2f)), 20f, FontStyles.Bold, TextAlignmentOptions.Center);
+            question.enableAutoSizing = true;
+            question.fontSizeMin = 13f;
+            question.fontSizeMax = 20f;
+            question.color = new Color32(255, 214, 102, 255);
+
+            // Die faces: a diamond like the die of the table, the number upright on it.
+            const float face = 64f;
+            const float gap = 12f;
+            var faces = new Button[8];
+            for (int i = 0; i < faces.Length; i++)
+            {
+                float x = (i - (faces.Length - 1) / 2f) * (face + gap);
+                Image area = UiBuilder.Fixed<Image>(root, "Face " + (i + 1), new Vector2(0.5f, 0.5f), new Vector2(x, 20f), new Vector2(face, face));
+                area.color = Color.clear;
+                Image diamond = UiBuilder.Box(UiBuilder.Fixed<Image>(area.transform, "Losange", new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(face * 0.72f, face * 0.72f)), new Color32(236, 238, 245, 255));
+                diamond.rectTransform.localRotation = Quaternion.Euler(0f, 0f, 45f);
+                TMP_Text number = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(area.transform, "Chiffre", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), 26f, FontStyles.Bold, TextAlignmentOptions.Center);
+                number.color = new Color32(20, 22, 34, 255);
+                faces[i] = area.gameObject.AddComponent<Button>();
+                faces[i].targetGraphic = diamond;
+                ColorBlock colors = faces[i].colors;
+                colors.disabledColor = new Color(1f, 1f, 1f, 0.2f);
+                faces[i].colors = colors;
+            }
+
+            var middle = new RectTransform[3];
+            for (int i = 0; i < middle.Length; i++)
+            {
+                middle[i] = UiBuilder.Fixed<RectTransform>(root, "Carte au centre " + (i + 1), new Vector2(0.5f, 0.5f), new Vector2(0f, -10f), new Vector2(130f, 180f));
+            }
+
+            DecisionBoard board = root.gameObject.AddComponent<DecisionBoard>();
+            board.Assign(panel.gameObject, question, faces, middle);
+            return board;
+        }
+
         private static HelpBubble BuildHelp(Transform parent)
         {
             Image bubble = UiBuilder.Box(UiBuilder.Fixed<Image>(parent, "Aide", new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(420f, 60f)), new Color(0.02f, 0.03f, 0.07f, 0.95f));
@@ -289,7 +361,8 @@ namespace Vortex.Editor
         }
 
         // The two black markets in the middle: attack on the left, defense on the right (INTERFACE.md 3.3), with their
-        // buttons at their level (ARB-71): "Recycler" in each half's header, "Passer le marché" above the middle.
+        // buttons at their level (ARB-71): "Recycler" in each half's header, "Passer le marché" above the middle. Outside
+        // the person's market phase, it folds under the round banner; the button under it opens it (ARB-81).
         private static (MarketDisplay Market, Button RecycleAttack, Button RecycleDefense, Button EndMarket) BuildMarket(Transform ui)
         {
             // 1180 wide: the panels of the opponents at the ends of the arc stay clear of it.
@@ -300,6 +373,9 @@ namespace Vortex.Editor
             endLabel.fontSize = 18f;
             MarketDisplay market = root.gameObject.AddComponent<MarketDisplay>();
             market.Assign(attackRow, defenseRow, attackLabel, defenseLabel, attackDeck, defenseDeck, 133f);
+            (Button toggle, TMP_Text toggleLabel) = UiBuilder.Button(ui, "Ouvrir le marché", new Vector2(0.5f, 0.5f), new Vector2(0f, 300f), new Vector2(180f, 36f));
+            toggleLabel.fontSize = 18f;
+            market.AssignToggle(toggle, toggleLabel, new Vector2(0f, -20f), new Vector2(0f, 368f));
             return (market, recycleAttack, recycleDefense, endMarket);
         }
 
@@ -352,17 +428,15 @@ namespace Vortex.Editor
             (Button combo, TMP_Text comboLabel) = UiBuilder.Button(root, "Combo", new Vector2(0.5f, 0f), new Vector2(-340f, 244f), new Vector2(150f, 40f));
             comboLabel.fontStyle = FontStyles.Bold;
 
-            // The ship stands a quarter of the screen up (GameDirector), that is 270 units above the panel's bottom.
-            var ship = new Vector2(0f, 270f);
-            CrewAction[] order = { CrewAction.Attack, CrewAction.Sabotage, CrewAction.RerollShield, CrewAction.Overcharge, CrewAction.DefensivePosture };
-            float[] angles = { 160f, 125f, 90f, 55f, 20f };
-            var actions = new ActionButton[order.Length];
-            for (int i = 0; i < order.Length; i++)
-            {
-                float angle = angles[i] * Mathf.Deg2Rad;
-                Vector2 place = ship + (new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * 125f);
-                actions[i] = BuildAction(root, order[i], place);
-            }
+            // The actions, on an arc centred above the ship (ActionArc lays them out, playtest 2): attack actions on the
+            // left, beside the attack card, shield actions on the right; aimed actions at the ends, own ones near the top.
+            ActionButton[] attackSide = { BuildAction(root, CrewAction.Attack), BuildAction(root, CrewAction.Overcharge) };
+            ActionButton[] shieldSide = { BuildAction(root, CrewAction.RerollShield), BuildAction(root, CrewAction.DefensivePosture), BuildAction(root, CrewAction.Sabotage) };
+            ActionArc arc = root.gameObject.AddComponent<ActionArc>();
+            arc.Assign(attackSide, shieldSide);
+            shieldSide[1].gameObject.SetActive(false);
+            arc.Arrange();
+            ActionButton[] actions = attackSide.Concat(shieldSide).ToArray();
 
             SeatDisplay seat = root.gameObject.AddComponent<SeatDisplay>();
             seat.Assign(name, hp, shield, statuses, overcharge, rounds, attack, defense, highlight, leader, root.GetComponent<CanvasGroup>());
@@ -370,11 +444,10 @@ namespace Vortex.Editor
         }
 
         // One action: a disc with the pictogram, or its short name while the icon is missing.
-        private static ActionButton BuildAction(Transform parent, CrewAction action, Vector2 centre)
+        private static ActionButton BuildAction(Transform parent, CrewAction action)
         {
             Image disc = UiBuilder.Fixed<Image>(parent, "Action " + action, new Vector2(0.5f, 0f), Vector2.zero, new Vector2(56f, 56f));
             disc.rectTransform.pivot = new Vector2(0.5f, 0.5f);
-            disc.rectTransform.anchoredPosition = centre;
             disc.sprite = UiBuilder.Disc;
             disc.color = new Color(0.1f, 0.12f, 0.2f, 0.95f);
             disc.raycastTarget = true;
@@ -408,10 +481,41 @@ namespace Vortex.Editor
         {
             RectTransform root = UiBuilder.Part<RectTransform>(ui, "Journal", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             (Button toggle, TMP_Text toggleLabel) = UiBuilder.Button(root, "Bouton", Vector2.zero, new Vector2(20f, 20f), new Vector2(160f, 48f));
-            Image panel = UiBuilder.Box(UiBuilder.Fixed<Image>(root, "Panneau", Vector2.zero, new Vector2(20f, 76f), new Vector2(500f, 300f)), Panel);
-            TMP_Text lines = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(panel.transform, "Lignes", Vector2.zero, Vector2.one, new Vector2(14f, 10f), new Vector2(-14f, -10f)), 15f, FontStyles.Normal, TextAlignmentOptions.BottomLeft);
+            Image panel = UiBuilder.Box(UiBuilder.Fixed<Image>(root, "Panneau", Vector2.zero, new Vector2(20f, 76f), new Vector2(500f, 300f)), Panel, receivesPointer: true);
+
+            // A scroll view (wheel, drag or bar): the lines grow downwards from the top and the view follows the last one.
+            RectTransform view = UiBuilder.Part<RectTransform>(panel.transform, "Vue", Vector2.zero, Vector2.one, new Vector2(14f, 10f), new Vector2(-26f, -10f));
+            view.gameObject.AddComponent<RectMask2D>();
+            TMP_Text lines = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(view, "Lignes", new Vector2(0f, 1f), Vector2.one, Vector2.zero, Vector2.zero), 15f, FontStyles.Normal, TextAlignmentOptions.TopLeft);
+            lines.rectTransform.pivot = new Vector2(0.5f, 1f);
+            lines.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            GameObject barObject = DefaultControls.CreateScrollbar(new DefaultControls.Resources());
+            barObject.name = "Barre";
+            var barShape = (RectTransform)barObject.transform;
+            barShape.SetParent(panel.transform, false);
+            barShape.anchorMin = new Vector2(1f, 0f);
+            barShape.anchorMax = Vector2.one;
+            barShape.pivot = new Vector2(1f, 0.5f);
+            barShape.offsetMin = new Vector2(-18f, 10f);
+            barShape.offsetMax = new Vector2(-8f, -10f);
+            Scrollbar bar = barObject.GetComponent<Scrollbar>();
+            bar.direction = Scrollbar.Direction.BottomToTop;
+            barObject.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.06f);
+            bar.handleRect.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.3f);
+
+            ScrollRect scroll = panel.gameObject.AddComponent<ScrollRect>();
+            scroll.viewport = view;
+            scroll.content = lines.rectTransform;
+            scroll.horizontal = false;
+            scroll.vertical = true;
+            scroll.movementType = ScrollRect.MovementType.Clamped;
+            scroll.scrollSensitivity = 30f;
+            scroll.verticalScrollbar = bar;
+            scroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide;
+
             GameLogDisplay log = root.gameObject.AddComponent<GameLogDisplay>();
-            log.Assign(panel.gameObject, lines, toggle, toggleLabel);
+            log.Assign(panel.gameObject, lines, toggle, toggleLabel, scroll);
             return log;
         }
 

@@ -8,6 +8,8 @@ using Vortex.Client.Gallery;
 using Vortex.Client.Menus;
 using Vortex.Client.Presentation;
 using Vortex.Core.Commands;
+using Vortex.Core.Content;
+using Vortex.Core.Projection;
 using Object = UnityEngine.Object;
 
 namespace Vortex.Editor
@@ -26,8 +28,10 @@ namespace Vortex.Editor
         /// Bots play the game scene until the requested round, then the table is rendered. With VORTEX_HUMAN=1, the first
         /// seat is a person's: the table is rendered on their turn, with the controls offered, after the market or, with
         /// VORTEX_PHASE=market, during it. VORTEX_PHASE=aim shows an attack being aimed at the first opponent it may target,
-        /// with the engine's preview next to it (ADR-0018). VORTEX_PHASE=pause shows the pause menu, and VORTEX_PHASE=end
-        /// plays the game to its end and shows the end of game panel.
+        /// with the engine's preview next to it (ADR-0018). VORTEX_PHASE=pause shows the pause menu, VORTEX_PHASE=end
+        /// plays the game to its end and shows the end of game panel, and VORTEX_PHASE=log opens the game log. With a person,
+        /// VORTEX_PHASE=decision renders the first decision they answer on the table (ARB-82): the person buys and uses
+        /// cards, so that something asks them.
         /// </summary>
         public static void Game()
         {
@@ -37,15 +41,17 @@ namespace Vortex.Editor
             string? phase = Environment.GetEnvironmentVariable("VORTEX_PHASE");
             bool atMarket = phase == "market";
             bool toTheEnd = phase == "end";
+            bool atDecision = phase == "decision";
             EditorSceneManager.OpenScene(GameScene.ScenePath, OpenSceneMode.Single);
             (Camera camera, RenderTexture target) = Prepare();
             GameDirector director = Object.FindAnyObjectByType<GameDirector>();
             director.HumanFirstSeat = human;
+            director.TurnSeconds = int.TryParse(Environment.GetEnvironmentVariable("VORTEX_TURN_SECONDS"), out int turn) ? turn : 0;
             director.Begin();
             for (int frame = 0; frame < 50000 && (toTheEnd ? !director.GameOver.Shown : director.Model!.Outcome == null); frame++)
             {
                 director.Advance(0.2f);
-                bool reached = !toTheEnd && director.Model!.Round >= round;
+                bool reached = !toTheEnd && (atDecision || director.Model!.Round >= round);
                 if (!human && reached && director.IsPlaying)
                 {
                     break;
@@ -53,23 +59,29 @@ namespace Vortex.Editor
 
                 if (human && director.Controls.Offered)
                 {
-                    // The person's turn: rendered at the market or after it, once the round is reached.
-                    if (reached && director.Controls.CanEndMarket == atMarket && !director.Controls.Decision.gameObject.activeSelf)
+                    // The person's turn: rendered at the market or after it, once the round is reached; or their first
+                    // decision on the table.
+                    PlayerControls controls = director.Controls;
+                    bool asked = controls.Choices != null || controls.Decision.gameObject.activeSelf;
+                    if (atDecision ? controls.Choices != null : reached && !asked && controls.CanEndMarket == atMarket)
                     {
                         break;
                     }
 
-                    if (director.Controls.Decision.gameObject.activeSelf)
+                    if (TableAnswers.Answer(controls))
                     {
-                        director.Controls.Decision.Choose(0);
+                        // A decision, answered on the table.
                     }
-                    else if (director.Controls.CanEndMarket)
+                    else if (controls.CanEndMarket)
                     {
-                        director.Controls.EndMarket();
+                        if (!(atDecision && Buy(director)))
+                        {
+                            controls.EndMarket();
+                        }
                     }
-                    else
+                    else if (!(atDecision && UseACard(director)))
                     {
-                        director.Controls.EndTurn();
+                        controls.EndTurn();
                     }
                 }
             }
@@ -85,6 +97,11 @@ namespace Vortex.Editor
                 director.Pause.Open();
             }
 
+            if (phase == "log")
+            {
+                Object.FindAnyObjectByType<GameLogDisplay>().Toggle();
+            }
+
             if (human && phase == "aim")
             {
                 // The layers must stand where they are drawn before the pointer positions are read.
@@ -93,6 +110,23 @@ namespace Vortex.Editor
             }
 
             Render(camera, target, output);
+        }
+
+        // Buys the first card of a market onto the person's side (attack in even rounds, defense in odd ones).
+        private static bool Buy(GameDirector director)
+        {
+            Rect side = CardAnchor.ScreenRectOf((RectTransform)director.Seats[director.Viewer].transform);
+            CardSlot slot = director.Model!.Round % 2 == 0 ? CardSlot.Attack : CardSlot.Defense;
+            return director.Controls.CanBuy(slot, 0) && director.Controls.Buy(slot, 0, side.center);
+        }
+
+        // Drags one of the person's usable cards into the middle; false when none can be used.
+        private static bool UseACard(GameDirector director)
+        {
+            PlayerView me = director.Session!.View.Players[director.Viewer];
+            PlayerControls controls = director.Controls;
+            Vector2 middle = CardAnchor.ScreenRectOf(controls.ActivationZone).center;
+            return new[] { me.AttackSlot, me.DefenseSlot }.Any(card => card != null && controls.CanUse(card.Uid) && controls.UseCard(card.Uid, middle));
         }
 
         /// <summary>
