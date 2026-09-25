@@ -507,3 +507,7 @@ MonoBehaviour:
     Text: "illimit\xE9"
   - Key: local.turn-time-seconds
     Text: '{0} s'
+  - Key: button.market-open
+    Text: "March\xE9"
+  - Key: button.market-fold
+    Text: "R\xE9duire le march\xE9"
