@@ -161,6 +161,9 @@ namespace Vortex.Client.Content
         /// <summary>Help of the combo button.</summary>
         public const string HelpCombo = "help.combo";
 
+        /// <summary>Marker of an eliminated player who chooses the events (ghosts option).</summary>
+        public const string SeatGhost = "seat.ghost";
+
         /// <summary>Help of the combo button when a combo is ready. {0}: technology, {1}: its effect.</summary>
         public const string HelpComboReady = "help.combo-ready";
 
@@ -425,6 +428,7 @@ namespace Vortex.Client.Content
             Add(ButtonCombo, "Combo");
             Add(HelpOvercharge, "Surcharge : touchez le jeton pour l'armer. La prochaine attaque ou le prochain reparamétrage la dépense (un dé de plus). Touchez de nouveau pour la désarmer.");
             Add(HelpCombo, "Combo : vos deux modificateurs sont de la même technologie. Ils sont défaussés et la technologie est obtenue.");
+            Add(SeatGhost, "Fantôme : choisit l'événement");
             Add(HelpComboReady, "Combo : vos deux modificateurs sont défaussés et vous obtenez {0}. {1}");
             Add(PreviewDice, "Dés : {0}d{1}");
             Add(PreviewDiceKept, "Dés : {0}d{1}, les {2} meilleurs gardés");

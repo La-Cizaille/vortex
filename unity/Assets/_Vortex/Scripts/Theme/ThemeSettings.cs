@@ -31,6 +31,8 @@ namespace Vortex.Client.Theme
         [SerializeField] private Color overcharge = new Color32(255, 170, 60, 255);
         [Tooltip("Teinte du vaisseau d'un joueur éliminé (épave).")]
         [SerializeField] private Color wreck = new Color32(58, 60, 68, 255);
+        [Tooltip("Cadre de la carte qu'un achat remplacerait, pendant qu'on glisse une carte du marché.")]
+        [SerializeField] private Color loss = new Color32(229, 57, 53, 255);
 
         [Header("Sièges")]
         [Tooltip("Couleur de chaque siège, dans l'ordre de la table. Elle teinte les vaisseaux provisoires.")]
@@ -79,6 +81,9 @@ namespace Vortex.Client.Theme
 
         /// <summary>Tint of an eliminated player's ship.</summary>
         public Color Wreck => wreck;
+
+        /// <summary>Frame of the card a purchase would replace (INTERFACE.md 3.3).</summary>
+        public Color Loss => loss;
 
         /// <summary>Title font, or null for the TextMeshPro default.</summary>
         public TMP_FontAsset? TitleFont => titleFont;
