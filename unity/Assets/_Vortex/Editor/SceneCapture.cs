@@ -26,8 +26,8 @@ namespace Vortex.Editor
         /// Bots play the game scene until the requested round, then the table is rendered. With VORTEX_HUMAN=1, the first
         /// seat is a person's: the table is rendered on their turn, with the controls offered, after the market or, with
         /// VORTEX_PHASE=market, during it. VORTEX_PHASE=aim shows an attack being aimed at the first opponent it may target,
-        /// with the engine's preview next to it (ADR-0018). VORTEX_PHASE=pause shows the pause menu, and VORTEX_PHASE=end
-        /// plays the game to its end and shows the end of game panel.
+        /// with the engine's preview next to it (ADR-0018). VORTEX_PHASE=pause shows the pause menu, VORTEX_PHASE=end
+        /// plays the game to its end and shows the end of game panel, and VORTEX_PHASE=log opens the game log.
         /// </summary>
         public static void Game()
         {
@@ -83,6 +83,11 @@ namespace Vortex.Editor
             if (phase == "pause")
             {
                 director.Pause.Open();
+            }
+
+            if (phase == "log")
+            {
+                Object.FindAnyObjectByType<GameLogDisplay>().Toggle();
             }
 
             if (human && phase == "aim")

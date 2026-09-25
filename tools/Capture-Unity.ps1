@@ -6,7 +6,7 @@
     Game: five bots play until the requested round, then the table is rendered (1920 x 1080); with -Human, the first
     seat is a person's and the table is rendered on their turn, controls offered, after the market or (-Phase Market)
     during it; -Phase Aim shows an attack aimed at an opponent, with the engine's preview; -Phase Pause the pause menu;
-    -Phase End the end of game panel (the game is played to its end). Menu: the home screen, or -Phase Local, Dev or
+    -Phase End the end of game panel (the game is played to its end); -Phase Log the open game log. Menu: the home screen, or -Phase Local, Dev or
     Options. Gallery: every card and ship. A way
     to check a layout, a new illustration or a new model in context. The editor must be closed.
 
@@ -25,7 +25,7 @@ param(
     [ValidateRange(1, 30)]
     [int] $Round = 4,
     [switch] $Human,
-    [ValidateSet('Actions', 'Market', 'Aim', 'Pause', 'End', 'Home', 'Local', 'Dev', 'Options')]
+    [ValidateSet('Actions', 'Market', 'Aim', 'Pause', 'End', 'Log', 'Home', 'Local', 'Dev', 'Options')]
     [string] $Phase = 'Actions'
 )
 
