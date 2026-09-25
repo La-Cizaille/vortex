@@ -5,12 +5,13 @@
 .DESCRIPTION
     Game: five bots play until the requested round, then the table is rendered (1920 x 1080); with -Human, the first
     seat is a person's and the table is rendered on their turn, controls offered, after the market or (-Phase Market)
-    during it. Gallery: every card and ship. A way
+    during it; -Phase Aim shows an attack aimed at an opponent, with the engine's preview. Gallery: every card and ship. A way
     to check a layout, a new illustration or a new model in context. The editor must be closed.
 
 .EXAMPLE
     ./tools/Capture-Unity.ps1 -Scene Game -Round 6 -Out captures/table.png
     ./tools/Capture-Unity.ps1 -Scene Game -Round 3 -Human -Out captures/my-turn.png
+    ./tools/Capture-Unity.ps1 -Scene Game -Round 3 -Human -Phase Aim -Out captures/aim.png
     ./tools/Capture-Unity.ps1 -Scene Gallery -Out captures/gallery.png
 #>
 param(
@@ -21,7 +22,7 @@ param(
     [ValidateRange(1, 30)]
     [int] $Round = 4,
     [switch] $Human,
-    [ValidateSet('Actions', 'Market')]
+    [ValidateSet('Actions', 'Market', 'Aim')]
     [string] $Phase = 'Actions'
 )
 

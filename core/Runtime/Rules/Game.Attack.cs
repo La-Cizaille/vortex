@@ -16,6 +16,7 @@ namespace Vortex.Core.Rules
         public AttackInfo ResolveAttack(int attacker, int target, bool useOvercharge)
         {
             var attack = new AttackInfo(attacker, target);
+            Attacks.Add(attack);
 
             // 1. Declaration (legality was validated with the permission "cibler").
             if (useOvercharge)
@@ -55,7 +56,7 @@ namespace Vortex.Core.Rules
                 Emit(new GameEvent { Type = GameEventType.LeaderBountyApplied, Player = attacker, Other = attack.Target, Amount = bounty });
             }
 
-            attack.Value = Math.Max(0, Calculate(attack.KeptSum, (e, s, m) => e.ModifyAttackValue(this, s, attack, m), m => m.Add(bounty)));
+            attack.Value = Math.Max(0, Calculate(attack.KeptSum, (e, s, m) => e.ModifyAttackValue(this, s, attack, m), m => m.Add(bounty), attack.Bonuses));
 
             // 7. Effective shield.
             attack.EffectiveShield = Math.Max(0, Calculate(ShieldOf(attack.Target), (e, s, m) => e.ModifyEffectiveShield(this, s, attack, m)));
@@ -147,6 +148,7 @@ namespace Vortex.Core.Rules
             }
 
             attack.Kept.AddRange(kept);
+            attack.NetAdvantage = Math.Sign(net);
             Emit(new GameEvent { Type = GameEventType.DiceRolled, Player = attack.Attacker, Values = new List<int>(attack.Rolls), Amount = attack.KeptSum, Value = net });
         }
 

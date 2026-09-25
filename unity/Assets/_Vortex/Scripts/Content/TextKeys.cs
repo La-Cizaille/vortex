@@ -159,6 +159,60 @@ namespace Vortex.Client.Content
         /// <summary>Help of the combo button.</summary>
         public const string HelpCombo = "help.combo";
 
+        /// <summary>Preview, dice of an attack. {0}: dice per throw, {1}: faces.</summary>
+        public const string PreviewDice = "preview.dice";
+
+        /// <summary>Preview, dice of an attack keeping the best ones. {0}: dice per throw, {1}: faces, {2}: dice kept.</summary>
+        public const string PreviewDiceKept = "preview.dice-kept";
+
+        /// <summary>Preview, added to the dice when thrown with advantage.</summary>
+        public const string PreviewAdvantage = "preview.advantage";
+
+        /// <summary>Preview, added to the dice when thrown with disadvantage.</summary>
+        public const string PreviewDisadvantage = "preview.disadvantage";
+
+        /// <summary>Preview, effective shield of the target. {0}: value or range.</summary>
+        public const string PreviewShield = "preview.shield";
+
+        /// <summary>Preview, bonuses and maluses added to the dice. {0}: the list of <see cref="PreviewBonusItem"/>.</summary>
+        public const string PreviewBonuses = "preview.bonuses";
+
+        /// <summary>Preview, one bonus. {0}: where it comes from, {1}: signed amount or range.</summary>
+        public const string PreviewBonusItem = "preview.bonus-item";
+
+        /// <summary>Preview, name of a bonus given by the base rules (a rule option).</summary>
+        public const string PreviewBonusRule = "preview.bonus-rule";
+
+        /// <summary>Preview, damage. {0}: range, {1}: average.</summary>
+        public const string PreviewDamage = "preview.damage";
+
+        /// <summary>Preview, damage when it is certain. {0}: damage.</summary>
+        public const string PreviewDamageExact = "preview.damage-exact";
+
+        /// <summary>Preview, chances. {0}: hit, {1}: critical.</summary>
+        public const string PreviewChances = "preview.chances";
+
+        /// <summary>Preview, chances when the target may be destroyed. {0}: hit, {1}: critical, {2}: destroyed.</summary>
+        public const string PreviewChancesDestroyed = "preview.chances-destroyed";
+
+        /// <summary>Preview, the target may redirect the attack.</summary>
+        public const string PreviewRedirect = "preview.redirect";
+
+        /// <summary>Preview, HP the acting player may lose. {0}: most HP lost.</summary>
+        public const string PreviewSelfLoss = "preview.self-loss";
+
+        /// <summary>Preview, shield of a sabotaged target. {0}: now, {1}: average after, {2}: range after.</summary>
+        public const string PreviewSabotage = "preview.sabotage";
+
+        /// <summary>Preview, a range of values. {0}: lowest, {1}: highest.</summary>
+        public const string PreviewRange = "preview.range";
+
+        /// <summary>Preview, a chance. {0}: percentage.</summary>
+        public const string PreviewPercent = "preview.percent";
+
+        /// <summary>Preview, decimal separator of averages.</summary>
+        public const string PreviewDecimal = "preview.decimal";
+
         /// <summary>Every key with its default text.</summary>
         public static readonly IReadOnlyList<KeyValuePair<string, string>> Defaults = BuildDefaults();
 
@@ -188,6 +242,8 @@ namespace Vortex.Client.Content
 
         /// <summary>Word for a decision answer, by its engine key (e.g. <c>yes</c>, <c>clockwise</c>).</summary>
         public static string Option(string key) => "option." + key;
+
+        private const string NoBreakSpace = "\u00A0";
 
         private static List<KeyValuePair<string, string>> BuildDefaults()
         {
@@ -244,6 +300,24 @@ namespace Vortex.Client.Content
             Add(ButtonCombo, "Combo");
             Add(HelpOvercharge, "Surcharge : touchez le jeton pour l'armer. La prochaine attaque ou le prochain reparamétrage la dépense (un dé de plus). Touchez de nouveau pour la désarmer.");
             Add(HelpCombo, "Combo : vos deux modificateurs sont de la même technologie. Ils sont défaussés et la technologie est obtenue.");
+            Add(PreviewDice, "Dés : {0}d{1}");
+            Add(PreviewDiceKept, "Dés : {0}d{1}, les {2} meilleurs gardés");
+            Add(PreviewAdvantage, ", avec avantage");
+            Add(PreviewDisadvantage, ", avec désavantage");
+            Add(PreviewShield, "Bouclier de la cible : {0}");
+            Add(PreviewBonuses, "Bonus : {0}");
+            Add(PreviewBonusItem, "{1} {0}");
+            Add(PreviewBonusRule, "règle de la partie");
+            Add(PreviewDamage, "Dégâts : {0}, {1} en moyenne");
+            Add(PreviewDamageExact, "Dégâts : {0}");
+            Add(PreviewChances, "Touche : {0} · critique : {1}");
+            Add(PreviewChancesDestroyed, "Touche : {0} · critique : {1} · détruit : {2}");
+            Add(PreviewRedirect, "La cible peut dévier l'attaque.");
+            Add(PreviewSelfLoss, "Vous pouvez perdre jusqu'à {0} PV.");
+            Add(PreviewSabotage, "Bouclier de la cible : {0} maintenant, {1} en moyenne après ({2})");
+            Add(PreviewRange, "{0} à {1}");
+            Add(PreviewPercent, "{0}" + NoBreakSpace + "%");
+            Add(PreviewDecimal, ",");
 
             Add(ActionShort(CrewAction.Attack), "ATQ");
             Add(ActionShort(CrewAction.Sabotage), "SAB");

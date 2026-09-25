@@ -49,6 +49,9 @@ namespace Vortex.Core.Rules
         /// <summary>Events emitted so far by this run.</summary>
         public List<GameEvent> Events { get; } = new List<GameEvent>();
 
+        /// <summary>Attacks started by this run, in order (read by previews, ADR-0018).</summary>
+        public List<AttackInfo> Attacks { get; } = new List<AttackInfo>();
+
         /// <summary>
         /// Test-only die source (scripted scenarios). Production runs leave it null so every roll comes from the
         /// state's generator, which keeps re-execution deterministic (ADR-0009).
@@ -324,14 +327,15 @@ namespace Vortex.Core.Rules
         }
 
         /// <summary>Calculation: every active effect registers its modifications; returns the stacked result (RULES B4).</summary>
-        public int Calculate(int baseValue, Action<Effect, EffectSource, ValueModifiers> calculation, Action<ValueModifiers>? baseRule = null)
+        public int Calculate(int baseValue, Action<Effect, EffectSource, ValueModifiers> calculation, Action<ValueModifiers>? baseRule = null, List<ValueShare>? shares = null)
         {
-            var modifiers = new ValueModifiers();
+            var modifiers = new ValueModifiers { Shares = shares };
 
             // Modifiers of the base rules themselves (rule options) stack with the effects' ones (RULES B4).
             baseRule?.Invoke(modifiers);
             foreach (KeyValuePair<Effect, EffectSource> pair in ActiveEffects())
             {
+                modifiers.Source = pair.Value;
                 calculation(pair.Key, pair.Value, modifiers);
             }
 

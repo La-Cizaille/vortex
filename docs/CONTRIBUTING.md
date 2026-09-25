@@ -113,7 +113,7 @@ Ces scripts lancent Unity en mode batch : l'éditeur doit être **fermé** (ils 
 |---|---|
 | `tools/Test-Unity.ps1 [-Platform PlayMode]` | Lance les tests Unity et affiche le résumé. |
 | `tools/Update-UnityAssets.ps1` | Crée les assets de base qui manquent (thème, catalogues, prefabs, scènes, textes) et complète la table des textes. Ne remplace jamais un asset existant : pour en régénérer un, le supprimer d'abord. |
-| `tools/Capture-Unity.ps1 -Scene Game\|Gallery -Out <fichier.png> [-Round N]` | Enregistre une image 1920×1080 de la table (des bots jouent jusqu'à la manche demandée) ou de la galerie. Pratique pour vérifier une disposition, une illustration ou un modèle en contexte. |
+| `tools/Capture-Unity.ps1 -Scene Game\|Gallery -Out <fichier.png> [-Round N] [-Human [-Phase Actions\|Market\|Aim]]` | Enregistre une image 1920×1080 de la table (des bots jouent jusqu'à la manche demandée) ou de la galerie. Avec `-Human`, le premier siège est une personne : l'image montre son tour, après le marché, pendant (`-Phase Market`), ou pendant la visée d'une attaque avec son aperçu (`-Phase Aim`). Pratique pour vérifier une disposition, une illustration ou un modèle en contexte. |
 
 Chaque commande se lance avec `powershell -ExecutionPolicy Bypass -File <script>`.
 
