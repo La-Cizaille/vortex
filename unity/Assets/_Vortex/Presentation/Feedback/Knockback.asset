@@ -12,10 +12,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 900e3db4bdb4970488ca016a2783899d, type: 3}
   m_Name: Knockback
   m_EditorClassIdentifier: Vortex.Client::Vortex.Client.Presentation.KnockbackFeedback
-  perPoint: 0.05
-  maximum: 0.7
-  outSeconds: 0.1
-  backSeconds: 0.6
-  sparks: {fileID: 0}
-  wait: 0.35
-  otherWait: 0.15
