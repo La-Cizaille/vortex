@@ -24,6 +24,8 @@ Téléchargées depuis le dépôt officiel Google Fonts, [`google/fonts`](https:
 
 Textes de licence (même contenu OFL 1.1, en-têtes de copyright propres à chaque famille) :
 
+Les empreintes sont celles des fichiers tels que téléchargés. Git normalise les fins de ligne des fichiers texte : `anton/OFL.txt` et `imfellenglish/OFL.txt`, servis en CRLF, sont stockés en LF, et leur empreinte dans le dépôt diffère donc de celle-ci ; les polices, binaires, sont stockées telles quelles.
+
 | Fichier | SHA-256 |
 |---|---|
 | `anton/OFL.txt` | `ee67e6ee22790b7929f1a3769ca2801d565c64b5a9096942c1adf5596de9c9e4` |
