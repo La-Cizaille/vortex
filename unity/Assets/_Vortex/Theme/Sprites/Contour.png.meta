@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 64c82383ec21ad448ab030009153aecf
+guid: ff1bdfaa0fcff6d408747d22616ad39e
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6709061427766638439
-    second: Plaque_0
+      213: -2297466579818585015
+    second: Contour_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -180,7 +180,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Plaque_0
+      name: Contour_0
       rect:
         serializedVersion: 2
         x: 0
@@ -195,8 +195,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7673e4a82df5b1d50800000000000000
-      internalID: 6709061427766638439
+      spriteID: 944e4927152cd10e0800000000000000
+      internalID: -2297466579818585015
       vertices: []
       indices: 
       edges: []

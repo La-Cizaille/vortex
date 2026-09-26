@@ -188,7 +188,7 @@ Le thème a déjà deux emplacements de police, titre et texte (`ThemeSettings`)
   - Les **plaques de métal noirci** pour tout ce qui est « à bord » : cockpit, panneaux des sièges, arc d'actions. Écrans de terminal verts, voyants, câbles qui courent entre les éléments.
   - Le **papier jauni** pour tout ce qui est « dans le secteur » : menus, bandeau de manche, fin de partie, bulles d'aide. Affiches arrachées, photocopies, agrafes.
 - **Tampons** pour les verdicts : « ÉLIMINÉ », « DOSSIER CLASSÉ », « ÉLU ».
-- Pas de formes rondes et joyeuses, pas d'inclinaisons fantaisistes : les éléments sont droits, lourds, administratifs.
+- Pas d'inclinaisons fantaisistes. Les panneaux de l'interface sont **légers et arrondis**, fond sombre à peine présent, bord presque invisible ; **un cadre n'existe que s'il sert** (ARB-100) : le bandeau de manche n'en a pas.
 
 ### 6.5 Écrans clés **[à valider sur la planche]**
 - **Accueil** : un mur d'affiches de propagande arrachées, sous une lumière blafarde, le vortex en fond.
