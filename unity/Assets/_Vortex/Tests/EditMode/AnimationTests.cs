@@ -446,6 +446,8 @@ namespace Vortex.Tests.EditMode
 
             public Camera? View => null;
 
+            public MarketDisplay? Markets => null;
+
             public System.Func<CardDisplay>? Cards { get; set; }
 
             public HashSet<int> PlacedByHand { get; } = new HashSet<int>();

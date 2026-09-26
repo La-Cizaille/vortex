@@ -324,6 +324,9 @@ namespace Vortex.Client.Presentation
         Camera? IFeedbackStage.View => view;
 
         /// <inheritdoc/>
+        MarketDisplay? IFeedbackStage.Markets => market;
+
+        /// <inheritdoc/>
         public ShipMotion? MotionOf(int seat) => _ships.TryGetValue(seat, out Transform ship) ? ship.GetComponent<ShipMotion>() : null;
 
         /// <inheritdoc/>

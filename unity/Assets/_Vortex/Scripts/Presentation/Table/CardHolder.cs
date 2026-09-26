@@ -48,6 +48,9 @@ namespace Vortex.Client.Presentation
         /// <summary>What a touch of the card does (a decision's answer, ARB-82), or null.</summary>
         public Action? OnTap { get; set; }
 
+        /// <summary>What keeps the card over its place, or null before the first card is shown.</summary>
+        public CardAnchor? Anchor => _card != null ? _card.GetComponent<CardAnchor>() : null;
+
         /// <summary>The card of the table shown, or null (nothing, or a face that is not on the table).</summary>
         public CardView? Shown => _shown;
 

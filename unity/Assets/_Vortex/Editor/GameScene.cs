@@ -33,6 +33,9 @@ namespace Vortex.Editor
 
         // Opaque, so that the turn frame behind a seat shows only around it.
         private static readonly Color SeatBackground = new Color(0.05f, 0.06f, 0.11f, 1f);
+        // Height of a market card, in interface units: 120 leaves room for the deck at the head of each row of five.
+        private const float CardHeight = 120f;
+
         private static readonly Color Muted = new Color32(150, 156, 175, 255);
 
         /// <summary>Creates the opponent panel and the scene if they do not exist (<see cref="BuildSceneList"/> lists it in the build).</summary>
@@ -378,11 +381,25 @@ namespace Vortex.Editor
             (Button endMarket, TMP_Text endLabel) = UiBuilder.Button(root.transform, "Passer le marché", new Vector2(0.5f, 1f), new Vector2(0f, 46f), new Vector2(220f, 40f));
             endLabel.fontSize = 18f;
             MarketDisplay market = root.gameObject.AddComponent<MarketDisplay>();
-            market.Assign(attackRow, defenseRow, attackLabel, defenseLabel, attackDeck, defenseDeck, 133f);
+            market.Assign(attackRow, defenseRow, attackLabel, defenseLabel, attackDeck, defenseDeck, CardHeight);
+            market.AssignDecks(DeckPlace(attackRow), DeckPlace(defenseRow));
             (Button toggle, TMP_Text toggleLabel) = UiBuilder.Button(ui, "Ouvrir le marché", new Vector2(0.5f, 0.5f), new Vector2(0f, 300f), new Vector2(180f, 36f));
             toggleLabel.fontSize = 18f;
             market.AssignToggle(toggle, toggleLabel, new Vector2(0f, -20f), new Vector2(0f, 368f));
             return (market, recycleAttack, recycleDefense, endMarket);
+        }
+
+        // The deck's place, at the head of a market's row, the size of a card (ANIMATIONS.md §2).
+        private static RectTransform DeckPlace(RectTransform row)
+        {
+            var place = new GameObject("Paquet", typeof(RectTransform), typeof(LayoutElement));
+            var shape = (RectTransform)place.transform;
+            shape.SetParent(row, false);
+            shape.SetAsFirstSibling();
+            LayoutElement size = place.GetComponent<LayoutElement>();
+            size.preferredWidth = CardHeight / 1.4f;
+            size.preferredHeight = CardHeight;
+            return shape;
         }
 
         private static (RectTransform Row, TMP_Text Label, TMP_Text Deck, Button Recycle) MarketHalf(Transform parent, string name, float from, float to)

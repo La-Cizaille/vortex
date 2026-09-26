@@ -47,4 +47,8 @@ MonoBehaviour:
     Feedback: {fileID: 11400000, guid: 21074db6b0668854dacb23f5f9062ce6, type: 2}
   - EventType: 4
     Feedback: {fileID: 11400000, guid: 3ea8f39d677198a47924a823be65b2c4, type: 2}
+  - EventType: 9
+    Feedback: {fileID: 11400000, guid: 3bd4fe184023d66419d0f8e3fb4af398, type: 2}
+  - EventType: 8
+    Feedback: {fileID: 11400000, guid: 3bd4fe184023d66419d0f8e3fb4af398, type: 2}
   fallback: {fileID: 11400000, guid: 8c7a767d5c6036749b463a7b3db5cfc3, type: 2}

@@ -35,6 +35,9 @@ namespace Vortex.Client.Presentation
         /// <summary>Whether the person dropped this card where it goes (then its trip is not animated); asking forgets it.</summary>
         bool TakePlacedByHand(int uid);
 
+        /// <summary>The black markets, with their decks and places, or null when the scene has none.</summary>
+        MarketDisplay? Markets { get; }
+
         /// <summary>What the stage remembers of the attack being played (deflection, critical hit).</summary>
         AttackMemory Attack { get; }
 
