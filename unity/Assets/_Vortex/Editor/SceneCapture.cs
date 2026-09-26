@@ -9,6 +9,7 @@ using Vortex.Client.Menus;
 using Vortex.Client.Presentation;
 using Vortex.Core.Commands;
 using Vortex.Core.Content;
+using Vortex.Core.Events;
 using Vortex.Core.Projection;
 using Object = UnityEngine.Object;
 
@@ -102,6 +103,11 @@ namespace Vortex.Editor
                 Object.FindAnyObjectByType<GameLogDisplay>().Toggle();
             }
 
+            if (phase == "effects")
+            {
+                PlayEffects(director, float.TryParse(Environment.GetEnvironmentVariable("VORTEX_EFFECT_TIME"), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float at) ? at : 0.35f);
+            }
+
             if (human && phase == "aim")
             {
                 // The layers must stand where they are drawn before the pointer positions are read.
@@ -127,6 +133,50 @@ namespace Vortex.Editor
             PlayerControls controls = director.Controls;
             Vector2 middle = CardAnchor.ScreenRectOf(controls.ActivationZone).center;
             return new[] { me.AttackSlot, me.DefenseSlot }.Any(card => card != null && controls.CanUse(card.Uid) && controls.UseCard(card.Uid, middle));
+        }
+
+        // The animations of the table frozen mid-way (ANIMATIONS.md §5), to judge them without playing: seat 2 aims at
+        // seat 0 and fires, seat 3 powers up, seat 4 explodes. The frame loop does not run here: effects and ships are
+        // moved on by hand, by the same amount of time.
+        private static void PlayEffects(GameDirector director, float seconds)
+        {
+            IFeedbackStage stage = director;
+            int seats = director.Ships.Count;
+            var shot = new GameEvent { Type = GameEventType.AttackResolved, Player = 1 % seats, Other = 0, Value = 10 };
+            ScriptableObject.CreateInstance<AimFeedback>().Play(new GameEvent { Type = GameEventType.AttackDeclared, Player = shot.Player, Other = 0 }, stage);
+            Advance(0.6f);
+            ScriptableObject.CreateInstance<LaserFeedback>().Play(shot, stage);
+            if (seats > 2)
+            {
+                ScriptableObject.CreateInstance<ThrusterFeedback>().Play(new GameEvent { Type = GameEventType.TechnologyActivated, Player = 2, Value = (int)TechColor.Blue }, stage);
+            }
+
+            if (seats > 3)
+            {
+                ScriptableObject.CreateInstance<ExplosionFeedback>().Play(new GameEvent { Type = GameEventType.PlayerEliminated, Player = 3 }, stage);
+            }
+
+            Advance(seconds);
+        }
+
+        private static void Advance(float seconds)
+        {
+            const float step = 1f / 60f;
+            for (float time = 0f; time < seconds; time += step)
+            {
+                foreach (ShipMotion motion in Object.FindObjectsByType<ShipMotion>())
+                {
+                    motion.Tick(step);
+                }
+
+                foreach (PlaceholderEffect effect in Object.FindObjectsByType<PlaceholderEffect>())
+                {
+                    if (effect != null)
+                    {
+                        effect.Tick(step);
+                    }
+                }
+            }
         }
 
         /// <summary>

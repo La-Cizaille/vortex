@@ -61,14 +61,15 @@ Chaque lot se fait des deux côtés : les modèles et effets par l'atelier Blend
 
 ## 5. Lot 1 : ce qui est en place
 
-Chaque animation marche déjà avec un effet provisoire fait de formes simples, sans matériau ni texture, comme le vaisseau provisoire. Un effet définitif le remplace sans code : il suffit de le déposer dans le retour visuel correspondant (`Presentation/Feedback/`), ou dans le thème pour le dé.
+Chaque animation marche déjà avec un effet provisoire fait de formes simples, comme le vaisseau provisoire. Les parties lumineuses (tirs, jets, étincelles) utilisent le matériau additif `Theme/Materials/Glow.mat` (champ *Glow Material* du thème), assez brillant pour le Bloom. Un effet définitif le remplace sans code : il suffit de le déposer dans le retour visuel correspondant (`Presentation/Feedback/`), ou dans le thème pour le dé. Pour juger les effets sans jouer : `tools/Capture-Unity.ps1 -Scene Game -Phase Effects [-EffectTime s]` fige un tir, un combo et une explosion à mi-course.
 
 | Animation | Retour visuel ou composant | Événement | Pour la remplacer |
 |---|---|---|---|
-| Balancement | `ShipMotion`, ajouté à chaque vaisseau | État permanent | Réglages *Animations* de `Theme/ThemeSettings` (hauteur, roulis, tangage, durée). Seules les pièces du vaisseau bougent, sous un enfant `Mouvement` : la fiche qui suit le vaisseau ne tremble pas |
-| Rayon d'attaque et recul | `Beam.asset` (`BeamFeedback`) | `AttackResolved`, après les dés : le rayon va vers la cible finale | Champ *Prefab* : un rayon dont l'axe avant fait une unité de long ; le jeu l'étire entre les deux vaisseaux. L'épaisseur du rayon provisoire suit la force de l'attaque |
+| Balancement | `ShipMotion`, ajouté à chaque vaisseau | État permanent | Réglages *Animations* de `Theme/ThemeSettings` (hauteur, roulis, tangage, durée). Chaque vaisseau a une racine immobile, placée par la table et suivie par sa fiche ; le modèle bouge dessous |
+| Visée | `Aim.asset` (`AimFeedback`) | `AttackDeclared` : l'attaquant se tourne vers sa cible et garde la visée pendant les dés | Durée du virage. Si le tir ne vient pas, le vaisseau revient seul à sa place |
+| Tir laser et recul | `Laser.asset` (`LaserFeedback`) | `AttackResolved`, après les dés : un projectile part vers la cible finale (une attaque déviée vise d'abord sa nouvelle cible), éclair à la bouche et à l'impact, recul, puis retour à sa place. Les dégâts attendent l'impact | Champ *Prefab* : le projectile, qui vole selon son axe avant. Vitesse, longueur, éclat |
 | Recul aux dégâts | `Knockback.asset` (`KnockbackFeedback`) | `HpLost` d'une attaque ou d'un renvoi | Champ *Sparks* : les étincelles de l'impact. Le recul se règle (par point de PV, maximum, durées) |
-| Flambée des réacteurs | `Thrusters.asset` (`ThrusterFeedback`) | `TechnologyActivated` | Champ *Prefab* : la flamme, orientée vers l'arrière, posée sur chaque réacteur |
+| Combo : postcombustion | `Thrusters.asset` (`ThrusterFeedback`) | `TechnologyActivated` : un anneau d'étincelles à la couleur de la technologie s'étend autour du vaisseau, puis chaque réacteur crache un jet (cœur blanc, gaine colorée qui vacille) pendant que le vaisseau prend un élan | Champ *Prefab* : le jet, orienté vers l'arrière, posé sur chaque réacteur et porté par le vaisseau |
 | Explosion | `Explosion.asset` (`ExplosionFeedback`) | `PlayerEliminated` | Champ *Prefab* : l'explosion. L'épave dérive ensuite lentement |
 | Dé à 8 faces | `DiceTray` et `DieSpinner` | `DiceRolled`, `DieRolled` | Champ *Die Model* de `Theme/ThemeSettings`. Sans modèle, un octaèdre généré |
 
