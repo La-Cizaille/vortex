@@ -137,11 +137,6 @@ namespace Vortex.Client.Presentation
 
             _name = Writing(Part("Zone_Nom"), new Color32(22, 24, 30, 255));
             _hp = Writing(Part("Zone_PV"), Color.white);
-            if (_hp != null)
-            {
-                _hp.outlineWidth = 0.25f;
-                _hp.outlineColor = new Color32(10, 10, 14, 255);
-            }
 
             for (int i = 0; i < DialMarks; i++)
             {
@@ -191,8 +186,10 @@ namespace Vortex.Client.Presentation
             _fillTarget = maxHp > 0 ? Mathf.Clamp01((float)hp / maxHp) : 0f;
             if (_fill != null)
             {
-                Color liquid = Color.Lerp(theme.Loss, new Color(0.3f, 0.95f, 0.55f), _fillTarget);
-                Paint(_fill.GetComponent<Renderer>(), liquid, liquid * 1.3f);
+                // Through the hues, from the loss colour to green, deep enough for the white figure to stay readable.
+                Color.RGBToHSV(theme.Loss, out float lost, out _, out _);
+                Color liquid = Color.HSVToRGB(Mathf.Lerp(lost, 0.38f, _fillTarget), 0.9f, 0.55f);
+                Paint(_fill.GetComponent<Renderer>(), liquid, liquid * 0.3f);
             }
 
             float share = maxShield > 0 ? Mathf.Clamp01((float)shield / maxShield) : 0f;

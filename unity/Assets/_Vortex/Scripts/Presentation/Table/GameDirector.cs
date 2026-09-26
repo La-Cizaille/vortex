@@ -116,6 +116,7 @@ namespace Vortex.Client.Presentation
         private int _viewer;
         private float _wait;
         private bool _dirty;
+        private bool _unprotected;
 
         // False while the opening events play: the session only has the view after them, so patching it again would
         // count their effects twice. The table shows that view, and the log still follows each event.
@@ -755,14 +756,26 @@ namespace Vortex.Client.Presentation
                     model.MaxHp,
                     me.Shield,
                     _session.Rules.MaxShield,
-                    // The engine's reckoning, which follows every effect (disabled shield...), without naming any.
-                    _session.Protection(_viewer) <= 0.0,
+                    Unprotected(),
                     me.Overcharge > 0,
                     controls.OverchargeArmed,
                     me.Technologies.Select(theme.Technology).ToList(),
                     texts,
                     theme);
             }
+        }
+
+        // Whether the viewer's shield protects nothing: the engine's reckoning, which follows every effect (disabled
+        // shield...) without naming any. It reads the game as it stands, so it is asked once the events have played out,
+        // and kept while they play, when the figures shown are still catching up.
+        private bool Unprotected()
+        {
+            if (!IsPlaying && _session != null)
+            {
+                _unprotected = _session.Protection(_viewer) <= 0.0;
+            }
+
+            return _unprotected;
         }
 
         // The viewer's ship in front, the opponents' ships in an arc in turn order, each with its panel under it.

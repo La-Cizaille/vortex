@@ -53,5 +53,6 @@ MonoBehaviour:
   sickTint: {r: 0.47058824, g: 0.6666667, b: 0.23529412, a: 1}
   sporeColor: {r: 1.1, g: 2, b: 0.5, a: 1}
   cockpitModel: {fileID: 919132149155446097, guid: 27985f4f984063e449dd60773a97aebe, type: 3}
+  glassMaterial: {fileID: 2100000, guid: c2f8f221a066fdc41b60bb9dde439197, type: 2}
   dieModel: {fileID: 0}
   timerTick: {fileID: 0}
