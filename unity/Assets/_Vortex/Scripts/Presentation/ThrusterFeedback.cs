@@ -68,7 +68,7 @@ namespace Vortex.Client.Presentation
             if (prefab != null)
             {
                 GameObject jet = Instantiate(prefab, at, backwards, carrier);
-                Destroy(jet, seconds / speed);
+                TimedRemoval.After(jet, seconds / speed);
                 return;
             }
 

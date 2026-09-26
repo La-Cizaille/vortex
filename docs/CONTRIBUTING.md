@@ -174,6 +174,12 @@ blender --background --disable-autoexec art-src/market/Marche.blend --python too
 ```
 Le fond est fait pour la caméra de la table (`GameScene`) : si elle change de place, changer ses nombres en tête de `build_background.py`.
 
+**Les effets** (lot B4) : Blender fait la matière (maillages, planches d'images), Unity l'assemble en systèmes de particules à l'import (`EffectSync`). Chaque préfab `Prefabs/Effects/*` et chaque matériau `Theme/Materials/Fx*` n'est créé qu'une fois : pour le régler, l'ouvrir dans Unity ; pour le refaire depuis le code, le supprimer et relancer l'outil d'assets. L'éclat d'un effet tient dans la couleur de son matériau (au-dessus de 1,5, il rayonne), la teinte dans ses particules. Pour juger les effets sans jouer : `tools/Capture-Unity.ps1 -Scene Game -Round 3 -Phase Effects -EffectTime 0.3`.
+```
+blender --background --factory-startup --disable-autoexec --python tools/blender/build_effects.py -- art-src/effects/Effets.blend
+blender --background --disable-autoexec art-src/effects/Effets.blend --python tools/blender/export_unity.py -- unity/Assets/_Vortex/Art/Effects/Effets.fbx --budget 1000
+```
+
 ## Fusion des fichiers Unity
 Ajouter UnityYAMLMerge dans votre configuration Git locale (le chemin dépend de votre version d'Unity) :
 ```

@@ -34,7 +34,7 @@ namespace Vortex.Client.Presentation
             GameObject? effect = stage.Theme != null && gameEvent.Id != null ? stage.Theme.EventEffectFor(gameEvent.Id) : null;
             if (effect != null)
             {
-                Destroy(Instantiate(effect, centre.position, Quaternion.identity), seconds / speed);
+                TimedRemoval.After(Instantiate(effect, centre.position, Quaternion.identity), seconds / speed);
                 return wait;
             }
 

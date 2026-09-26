@@ -118,7 +118,7 @@ namespace Vortex.Client.Presentation
             {
                 GameObject shown = Instantiate(sparks, hull, Quaternion.LookRotation(away));
                 shown.transform.localScale *= Mathf.Lerp(0.6f, 1.6f, severity);
-                Destroy(shown, 1.5f / speed);
+                TimedRemoval.After(shown, 1.5f / speed);
                 return;
             }
 

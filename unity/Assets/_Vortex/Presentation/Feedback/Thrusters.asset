@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2291b9d233b4d964faaab679aa3a8d18, type: 3}
   m_Name: Thrusters
   m_EditorClassIdentifier: Vortex.Client::Vortex.Client.Presentation.ThrusterFeedback
-  prefab: {fileID: 0}
+  prefab: {fileID: 8063610536500822948, guid: 056fe544361e2d04bb7439e3c7beb6dc, type: 3}
   seconds: 1.1
   length: 1.4
+  pulseRadius: 2.2
+  brightness: 2.5
   surge: 0.2
   wait: 0.8

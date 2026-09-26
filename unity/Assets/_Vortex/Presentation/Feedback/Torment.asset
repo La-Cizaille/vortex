@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e536f9b83862e9489006f6a6fd4d198, type: 3}
   m_Name: Torment
   m_EditorClassIdentifier: Vortex.Client::Vortex.Client.Presentation.TormentFeedback
-  prefab: {fileID: 0}
+  prefab: {fileID: 2364373616801076909, guid: e4d79c76264fcee49a91b9e8dd91c7c2, type: 3}
   spores: {r: 1.2, g: 2.2, b: 0.6, a: 1}
   cleansed: {r: 1.6, g: 2, b: 2.4, a: 1}
   seconds: 1
