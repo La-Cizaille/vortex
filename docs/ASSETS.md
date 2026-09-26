@@ -61,6 +61,10 @@ La chaîne de production (Blender, export, versions) est décrite dans [ADR-0016
 
 Les icônes des actions d'équipage sont branchées : une image déposée remplace aussitôt le nom court de l'action. Les autres icônes, les cadres, le fond et le logo le seront en M5 ; les déposer dans ces dossiers n'a donc pas encore d'effet visible, mais ils sont prêts.
 
+## 3 bis. Polices
+
+Les cinq familles de la direction artistique (bible §6.2), sous licence OFL, sont dans `Art/Fonts/` avec leur `OFL.txt` ; sources, commit épinglé et empreintes dans `art-src/LICENCES.md`. L'outil d'assets en fait des polices TextMeshPro dans `Theme/Fonts/` (atlas statiques de 1024 px, caractères du français) et les donne au thème : titres (Anton), textes (Barlow), libellés (Barlow Condensed, aussi police par défaut de TextMeshPro), pochoir (Big Shoulders Stencil, graisse 900 figée par `tools/fonts/instance_font.py`), gravée (IM Fell English), terminal (Share Tech Mono). Pour changer une police : remplacer le fichier, supprimer son asset dans `Theme/Fonts/`, relancer l'outil.
+
 ## 4. Plus tard
 
 - **Sons** (M5, ARB-72) : lancer de dés, impact, bouclier, élimination, achat au marché, fin de tour, signaux du temps de tour (dernières secondes, temps écoulé, ARB-70 ; le tic des dix dernières secondes est aujourd'hui un bip généré, remplacé par le son *Timer Tick* de `Theme/ThemeSettings`), musique d'ambiance. Format : WAV 48 kHz pour les effets, OGG pour la musique.

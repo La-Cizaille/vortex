@@ -24,5 +24,6 @@ Un ADR consigne **une** décision structurante : son contexte, les options envis
 | [0018](0018-apercus-par-simulation.md) | Les aperçus sont calculés en jouant le coup sur des parties supposées | Accepté |
 | [0019](0019-menus-et-lancement-de-partie.md) | Menus dans une scène à part, partie transmise par un objet de lancement | Accepté |
 | [0020](0020-direction-artistique.md) | Une direction artistique et un univers communs, décrits dans une bible | Accepté |
+| [0021](0021-texte-d-ambiance.md) | Un texte d'ambiance facultatif dans le format du contenu | Accepté |
 
 Modèle : copier un ADR existant et garder les sections *Statut*, *Contexte*, *Options*, *Décision* et *Conséquences*.

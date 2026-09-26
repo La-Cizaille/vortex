@@ -9,13 +9,15 @@ using Vortex.Client.Content;
 namespace Vortex.Client.Menus
 {
     /// <summary>
-    /// The options (INTERFACE.md 5): the default animation speed, and under Windows the full screen and the resolution.
+    /// The options (INTERFACE.md 5): the default animation speed, the narrator's comments (ARB-95), and under Windows the
+    /// full screen and the resolution.
     /// Each change is kept at once on this device. Opened from the home menu and from the pause menu.
     /// </summary>
     public sealed class OptionsMenu : MonoBehaviour
     {
         [SerializeField] private TMP_Text title = null!;
         [SerializeField] private Button speed = null!;
+        [SerializeField] private Button commentary = null!;
         [SerializeField] private Button fullScreen = null!;
         [SerializeField] private Button resolution = null!;
         [SerializeField] private Button back = null!;
@@ -36,6 +38,7 @@ namespace Vortex.Client.Menus
             title.text = texts.Get(TextKeys.OptionsTitle);
             MenuButtons.Label(back, texts.Get(TextKeys.MenuBack));
             MenuButtons.Wire(speed, NextSpeed);
+            MenuButtons.Wire(commentary, ToggleCommentary);
             MenuButtons.Wire(fullScreen, ToggleFullScreen);
             MenuButtons.Wire(resolution, NextResolution);
             MenuButtons.Wire(back, Close);
@@ -72,6 +75,19 @@ namespace Vortex.Client.Menus
             }
 
             Options.Speed = UserOptions.NextSpeed(Options.Speed);
+            Options.Save();
+            Refresh();
+        }
+
+        /// <summary>The narrator's comments on or off.</summary>
+        public void ToggleCommentary()
+        {
+            if (Options is null)
+            {
+                return;
+            }
+
+            Options.Commentary = !Options.Commentary;
             Options.Save();
             Refresh();
         }
@@ -114,10 +130,11 @@ namespace Vortex.Client.Menus
         }
 
         /// <summary>Wires the parts of the layout (editor setup).</summary>
-        public void Assign(TMP_Text titleLabel, Button speedButton, Button fullScreenButton, Button resolutionButton, Button backButton)
+        public void Assign(TMP_Text titleLabel, Button speedButton, Button commentaryButton, Button fullScreenButton, Button resolutionButton, Button backButton)
         {
             title = titleLabel;
             speed = speedButton;
+            commentary = commentaryButton;
             fullScreen = fullScreenButton;
             resolution = resolutionButton;
             back = backButton;
@@ -135,6 +152,7 @@ namespace Vortex.Client.Menus
             }
 
             MenuButtons.Label(speed, string.Format(CultureInfo.InvariantCulture, _texts.Get(TextKeys.OptionsSpeed), Options.Speed));
+            MenuButtons.Label(commentary, string.Format(CultureInfo.InvariantCulture, _texts.Get(TextKeys.OptionsCommentary), _texts.Get(Options.Commentary ? TextKeys.Yes : TextKeys.No)));
             MenuButtons.Label(fullScreen, string.Format(CultureInfo.InvariantCulture, _texts.Get(TextKeys.OptionsFullScreen), _texts.Get(Options.FullScreen ? TextKeys.Yes : TextKeys.No)));
             Vector2Int size = CurrentSize();
             MenuButtons.Label(resolution, string.Format(CultureInfo.InvariantCulture, _texts.Get(TextKeys.OptionsResolution), size.x, size.y));

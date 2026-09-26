@@ -527,3 +527,5 @@ MonoBehaviour:
     Text: TECH
   - Key: log.HpLossPrevented
     Text: "{0} \xE9vite {2} PV de perte."
+  - Key: options.commentary
+    Text: 'Commentaires de SINISTRA : {0}'

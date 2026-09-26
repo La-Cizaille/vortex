@@ -106,7 +106,7 @@ namespace Vortex.Client.Presentation
 
             Label(caption, badge != null ? face.Usage : face.Caption, theme.BodyFont, Modelled ? theme.Text : theme.MutedText, richText: false);
             Label(id, face.Id, theme.BodyFont, theme.MutedText, richText: false);
-            Label(body, CardText.ToRichText(face.Text, theme.HasTextIcon), theme.BodyFont, ink, richText: true);
+            Label(body, CardText.ToRichText(face.Text, theme.HasTextIcon) + Flavor(face.Flavor), theme.BodyFont, ink, richText: true);
             if (theme.TextIcons != null)
             {
                 body.spriteAsset = theme.TextIcons;
@@ -283,5 +283,10 @@ namespace Vortex.Client.Presentation
                 label.font = chosen;
             }
         }
+
+        // The flavour text, under the printed text, in italics and a little smaller (ARB-95). The content validator
+        // forbids markup in it, so it goes into the rich text as it is.
+        private static string Flavor(string flavor) =>
+            string.IsNullOrEmpty(flavor) ? string.Empty : "\n<size=85%><i>" + flavor + "</i></size>";
     }
 }

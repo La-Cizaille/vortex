@@ -162,7 +162,7 @@ L'interface est simple au début et pourra s'enrichir.
 - **Accueil** : Partie locale ; Trouver une partie (grisé, « bientôt ») ; Options ; Social (grisé) ; Quitter (sous Windows seulement).
 - **Partie locale** : le nombre de joueurs, de 2 à 5, avec **5 par défaut** (le mode standard, ARB-52). Pour chaque siège : humain ou bot (et le niveau du bot), et un nom.
 - **Menu de développement**, absent des builds publiés : les options de règles à essayer (posture défensive, prime sur le leader, fantômes) et la graine de la partie.
-- **Options** : vitesse des animations ; plein écran et résolution sous Windows.
+- **Options** : vitesse des animations ; commentaires de SINISTRA, oui ou non (ARB-95 : le narrateur se tait, les faits restent au journal) ; plein écran et résolution sous Windows.
 - **Langue** : français seulement. Tous les textes de l'interface passent quand même par une table de textes, pour pouvoir traduire un jour sans reprendre l'interface.
 - **Pause** : reprendre, recommencer, options, quitter.
 - **Fin de partie** : le vainqueur et le type de victoire (Domination, Élection galactique, ou égalité), avec « Rejouer » et « Menu ».
