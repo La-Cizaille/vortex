@@ -12,6 +12,7 @@ The user is a security professional: security, optimisation, and clean documenta
 - Game rules: `docs/RULES.md` - part A base rules, part B effect model (engine behaviour must match it; cite sections like `RULES A6` / `RULES B4` in code).
 - Card data: `core/Runtime/Data/{cards,events,technologies}.json` is the **source of truth** (ADR-0008): printed text + ruling per card. `docs/CARDS.md` is generated from it (never hand-edit).
 - Decisions: `docs/adr/`. Add an ADR for any structural decision.
+- Art direction and lore: `docs/DIRECTION_ARTISTIQUE.md` (ADR-0020, ARB-93) is the reference for look, tone and writing; every asset and interface text follows it. Rule texts stay neutral: humour never replaces game information.
 - Art: `docs/ASSETS.md` lists every visual to create with its format (scale, orientation, budgets, names); pipeline in ADR-0016.
 - Client interface: `docs/INTERFACE.md` (screen layout, gestures, menus, decisions on the table; designer rulings ARB-59 to ARB-75 and ARB-80 to ARB-82). The interface holds no rules: legal targets come from the session's legal commands, previews are computed by the engine (ADR-0015).
 - Rulings not covered by RULES.md: **ask the user**, do not guess; then record the answer in the card's `ruling` (card-specific) or RULES.md part A/B (generic), **and** log it in `docs/ARBITRAGES.md` (new `ARB-xx` entry: question, decision, reason, where applied; entries are never rewritten). Unanswered questions live in RULES.md "Questions ouvertes".
