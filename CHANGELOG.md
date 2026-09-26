@@ -4,6 +4,7 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Non publié]
 ### Ajouté
+- **Panneaux allégés** (ARB-99) : cadre fin d'acier et petits rivets sur fond sombre translucide, sans métal brossé ; le cadre du tour en cours devient un contour.
 - **Direction artistique, lot 2 : la table** :
   - surfaces générées (`ThemeSprites`) : plaque de métal noirci rivetée, écran de terminal, bandes de danger ; une image du même nom les remplace ;
   - panneaux des adversaires en plaques de métal : nom au pochoir, PV et bouclier sur un écran de terminal (« > PV: 23 ») ;

@@ -67,7 +67,7 @@ Les cinq familles de la direction artistique (bible §6.2), sous licence OFL, so
 
 ## 3 ter. Surfaces de l'interface
 
-L'outil d'assets dessine trois images dans `Theme/Sprites/` (`ThemeSprites`) : `Plaque.png` (métal noirci riveté, découpé en neuf pour s'étirer), `Ecran.png` (écran de terminal vert), `Danger.png` (bandes jaunes et noires, répétées). Elles habillent les panneaux, le bandeau, les boutons, l'annonce de tour et le marché. Pour les remplacer : déposer une image du même nom, en gardant les bords (26 px pour la plaque, 10 px pour l'écran), ou supprimer l'image et relancer l'outil pour la redessiner.
+L'outil d'assets dessine trois images dans `Theme/Sprites/` (`ThemeSprites`) : `Plaque.png` (cadre fin d'acier et petits rivets sur un fond sombre translucide, découpé en neuf pour s'étirer ; ARB-99), `Ecran.png` (écran de terminal vert), `Danger.png` (bandes jaunes et noires, répétées). Elles habillent les panneaux, le bandeau, les boutons, l'annonce de tour et le marché. Pour les remplacer : déposer une image du même nom, en gardant les bords (26 px pour la plaque, 10 px pour l'écran), ou supprimer l'image et relancer l'outil pour la redessiner.
 
 ## 4. Plus tard
 
