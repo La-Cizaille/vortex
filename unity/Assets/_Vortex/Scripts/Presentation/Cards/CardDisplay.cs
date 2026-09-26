@@ -67,7 +67,7 @@ namespace Vortex.Client.Presentation
         /// <summary>False while the card is hidden (for instance, scrolled out of view).</summary>
         public bool Visible => visual.activeSelf;
 
-        /// <summary>True for the modelled body, whose name and text lie on light panels.</summary>
+        /// <summary>True for the modelled body, whose name and text lie on faces of their own (CardInk).</summary>
         public bool Modelled => trimSlot >= 0;
 
         /// <summary>True while the disc shows the slot's icon rather than its short text.</summary>
@@ -94,7 +94,8 @@ namespace Vortex.Client.Presentation
             ShowsPlaceholder = cardArt.IsPlaceholder;
 
             // Names and ids are plain text; only the card text is rich text, converted by CardText. On the modelled
-            // body, the name and the text lie on light panels, the badge and the usage on dark metal.
+            // body, the name and the text lie on faces of their own (the module's plate and terminal), the badge and the
+            // usage on its steel.
             Color ink = Modelled ? theme.CardInk : theme.Text;
             Label(title, face.Title, theme.TitleFont, ink, richText: false);
             if (badge != null)

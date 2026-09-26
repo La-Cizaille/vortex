@@ -11,7 +11,7 @@ namespace Vortex.Editor
     /// <summary>
     /// Lays out the card prefab (ADR-0017) from the card model (ARB-85): its body takes the model's mesh and the game's
     /// metal materials, and the illustration and the texts go where the model's Zone_* empties say (their X and Y scales
-    /// give the zone's size). Without the model, the body is a box with the first layout. Runs when the model changes and
+    /// give the zone's size; Zone_Dos sizes the back). Without the model, the body is a box with the first layout. Runs when the model changes and
     /// with <see cref="ProjectAssets.EnsureAll"/>; the prefab is only edited when something differs.
     /// </summary>
     public static class CardPrefabSync
@@ -36,6 +36,7 @@ namespace Vortex.Editor
 
         private const string Visual = "Visuel";
         private const string IconPart = "Pictogramme";
+        private const string Back = "Dos";
         private const string TrimName = "Lisere";
         private const string GemName = "Gemme";
         private const float Epsilon = 0.0005f;
@@ -111,6 +112,7 @@ namespace Vortex.Editor
                 Zone("Texte", 0f, -0.34f, 0.84f, 0.56f);
                 Zone("Identifiant", 0.24f, -0.655f, 0.4f, 0.05f);
                 Zone("Tourments", 0.42f, 0.62f, 0.3f, 0.3f);
+                Zone(Back, 0f, 0f, 0.96f, 1.36f);
             }
 
             private void Zone(string name, float x, float y, float width, float height) =>
@@ -169,7 +171,8 @@ namespace Vortex.Editor
                     || serialized.FindProperty("trimSlot").intValue != _trims || serialized.FindProperty("gemSlot").intValue != _gem
                     || serialized.FindProperty("badge").objectReferenceValue == null
                     || root.GetComponent<BoxCollider>().size != ThemeAssets.CardSize
-                    || !Near(visual.Find("Dos").localPosition, BackPosition))
+                    || !Near(visual.Find(Back).localPosition, BackPosition)
+                    || !Near(SizeOf(visual.Find(Back)), _zones[Back].Size, Back))
                 {
                     return false;
                 }
@@ -208,7 +211,9 @@ namespace Vortex.Editor
                 body.localScale = _scale;
                 body.GetComponent<Renderer>().sharedMaterials = _materials;
                 root.GetComponent<BoxCollider>().size = ThemeAssets.CardSize;
-                visual.Find("Dos").localPosition = BackPosition;
+                Transform back = visual.Find(Back);
+                back.localPosition = BackPosition;
+                back.localScale = new Vector3(_zones[Back].Size.x, _zones[Back].Size.y, 1f);
 
                 // The modelled body has its own panels: the flat background of the box is hidden.
                 Transform? background = visual.Find("Fond");
@@ -287,10 +292,10 @@ namespace Vortex.Editor
             Texture2D? normal = AssetDatabase.LoadAssetAtPath<Texture2D>(TexturePath("Normal"));
             Texture2D? metal = AssetDatabase.LoadAssetAtPath<Texture2D>(TexturePath("MetallicSmoothness"));
 
-            // Dark titanium: fully metallic, its shine following the brushed streaks. The metals of the card reflect their
-            // surroundings but not the lamp's highlight: flat and facing the camera, a whole card would flash at once and
-            // set the Bloom off.
-            Metal(FrameMaterialPath, new Color(0.34f, 0.35f, 0.38f), color, normal, material =>
+            // The module's steel (ARB-96): the texture carries its colours (blackened steel, worn edges, brass pins), the
+            // metal map where it is bare metal. The metals of the card reflect their surroundings but not the lamp's
+            // highlight: flat and facing the camera, a whole card would flash at once and set the Bloom off.
+            Metal(FrameMaterialPath, Color.white, color, normal, material =>
             {
                 material.SetFloat("_Metallic", 1f);
                 material.SetFloat("_Smoothness", 1f);
@@ -302,12 +307,16 @@ namespace Vortex.Editor
                 }
             });
 
-            // Light aluminium, half metallic: it stays light whatever it reflects, so the dark text on it stays legible.
-            Metal(PanelMaterialPath, new Color(0.93f, 0.94f, 0.96f), color, normal, material =>
+            // The faces that carry text (name plate, terminal): dark glass, so the light ink on it stays legible.
+            Metal(PanelMaterialPath, Color.white, color, normal, material =>
             {
-                material.SetFloat("_Metallic", 0.45f);
-                material.SetFloat("_Smoothness", 0.62f);
+                material.SetFloat("_Metallic", 0f);
+                material.SetFloat("_Smoothness", 0.8f);
                 NoHighlight(material);
+
+                // No reflection of the surroundings either: even 4 % of a bright sky greys a black screen.
+                material.SetFloat("_EnvironmentReflections", 0f);
+                material.EnableKeyword("_ENVIRONMENTREFLECTIONS_OFF");
             });
 
             // Trims and gem: their colour and glow come from each card (CardDisplay), through the emission.

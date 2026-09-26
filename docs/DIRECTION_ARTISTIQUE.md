@@ -209,7 +209,7 @@ Une carte n'est plus un papier : c'est un **module de vaisseau branchable**, un 
 - **La couleur de faction** passe par une bande de voyants et le liseré du boîtier ; l'emblème est estampé.
 - **Usage unique ou durable** : un voyant ou un fusible visible (un module à usage unique a un fusible qui grille).
 - Les **sockets du cockpit** deviennent des **baies** avec leurs broches ; le **marché noir** devient un **rack** de modules récupérés.
-- C'est une reprise du modèle 3D de la carte (`build_card.py`, ADR-0017), à faire par l'atelier Blender ; les zones nommées (illustration, nom, texte) restent, le jeu n'a pas à changer.
+- C'est une reprise du modèle 3D de la carte (`build_card.py`, ADR-0017), **faite** par l'atelier Blender (lot B1) : les zones nommées restent ; le texte, clair sur les faces sombres, prend l'encre os du thème (`CardInk`). Restent à faire côté jeu : le voile et le balayage de l'écran d'illustration, le fusible qui grille pour un usage unique, l'emblème estampé de la faction, le texte d'ambiance sous la règle.
 
 ### 6.6 Iconographie
 - Pictogrammes **au pochoir** : formes pleines, une couleur, lisibles à 32 px.
