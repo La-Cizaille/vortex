@@ -492,7 +492,7 @@ namespace Vortex.Client.Presentation
 
             _background = theme.TableBackground != null
                 ? Instantiate(theme.TableBackground, Vector3.zero, Quaternion.identity, shipRow)
-                : Starfield.Create(shipRow, view.transform.position, 700, 60f, theme.GlowMaterial).gameObject;
+                : Starfield.Create(shipRow, view.transform.position, 450, 60f, theme.GlowMaterial).gameObject;
         }
 
         private void TurnViewTo(int seat)

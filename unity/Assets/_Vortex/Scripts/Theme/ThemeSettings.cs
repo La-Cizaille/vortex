@@ -22,7 +22,7 @@ namespace Vortex.Client.Theme
         [SerializeField] private Color yellow = new Color32(232, 183, 48, 255);
 
         [Header("Interface")]
-        [SerializeField] private Color background = new Color32(10, 12, 24, 255);
+        [SerializeField] private Color background = new Color32(14, 15, 17, 255);
         [SerializeField] private Color cardBackground = new Color32(24, 27, 40, 255);
         [SerializeField] private Color text = new Color32(236, 238, 245, 255);
         [SerializeField] private Color mutedText = new Color32(150, 156, 175, 255);

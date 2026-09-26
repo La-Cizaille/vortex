@@ -174,11 +174,13 @@ namespace Vortex.Client.Presentation
             ShipCatalog.PaintSeat(gameObject, seat);
             if (_name != null)
             {
+                Typeface(_name, theme.StencilFont);
                 _name.text = name;
             }
 
             if (_hp != null)
             {
+                Typeface(_hp, theme.TerminalFont);
                 _hp.text = string.Format(CultureInfo.InvariantCulture, texts.Get(TextKeys.SeatHp), hp);
             }
 
@@ -288,6 +290,15 @@ namespace Vortex.Client.Presentation
             }
 
             renderer.SetPropertyBlock(block);
+        }
+
+        // The theme's font for a text of the console (docs/DIRECTION_ARTISTIQUE.md 6.2), when the theme has one.
+        private static void Typeface(TMP_Text text, TMP_FontAsset? font)
+        {
+            if (font != null && text.font != font)
+            {
+                text.font = font;
+            }
         }
 
         private static (Renderer?, Material?) Look(Transform? part) =>

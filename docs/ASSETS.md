@@ -65,6 +65,10 @@ Les icônes des actions d'équipage sont branchées : une image déposée rempla
 
 Les cinq familles de la direction artistique (bible §6.2), sous licence OFL, sont dans `Art/Fonts/` avec leur `OFL.txt` ; sources, commit épinglé et empreintes dans `art-src/LICENCES.md`. L'outil d'assets en fait des polices TextMeshPro dans `Theme/Fonts/` (atlas statiques de 1024 px, caractères du français) et les donne au thème : titres (Anton), textes (Barlow), libellés (Barlow Condensed, aussi police par défaut de TextMeshPro), pochoir (Big Shoulders Stencil, graisse 900 figée par `tools/fonts/instance_font.py`), gravée (IM Fell English), terminal (Share Tech Mono). Pour changer une police : remplacer le fichier, supprimer son asset dans `Theme/Fonts/`, relancer l'outil.
 
+## 3 ter. Surfaces de l'interface
+
+L'outil d'assets dessine trois images dans `Theme/Sprites/` (`ThemeSprites`) : `Plaque.png` (métal noirci riveté, découpé en neuf pour s'étirer), `Ecran.png` (écran de terminal vert), `Danger.png` (bandes jaunes et noires, répétées). Elles habillent les panneaux, le bandeau, les boutons, l'annonce de tour et le marché. Pour les remplacer : déposer une image du même nom, en gardant les bords (26 px pour la plaque, 10 px pour l'écran), ou supprimer l'image et relancer l'outil pour la redessiner.
+
 ## 4. Plus tard
 
 - **Sons** (M5, ARB-72) : lancer de dés, impact, bouclier, élimination, achat au marché, fin de tour, signaux du temps de tour (dernières secondes, temps écoulé, ARB-70 ; le tic des dix dernières secondes est aujourd'hui un bip généré, remplacé par le son *Timer Tick* de `Theme/ThemeSettings`), musique d'ambiance. Format : WAV 48 kHz pour les effets, OGG pour la musique.

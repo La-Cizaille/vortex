@@ -62,11 +62,17 @@ namespace Vortex.Editor
             shape.sizeDelta = new Vector2(300f, 170f);
             shape.pivot = new Vector2(0.5f, 1f);
 
+            // A plate of blackened metal (lot 2): the name stencilled in bone, the figures on a terminal screen.
+            ThemeSettings theme = AssetDatabase.LoadAssetAtPath<ThemeSettings>(ThemeAssets.ThemePath);
             Image highlight = UiBuilder.Box(UiBuilder.Part<Image>(root.transform, "Cadre", Vector2.zero, Vector2.one, new Vector2(-4f, -4f), new Vector2(4f, 4f)), Color.white);
-            UiBuilder.Box(UiBuilder.Part<Image>(root.transform, "Fond", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), SeatBackground, receivesPointer: true);
-            TMP_Text name = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "Nom", new Vector2(0f, 1f), new Vector2(12f, -8f), new Vector2(150f, 26f)), 20f, FontStyles.Bold, TextAlignmentOptions.Left);
-            TMP_Text hp = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "PV", new Vector2(0f, 1f), new Vector2(12f, -38f), new Vector2(150f, 24f)), 18f, FontStyles.Normal, TextAlignmentOptions.Left);
-            TMP_Text shield = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "Bouclier", new Vector2(0f, 1f), new Vector2(12f, -62f), new Vector2(150f, 24f)), 18f, FontStyles.Normal, TextAlignmentOptions.Left);
+            UiBuilder.Plate(UiBuilder.Part<Image>(root.transform, "Fond", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), new Color(0.78f, 0.78f, 0.8f, 1f), receivesPointer: true);
+            TMP_Text name = UiBuilder.Font(UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "Nom", new Vector2(0f, 1f), new Vector2(14f, -8f), new Vector2(150f, 28f)), 24f, FontStyles.Normal, TextAlignmentOptions.Left), theme.StencilFont);
+            name.color = UiBuilder.Bone;
+            UiBuilder.Screen(UiBuilder.Fixed<Image>(root.transform, "Écran", new Vector2(0f, 1f), new Vector2(10f, -38f), new Vector2(150f, 50f)));
+            TMP_Text hp = UiBuilder.Font(UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "PV", new Vector2(0f, 1f), new Vector2(18f, -41f), new Vector2(140f, 22f)), 17f, FontStyles.Normal, TextAlignmentOptions.Left), theme.TerminalFont);
+            TMP_Text shield = UiBuilder.Font(UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "Bouclier", new Vector2(0f, 1f), new Vector2(18f, -63f), new Vector2(140f, 22f)), 17f, FontStyles.Normal, TextAlignmentOptions.Left), theme.TerminalFont);
+            hp.color = theme.Terminal;
+            shield.color = theme.Terminal;
             Image[] rounds = Enumerable.Range(0, 4)
                 .Select(i => Disc(root.transform, "Technologie " + (i + 1), new Vector2(0f, 1f), new Vector2(12f + (i * 24f), -94f), 18f))
                 .ToArray();
@@ -104,6 +110,14 @@ namespace Vortex.Editor
             light.type = LightType.Directional;
             light.intensity = 1.2f;
             light.transform.rotation = Quaternion.Euler(55f, -30f, 0f);
+
+            // A cold rim light from behind the table (ARB-98): it outlines every ship against the dark sky, so the mood
+            // never costs the table its readability.
+            var rim = new GameObject("Lumière de découpe", typeof(Light)).GetComponent<Light>();
+            rim.type = LightType.Directional;
+            rim.intensity = 0.9f;
+            rim.color = new Color(0.72f, 0.8f, 1f);
+            rim.transform.rotation = Quaternion.Euler(25f, 170f, 0f);
             Transform ships = new GameObject("Vaisseaux").transform;
             Transform centre = new GameObject("Centre de la table").transform;
             Transform cards = new GameObject("Cartes 3D").transform;
@@ -228,12 +242,16 @@ namespace Vortex.Editor
         // "Tour de X", in the upper middle of the screen; it never takes the pointer.
         private static TurnAnnouncement BuildAnnouncement(Transform parent)
         {
-            Image box = UiBuilder.Box(UiBuilder.Fixed<Image>(parent, "Tour de", new Vector2(0.5f, 0.5f), new Vector2(0f, 170f), new Vector2(900f, 120f)), new Color(0.02f, 0.03f, 0.07f, 0.9f));
+            // A band of blackened metal between two hazard strips, the name stencilled in bone (lot 2).
+            ThemeSettings theme = AssetDatabase.LoadAssetAtPath<ThemeSettings>(ThemeAssets.ThemePath);
+            Image box = UiBuilder.Plate(UiBuilder.Fixed<Image>(parent, "Tour de", new Vector2(0.5f, 0.5f), new Vector2(0f, 170f), new Vector2(900f, 120f)), Color.white);
+            UiBuilder.Hazard(UiBuilder.Part<Image>(box.transform, "Danger haut", new Vector2(0f, 1f), Vector2.one, new Vector2(0f, 0f), new Vector2(0f, 14f)));
+            UiBuilder.Hazard(UiBuilder.Part<Image>(box.transform, "Danger bas", Vector2.zero, new Vector2(1f, 0f), new Vector2(0f, -14f), Vector2.zero));
             CanvasGroup group = box.gameObject.AddComponent<CanvasGroup>();
             group.blocksRaycasts = false;
             group.interactable = false;
-            TMP_Text text = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(box.transform, "Texte", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), 48f, FontStyles.Bold, TextAlignmentOptions.Center);
-            text.color = new Color32(255, 214, 102, 255);
+            TMP_Text text = UiBuilder.Font(UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(box.transform, "Texte", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), 56f, FontStyles.Normal, TextAlignmentOptions.Center), theme.StencilFont);
+            text.color = UiBuilder.Bone;
             TurnAnnouncement announcement = box.gameObject.AddComponent<TurnAnnouncement>();
             announcement.Assign(group, text);
             box.gameObject.SetActive(false);
@@ -379,7 +397,7 @@ namespace Vortex.Editor
         private static (MarketDisplay Market, Button RecycleAttack, Button RecycleDefense, Button EndMarket) BuildMarket(Transform ui)
         {
             // 1180 wide: the panels of the opponents at the ends of the arc stay clear of it.
-            Image root = UiBuilder.Box(UiBuilder.Fixed<Image>(ui, "Marché noir", new Vector2(0.5f, 0.5f), new Vector2(0f, -20f), new Vector2(1180f, 210f)), new Color(0f, 0f, 0f, 0.35f));
+            Image root = UiBuilder.Plate(UiBuilder.Fixed<Image>(ui, "Marché noir", new Vector2(0.5f, 0.5f), new Vector2(0f, -20f), new Vector2(1180f, 210f)), new Color(1f, 1f, 1f, 0.92f));
             (RectTransform attackRow, TMP_Text attackLabel, TMP_Text attackDeck, Button recycleAttack) = MarketHalf(root.transform, "ATK", 0f, 0.5f);
             (RectTransform defenseRow, TMP_Text defenseLabel, TMP_Text defenseDeck, Button recycleDefense) = MarketHalf(root.transform, "DEF", 0.5f, 1f);
             (Button endMarket, TMP_Text endLabel) = UiBuilder.Button(root.transform, "Passer le marché", new Vector2(0.5f, 1f), new Vector2(0f, 46f), new Vector2(220f, 40f));
@@ -498,11 +516,15 @@ namespace Vortex.Editor
         // Round, event, doom countdown and result, at the top centre (INTERFACE.md 3.8).
         private static RoundBanner BuildBanner(Transform ui)
         {
-            Image root = UiBuilder.Box(UiBuilder.Fixed<Image>(ui, "Bandeau", new Vector2(0.5f, 1f), new Vector2(0f, -8f), new Vector2(560f, 112f)), Panel);
-            TMP_Text round = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "Manche", new Vector2(0.5f, 1f), new Vector2(0f, -6f), new Vector2(540f, 36f)), 30f, FontStyles.Bold, TextAlignmentOptions.Center);
+            // A plate of blackened metal: the round stencilled in bone, the event, the doom countdown in amber (lot 2).
+            ThemeSettings theme = AssetDatabase.LoadAssetAtPath<ThemeSettings>(ThemeAssets.ThemePath);
+            Image root = UiBuilder.Plate(UiBuilder.Fixed<Image>(ui, "Bandeau", new Vector2(0.5f, 1f), new Vector2(0f, -8f), new Vector2(560f, 112f)), Color.white);
+            TMP_Text round = UiBuilder.Font(UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "Manche", new Vector2(0.5f, 1f), new Vector2(0f, -6f), new Vector2(540f, 38f)), 34f, FontStyles.Normal, TextAlignmentOptions.Center), theme.StencilFont);
+            round.color = UiBuilder.Bone;
             TMP_Text roundEvent = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "Événement", new Vector2(0.5f, 1f), new Vector2(0f, -44f), new Vector2(540f, 30f)), 22f, FontStyles.Normal, TextAlignmentOptions.Center);
+            roundEvent.color = UiBuilder.Bone;
             TMP_Text doom = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "Fin des temps", new Vector2(0.5f, 1f), new Vector2(0f, -76f), new Vector2(540f, 26f)), 18f, FontStyles.Normal, TextAlignmentOptions.Center);
-            doom.color = Muted;
+            doom.color = theme.Amber;
             TMP_Text outcome = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "Résultat", new Vector2(0.5f, 0f), new Vector2(0f, -56f), new Vector2(1000f, 48f)), 36f, FontStyles.Bold, TextAlignmentOptions.Center);
             outcome.color = new Color32(255, 214, 102, 255);
             RoundBanner banner = root.gameObject.AddComponent<RoundBanner>();
