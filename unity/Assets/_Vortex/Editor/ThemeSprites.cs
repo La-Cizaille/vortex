@@ -5,8 +5,8 @@ using UnityEngine;
 namespace Vortex.Editor
 {
     /// <summary>
-    /// The interface's generated surfaces (docs/DIRECTION_ARTISTIQUE.md 6.4, lot 2): a riveted plate of blackened metal
-    /// for what is on board, a terminal screen for the figures, hazard stripes for alerts. They are placeholders in the
+    /// The interface's generated surfaces (docs/DIRECTION_ARTISTIQUE.md 6.4, lot 2): a light riveted frame over a
+    /// translucent dark fill for what is on board, a terminal screen for the figures, hazard stripes for alerts. They are placeholders in the
     /// sense of the project: a designer's image with the same name replaces them. Each is drawn once, never overwritten:
     /// delete one to redraw it.
     /// </summary>
@@ -75,38 +75,24 @@ namespace Vortex.Editor
             Debug.Log("Created " + path);
         }
 
-        // Blackened metal: brushed noise, a bevel, a dark rim, a rivet in each corner. Mostly grey: the interface tints it.
+        // A light frame (playtest of lot 2: the brushed, opaque plates were heavy): a translucent dark fill that lets the
+        // table show through, a thin steel rim, and a small rivet in each corner. No texture: it tints cleanly.
         private static Texture2D DrawPlate()
         {
-            var random = new System.Random(7);
             var texture = new Texture2D(PlateSize, PlateSize, TextureFormat.RGBA32, false);
-            float[] streak = new float[PlateSize];
-            for (int y = 0; y < PlateSize; y++)
-            {
-                streak[y] = (float)(random.NextDouble() - 0.5) * 0.05f;
-            }
-
+            var fill = new Color(0.055f, 0.06f, 0.068f, 0.62f);
+            var rim = new Color(0.42f, 0.44f, 0.47f, 0.95f);
+            var shade = new Color(0.02f, 0.02f, 0.025f, 0.8f);
             for (int y = 0; y < PlateSize; y++)
             {
                 for (int x = 0; x < PlateSize; x++)
                 {
-                    float v = 0.2f + streak[y] + ((float)(random.NextDouble() - 0.5) * 0.025f);
                     int edge = Mathf.Min(Mathf.Min(x, y), Mathf.Min(PlateSize - 1 - x, PlateSize - 1 - y));
-                    if (edge < 2)
-                    {
-                        v = 0.05f;
-                    }
-                    else if (edge < 4)
-                    {
-                        // Bevel: light from the top left.
-                        v += x < PlateSize / 2 && y > PlateSize / 2 ? 0.12f : -0.06f;
-                    }
-
-                    texture.SetPixel(x, y, new Color(v, v * 1.02f, v * 1.05f, 1f));
+                    texture.SetPixel(x, y, edge < 2 ? rim : edge < 3 ? shade : fill);
                 }
             }
 
-            foreach (Vector2Int corner in new[] { new Vector2Int(12, 12), new Vector2Int(PlateSize - 13, 12), new Vector2Int(12, PlateSize - 13), new Vector2Int(PlateSize - 13, PlateSize - 13) })
+            foreach (Vector2Int corner in new[] { new Vector2Int(9, 9), new Vector2Int(PlateSize - 10, 9), new Vector2Int(9, PlateSize - 10), new Vector2Int(PlateSize - 10, PlateSize - 10) })
             {
                 Rivet(texture, corner);
             }
@@ -122,13 +108,13 @@ namespace Vortex.Editor
                 for (int x = -5; x <= 5; x++)
                 {
                     float d = Mathf.Sqrt((x * x) + (y * y));
-                    if (d > 4.5f)
+                    if (d > 2.8f)
                     {
                         continue;
                     }
 
-                    // Domed head: lit at the top left, a dark ring around it.
-                    float v = d > 3.5f ? 0.06f : 0.34f + (0.05f * (y - x));
+                    // Small domed head: lit at the top left, a dark ring around it.
+                    float v = d > 2f ? 0.08f : 0.5f + (0.04f * (y - x));
                     texture.SetPixel(centre.x + x, centre.y + y, new Color(v, v, v * 1.03f, 1f));
                 }
             }
