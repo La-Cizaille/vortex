@@ -116,7 +116,8 @@ Les **mots des règles ne changent pas** (PV, bouclier, surcharge, Tourment…) 
 ### 5.4 La voix de SINISTRA
 - Une ligne du journal garde **le fait lisible d'un coup d'œil**. La pique est un suffixe court, tiré au hasard parmi plusieurs variantes, pour ne pas lasser.
 - Une option **« Commentaires de SINISTRA »** permet de les couper (ARB-95), texte et voix ensemble.
-- Exemples (à écrire pour de bon avec la revue des textes) :
+- **En place** (lot 3) : ses répliques sont dans la table des textes, clé `sinistra.<événement>` (et `sinistra.AttackMissed` pour une attaque sans dégât), plusieurs variantes séparées par `|` ; une clé vide la fait taire. Elle commente toujours une élimination, un coup critique et la fin de partie, environ une fois sur deux le reste, jamais deux fois de suite la même réplique (`Narrator`).
+- Exemples :
   - Attaque : « Rouge perfore Bleu : 6 dégâts. *Franchise non applicable.* »
   - Coup critique : « Critique ! Bleu perd Sous-couche blindée. *Nos experts parlent de perte totale.* »
   - Élimination : « Le vaisseau de Vert est déclaré épave. *Dossier classé. Merci de votre fidélité.* »
