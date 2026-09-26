@@ -73,8 +73,9 @@ namespace Vortex.Client.Presentation
                 shown.Roll(values, sum, rollSeconds / speed, holdSeconds / speed);
             }
 
-            // In playback seconds: the event player applies the speed itself.
-            return rollSeconds + holdSeconds;
+            // In playback seconds: the event player applies the speed itself. The result stays on screen while the next
+            // events start, so that a critical hit can still make its die leap (playtest 4).
+            return rollSeconds + (holdSeconds * 0.4f);
         }
     }
 }

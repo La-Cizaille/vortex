@@ -18,6 +18,10 @@ namespace Vortex.Client.Presentation
         private Quaternion _to;
         private float _settle;
         private float _settleTime;
+        private float _leap;
+        private float _leapTime;
+        private float _closer = 1f;
+        private System.Action<Vector3>? _landed;
 
         /// <summary>The value shown once settled, or 0 while spinning.</summary>
         public int Value { get; private set; }
@@ -66,9 +70,46 @@ namespace Vortex.Client.Presentation
             return true;
         }
 
+        /// <summary>True while the die leaps (tests).</summary>
+        public bool Leaping => _leapTime < _leap;
+
+        /// <summary>
+        /// A critical hit (playtest 4): the die leaps towards the camera, spinning, then falls back to its place in
+        /// <paramref name="seconds"/>; <paramref name="landed"/> is told where it lands, for its burst of energy.
+        /// </summary>
+        public void Leap(float seconds, System.Action<Vector3>? landed)
+        {
+            _leap = Mathf.Max(0.1f, seconds);
+            _leapTime = 0f;
+            _landed = landed;
+        }
+
         /// <summary>Moves the die on (every frame; tests call it directly).</summary>
         public void Tick(float deltaTime)
         {
+            if (_leapTime < _leap)
+            {
+                _leapTime += deltaTime;
+                float t = Mathf.Clamp01(_leapTime / _leap);
+
+                // Up towards the camera for the first half, then down again, faster, like a fall.
+                float height = t < 0.5f ? Mathf.Sin(t * Mathf.PI) : 1f - (((t - 0.5f) / 0.5f) * ((t - 0.5f) / 0.5f));
+                _closer = 1f - (0.55f * height);
+                transform.Rotate(_axis, _degreesPerSecond * 1.5f * deltaTime * (1f - t), Space.World);
+                if (t >= 1f)
+                {
+                    _closer = 1f;
+                    if (Value > 0)
+                    {
+                        Show(Value, 0.15f);
+                    }
+
+                    Place();
+                    _landed?.Invoke(transform.position);
+                    _landed = null;
+                }
+            }
+
             Place();
             if (Value == 0)
             {
@@ -105,7 +146,8 @@ namespace Vortex.Client.Presentation
             }
 
             Rect rect = CardAnchor.ScreenRectOf(_place);
-            transform.position = _view.ViewportToWorldPoint(new Vector3(rect.center.x / _view.pixelWidth, rect.center.y / _view.pixelHeight, _depth));
+            float depth = _depth * _closer;
+            transform.position = _view.ViewportToWorldPoint(new Vector3(rect.center.x / _view.pixelWidth, rect.center.y / _view.pixelHeight, depth));
             transform.localScale = Vector3.one * CardAnchor.WorldHeightAt(_view, _depth, rect.height);
         }
 

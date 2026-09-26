@@ -63,9 +63,11 @@ namespace Vortex.Client.Presentation
 
         [Header("Disposition (positions à l'écran : 0,0 en bas à gauche, 1,1 en haut à droite)")]
         [Tooltip("Position à l'écran du vaisseau du joueur.")]
-        [SerializeField] private Vector2 viewerShipOnScreen = new Vector2(0.5f, 0.25f);
+        [SerializeField] private Vector2 viewerShipOnScreen = new Vector2(0.5f, 0.31f);
         [Tooltip("Taille du vaisseau du joueur : il est au premier plan, près de la caméra.")]
-        [SerializeField, Min(0.1f)] private float viewerShipScale = 1f;
+        [SerializeField, Min(0.1f)] private float viewerShipScale = 1.2f;
+        [Tooltip("Taille des vaisseaux des adversaires.")]
+        [SerializeField, Min(0.1f)] private float opponentShipScale = 1.3f;
         [Tooltip("Centre de l'arc des adversaires, à l'écran.")]
         [SerializeField] private Vector2 arcCentreOnScreen = new Vector2(0.5f, 0.62f);
         [Tooltip("Demi-largeur et demi-hauteur de l'arc des adversaires, à l'écran.")]
@@ -100,6 +102,7 @@ namespace Vortex.Client.Presentation
         private bool _outcomeShown;
         private readonly AttackMemory _attack = new AttackMemory();
         private GameObject? _background;
+        private readonly HashSet<int> _placedByHand = new HashSet<int>();
         private TurnClock _clock = new TurnClock(0f, MatchSetup.DecisionSeconds);
         private EventPlayer? _player;
         private TableModel? _model;
@@ -518,6 +521,27 @@ namespace Vortex.Client.Presentation
         void IControlsHost.ShowTargets(IReadOnlyCollection<int>? seats) => ShowTargets(seats);
 
         /// <inheritdoc/>
+        void IControlsHost.PlacedByHand(int uid) => _placedByHand.Add(uid);
+
+        /// <inheritdoc/>
+        bool IFeedbackStage.TakePlacedByHand(int uid) => _placedByHand.Remove(uid);
+
+        /// <inheritdoc/>
+        CardDisplay? IFeedbackStage.NewCard(string cardId)
+        {
+            if (_context is null)
+            {
+                return null;
+            }
+
+            CardDisplay card = Instantiate(cardPrefab, cardRoot, false);
+            card.name = "Carte en vol";
+            card.Show(_context.Face(cardId), theme, cardArt);
+            card.SetPointable(false);
+            return card;
+        }
+
+        /// <inheritdoc/>
         bool IControlsHost.ShowsCard(int uid) => _model != null && _model.Shows(uid);
 
         /// <inheritdoc/>
@@ -630,6 +654,9 @@ namespace Vortex.Client.Presentation
             _model = TableModel.From(_session.View, _session.Rules);
             _dirty = true;
             _patching = true;
+
+            // The command is played out: a card placed by hand no longer needs to be remembered.
+            _placedByHand.Clear();
         }
 
         private void ShowAll(bool redrawCards)
@@ -677,6 +704,7 @@ namespace Vortex.Client.Presentation
                 float angle = SeatLayout.ArcAngle(i, opponents.Count, arcMargin) * Mathf.Deg2Rad;
                 Vector2 onScreen = arcCentreOnScreen + new Vector2(Mathf.Cos(angle) * arcRadiusOnScreen.x, Mathf.Sin(angle) * arcRadiusOnScreen.y);
                 Transform ship = SpawnShip(opponents[i], OnTable(onScreen), viewerShip.position);
+                ship.localScale = Vector3.one * opponentShipScale;
 
                 SeatDisplay panel = Instantiate(opponentPrefab, opponentPanels, false);
                 panel.name = "Adversaire " + (opponents[i] + 1).ToString(CultureInfo.InvariantCulture);

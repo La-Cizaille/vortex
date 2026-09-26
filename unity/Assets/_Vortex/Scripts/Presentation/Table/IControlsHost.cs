@@ -20,6 +20,9 @@ namespace Vortex.Client.Presentation
         /// <summary>Highlights the seats a dragged action may target, or a decision offers (null: back to normal).</summary>
         void ShowTargets(IReadOnlyCollection<int>? seats);
 
+        /// <summary>The person dropped this card where it goes: its trip is not animated (playtest 4).</summary>
+        void PlacedByHand(int uid);
+
         /// <summary>Whether a card with this uid is on the table now (a decision among cards not shown opens its window).</summary>
         bool ShowsCard(int uid);
 

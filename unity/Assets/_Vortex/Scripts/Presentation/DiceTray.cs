@@ -64,6 +64,9 @@ namespace Vortex.Client.Presentation
             _dieModel = model;
         }
 
+        /// <summary>Keeps the dice on screen <paramref name="seconds"/> longer (a die that leaps for a critical hit).</summary>
+        public void Extend(float seconds) => _hold += Mathf.Max(0f, seconds);
+
         /// <summary>Total shown once settled, or empty (tests).</summary>
         public string Total => total.text;
 

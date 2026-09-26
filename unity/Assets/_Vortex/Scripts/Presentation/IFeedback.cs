@@ -29,6 +29,12 @@ namespace Vortex.Client.Presentation
         /// <summary>The theme of the game (seat and technology colours), or null when the scene has none.</summary>
         ThemeSettings? Theme { get; }
 
+        /// <summary>A new 3D card showing <paramref name="cardId"/>, for an animation to move and then destroy; null without cards.</summary>
+        CardDisplay? NewCard(string cardId);
+
+        /// <summary>Whether the person dropped this card where it goes (then its trip is not animated); asking forgets it.</summary>
+        bool TakePlacedByHand(int uid);
+
         /// <summary>What the stage remembers of the attack being played (deflection, critical hit).</summary>
         AttackMemory Attack { get; }
 

@@ -120,7 +120,7 @@ namespace Vortex.Editor
             // when the market folds (ARB-81). Nothing is drawn, so it catches no pointer.
             RectTransform middle = UiBuilder.Fixed<RectTransform>(ui, "Centre de la table", new Vector2(0.5f, 0.5f), new Vector2(0f, -20f), new Vector2(1180f, 210f));
             (MarketDisplay market, Button recycleAttack, Button recycleDefense, Button endMarket) = BuildMarket(ui);
-            (SeatDisplay player, ActionButton[] actions, Button combo, Button overcharge, Graphic overchargeGlow) = BuildPlayerPanel(ui);
+            (SeatDisplay player, ActionButton[] actions, Button combo, Button overcharge, Graphic overchargeGlow) = BuildPlayerPanel(ui, front.transform);
             RoundBanner banner = BuildBanner(ui);
             GameLogDisplay log = BuildLog(ui);
             PlaybackControls playback = BuildPlayback(ui);
@@ -406,7 +406,7 @@ namespace Vortex.Editor
         // The player's own seat at the bottom: modifiers on each side of the ship, figures under it (INTERFACE.md 3.2), the
         // crew actions in a half-circle above the ship (3.4), the combo under the ship, shown only when ready (ARB-87), the overcharge token
         // armable by a tap (ARB-67).
-        private static (SeatDisplay Seat, ActionButton[] Actions, Button Combo, Button Overcharge, Graphic OverchargeGlow) BuildPlayerPanel(Transform ui)
+        private static (SeatDisplay Seat, ActionButton[] Actions, Button Combo, Button Overcharge, Graphic OverchargeGlow) BuildPlayerPanel(Transform ui, Transform front)
         {
             RectTransform root = UiBuilder.Fixed<RectTransform>(ui, "Joueur", new Vector2(0.5f, 0f), Vector2.zero, new Vector2(1100f, 320f));
             root.gameObject.AddComponent<CanvasGroup>();
@@ -414,7 +414,8 @@ namespace Vortex.Editor
             RectTransform defense = UiBuilder.Fixed<RectTransform>(root, "DEF", new Vector2(0.5f, 0f), new Vector2(340f, 20f), new Vector2(150f, 210f));
 
             Image highlight = UiBuilder.Box(UiBuilder.Fixed<Image>(root, "Cadre", new Vector2(0.5f, 0f), new Vector2(0f, 6f), new Vector2(408f, 118f)), Color.white);
-            Image stats = UiBuilder.Box(UiBuilder.Fixed<Image>(root, "Chiffres", new Vector2(0.5f, 0f), new Vector2(0f, 10f), new Vector2(400f, 110f)), SeatBackground);
+            // The figures catch the pointer: touching one's own panel answers a decision that offers one's own seat.
+            Image stats = UiBuilder.Box(UiBuilder.Fixed<Image>(root, "Chiffres", new Vector2(0.5f, 0f), new Vector2(0f, 10f), new Vector2(400f, 110f)), SeatBackground, receivesPointer: true);
             TMP_Text name = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(stats.transform, "Nom", new Vector2(0.5f, 1f), new Vector2(0f, -6f), new Vector2(380f, 26f)), 20f, FontStyles.Bold, TextAlignmentOptions.Center);
             TMP_Text hp = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(stats.transform, "PV", new Vector2(0.5f, 1f), new Vector2(-95f, -34f), new Vector2(180f, 32f)), 26f, FontStyles.Bold, TextAlignmentOptions.Center);
             TMP_Text shield = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(stats.transform, "Bouclier", new Vector2(0.5f, 1f), new Vector2(95f, -34f), new Vector2(180f, 32f)), 26f, FontStyles.Bold, TextAlignmentOptions.Center);
@@ -431,7 +432,9 @@ namespace Vortex.Editor
             statuses.color = Muted;
             GameObject leader = Tag(root, new Vector2(0.5f, 0f), new Vector2(0f, 160f));
 
-            (Button combo, TMP_Text comboLabel) = UiBuilder.Button(root, "Combo", new Vector2(0.5f, 0f), new Vector2(0f, 190f), new Vector2(150f, 40f));
+            // The combo on the foreground layer, over the ship: the ship is 3D and would cut through a button of the table's
+            // interface.
+            (Button combo, TMP_Text comboLabel) = UiBuilder.Button(front, "Combo", new Vector2(0.5f, 0f), new Vector2(0f, 150f), new Vector2(160f, 42f));
             comboLabel.fontStyle = FontStyles.Bold;
 
             // The actions, on an arc centred above the ship (ActionArc lays them out, playtest 2): attack actions on the

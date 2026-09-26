@@ -115,7 +115,7 @@ namespace Vortex.Tests.EditMode
             Assert.That(at[CrewAction.Overcharge].x, Is.LessThan(0f), "Attack actions on the left.");
             Assert.That(at[CrewAction.RerollShield].x, Is.GreaterThan(0f), "Shield actions on the right.");
             Assert.That(at[CrewAction.Sabotage].x, Is.GreaterThan(at.Values.Max(p => p.x) - 0.01f), "Sabotage at the right end.");
-            Vector2 centre = new Vector2(0f, 270f);
+            Vector2 centre = new Vector2(0f, 335f);
             float radius = Vector2.Distance(at[CrewAction.Attack], centre);
             foreach (KeyValuePair<CrewAction, Vector2> action in at)
             {

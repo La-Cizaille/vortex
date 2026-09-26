@@ -366,8 +366,13 @@ namespace Vortex.Client.Presentation
         public bool CanBuy(CardSlot slot, int index) => Has(c => c.Type == CommandType.PickMarket && c.Slot == slot && c.MarketIndex == index);
 
         /// <summary>Buys a market card dropped on the player's side of the table; false when dropped elsewhere or not allowed.</summary>
-        public bool Buy(CardSlot slot, int index, Vector2 screen) =>
-            Contains(purchaseZone, screen) && SubmitFirst(c => c.Type == CommandType.PickMarket && c.Slot == slot && c.MarketIndex == index);
+        public bool Buy(CardSlot slot, int index, Vector2 screen)
+        {
+            // The card is where the person dropped it: it needs no trip to the ship (playtest 4).
+            IReadOnlyList<CardView>? market = _view?.Market(slot).Visible;
+            int uid = market != null && index >= 0 && index < market.Count ? market[index].Uid : -1;
+            return Contains(purchaseZone, screen) && Placed(uid, SubmitFirst(c => c.Type == CommandType.PickMarket && c.Slot == slot && c.MarketIndex == index));
+        }
 
         /// <summary>
         /// Whether the card <paramref name="uid"/> can be dragged now: one of the player's cards to use it, or any card a
@@ -386,13 +391,13 @@ namespace Vortex.Client.Presentation
         {
             if (_choices is null)
             {
-                return Contains(activationZone, screen) && SubmitFirst(c => c.Type == CommandType.ActivateCard && c.CardUid == uid);
+                return Contains(activationZone, screen) && Placed(uid, SubmitFirst(c => c.Type == CommandType.ActivateCard && c.CardUid == uid));
             }
 
             int seat = Contains(purchaseZone, screen) ? _seat : _host?.SeatAt(screen) ?? -1;
             if (seat >= 0 && _choices.Drops.TryGetValue((uid, seat), out string onSeat))
             {
-                return Answer(onSeat);
+                return Placed(uid, Answer(onSeat));
             }
 
             return Contains(activationZone, screen) && _choices.DropsInMiddle.TryGetValue(uid, out string inMiddle) && Answer(inMiddle);
@@ -591,6 +596,17 @@ namespace Vortex.Client.Presentation
             && choices.Cards.Keys.All(_host.ShowsCard)
             && choices.Drops.Keys.All(k => _host.ShowsCard(k.Card))
             && choices.DropsInMiddle.Keys.All(_host.ShowsCard);
+
+        // A card the person dropped where it goes: its trip is not animated again.
+        private bool Placed(int uid, bool done)
+        {
+            if (done && uid >= 0)
+            {
+                _host?.PlacedByHand(uid);
+            }
+
+            return done;
+        }
 
         private bool Answer(string? key) => key != null && SubmitFirst(c => c.Type == CommandType.AnswerDecision && c.Option == key);
 
