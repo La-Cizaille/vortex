@@ -50,9 +50,9 @@ MonoBehaviour:
   - Key: seat.default-name
     Text: Joueur {0}
   - Key: seat.hp
-    Text: PV {0}
+    Text: '> PV: {0}'
   - Key: seat.shield
-    Text: Bouclier {0}
+    Text: '> BOUCLIER: {0}'
   - Key: seat.eliminated
     Text: "\xC9limin\xE9"
   - Key: seat.leader

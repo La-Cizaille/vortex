@@ -438,8 +438,8 @@ namespace Vortex.Client.Content
             Add(BannerWinner, "Victoire de {0} : {1}");
             Add(BannerDraw, "Égalité");
             Add(SeatDefaultName, "Joueur {0}");
-            Add(SeatHp, "PV {0}");
-            Add(SeatShield, "Bouclier {0}");
+            Add(SeatHp, "> PV: {0}");
+            Add(SeatShield, "> BOUCLIER: {0}");
             Add(SeatEliminated, "Éliminé");
             Add(SeatLeader, "Leader");
             Add(MarketDeck, "Pioche : {0}");
