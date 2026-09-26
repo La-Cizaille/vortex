@@ -160,7 +160,8 @@ Le thème a déjà deux emplacements de police, titre et texte (`ThemeSettings`)
 
 ### 6.3 Matériaux 3D (registre A)
 - **Low-poly texturé** (ARB-77), inchangé : le détail vient des textures.
-- La tôle est peinte, écaillée, rouillée sur les arêtes, avec des rivets, des soudures et des rustines d'une autre couleur.
+- **Les peintures extérieures restent brillantes** : on est dans l'espace, la coque est laquée et vernie, avec des reflets francs (brillance élevée dans URP). L'usure se limite aux **arêtes, éclats, rayures et abords des rivets**, où la rouille et la tôle nue apparaissent. L'intérieur (cockpit, soutes) peut être plus mat et plus usé.
+- La tôle porte des rivets, des soudures et des rustines d'une autre couleur.
 - On y colle des **décalcomanies** : logos de faction, numéros de coque, et des mentions d'assureur (« NON COUVERT », « VÉHICULE DE REMPLACEMENT »).
 - **Néons émissifs** pour tout ce qui brille (le Bloom est déjà réglé) : réacteurs, feux, enseignes.
 - La peinture `Siege` reste en niveaux de gris clairs, teintée par le jeu (ARB-76). Elle devient une **peinture écaillée**, qui laisse voir la tôle dessous.
