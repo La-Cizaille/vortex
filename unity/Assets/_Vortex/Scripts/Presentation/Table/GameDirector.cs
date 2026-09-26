@@ -99,6 +99,7 @@ namespace Vortex.Client.Presentation
         private bool _paused;
         private bool _outcomeShown;
         private readonly AttackMemory _attack = new AttackMemory();
+        private GameObject? _background;
         private TurnClock _clock = new TurnClock(0f, MatchSetup.DecisionSeconds);
         private EventPlayer? _player;
         private TableModel? _model;
@@ -216,6 +217,7 @@ namespace Vortex.Client.Presentation
             _player.Idle += Resync;
 
             PlaceSeats();
+            PlaceBackground();
             market.Bind(_context);
             market.SetPurchase(controls.CanBuy, controls.Buy, controls.ExplainBuy, controls.HideHelp, MarkLoss);
             market.SetCardTap(uid => controls.ChooseCard(uid));
@@ -418,6 +420,19 @@ namespace Vortex.Client.Presentation
             {
                 TurnViewTo(actor);
             }
+        }
+
+        // The sky behind the table: the theme's background, or a generated starfield around the camera. Built once per game.
+        private void PlaceBackground()
+        {
+            if (_background != null)
+            {
+                Discard(_background);
+            }
+
+            _background = theme.TableBackground != null
+                ? Instantiate(theme.TableBackground, Vector3.zero, Quaternion.identity, shipRow)
+                : Starfield.Create(shipRow, view.transform.position, 700, 60f, theme.GlowMaterial).gameObject;
         }
 
         private void TurnViewTo(int seat)
@@ -629,6 +644,11 @@ namespace Vortex.Client.Presentation
                     damage.Show(1f - ((float)shown.Hp / Math.Max(1, model.MaxHp)), shown.Eliminated, theme.GlowMaterial, theme.SmokePrefab);
                 }
 
+                if (_ships.TryGetValue(seat.Key, out Transform charged) && charged.GetComponentInChildren<OverchargeArcs>() is OverchargeArcs arcs)
+                {
+                    arcs.Show(shown.Overcharge > 0 && !shown.Eliminated, seat.Key == _viewer && controls.OverchargeArmed, theme.Overcharge, theme.GlowMaterial, theme.ArcPrefab);
+                }
+
                 if (model.Seats[seat.Key].Eliminated && _wrecks.Add(seat.Key) && _ships.TryGetValue(seat.Key, out Transform ship))
                 {
                     Wreck(ship);
@@ -703,6 +723,7 @@ namespace Vortex.Client.Presentation
             // Each ship sways on its own rhythm: the phase follows the seat.
             ShipMotion.Attach(root, ship.transform, theme.ShipSwayHeight, theme.ShipSwayRoll, theme.ShipSwayPitch, theme.ShipSwaySeconds, seat * 0.37f);
             ship.AddComponent<HullDamage>();
+            ship.AddComponent<OverchargeArcs>();
             _ships[seat] = root;
             return root;
         }

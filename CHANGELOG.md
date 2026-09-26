@@ -4,6 +4,14 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Non publié]
 ### Ajouté
+- **Animations, suite du lot 2** (ANIMATIONS §5) :
+  - Tourment : spores et frisson ; purification quand les jetons s'en vont ;
+  - surcharge : arcs électriques sur la coque tant que le jeton est présent ;
+  - trajets des cartes achetées, volées ou utilisées ;
+  - dégâts renvoyés : un trait revient avant l'impact ;
+  - vague de lumière à la révélation d'un événement, ou l'effet que le thème lui associe (*Event Effects*) ;
+  - ciel étoilé généré, remplaçable par un fond (*Table Background*).
+  La capture `-Phase Effects` montre aussi le Tourment et la vague, et nettoie les effets laissés par la partie jouée pour arriver à la manche.
 - **Caméra rapprochée** : plus basse (33° au lieu de 38°), plus proche, champ plus étroit, et le vaisseau du joueur presque deux fois plus grand ; la disposition étant fixée à l'écran, rien ne change de place. **Liste de l'atelier Blender** (ANIMATIONS §6) : tout ce qui relève des modèles et des effets, avec où le déposer ; deux nouveaux points d'accroche dans le thème, *Shield Material* (plasma du bouclier) et *Smoke Prefab* (fumée d'un vaisseau endommagé).
 - **Animations de combat** (lot 2, ANIMATIONS §5) :
   - parade : la sphère de plasma de la cible s'allume là où le tir frappe si son bouclier a arrêté une part de l'attaque ;

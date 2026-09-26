@@ -136,12 +136,20 @@ namespace Vortex.Editor
         }
 
         // The animations of the table frozen mid-way (ANIMATIONS.md §5), to judge them without playing: seat 2 aims at
-        // seat 0 and fires into its shield, seat 3 powers up, seat 4 explodes, seat 5 takes a heavy hit. The frame loop does not run here: effects and ships are
+        // seat 0 and fires into its shield, seat 3 powers up, seat 4 explodes, seat 5 takes a heavy hit, seat 1 gets a
+        // Torment token and the round's event sends its wave. The frame loop does not run here: effects and ships are
         // moved on by hand, by the same amount of time.
         private static void PlayEffects(GameDirector director, float seconds)
         {
             IFeedbackStage stage = director;
             int seats = director.Ships.Count;
+
+            // The game played to reach the round left effects behind, never moved on here: they go first.
+            foreach (PlaceholderEffect left in Object.FindObjectsByType<PlaceholderEffect>())
+            {
+                Object.DestroyImmediate(left.gameObject);
+            }
+
             var shot = new GameEvent { Type = GameEventType.AttackResolved, Player = 1 % seats, Other = 0, Value = 10, Amount = 5, Values = new System.Collections.Generic.List<int> { 5, 5, 5 } };
             ScriptableObject.CreateInstance<AimFeedback>().Play(new GameEvent { Type = GameEventType.AttackDeclared, Player = shot.Player, Other = 0 }, stage);
             Advance(0.6f);
@@ -151,6 +159,8 @@ namespace Vortex.Editor
                 ScriptableObject.CreateInstance<ThrusterFeedback>().Play(new GameEvent { Type = GameEventType.TechnologyActivated, Player = 2, Value = (int)TechColor.Blue }, stage);
             }
 
+            ScriptableObject.CreateInstance<TormentFeedback>().Play(new GameEvent { Type = GameEventType.TormentPlaced, Player = 0, Value = 1 }, stage);
+            ScriptableObject.CreateInstance<EventFeedback>().Play(new GameEvent { Type = GameEventType.EventRevealed, Id = "EVT_CAPTURE" }, stage);
             if (seats > 4)
             {
                 ScriptableObject.CreateInstance<KnockbackFeedback>().Play(new GameEvent { Type = GameEventType.HpLost, Player = 4, Amount = 12, Cause = HpLossCause.Attack }, stage);

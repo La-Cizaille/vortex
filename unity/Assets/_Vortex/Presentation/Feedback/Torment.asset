@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e536f9b83862e9489006f6a6fd4d198, type: 3}
+  m_Name: Torment
+  m_EditorClassIdentifier: Vortex.Client::Vortex.Client.Presentation.TormentFeedback
+  prefab: {fileID: 0}
+  spores: {r: 1.2, g: 2.2, b: 0.6, a: 1}
+  cleansed: {r: 1.6, g: 2, b: 2.4, a: 1}
+  seconds: 1
+  wait: 0.4

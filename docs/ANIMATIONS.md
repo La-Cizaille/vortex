@@ -54,7 +54,7 @@ Une animation ne décide jamais de rien : le résultat est déjà calculé par l
 ## 4. Ordre proposé
 
 - **Lot 1**, le plus visible pour le moins d'effort : balancement, rayon d'attaque, recul aux dégâts, flambée de combo, d8 qui tourne, élimination. Aucun ajout au moteur. **Fait côté jeu**, avec des effets provisoires (§5) ; restent les modèles et les effets définitifs.
-- **Lot 2** : parade et esquive (après l'ajout au moteur), Tourment, fond et ses effets, paquets du marché, critique, surcharge, sabotage, trajets des cartes, dégâts renvoyés, déviation, fin des temps, vaisseau endommagé. **Fait côté jeu, partie combat** (§5) : parade, esquive, déviation, critique, bouclier qui change (sabotage, reparamétrage, cartes), vaisseau endommagé. Restent le Tourment, le fond, les paquets du marché, la surcharge, les trajets des cartes, les dégâts renvoyés et la Fin des temps.
+- **Lot 2** : parade et esquive (après l'ajout au moteur), Tourment, fond et ses effets, paquets du marché, critique, surcharge, sabotage, trajets des cartes, dégâts renvoyés, déviation, fin des temps, vaisseau endommagé. **Fait côté jeu** (§5), sauf les paquets du marché : parade, esquive, déviation, critique, bouclier qui change, vaisseau endommagé, Tourment, surcharge, trajets des cartes, dégâts renvoyés, vague de l'événement de manche (et un effet par événement, dont la Fin des temps, à déposer dans le thème), ciel étoilé. Les paquets du marché, qui demandent un modèle et d'animer les cartes elles-mêmes, feront une étape à part.
 - **Lot 3** : contamination, réparation, halos, tour en cours, victoire, initiative.
 
 Chaque lot se fait des deux côtés : les modèles et effets par l'atelier Blender, les retours visuels et les ajouts au moteur par le développement. Un retour visuel sans son modèle utilise un effet provisoire, comme les cartes et les vaisseaux l'ont fait.
@@ -76,6 +76,12 @@ Chaque animation marche déjà avec un effet provisoire fait de formes simples, 
 | Déviation (ARB-88) | `Deflect.asset` (`DeflectFeedback`) puis `Laser.asset` | `AttackRedirected` : le bouclier du vaisseau qui dévie s'allume ; le tir, après les dés, frappe ce bouclier puis bifurque vers la nouvelle cible | Durée, éclat |
 | Coup critique | `Critical.asset` (`CriticalFeedback`) puis `Laser.asset` | `CriticalHit`, dit avant le tir : à l'impact, un éclair blanc plus gros et une secousse de la caméra (`CameraShake`) ; l'interface ne bouge pas | Force de la secousse (dans `Laser.asset`) |
 | Bouclier qui change | `ShieldPulse.asset` (`ShieldPulseFeedback`) | `ShieldChanged`, quelle qu'en soit la cause (reparamétrage, sabotage, carte) : la sphère se recharge en brillant quand il monte, grésille en rougissant quand il baisse, d'autant plus fort que l'écart est grand | Durée, éclat, écart le plus fort |
+| Tourment | `Torment.asset` (`TormentFeedback`) | `TormentPlaced` : un nuage de spores éclate autour du vaisseau qui porte la carte, qui frissonne ; `TormentsRemoved` : un éclat clair s'élève. Un jeton sur une carte du marché n'a pas de vaisseau : rien ne se joue | Champ *Prefab* : le nuage ; couleurs des spores et de la purification |
+| Surcharge | `OverchargeArcs`, ajouté à chaque vaisseau | État : tant que le vaisseau a un jeton, de petits arcs électriques courent sur sa coque, plus souvent quand il est armé | Effet provisoire |
+| Trajets des cartes | `CardFlight.asset` (`CardFlightFeedback`) | `MarketCardTaken` : du marché au vaisseau de l'acheteur ; `CardStolen` : d'un vaisseau à l'autre ; `CardActivated` : du vaisseau au centre, où elle se consume | Durée, hauteur de la courbe, éclat |
+| Dégâts renvoyés | `Knockback.asset` | `HpLost` de cause `Reflect` : un trait blanc revient du vaisseau qui renvoie, puis l'impact | — |
+| Événement de manche | `RoundEvent.asset` (`EventFeedback`) | `EventRevealed` : l'effet du thème pour cet événement, sinon une vague de lumière qui balaie la table | Liste *Event Effects* de `Theme/ThemeSettings` : un effet par identifiant d'événement (dont la Fin des temps) |
+| Ciel étoilé | `Starfield`, créé au début de la partie | Permanent : étoiles discrètes autour de la caméra, en un seul maillage, qui tournent très lentement | Champ *Table Background* de `Theme/ThemeSettings` : le fond définitif le remplace |
 | Vaisseau endommagé | `HullDamage`, ajouté à chaque vaisseau | État : sous la moitié de ses PV, de la fumée s'échappe, de plus en plus souvent ; sous le quart, des étincelles ; plus rien pour une épave | Effet provisoire ; un vrai panache de fumée viendra avec les effets définitifs |
 | Dé à 8 faces | `DiceTray` et `DieSpinner` | `DiceRolled`, `DieRolled` | Champ *Die Model* de `Theme/ThemeSettings`. Sans modèle, un octaèdre généré |
 
@@ -97,6 +103,9 @@ Tout ce qui suit revient à l'atelier Blender : le jeu a déjà le déclencheur,
 | **Explosion** | Élimination | Champ *Prefab* de `Presentation/Feedback/Explosion` | Environ 1,2 s ; boule de feu, onde, débris |
 | **Plasma du bouclier** | Parade, déviation, bouclier qui change | Champ *Shield Material* de `Theme/ThemeSettings` (une sphère, teintée à la couleur du siège par le jeu) | Plus vif sur les bords (effet de Fresnel), ondulation au point d'impact, couleur du siège |
 | **Fumée d'un vaisseau endommagé** | Vaisseau endommagé | Champ *Smoke Prefab* de `Theme/ThemeSettings` (posé sur la coque, détruit après 3 s) | Panache qui s'élève, dense et sombre quand les PV sont bas |
-| **Fond spatial** | Fond, effets d'événements | Voir ASSETS §3 et le lot 2 | Panorama ; un effet par événement de manche |
+| **Fond spatial** | Fond de la table | Champ *Table Background* de `Theme/ThemeSettings` (posé à l'origine de la scène) | Panorama (ASSETS §3), étoiles qui scintillent, planètes lentes |
+| **Effets des événements de manche** (tempête, trou noir, Fin des temps…) | Événement révélé | Liste *Event Effects* de `Theme/ThemeSettings`, par identifiant d'événement (CARDS.md) | Joué au centre de la table, environ 3 s |
+| **Nuage de spores** | Tourment | Champ *Prefab* de `Presentation/Feedback/Torment` | Posé sur la coque, porté par le vaisseau |
+| **Arcs électriques** | Surcharge | Champ *Arc Prefab* de `Theme/ThemeSettings` (posé sur la coque, détruit après 1 s) | Courts, crépitants, couleur de la surcharge |
 | **Paquet du marché** | Tirage des cartes | Lot 2 | Bloc au dos des cartes, épaisseur variable |
 | **Jetons 3D** (Tourment, surcharge), **épave**, **matériau contaminé** | Lots 2 et 3 | Lots 2 et 3 | Voir §2 et §3 |
