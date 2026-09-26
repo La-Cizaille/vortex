@@ -54,9 +54,9 @@ MonoBehaviour:
   shipSwayPitch: 1.2
   shipSwaySeconds: 3.4
   glowMaterial: {fileID: 2100000, guid: 236b2e8d87956f24d97d9a1dee8a6033, type: 2}
-  shieldMaterial: {fileID: 0}
-  smokePrefab: {fileID: 0}
-  arcPrefab: {fileID: 0}
+  shieldMaterial: {fileID: 2100000, guid: 92170486040034e45a95318d9d0db3f4, type: 2}
+  smokePrefab: {fileID: 7898917156193407723, guid: bc3ae949210a5a743ab651304d9eae11, type: 3}
+  arcPrefab: {fileID: 8392960113323075407, guid: d586ed185010f7541b36a86549d6b27f, type: 3}
   tableBackground: {fileID: 5181726139699177051, guid: 6acf239d7c05d174f933cbad844d74f2, type: 3}
   eventEffects: []
   statusColors: []

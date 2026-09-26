@@ -50,7 +50,7 @@ namespace Vortex.Client.Presentation
             Sparks++;
             if (_arc != null)
             {
-                Destroy(Instantiate(_arc, at, Quaternion.LookRotation(along), transform), 1f);
+                TimedRemoval.After(Instantiate(_arc, at, Quaternion.LookRotation(along), transform), 1f);
                 return;
             }
 

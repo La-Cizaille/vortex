@@ -34,7 +34,7 @@ namespace Vortex.Client.Presentation
             Vector3 hull = ShipParts.HullOf(ship);
             if (prefab != null)
             {
-                Destroy(Instantiate(prefab, hull, Quaternion.identity, ship), seconds / speed);
+                TimedRemoval.After(Instantiate(prefab, hull, Quaternion.identity, ship), seconds / speed);
                 return wait;
             }
 

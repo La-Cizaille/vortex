@@ -12,3 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8bd112403ca2b344be9e9915d9867bd, type: 3}
   m_Name: Laser
   m_EditorClassIdentifier: Vortex.Client::Vortex.Client.Presentation.LaserFeedback
+  prefab: {fileID: 1538129721138891453, guid: 499a596fa93b45245be76b2cda2b6444, type: 3}
+  aimSeconds: 0.15
+  boltSpeed: 22
+  boltLength: 0.9
+  boltWidth: 0.12
+  brightness: 4
+  recoil: 0.3
+  criticalShake: 0.18
+  returnSeconds: 0.5

@@ -51,7 +51,7 @@ namespace Vortex.Client.Presentation
             Puffs++;
             if (_smoke != null)
             {
-                Destroy(Instantiate(_smoke, at, Quaternion.identity), 3f);
+                TimedRemoval.After(Instantiate(_smoke, at, Quaternion.identity), 3f);
                 return;
             }
 
