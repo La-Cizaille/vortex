@@ -19,9 +19,10 @@ Ce document est la **bible** de l'apparence et du ton du jeu. Tout visuel, tout 
 **Piliers**
 1. **Fun d'abord.** Chaque coup se lit, se sent et se paie tout de suite. L'humour accompagne le jeu sans jamais le ralentir.
 2. **Un monde sombre, une voix cruelle.** L'univers est pris au sérieux : sombre, lourd, sans issue, jamais cartoon. L'humour vient du **sarcasme froid** posé sur ce monde, pas de gags visuels. **L'image est grave, le texte est cruel** : c'est ce décalage qui fait rire (ARB-94). On ne rit jamais aux dépens du joueur réel ni de personnes réelles (§5.2).
-3. **Pirates en sursis.** Tout est usé, rafistolé, volé. Les équipages sont épuisés, les coques ont déjà servi à d'autres morts. Rien n'est neuf, rien n'est garanti, personne n'est sauvé.
-4. **Satire électorale.** L'Élection galactique est une campagne : affiches, promesses, pots-de-vin, votes achetés.
-5. **Lisible avant tout.** Une information de jeu reste nette dans n'importe quelle ambiance : la blague vit **à côté** de l'information, jamais à sa place (§5.3).
+3. **Technologie de récupération.** Tout est machine : câbles, valves, tuyaux, circuits, écrans, voyants. Des vaisseaux et des modules rafistolés, branchés les uns sur les autres, qui tiennent par le bricolage (ARB-95).
+4. **Pirates en sursis.** Tout est usé, rafistolé, volé. Les équipages sont épuisés, les coques ont déjà servi à d'autres morts. Rien n'est neuf, rien n'est garanti, personne n'est sauvé.
+5. **Satire électorale.** L'Élection galactique est une campagne : affiches, promesses, pots-de-vin, votes achetés.
+6. **Lisible avant tout.** Une information de jeu reste nette dans n'importe quelle ambiance : la blague vit **à côté** de l'information, jamais à sa place (§5.3).
 
 ## 2. L'univers
 
@@ -48,15 +49,16 @@ Ce document est la **bible** de l'apparence et du ton du jeu. Tout visuel, tout 
 ### 2.5 Les épaves
 - Un capitaine éliminé laisse une épave qui dérive. Avec l'option des fantômes, son équipage mort continue de se mêler de tout.
 
-### 2.6 La voix du secteur : SINISTRA **[à valider]**
+### 2.6 La voix du secteur : SINISTRA
 - **Qui** : l'IA d'expertise des **Assurances Horizon Final**, dont le slogan est *« Nous couvrons tout. Sauf vous. »*
 - **Son rôle** : elle commente la partie dans le journal, les annonces de tour et les épitaphes. Elle estime chaque dommage, classe chaque dossier, et ne rembourse jamais.
 - **Son ton** : d'une politesse glaciale, elle vouvoie, avec un vocabulaire d'assureur (sinistre, franchise, dossier classé, clause d'exclusion). Elle ne plaisante jamais : elle constate. Le rire vient de son indifférence totale à la mort des équipages.
 - **Pourquoi elle** : un narrateur unique donne une voix constante au jeu et concentre l'humour à un seul endroit, qu'on peut couper (§5.4).
+- **Texte seulement** pour l'instant : aucune voix n'est enregistrée ni synthétisée. Une voix viendrait avec le lot son (§6.8) **[à décider]**.
 
 ## 3. Les factions
 
-Les quatre technologies deviennent quatre factions. Obtenir une technologie, c'est **obtenir le soutien d'une faction** pour l'élection. Un combo est **un pacte** avec elle.
+Les quatre technologies deviennent quatre factions, **et le jeu affiche le nom de la faction** à la place de celui de la technologie (ARB-95). Obtenir une technologie, c'est **obtenir le soutien d'une faction** pour l'élection. Un combo est **un pacte** avec elle.
 
 | Technologie (couleur) | Faction | Qui ils sont | Visuel | Ton | Lien avec la mécanique |
 |---|---|---|---|---|---|
@@ -79,6 +81,7 @@ Les **mots des règles ne changent pas** (PV, bouclier, surcharge, Tourment…) 
 | Surcharge | Pousser le réacteur au-delà de la garantie constructeur |
 | Tourment | L'infestation par les spores des Adeptes |
 | Marché noir, recycler | Le marché noir ; « on vide l'étal » |
+| Modificateur (carte) | Un **module** de vaisseau récupéré, qu'on branche dans une baie (ATK ou DEF) |
 | Technologie, combo | Le soutien d'une faction ; un pacte |
 | Manche | Un tour d'horloge avant le vortex |
 | Dé | Le dé du destin : un d8 de casino, forcément pipé |
@@ -107,12 +110,12 @@ Les **mots des règles ne changent pas** (PV, bouclier, surcharge, Tourment…) 
 | Texte de règle d'une carte, règles, aperçus, raisons d'un refus, questions d'une décision | **Neutre et exact** | Aucune blague : c'est ce que le joueur lit pour décider |
 | Libellés de l'interface (boutons, menus) | **Clair**, touche d'ambiance tolérée dans les titres | Le mot d'action reste évident (« Fin de tour », pas un jeu de mots) |
 | Nom d'une carte, d'un événement, d'une faction | **Ambiance** | Voir §8 pour les renommages |
-| Texte d'ambiance d'une carte **[à valider]** | **Ambiance** | Une ligne sous le texte de règle, en italique, facultative |
+| Texte d'ambiance d'une carte | **Ambiance** | Une ligne sous le texte de règle, facultative. Écrite par le designer dans un second temps (ARB-95) ; il faudra un champ de plus dans le contenu |
 | Journal, annonces de tour, épitaphes, astuces | **La voix de SINISTRA** | Le fait d'abord (qui, quoi, combien), la pique ensuite, courte |
 
 ### 5.4 La voix de SINISTRA
 - Une ligne du journal garde **le fait lisible d'un coup d'œil**. La pique est un suffixe court, tiré au hasard parmi plusieurs variantes, pour ne pas lasser.
-- Une option **« Commentaires de SINISTRA »** permet de les couper **[à valider]**.
+- Une option **« Commentaires de SINISTRA »** permet de les couper (ARB-95).
 - Exemples (à écrire pour de bon avec la revue des textes) :
   - Attaque : « Rouge perfore Bleu : 6 dégâts. *Franchise non applicable.* »
   - Coup critique : « Critique ! Bleu perd Sous-couche blindée. *Nos experts parlent de perte totale.* »
@@ -130,6 +133,8 @@ Deux registres, choisis par le designer (ARB-93), assombris après la première 
 - **C, pour la 2D : la propagande autoritaire.** Affiches en deux ou trois couleurs (noir, os, rouge sang), photocopies dégradées, tampons, avis de recherche. Le graphisme d'un régime, pas celui d'une bande dessinée.
 
 Ils se rejoignent dans le cockpit et les menus : du métal noirci couvert d'affiches arrachées.
+
+**Une couche technologique partout** (ARB-95) : câbles, gaines, valves, manomètres, tuyaux, circuits imprimés, connecteurs, voyants, écrans cathodiques. Rien n'est lisse : chaque surface montre comment elle est branchée.
 
 **Ce qui fait rire n'est jamais l'image.** Les visuels et les animations restent graves ; le sarcasme vient des textes (§5).
 
@@ -168,6 +173,7 @@ Le thème a déjà deux emplacements de police, titre et texte (`ThemeSettings`)
 - **Low-poly texturé** (ARB-77), inchangé : le détail vient des textures.
 - **Les peintures extérieures restent brillantes** : on est dans l'espace, la coque est laquée et vernie, avec des reflets francs (brillance élevée dans URP), mais **dans des teintes profondes**, jamais acidulées. L'usure se limite aux **arêtes, éclats, rayures et abords des rivets**, où la rouille et la tôle nue apparaissent. L'intérieur (cockpit, soutes) est plus mat, plus sale.
 - La tôle porte des rivets, des soudures, des traces de brûlure et des rustines.
+- **Machinerie apparente** : faisceaux de câbles gainés, valves à volant, tuyaux, boîtiers électroniques, radiateurs, antennes. Sur les vaisseaux, le cockpit, le dé et la table.
 - Les **marquages** sont fonctionnels et sinistres : numéros de coque au pochoir, avertissements, décomptes de victimes, mentions d'assureur (« NON COUVERT »).
 - **Lumières émissives rares** (le Bloom est déjà réglé) : réacteurs, feux de position, écrans. Pas d'enseigne partout.
 - La peinture `Siege` reste en niveaux de gris clairs, teintée par le jeu (ARB-76), avec l'usure aux arêtes.
@@ -176,7 +182,7 @@ Le thème a déjà deux emplacements de police, titre et texte (`ThemeSettings`)
 ### 6.4 Formes
 - **Vaisseaux** : massifs, industriels, asymétriques par réparation plutôt que par fantaisie. Silhouettes lourdes et lisibles de loin.
 - **Interface** : deux familles.
-  - Les **plaques de métal noirci** pour tout ce qui est « à bord » : cockpit, panneaux des sièges, arc d'actions. Écrans de terminal verts.
+  - Les **plaques de métal noirci** pour tout ce qui est « à bord » : cockpit, panneaux des sièges, arc d'actions. Écrans de terminal verts, voyants, câbles qui courent entre les éléments.
   - Le **papier jauni** pour tout ce qui est « dans le secteur » : menus, bandeau de manche, fin de partie, bulles d'aide. Affiches arrachées, photocopies, agrafes.
 - **Tampons** pour les verdicts : « ÉLIMINÉ », « DOSSIER CLASSÉ », « ÉLU ».
 - Pas de formes rondes et joyeuses, pas d'inclinaisons fantaisistes : les éléments sont droits, lourds, administratifs.
@@ -191,6 +197,16 @@ Le thème a déjà deux emplacements de police, titre et texte (`ThemeSettings`)
   - avec les épitaphes des autres, tamponnées « DOSSIER CLASSÉ ».
 - **Pause** : une notice d'assurance, avec ses petites lignes.
 
+### 6.5 bis Les cartes deviennent des modules (ARB-95)
+Une carte n'est plus un papier : c'est un **module de vaisseau branchable**, un boîtier qu'on enfiche dans une baie du cockpit.
+- **Le boîtier** : métal noirci, vis, grille d'aération, **connecteur à broches** en bas (il entre dans la baie), une poignée ou des encoches sur le haut.
+- **L'illustration** apparaît sur un **écran** du module, légèrement teinté et balayé.
+- **Le nom** est une plaque gravée ou un pochoir. **Le texte de règle** est affiché sur un écran de terminal ou une plaque rétroéclairée, toujours net et lisible (§5.3).
+- **La couleur de faction** passe par une bande de voyants et le liseré du boîtier ; l'emblème est estampé.
+- **Usage unique ou durable** : un voyant ou un fusible visible (un module à usage unique a un fusible qui grille).
+- Les **sockets du cockpit** deviennent des **baies** avec leurs broches ; le **marché noir** devient un **rack** de modules récupérés.
+- C'est une reprise du modèle 3D de la carte (`build_card.py`, ADR-0017), à faire par l'atelier Blender ; les zones nommées (illustration, nom, texte) restent, le jeu n'a pas à changer.
+
 ### 6.6 Iconographie
 - Pictogrammes **au pochoir** : formes pleines, une couleur, lisibles à 32 px.
 - Chaque faction a un emblème (§3) : sur les cartes, les diodes du cockpit, les affiches et les coques.
@@ -202,6 +218,7 @@ Le thème a déjà deux emplacements de police, titre et texte (`ThemeSettings`)
 - **Rythme** : un effet ne retarde jamais le jeu au-delà de ce qu'il raconte. La vitesse de lecture s'applique à tout.
 
 ### 6.8 Son (lot à part, plus tard)
+- **Voix de SINISTRA** **[à décider]** : aucune pour l'instant. Si on en veut une, une voix de synthèse volontairement froide et artificielle colle au personnage ; il faudra tracer la licence de l'outil et des fichiers produits.
 - **Ambiance** : drones industriels, radio du secteur grésillante, fragments de propagande ; un jazz d'ascenseur sinistre pour la Maison.
 - **Retours de jeu** : impacts métalliques sourds, grincements de coque, alarmes, coups de tampon, bips du terminal de SINISTRA (en texte, sans voix enregistrée au début).
 - Le jeu n'a aucun son aujourd'hui : il faudra des sources libres ou faites maison, licences tracées, comme les images.
@@ -218,7 +235,8 @@ Le designer génère les illustrations de son côté. Pour qu'elles tiennent ens
 - **Style commun (registre C)** :
   - illustration sombre de science-fiction industrielle, peinture réaliste, éclairage bas et contrasté ;
   - palette réduite (§6.1), grain, usure ; jamais cartoon, jamais acidulé ;
-  - un sujet central lisible en petit.
+  - un sujet central lisible en petit ;
+  - l'image est affichée **sur l'écran d'un module** : pas besoin de cadre dans l'image.
 - **Sans texte dans l'image** : le jeu écrit le nom et le texte. Les lettres générées sont presque toujours fausses.
 - **Cohérence** :
   - même modèle et mêmes réglages pour toute la série ;
