@@ -132,7 +132,7 @@ namespace Vortex.Editor
             return outside + Mathf.Min(Mathf.Max(px, py), 0f) - radius;
         }
 
-        // A dark green screen with a thin frame and scan lines.
+        // A dark green screen with rounded corners, a thin frame and scan lines.
         private static Texture2D DrawScreen()
         {
             var texture = new Texture2D(ScreenSize, ScreenSize, TextureFormat.RGBA32, false);
@@ -143,8 +143,11 @@ namespace Vortex.Editor
             {
                 for (int x = 0; x < ScreenSize; x++)
                 {
-                    int edge = Mathf.Min(Mathf.Min(x, y), Mathf.Min(ScreenSize - 1 - x, ScreenSize - 1 - y));
-                    texture.SetPixel(x, y, edge < 2 ? frame : y % 3 == 0 ? line : glass);
+                    // Rounded like the panels (ARB-100), a thin frame, scan lines.
+                    float d = RoundedDistance(x, y, ScreenSize, 7f);
+                    Color pixel = d > -1.5f ? frame : y % 3 == 0 ? line : glass;
+                    pixel.a *= Mathf.Clamp01(0.5f - d);
+                    texture.SetPixel(x, y, pixel);
                 }
             }
 
