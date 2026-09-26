@@ -344,6 +344,24 @@ namespace Vortex.Client.Content
         /// <summary>End of game: back to the home menu.</summary>
         public const string GameOverMenu = "game-over.menu";
 
+        /// <summary>Stamp of the end poster when the last ship standing wins.</summary>
+        public const string GameOverWanted = "game-over.wanted";
+
+        /// <summary>Stamp of the end poster when the election is won.</summary>
+        public const string GameOverElected = "game-over.elected";
+
+        /// <summary>Stamp of the end poster on a draw.</summary>
+        public const string GameOverClosed = "game-over.closed";
+
+        /// <summary>Epitaph of a fallen captain. {0}: name.</summary>
+        public const string EpitaphOf = "game-over.epitaph";
+
+        /// <summary>The narrator's lines after an epitaph.</summary>
+        public const string QuipEpitaph = "sinistra.Epitaph";
+
+        /// <summary>Line under the title of the home menu.</summary>
+        public const string MenuTagline = "menu.tagline";
+
         /// <summary>Banner when the view turns to a person. {0}: name.</summary>
         public const string TurnOf = "turn.of";
 
@@ -509,7 +527,7 @@ namespace Vortex.Client.Content
             Add(MenuSocial, "Social (bientôt)");
             Add(MenuQuit, "Quitter");
             Add(MenuBack, "Retour");
-            Add(LocalTitle, "Partie locale");
+            Add(LocalTitle, "Registre des contrats");
             Add(LocalPlayers, "Joueurs : {0}");
             Add(LocalLaunch, "Lancer la partie");
             Add(LocalDevelopment, "Développement");
@@ -526,7 +544,7 @@ namespace Vortex.Client.Content
             Add(DevBonus, "+{0}");
             Add(Yes, "oui");
             Add(No, "non");
-            Add(OptionsTitle, "Options");
+            Add(OptionsTitle, "Notice technique");
             Add(OptionsSpeed, "Vitesse des animations : ×{0}");
             Add(OptionsFullScreen, "Plein écran : {0}");
             Add(OptionsCommentary, "Commentaires de SINISTRA : {0}");
@@ -539,6 +557,12 @@ namespace Vortex.Client.Content
             Add(PauseQuit, "Quitter la partie");
             Add(GameOverReplay, "Rejouer");
             Add(GameOverMenu, "Menu");
+            Add(GameOverWanted, "RECHERCHÉ");
+            Add(GameOverElected, "ÉLU");
+            Add(GameOverClosed, "DOSSIER CLASSÉ");
+            Add(EpitaphOf, "Ci-gît {0}.");
+            Add(QuipEpitaph, "Il avait un bouclier et des principes. Il n'a plus ni l'un ni l'autre.|Mort en service. Le service n'a rien remarqué.|Aucune famille à prévenir. Nous avons vérifié, par économie.|Sa dette lui survit. Elle est en meilleure santé.|Parti comme il a vécu : sans couverture.");
+            Add(MenuTagline, "Le dernier grand casse avant la fin des temps.");
             Add(TurnOf, "Tour de {0}");
             Add(RefusalSource, "{0} Cause : {1}.");
             Add(LocalTurnTime, "Temps de tour : {0}");
@@ -670,7 +694,7 @@ namespace Vortex.Client.Content
             Add(Log(GameEventType.ShieldChanged), "Bouclier de {0} : {3}.");
             Add(Log(GameEventType.ShieldChangeRefused), "Le bouclier de {0} ne peut pas être modifié.");
             Add(Log(GameEventType.OverchargeChanged), "Surcharge de {0} : {3}.");
-            Add(Log(GameEventType.TormentPlaced), "Jeton de Tourment posé (carte de {0}).");
+            Add(Log(GameEventType.TormentPlaced), "Jeton de Tourment posé sur {4}.");
             Add(Log(GameEventType.TormentsRemoved), "{2} jetons de Tourment retirés (cartes de {0}).");
             Add(Log(GameEventType.StatusAdded), "Effet sur {0} : {4}.");
             Add(Log(GameEventType.StatusEnded), string.Empty);

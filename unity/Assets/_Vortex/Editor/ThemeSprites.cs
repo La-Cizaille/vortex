@@ -24,6 +24,9 @@ namespace Vortex.Editor
         /// <summary>Rounded outline, nine-sliced: the frame of the seat whose turn it is.</summary>
         public const string OutlinePath = Folder + "/Contour.png";
 
+        /// <summary>Yellowed poster paper with torn edges, nine-sliced: the menus (lot 4).</summary>
+        public const string PaperPath = Folder + "/Affiche.png";
+
         /// <summary>Hazard stripes, tiled.</summary>
         public const string HazardPath = Folder + "/Danger.png";
 
@@ -33,12 +36,17 @@ namespace Vortex.Editor
         private const int ScreenSize = 64;
         private const int ScreenBorder = 10;
         private const int HazardSize = 64;
+        private const int PaperSize = 128;
+        private const int PaperBorder = 24;
 
         /// <summary>The riveted plate.</summary>
         public static Sprite Plate => AssetDatabase.LoadAssetAtPath<Sprite>(PlatePath);
 
         /// <summary>The rounded outline.</summary>
         public static Sprite Outline => AssetDatabase.LoadAssetAtPath<Sprite>(OutlinePath);
+
+        /// <summary>The poster paper.</summary>
+        public static Sprite Paper => AssetDatabase.LoadAssetAtPath<Sprite>(PaperPath);
 
         /// <summary>The terminal screen.</summary>
         public static Sprite Screen => AssetDatabase.LoadAssetAtPath<Sprite>(ScreenPath);
@@ -53,6 +61,7 @@ namespace Vortex.Editor
             Draw(OutlinePath, DrawOutline(), PlateBorder, tiled: false);
             Draw(ScreenPath, DrawScreen(), ScreenBorder, tiled: false);
             Draw(HazardPath, DrawHazard(), 0, tiled: true);
+            Draw(PaperPath, DrawPaper(), PaperBorder, tiled: false);
         }
 
         private static void Draw(string path, Texture2D texture, int border, bool tiled)
@@ -148,6 +157,41 @@ namespace Vortex.Editor
                     Color pixel = d > -1.5f ? frame : y % 3 == 0 ? line : glass;
                     pixel.a *= Mathf.Clamp01(0.5f - d);
                     texture.SetPixel(x, y, pixel);
+                }
+            }
+
+            texture.Apply();
+            return texture;
+        }
+
+        // Yellowed poster paper (docs/DIRECTION_ARTISTIQUE.md 6.4): bone with a fine grain (no specks: the sheet stretches),
+        // darker towards the edges,
+        // the edges torn unevenly. White enough to be tinted; the grain stays.
+        private static Texture2D DrawPaper()
+        {
+            var random = new System.Random(11);
+            var texture = new Texture2D(PaperSize, PaperSize, TextureFormat.RGBA32, false);
+            int[] tear = new int[PaperSize];
+            for (int i = 0; i < PaperSize; i++)
+            {
+                tear[i] = random.Next(0, 5);
+            }
+
+            for (int y = 0; y < PaperSize; y++)
+            {
+                for (int x = 0; x < PaperSize; x++)
+                {
+                    int edge = Mathf.Min(Mathf.Min(x - tear[y], y - tear[x]), Mathf.Min(PaperSize - 1 - x - tear[(y * 7) % PaperSize], PaperSize - 1 - y - tear[(x * 5) % PaperSize]));
+                    if (edge < 0)
+                    {
+                        texture.SetPixel(x, y, Color.clear);
+                        continue;
+                    }
+
+                    float grain = (float)(random.NextDouble() - 0.5) * 0.06f;
+                    float age = edge < 10 ? (10 - edge) * 0.012f : 0f;
+                    float v = 0.97f + grain - age;
+                    texture.SetPixel(x, y, new Color(v, v * 0.95f, v * 0.82f, 1f));
                 }
             }
 

@@ -4,6 +4,7 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Non publié]
 ### Ajouté
+- **Direction artistique, lot 4 : les menus en affiches** (bible §6.5) : les fenêtres deviennent des affiches (papier jauni aux bords déchirés, `Affiche.png`), titres en Anton couleur sang, texte à l'encre, boutons pleins à l'encre ; accueil en mur d'affiches, bandeau de sang « VORTEX » et accroche ; partie locale en « Registre des contrats », options en « Notice technique » ; fin de partie en affiche tamponnée (« RECHERCHÉ », « ÉLU » ou « DOSSIER CLASSÉ ») avec l'épitaphe de chaque capitaine tombé, suivie d'une ligne de SINISTRA (`sinistra.Epitaph`) ; tests dans `ArtDirectionTests` et `NarratorTests`.
 - **Pistes après les playtests**, en discussion : dossier `docs/balance/pistes-apres-playtests.md` (Régénération parasitaire, Nouvel arrivage, la prime sur le leader en événement, une carte de réanimation, une carte de pacte ; combo laissé ouvert). Ce ne sont pas des décisions : aucune règle ne change et aucun développement n'est demandé.
 - **Direction artistique, lot 3 : la voix de SINISTRA** (bible §5.4) : le narrateur commente la partie dans le journal (le fait, puis son constat) et dans l'annonce de tour ; ses répliques, plusieurs par événement, vivent dans la table des textes (`sinistra.*`) et ne nomment jamais une carte ; l'option « Commentaires de SINISTRA » la fait taire (`Narrator`, tests `NarratorTests`). Le journal devient un terminal : lignes vertes sur écran sombre.
 - **Panneaux allégés** (ARB-99, ARB-100) : panneaux arrondis, fond sombre à peine présent, bord presque invisible, sans rivets ni métal brossé ; plus de cadre autour du bandeau de manche ; le tour en cours est un contour arrondi doré. PV et bouclier des adversaires sur un radar pirate (ARB-102) : lueur, barre de balayage, brèves perturbations (`RadarScreen`).
@@ -141,6 +142,7 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 - Le rapport d'équilibrage identifie le contenu par l'empreinte des quatre fichiers de contenu, et non plus du seul `cards.json`. L'option `--samples` est remplacée par `--bot`.
 
 ### Corrigé
+- Journal : « Jeton de Tourment posé (carte de —) » pour un jeton posé sur une carte des marchés ; la ligne nomme maintenant la carte (« Jeton de Tourment posé sur … »).
 - **Surcharge** (ARB-91) : le jeton armé est désarmé dès qu'une commande part, et le levier du cockpit redescend de lui-même ; il restait armé après une attaque surchargée. Test `An_armed_overcharge_is_disarmed_once_the_action_is_sent`.
 - **Captures** : le cockpit est replacé et posé au repos avant la prise de vue (`SceneCapture`).
 - « Ni vu ni connu » (et toute décision qui propose son propre vaisseau) : sa propre fiche ne recevait pas le toucher. Ses chiffres reçoivent maintenant le pointeur.

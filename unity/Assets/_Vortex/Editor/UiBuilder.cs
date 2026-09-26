@@ -80,6 +80,23 @@ namespace Vortex.Editor
         /// <summary>Bone: the light text on blackened metal (docs/DIRECTION_ARTISTIQUE.md 6.1).</summary>
         public static readonly Color Bone = new Color32(207, 196, 168, 255);
 
+        /// <summary>Ink: the text on poster paper.</summary>
+        public static readonly Color Ink = new Color32(20, 19, 18, 255);
+
+        /// <summary>Blood: titles and stamps on poster paper.</summary>
+        public static readonly Color Blood = new Color32(142, 27, 27, 255);
+
+        /// <summary>A sheet of poster paper (ThemeSprites), nine-sliced; the rounded box while it is not drawn.</summary>
+        public static Image Paper(Image image, bool receivesPointer = false)
+        {
+            Sprite paper = ThemeSprites.Paper;
+            image.sprite = paper != null ? paper : RoundedBox;
+            image.type = Image.Type.Sliced;
+            image.color = paper != null ? new Color(0.84f, 0.8f, 0.7f, 1f) : Bone;
+            image.raycastTarget = receivesPointer;
+            return image;
+        }
+
         /// <summary>A soft rounded panel (ThemeSprites), nine-sliced, tinted; the rounded box while it is not drawn.</summary>
         public static Image Plate(Image image, Color tint, bool receivesPointer = false)
         {
