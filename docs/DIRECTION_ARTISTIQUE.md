@@ -27,7 +27,7 @@ Ce document est la **bible** de l'apparence et du ton du jeu. Tout visuel, tout 
 
 ### 2.1 La Marge
 - Un secteur en bordure de carte, abandonné par les grandes puissances le jour où le **Vortex** est apparu : un trou noir errant qui se rapproche à chaque manche.
-- Il ne reste que des pirates, des marchands sans scrupules, et quatre factions qui se disputent les restes.
+- Il ne reste que des pirates, des marchands sans scrupules, et quatre factions qui se disputent les restes. L'une d'elles, la Légion de l'Ordre, ne rit jamais : elle sert de contrepoint sérieux aux trois autres.
 - La loi du secteur tient en une phrase : *tout ce qui n'est pas cloué appartient au plus rapide ; tout ce qui est cloué aussi.*
 
 ### 2.2 Les capitaines (les joueurs)
@@ -60,7 +60,7 @@ Les quatre technologies deviennent quatre factions. Obtenir une technologie, c'e
 
 | Technologie (couleur) | Faction | Qui ils sont | Visuel | Ton | Lien avec la mécanique |
 |---|---|---|---|---|---|
-| **Ordre** (bleu) | **La Maréchaussée** | Police et fisc fusionnés, seule administration restée sur place. Tout est formulaire, tout est taxé. | Gyrophares, tampons, blindage propre mais cabossé, tampons « REFUSÉ ». Emblème : un œil dans un tampon encreur | Bureaucratique, pompeux | Dévier une attaque : **« renvoyée au service compétent »** |
+| **Ordre** (bleu) | **La Légion de l'Ordre** | Des fantassins d'élite en armure lourde, dernière force régulière de la Marge. Disciplinés, fanatiques, sans le moindre humour : ce sont eux, les pas rigolos. | Armures lourdes, visières, bannières, rangs serrés. Emblème : un casque de combat sur un bouclier | **Sérieux, martial**. L'humour vient de ce qui les entoure, jamais d'eux | Dévier une attaque : interceptée et redirigée, « conformément au protocole » |
 | **Casino Cosmique** (jaune) | **La Maison** | La pègre du jeu. Elle possède la moitié des dettes du secteur et l'autre moitié des croupiers. | Néons, dorures criardes, jetons, tapis vert. Emblème : un d8 couronné | Bonimenteur, faussement généreux | Deux actions d'équipage : **« double mise »** |
 | **Rebelles** (rouge) | **Le Front Syndical des Mutins** | Des équipages en grève perpétuelle, armés jusqu'aux dents. Ils votent tout, sauf le retour au travail. | Pochoirs, peinture à la bombe, drapeaux rapiécés. Emblème : un poing qui serre une clé à molette | Militant, grandiloquent | Surcharge et avantage : **« mouvement social »** |
 | **Abomination organique** (vert) | **L'Église de la Spore** | Un culte fongique. La contamination y est une communion ; les membres ne sont plus tout à fait des gens. | Chair, mycélium, bioluminescence verte, coques colonisées. Emblème : une spore en forme d'œil | Doucereux, prosélyte | Tourment réactivé : **« grande communion »** |
