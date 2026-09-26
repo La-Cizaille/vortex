@@ -1,9 +1,12 @@
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Vortex.Client.Presentation;
+using Vortex.Client.Session;
+using Vortex.Core.Bots;
 using Vortex.Core.Commands;
 using Vortex.Core.Content;
 using Vortex.Editor;
@@ -174,6 +177,11 @@ namespace Vortex.Tests.EditMode
         [Test]
         public void An_armed_overcharge_is_disarmed_once_the_action_is_sent()
         {
+            // A duel against a random bot, a fixed seed: the person lives long enough to hold a token on one of their turns.
+            _director.Begin(new MatchSetup(
+                new List<SeatSetup> { new SeatSetup("Vous", SeatKind.Human), new SeatSetup("Bot", SeatKind.Bot, BotLevel.Random) },
+                seed: 3));
+
             // Gain the token, turn after turn, until one of the person's turns starts with it still held (a hit may cost it).
             ReachActionPhase();
             for (int turn = 0; turn < 20 && _director.Session!.View.Players[0].Overcharge == 0; turn++)
