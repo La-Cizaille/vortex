@@ -4,6 +4,13 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Non publié]
 ### Ajouté
+- **Direction artistique, lot 1 : fondations** (ARB-95 à ARB-98) :
+  - polices de la bible (Anton, Big Shoulders Stencil, IM Fell English, Barlow, Barlow Condensed, Share Tech Mono), sous licence OFL, épinglées et tracées dans `art-src/LICENCES.md` ; atlas TextMeshPro statiques, donnés au thème ; Barlow Condensed devient la police par défaut de l'interface ;
+  - palette de la bible dans le thème (suie, os, encre, sang, vert terminal, ambre, danger), pour les lots suivants ;
+  - les noms des factions remplacent ceux des technologies : Légion de l'Ordre, la Maison, Front Syndical des Mutins, Adeptes de la Corruption (identifiants inchangés) ;
+  - texte d'ambiance facultatif (`flavor`) dans le format du contenu, validé (texte brut, 200 caractères au plus), affiché en italique sous la règle, repris dans `CARDS.md` (ADR-0021) ; vide pour l'instant ;
+  - option « Commentaires de SINISTRA » ;
+  - recul des vaisseaux plus lourd, sans rebond au-delà de leur place.
 - **Direction artistique et univers** (ARB-93, ADR-0020) : bible `docs/DIRECTION_ARTISTIQUE.md` (ARB-93 à ARB-96). Elle couvre le pitch (le dernier casse avant le vortex), les quatre factions, la charte d'écriture et ses limites, la voix du narrateur SINISTRA, la palette, les typographies, les matériaux, les formes, l'animation, le son et les consignes pour les illustrations Stable Diffusion.
 - **Cockpit du joueur** (ARB-90) : modèle Blender construit par script (`tools/blender/build_cockpit.py`, 1 136 triangles), exporté en `Art/Cockpit/Cockpit.fbx` et pris par le thème (*Cockpit Model*). Sous le vaisseau, il remplace le panneau de chiffres (`CockpitDisplay`) :
   - plaque du nom, jauge de PV qui se remplit et change de couleur, avec le chiffre ;

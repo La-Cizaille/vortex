@@ -89,8 +89,8 @@ namespace Vortex.Client.Presentation
             return travel;
         }
 
-        // Thrown like a ball on an elastic (playtest 4): away from the shot, tumbling, harder the heavier the hit; the
-        // elastic brings it back. Cosmetic chaos only, never a game value.
+        // Thrown away from the shot, harder the heavier the hit, then pulled back to its place (playtest 4). A heavy hull
+        // (ARB-95): little tumble, no bounce past its place. Cosmetic only, never a game value.
         private void Throw(ShipMotion? motion, Vector3 away, float severity, float scale, float speed, float delay)
         {
             if (motion == null)
@@ -101,8 +101,8 @@ namespace Vortex.Client.Presentation
             // The distance the elastic lets it reach, turned into a starting speed; a little random slant.
             float reach = Mathf.Lerp(lightThrow, heavyThrow, severity) * scale;
             Vector3 direction = Quaternion.Euler(0f, Random.Range(-20f, 20f), 0f) * away;
-            Vector3 velocity = ((direction * 1f) + (Vector3.up * 0.35f * severity)) * reach * Mathf.Sqrt(ShipMotion.Stiffness) * 1.4f * speed;
-            Vector3 spin = Vector3.Scale(heavySpin * Mathf.Lerp(0.3f, 1f, severity), RandomSigns()) * 6f * speed;
+            Vector3 velocity = ((direction * 1f) + (Vector3.up * 0.35f * severity)) * reach * Mathf.Sqrt(ShipMotion.Stiffness) * 2f * speed;
+            Vector3 spin = Vector3.Scale(heavySpin * Mathf.Lerp(0.3f, 1f, severity), RandomSigns()) * 3.5f * speed;
             if (delay > 0f)
             {
                 motion.ThrowAfter(delay / speed, velocity, spin);

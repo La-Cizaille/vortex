@@ -40,6 +40,7 @@ Conséquences concrètes :
 | S7 | Builds distribués (APK, exe) | 1–2 | Rétro-ingénierie, modification du client |
 | S10 | Menus du client : noms saisis dans la partie locale, options de l'appareil (`PlayerPrefs`) | 1 | Texte libre tapé par le joueur ; valeurs modifiables hors du jeu (registre Windows, fichier de préférences Android) |
 | S9 | Illustrations et modèles déposés dans `unity/Assets/_Vortex/Art/`, sources Blender dans `art-src/` | 1 | Fichiers lus par les importeurs de l'éditeur (PNG, FBX) et par Blender (`.blend`, qui peuvent contenir des scripts) |
+| S11 | Polices (`unity/Assets/_Vortex/Art/Fonts/`, ARB-95) | 1 | Fichiers TrueType tiers lus par l'éditeur. Épinglés au commit de `google/fonts`, empreintes SHA-256 dans `art-src/LICENCES.md`. Les atlas TextMeshPro sont **statiques** : le build emporte les glyphes dessinés, aucune police n'est analysée sur l'appareil du joueur |
 | S8 | Variantes et grilles d'équilibrage (`docs/balance/variants/*.json`, `docs/balance/grids/*.json`) et options du simulateur | 1 | Fichiers édités à la main, passés en ligne de commande à un outil de développement |
 
 ## 3. Modèle de menaces (STRIDE) et mesures

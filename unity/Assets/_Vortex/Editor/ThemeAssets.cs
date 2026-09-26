@@ -71,6 +71,7 @@ namespace Vortex.Editor
             Ensure<ThemeSettings>(ThemePath);
             EnsureGlow();
             EnsureGlass();
+            ThemeFonts.Ensure();
             EnsureCockpit();
             Ensure<CardArtCatalog>(CardArtPath);
             Ensure<ShipCatalog>(ShipsPath);

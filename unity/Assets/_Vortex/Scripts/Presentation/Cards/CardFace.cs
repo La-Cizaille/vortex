@@ -21,8 +21,9 @@ namespace Vortex.Client.Presentation
         public const string TechnologyIcon = "Slot_TECH";
 
         /// <summary>Creates a face.</summary>
-        public CardFace(string id, string title, string badge, string usage, string text, TechColor color, string badgeIcon = "")
+        public CardFace(string id, string title, string badge, string usage, string text, TechColor color, string badgeIcon = "", string? flavor = null)
         {
+            Flavor = flavor ?? string.Empty;
             Id = id;
             Title = title;
             Badge = badge;
@@ -53,6 +54,9 @@ namespace Vortex.Client.Presentation
         /// <summary>Printed text, in the content format (bold and icon tags).</summary>
         public string Text { get; }
 
+        /// <summary>Flavour text under the printed text (ARB-95), plain; empty when the card has none.</summary>
+        public string Flavor { get; }
+
         /// <summary>Technology colour (neutral for events).</summary>
         public TechColor Color { get; }
 
@@ -71,7 +75,7 @@ namespace Vortex.Client.Presentation
                 CardUsage.Triggered => TextKeys.UsageTriggered,
                 _ => TextKeys.UsageDurable,
             });
-            return new CardFace(card.Id, CardText.ToPlainText(card.Name), slot, usage, card.Text, card.Color, card.Slot == CardSlot.Attack ? AttackIcon : DefenseIcon);
+            return new CardFace(card.Id, CardText.ToPlainText(card.Name), slot, usage, card.Text, card.Color, card.Slot == CardSlot.Attack ? AttackIcon : DefenseIcon, card.Flavor);
         }
 
         /// <summary>Face of an event.</summary>
@@ -82,7 +86,7 @@ namespace Vortex.Client.Presentation
                 throw new ArgumentNullException(nameof(gameEvent));
             }
 
-            return new CardFace(gameEvent.Id, CardText.ToPlainText(gameEvent.Name), texts.Get(TextKeys.BadgeEvent), texts.Get(TextKeys.KindEvent), gameEvent.Text, TechColor.Neutral, EventIcon);
+            return new CardFace(gameEvent.Id, CardText.ToPlainText(gameEvent.Name), texts.Get(TextKeys.BadgeEvent), texts.Get(TextKeys.KindEvent), gameEvent.Text, TechColor.Neutral, EventIcon, gameEvent.Flavor);
         }
 
         /// <summary>Face of a technology.</summary>
@@ -93,7 +97,7 @@ namespace Vortex.Client.Presentation
                 throw new ArgumentNullException(nameof(technology));
             }
 
-            return new CardFace(technology.Id, CardText.ToPlainText(technology.Name), texts.Get(TextKeys.BadgeTechnology), texts.Get(TextKeys.KindTechnology), technology.Text, technology.Color, TechnologyIcon);
+            return new CardFace(technology.Id, CardText.ToPlainText(technology.Name), texts.Get(TextKeys.BadgeTechnology), texts.Get(TextKeys.KindTechnology), technology.Text, technology.Color, TechnologyIcon, technology.Flavor);
         }
     }
 }

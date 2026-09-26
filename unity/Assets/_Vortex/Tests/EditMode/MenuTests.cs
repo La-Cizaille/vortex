@@ -148,5 +148,26 @@ namespace Vortex.Tests.EditMode
                 kept.Save();
             }
         }
+
+        [Test]
+        public void The_narrators_comments_can_be_turned_off_and_stay_so()
+        {
+            bool before = UserOptions.Load(1f).Commentary;
+            try
+            {
+                _menu.ShowOptions();
+                OptionsMenu options = _menu.Options;
+                bool shown = options.Options!.Commentary;
+                options.ToggleCommentary();
+                Assert.That(UserOptions.Load(1f).Commentary, Is.EqualTo(!shown), "Kept on this device.");
+                options.Close();
+            }
+            finally
+            {
+                UserOptions kept = UserOptions.Load(1f);
+                kept.Commentary = before;
+                kept.Save();
+            }
+        }
     }
 }

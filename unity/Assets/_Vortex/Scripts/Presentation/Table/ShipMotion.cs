@@ -40,10 +40,13 @@ namespace Vortex.Client.Presentation
         public Vector3 PushOffset { get; private set; }
 
         /// <summary>Pull of the elastic that brings a thrown ship back (per second squared, per unit).</summary>
-        public const float Stiffness = 26f;
+        public const float Stiffness = 20f;
 
-        /// <summary>Braking of the elastic: low enough for the ship to overshoot its place a little and settle.</summary>
-        public const float Damping = 4.5f;
+        /// <summary>
+        /// Braking of the elastic: close to critical, so a heavy hull comes back without bouncing past its place
+        /// (ARB-95: weight, not rubber).
+        /// </summary>
+        public const float Damping = 8f;
 
         /// <summary>The ship's model, which moves (tests).</summary>
         public Transform Body => _body;
