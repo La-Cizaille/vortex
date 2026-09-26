@@ -5,6 +5,13 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 ## [Non publié]
 ### Ajouté
 - **La carte devient un module** (lot B1 de l'atelier Blender, ARB-96, ARB-97, bible §6.5 bis). `tools/blender/build_card.py` construit le module de la planche v3 (896 triangles) : boîtier d'acier noirci vissé, poignée, connecteur à broches en laiton, plaque sombre du nom avec l'étiquette ambre de l'emplacement, écran serti de l'illustration, terminal sombre de la règle, rangée d'état (voyant et diodes de faction, usage près du fusible, identifiant), grille d'aération. Une texture peinte à la disposition de la face porte les couleurs, l'usure aux arêtes, la rouille et les lignes du terminal. Mêmes zones et mêmes matériaux : le jeu le prend sans code ; l'encre des cartes passe en os clair (`CardInk`), les faces qui portent du texte ne reflètent plus rien, et le dos prend la taille du boîtier (`Zone_Dos`).
+- **Direction artistique, lot 1 : fondations** (ARB-95 à ARB-98) :
+  - polices de la bible (Anton, Big Shoulders Stencil, IM Fell English, Barlow, Barlow Condensed, Share Tech Mono), sous licence OFL, épinglées et tracées dans `art-src/LICENCES.md` ; atlas TextMeshPro statiques, donnés au thème ; Barlow Condensed devient la police par défaut de l'interface ;
+  - palette de la bible dans le thème (suie, os, encre, sang, vert terminal, ambre, danger), pour les lots suivants ;
+  - les noms des factions remplacent ceux des technologies : Légion de l'Ordre, la Maison, Front Syndical des Mutins, Adeptes de la Corruption (identifiants inchangés) ;
+  - texte d'ambiance facultatif (`flavor`) dans le format du contenu, validé (texte brut, 200 caractères au plus), affiché en italique sous la règle, repris dans `CARDS.md` (ADR-0021) ; vide pour l'instant ;
+  - option « Commentaires de SINISTRA » ;
+  - recul des vaisseaux plus lourd, sans rebond au-delà de leur place.
 - **Direction artistique et univers** (ARB-93, ADR-0020) : bible `docs/DIRECTION_ARTISTIQUE.md` (ARB-93 à ARB-96). Elle couvre le pitch (le dernier casse avant le vortex), les quatre factions, la charte d'écriture et ses limites, la voix du narrateur SINISTRA, la palette, les typographies, les matériaux, les formes, l'animation, le son et les consignes pour les illustrations Stable Diffusion.
 - **Cockpit du joueur** (ARB-90) : modèle Blender construit par script (`tools/blender/build_cockpit.py`, 1 136 triangles), exporté en `Art/Cockpit/Cockpit.fbx` et pris par le thème (*Cockpit Model*). Sous le vaisseau, il remplace le panneau de chiffres (`CockpitDisplay`) :
   - plaque du nom, jauge de PV qui se remplit et change de couleur, avec le chiffre ;

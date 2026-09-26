@@ -122,11 +122,12 @@ namespace Vortex.Editor
             Image window = Window(parent, "Options", new Vector2(0.5f, 0.5f), Vector2.zero, 640f);
             TMP_Text title = Title(window.transform, 40f);
             Button speed = Button(window.transform, "Vitesse", 64f);
+            Button commentary = Button(window.transform, "Commentaires", 64f);
             Button fullScreen = Button(window.transform, "Plein écran", 64f);
             Button resolution = Button(window.transform, "Résolution", 64f);
             Button back = Button(window.transform, "Retour", 64f);
             OptionsMenu options = window.gameObject.AddComponent<OptionsMenu>();
-            options.Assign(title, speed, fullScreen, resolution, back);
+            options.Assign(title, speed, commentary, fullScreen, resolution, back);
             window.gameObject.SetActive(false);
             return options;
         }

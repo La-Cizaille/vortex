@@ -55,11 +55,35 @@ namespace Vortex.Client.Theme
             new Color32(245, 205, 95, 255),
         };
 
+        [Header("Palette de la direction artistique (DIRECTION_ARTISTIQUE §6.1)")]
+        [Tooltip("Suie : fonds, ciel, ombres.")]
+        [SerializeField] private Color soot = new Color32(14, 15, 17, 255);
+        [Tooltip("Os : papier jauni des affiches et des textes de cartes.")]
+        [SerializeField] private Color bone = new Color32(207, 196, 168, 255);
+        [Tooltip("Encre : texte sur l'os.")]
+        [SerializeField] private Color ink = new Color32(20, 19, 18, 255);
+        [Tooltip("Sang : affiches, tampons, verdicts.")]
+        [SerializeField] private Color blood = new Color32(142, 27, 27, 255);
+        [Tooltip("Vert terminal : écrans de bord, journal ; au-dessus de 1,5, il rayonne.")]
+        [SerializeField, ColorUsage(false, true)] private Color terminal = new Color32(77, 255, 122, 255);
+        [Tooltip("Ambre sale : réacteurs, feux, lumières de bord.")]
+        [SerializeField] private Color amber = new Color32(224, 146, 47, 255);
+        [Tooltip("Jaune des bandes de danger.")]
+        [SerializeField] private Color hazard = new Color32(217, 165, 20, 255);
+
         [Header("Textes")]
-        [Tooltip("Police des titres. Vide : la police par défaut de TextMeshPro.")]
+        [Tooltip("Police des titres, affiches et gros chiffres (Anton). Vide : la police par défaut de TextMeshPro.")]
         [SerializeField] private TMP_FontAsset? titleFont;
-        [Tooltip("Police des textes. Vide : la police par défaut de TextMeshPro.")]
+        [Tooltip("Police des textes, dont les règles des cartes (Barlow). Vide : la police par défaut de TextMeshPro.")]
         [SerializeField] private TMP_FontAsset? bodyFont;
+        [Tooltip("Police des libellés et boutons (Barlow Condensed), aussi la police par défaut de TextMeshPro. Vide : la police par défaut.")]
+        [SerializeField] private TMP_FontAsset? labelFont;
+        [Tooltip("Police des pochoirs : noms sur les coques, marquages, verdicts (Big Shoulders Stencil). Vide : la police des titres.")]
+        [SerializeField] private TMP_FontAsset? stencilFont;
+        [Tooltip("Police gravée des épitaphes et textes d'ambiance (IM Fell English). Vide : la police des textes.")]
+        [SerializeField] private TMP_FontAsset? engravedFont;
+        [Tooltip("Police du terminal : chiffres de bord et journal (Share Tech Mono). Vide : la police des textes.")]
+        [SerializeField] private TMP_FontAsset? terminalFont;
         [Tooltip("Sprite asset TextMeshPro dont les sprites portent le nom des icônes des cartes (ATQ, BOU, DIC, MKT, MOD, SUR, TOR). Vide : les icônes sont omises du texte.")]
         [SerializeField] private TMP_SpriteAsset? textIcons;
 
@@ -132,11 +156,63 @@ namespace Vortex.Client.Theme
         /// <summary>Frame of the card a purchase would replace (INTERFACE.md 3.3).</summary>
         public Color Loss => loss;
 
+        /// <summary>Soot: backgrounds, sky, shadows (art direction palette).</summary>
+        public Color Soot => soot;
+
+        /// <summary>Bone: yellowed paper of posters and card texts.</summary>
+        public Color Bone => bone;
+
+        /// <summary>Ink: text on bone.</summary>
+        public Color Ink => ink;
+
+        /// <summary>Blood: posters, stamps, verdicts.</summary>
+        public Color Blood => blood;
+
+        /// <summary>Terminal green: on-board screens and the log.</summary>
+        public Color Terminal => terminal;
+
+        /// <summary>Dirty amber: engines, lights on board.</summary>
+        public Color Amber => amber;
+
+        /// <summary>Yellow of the hazard stripes.</summary>
+        public Color Hazard => hazard;
+
         /// <summary>Title font, or null for the TextMeshPro default.</summary>
         public TMP_FontAsset? TitleFont => titleFont;
 
         /// <summary>Body font, or null for the TextMeshPro default.</summary>
         public TMP_FontAsset? BodyFont => bodyFont;
+
+        /// <summary>Font of labels and buttons, or null for TextMeshPro's default.</summary>
+        public TMP_FontAsset? LabelFont => labelFont;
+
+        /// <summary>Stencil font (hull names, markings, verdicts); the title font when none.</summary>
+        public TMP_FontAsset? StencilFont => stencilFont != null ? stencilFont : titleFont;
+
+        /// <summary>Engraved font (epitaphs, flavour text); the body font when none.</summary>
+        public TMP_FontAsset? EngravedFont => engravedFont != null ? engravedFont : bodyFont;
+
+        /// <summary>Terminal font (on-board figures, log); the body font when none.</summary>
+        public TMP_FontAsset? TerminalFont => terminalFont != null ? terminalFont : bodyFont;
+
+        /// <summary>Sets the fonts of the art direction where the theme has none (editor setup); true when one was set.</summary>
+        public bool AssignFontsIfMissing(TMP_FontAsset title, TMP_FontAsset body, TMP_FontAsset label, TMP_FontAsset stencil, TMP_FontAsset engraved, TMP_FontAsset terminal)
+        {
+            // Non-short-circuit "|": every slot is filled.
+            return Fill(ref titleFont, title) | Fill(ref bodyFont, body) | Fill(ref labelFont, label)
+                | Fill(ref stencilFont, stencil) | Fill(ref engravedFont, engraved) | Fill(ref terminalFont, terminal);
+        }
+
+        private static bool Fill(ref TMP_FontAsset? slot, TMP_FontAsset font)
+        {
+            if (slot != null)
+            {
+                return false;
+            }
+
+            slot = font;
+            return true;
+        }
 
         /// <summary>Sprites of the card text icons, or null.</summary>
         public TMP_SpriteAsset? TextIcons => textIcons;

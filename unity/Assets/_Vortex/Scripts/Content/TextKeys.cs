@@ -314,6 +314,9 @@ namespace Vortex.Client.Content
         /// <summary>Full screen (Windows). {0}: yes or no.</summary>
         public const string OptionsFullScreen = "options.full-screen";
 
+        /// <summary>Button of the narrator's comments, with yes or no ({0}).</summary>
+        public const string OptionsCommentary = "options.commentary";
+
         /// <summary>Screen resolution (Windows). {0}: width, {1}: height.</summary>
         public const string OptionsResolution = "options.resolution";
 
@@ -516,6 +519,7 @@ namespace Vortex.Client.Content
             Add(OptionsTitle, "Options");
             Add(OptionsSpeed, "Vitesse des animations : ×{0}");
             Add(OptionsFullScreen, "Plein écran : {0}");
+            Add(OptionsCommentary, "Commentaires de SINISTRA : {0}");
             Add(OptionsResolution, "Résolution : {0} × {1}");
             Add(PauseButton, "Pause");
             Add(PauseTitle, "Pause");

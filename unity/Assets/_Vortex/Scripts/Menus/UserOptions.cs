@@ -5,8 +5,8 @@ using UnityEngine;
 namespace Vortex.Client.Menus
 {
     /// <summary>
-    /// The person's options on this device (INTERFACE.md 5): the animation speed, and under Windows the full screen and
-    /// the resolution. They are kept with <see cref="PlayerPrefs"/>, which anyone can edit outside the game: every value
+    /// The person's options on this device (INTERFACE.md 5): the animation speed, the narrator's comments (ARB-95), and
+    /// under Windows the full screen and the resolution. They are kept with <see cref="PlayerPrefs"/>, which anyone can edit outside the game: every value
     /// read back is checked, and an unexpected one falls back to the default (docs/SECURITY.md).
     /// </summary>
     public sealed class UserOptions
@@ -15,14 +15,16 @@ namespace Vortex.Client.Menus
         private const string FullScreenKey = "vortex.options.full-screen";
         private const string WidthKey = "vortex.options.width";
         private const string HeightKey = "vortex.options.height";
+        private const string CommentaryKey = "vortex.options.commentary";
         private const int MinSide = 640;
         private const int MaxSide = 16384;
 
         private static readonly float[] AllowedSpeeds = { 1f, 2f, 4f };
 
-        private UserOptions(float speed, bool fullScreen, int width, int height)
+        private UserOptions(float speed, bool commentary, bool fullScreen, int width, int height)
         {
             Speed = speed;
+            Commentary = commentary;
             FullScreen = fullScreen;
             Width = width;
             Height = height;
@@ -37,6 +39,12 @@ namespace Vortex.Client.Menus
 
         /// <summary>Default animation speed.</summary>
         public float Speed { get; set; }
+
+        /// <summary>
+        /// Whether the narrator SINISTRA comments the game (docs/DIRECTION_ARTISTIQUE.md 5.4): the jibes in the log and the
+        /// announcements, and later her voice. The facts are always shown.
+        /// </summary>
+        public bool Commentary { get; set; }
 
         /// <summary>Full screen (Windows).</summary>
         public bool FullScreen { get; set; }
@@ -57,6 +65,7 @@ namespace Vortex.Client.Menus
             bool validSize = width >= MinSide && width <= MaxSide && height >= MinSide && height <= MaxSide;
             return new UserOptions(
                 Array.IndexOf(AllowedSpeeds, speed) >= 0 ? speed : fallback,
+                PlayerPrefs.GetInt(CommentaryKey, 1) != 0,
                 PlayerPrefs.GetInt(FullScreenKey, 1) != 0,
                 validSize ? width : 0,
                 validSize ? height : 0);
@@ -69,6 +78,7 @@ namespace Vortex.Client.Menus
         public void Save()
         {
             PlayerPrefs.SetFloat(SpeedKey, Speed);
+            PlayerPrefs.SetInt(CommentaryKey, Commentary ? 1 : 0);
             PlayerPrefs.SetInt(FullScreenKey, FullScreen ? 1 : 0);
             PlayerPrefs.SetInt(WidthKey, Width);
             PlayerPrefs.SetInt(HeightKey, Height);

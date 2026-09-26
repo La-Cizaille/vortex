@@ -12,7 +12,7 @@ namespace Vortex.Core.Content
     {
         /// <summary>Creates a card definition. Values are validated by <see cref="GameDataValidator"/>, not here.</summary>
         [JsonConstructor]
-        public CardDefinition(string id, string name, CardSlot slot, TechColor color, CardUsage usage, int copies, bool needsReview, string text, string ruling, IReadOnlyList<EffectSpec>? effects)
+        public CardDefinition(string id, string name, CardSlot slot, TechColor color, CardUsage usage, int copies, bool needsReview, string text, string ruling, IReadOnlyList<EffectSpec>? effects, string? flavor = null)
         {
             Id = id;
             Name = name;
@@ -24,6 +24,7 @@ namespace Vortex.Core.Content
             Text = text;
             Ruling = ruling;
             Effects = effects ?? Array.Empty<EffectSpec>();
+            Flavor = flavor;
         }
 
         /// <summary>Stable identifier, e.g. <c>A_005</c> or <c>D_012</c>.</summary>
@@ -58,6 +59,12 @@ namespace Vortex.Core.Content
 
         /// <summary>Effect bricks implementing the ruling (ADR-0007), in order.</summary>
         public IReadOnlyList<EffectSpec> Effects { get; }
+
+        /// <summary>
+        /// Flavour text shown under the rules text (ARB-95), or null. It never states a rule: the rules text alone does
+        /// (docs/DIRECTION_ARTISTIQUE.md section 5.3). Plain text, without markup.
+        /// </summary>
+        public string? Flavor { get; }
     }
 
     /// <summary>Static description of an event card (docs/RULES.md A4).</summary>
@@ -65,7 +72,7 @@ namespace Vortex.Core.Content
     {
         /// <summary>Creates an event definition.</summary>
         [JsonConstructor]
-        public EventDefinition(string id, string name, int copies, string text, string ruling, IReadOnlyList<EffectSpec>? effects)
+        public EventDefinition(string id, string name, int copies, string text, string ruling, IReadOnlyList<EffectSpec>? effects, string? flavor = null)
         {
             Id = id;
             Name = name;
@@ -73,6 +80,7 @@ namespace Vortex.Core.Content
             Text = text;
             Ruling = ruling;
             Effects = effects ?? Array.Empty<EffectSpec>();
+            Flavor = flavor;
         }
 
         /// <summary>Stable identifier, e.g. <c>EVT_TROU_NOIR</c>.</summary>
@@ -92,6 +100,12 @@ namespace Vortex.Core.Content
 
         /// <summary>Effect bricks (ADR-0007), in order.</summary>
         public IReadOnlyList<EffectSpec> Effects { get; }
+
+        /// <summary>
+        /// Flavour text shown under the rules text (ARB-95), or null. It never states a rule: the rules text alone does
+        /// (docs/DIRECTION_ARTISTIQUE.md section 5.3). Plain text, without markup.
+        /// </summary>
+        public string? Flavor { get; }
     }
 
     /// <summary>Static description of a technology combo (docs/RULES.md A8).</summary>
@@ -99,7 +113,7 @@ namespace Vortex.Core.Content
     {
         /// <summary>Creates a technology definition.</summary>
         [JsonConstructor]
-        public TechnologyDefinition(string id, TechColor color, string name, string text, string ruling, IReadOnlyList<EffectSpec>? effects)
+        public TechnologyDefinition(string id, TechColor color, string name, string text, string ruling, IReadOnlyList<EffectSpec>? effects, string? flavor = null)
         {
             Id = id;
             Color = color;
@@ -107,6 +121,7 @@ namespace Vortex.Core.Content
             Text = text;
             Ruling = ruling;
             Effects = effects ?? Array.Empty<EffectSpec>();
+            Flavor = flavor;
         }
 
         /// <summary>Stable identifier, e.g. <c>TECH_BLUE</c>.</summary>
@@ -126,6 +141,12 @@ namespace Vortex.Core.Content
 
         /// <summary>Effect bricks (ADR-0007), in order.</summary>
         public IReadOnlyList<EffectSpec> Effects { get; }
+
+        /// <summary>
+        /// Flavour text shown under the rules text (ARB-95), or null. It never states a rule: the rules text alone does
+        /// (docs/DIRECTION_ARTISTIQUE.md section 5.3). Plain text, without markup.
+        /// </summary>
+        public string? Flavor { get; }
     }
 
     /// <summary>All static game content, assembled from the content files by <see cref="GameDataLoader"/>.</summary>
