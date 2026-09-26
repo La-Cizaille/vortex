@@ -63,7 +63,7 @@ Les quatre technologies deviennent quatre factions. Obtenir une technologie, c'e
 | **Ordre** (bleu) | **La Légion de l'Ordre** | Des fantassins d'élite en armure lourde, dernière force régulière de la Marge. Disciplinés, fanatiques, sans le moindre humour : ce sont eux, les pas rigolos. | Armures lourdes, visières, bannières, rangs serrés. Emblème : un casque de combat sur un bouclier | **Sérieux, martial**. L'humour vient de ce qui les entoure, jamais d'eux | Dévier une attaque : interceptée et redirigée, « conformément au protocole » |
 | **Casino Cosmique** (jaune) | **La Maison** | La pègre du jeu. Elle possède la moitié des dettes du secteur et l'autre moitié des croupiers. | Néons, dorures criardes, jetons, tapis vert. Emblème : un d8 couronné | Bonimenteur, faussement généreux | Deux actions d'équipage : **« double mise »** |
 | **Rebelles** (rouge) | **Le Front Syndical des Mutins** | Des équipages en grève perpétuelle, armés jusqu'aux dents. Ils votent tout, sauf le retour au travail. | Pochoirs, peinture à la bombe, drapeaux rapiécés. Emblème : un poing qui serre une clé à molette | Militant, grandiloquent | Surcharge et avantage : **« mouvement social »** |
-| **Abomination organique** (vert) | **L'Église de la Spore** | Un culte fongique. La contamination y est une communion ; les membres ne sont plus tout à fait des gens. | Chair, mycélium, bioluminescence verte, coques colonisées. Emblème : une spore en forme d'œil | Doucereux, prosélyte | Tourment réactivé : **« grande communion »** |
+| **Abomination organique** (vert) | **Les Adeptes de la Corruption** | Un culte fongique. La contamination y est une communion ; les membres ne sont plus tout à fait des gens. | Chair, mycélium, bioluminescence verte, coques colonisées. Emblème : une spore en forme d'œil | Doucereux, prosélyte | Tourment réactivé : **« grande communion »** |
 
 Les couleurs des technologies restent celles du thème : les joueurs les connaissent déjà, et chaque faction a en plus son emblème (§6.6), qui ne repose pas sur la couleur seule.
 
@@ -77,7 +77,7 @@ Les **mots des règles ne changent pas** (PV, bouclier, surcharge, Tourment…) 
 | Bouclier, reparamétrage | Le déflecteur, qu'on recalibre à coups de clé |
 | Sabotage | Le bidouillage du déflecteur d'un autre, à distance |
 | Surcharge | Pousser le réacteur au-delà de la garantie constructeur |
-| Tourment | L'infestation par les spores de l'Église |
+| Tourment | L'infestation par les spores des Adeptes |
 | Marché noir, recycler | Le marché noir ; « on vide l'étal » |
 | Technologie, combo | Le soutien d'une faction ; un pacte |
 | Manche | Un tour d'horloge avant le vortex |
