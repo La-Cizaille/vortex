@@ -94,6 +94,8 @@ namespace Vortex.Client.Theme
         [SerializeField] private Color sickTint = new Color32(120, 170, 60, 255);
         [Tooltip("Couleur des spores qui s'échappent d'un vaisseau contaminé ; au-dessus de 1,5, elles rayonnent.")]
         [SerializeField, ColorUsage(false, true)] private Color sporeColor = new Color(1.1f, 2f, 0.5f);
+        [Tooltip("Modèle du cockpit du joueur (ARB-90, tools/blender/build_cockpit.py), avec ses pièces nommées. Vide : le panneau de chiffres de l'interface.")]
+        [SerializeField] private GameObject? cockpitModel;
         [Tooltip("Modèle du dé à 8 faces (ASSETS §2). Il porte huit repères vides Face_1 à Face_8, dont l'axe avant sort de la face. Vide : un octaèdre généré.")]
         [SerializeField] private GameObject? dieModel;
 
@@ -186,6 +188,21 @@ namespace Vortex.Client.Theme
 
         /// <summary>The colour of the spores of a contaminated ship.</summary>
         public Color SporeColor => sporeColor;
+
+        /// <summary>The player's cockpit model, or null for the interface's panel of figures.</summary>
+        public GameObject? CockpitModel => cockpitModel;
+
+        /// <summary>Sets the cockpit model when the theme has none (editor setup).</summary>
+        public bool AssignCockpitIfMissing(GameObject model)
+        {
+            if (cockpitModel != null)
+            {
+                return false;
+            }
+
+            cockpitModel = model;
+            return true;
+        }
 
         /// <summary>The table's background, or null for the generated starfield.</summary>
         public GameObject? TableBackground => tableBackground;

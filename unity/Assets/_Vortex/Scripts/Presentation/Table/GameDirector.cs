@@ -60,6 +60,7 @@ namespace Vortex.Client.Presentation
         [SerializeField] private GameOverPanel gameOver = null!;
         [SerializeField] private TurnAnnouncement announcement = null!;
         [SerializeField] private TurnTimerDisplay timer = null!;
+        [SerializeField] private RectTransform? cockpitPlace;
 
         [Header("Disposition (positions à l'écran : 0,0 en bas à gauche, 1,1 en haut à droite)")]
         [Tooltip("Position à l'écran du vaisseau du joueur.")]
@@ -102,6 +103,7 @@ namespace Vortex.Client.Presentation
         private bool _outcomeShown;
         private readonly AttackMemory _attack = new AttackMemory();
         private GameObject? _background;
+        private CockpitDisplay? _cockpit;
         private readonly HashSet<int> _placedByHand = new HashSet<int>();
         private TurnClock _clock = new TurnClock(0f, MatchSetup.DecisionSeconds);
         private EventPlayer? _player;
@@ -227,6 +229,7 @@ namespace Vortex.Client.Presentation
 
             PlaceSeats();
             PlaceBackground();
+            PlaceCockpit();
             market.Bind(_context);
             market.SetPurchase(controls.CanBuy, controls.Buy, controls.ExplainBuy, controls.HideHelp, MarkLoss);
             market.SetCardTap(uid => controls.ChooseCard(uid));
@@ -449,6 +452,32 @@ namespace Vortex.Client.Presentation
             {
                 ShipCatalog.PaintSeat(motion.Body.gameObject, Color.Lerp(theme.Seat(seat), theme.SickTint, contamination * 0.6f));
             }
+        }
+
+        // The player's cockpit (ARB-90): the theme's model over the player's panel, between the interface and the player's
+        // cards (a little further than them, so that they lie in its sockets). Built once per game.
+        private void PlaceCockpit()
+        {
+            if (_cockpit != null)
+            {
+                Discard(_cockpit.gameObject);
+                _cockpit = null;
+            }
+
+            if (theme.CockpitModel == null || cockpitPlace == null)
+            {
+                return;
+            }
+
+            GameObject console = Instantiate(theme.CockpitModel, cardRoot, false);
+            console.name = "Cockpit";
+            _cockpit = console.AddComponent<CockpitDisplay>();
+            _cockpit.Bind(cockpitPlace, view, cardDepth + 0.4f, theme.GlowMaterial, () =>
+            {
+                controls.ToggleOvercharge();
+                _dirty = true;
+            });
+            _cockpit.Tapped = () => controls.ChooseSeat(_viewer);
         }
 
         // The sky behind the table: the theme's background, or a generated starfield around the camera. Built once per game.
@@ -715,6 +744,22 @@ namespace Vortex.Client.Presentation
 
             market.Show(model, redrawCards);
             banner.Show(model);
+            if (_cockpit != null && _session != null)
+            {
+                SeatModel me = model.Seats[_viewer];
+                _cockpit.Show(
+                    me.Name,
+                    theme.Seat(_viewer),
+                    me.Hp,
+                    model.MaxHp,
+                    me.Shield,
+                    _session.Rules.MaxShield,
+                    me.Overcharge > 0,
+                    controls.OverchargeArmed,
+                    me.Technologies.Select(theme.Technology).ToList(),
+                    texts,
+                    theme);
+            }
         }
 
         // The viewer's ship in front, the opponents' ships in an arc in turn order, each with its panel under it.
@@ -883,6 +928,12 @@ namespace Vortex.Client.Presentation
 
         /// <summary>Wires the display of the turn time (editor setup).</summary>
         public void AssignTimer(TurnTimerDisplay turnTimer) => timer = turnTimer;
+
+        /// <summary>Wires the place of the player's cockpit (editor setup).</summary>
+        public void AssignCockpitPlace(RectTransform place) => cockpitPlace = place;
+
+        /// <summary>The player's cockpit, or null when the theme has none (tests).</summary>
+        public CockpitDisplay? Cockpit => _cockpit;
 
         /// <summary>Wires the menus of the game: pause, end of game, turn banner (editor setup).</summary>
         public void AssignMenus(PauseMenu pauseMenu, GameOverPanel gameOverPanel, TurnAnnouncement turnAnnouncement)
