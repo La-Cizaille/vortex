@@ -10,6 +10,7 @@ namespace Vortex.Client.Presentation
     public sealed class HullDamage : MonoBehaviour
     {
         private Material? _glow;
+        private GameObject? _smoke;
         private float _damage;
         private float _next;
         private float _time;
@@ -21,12 +22,16 @@ namespace Vortex.Client.Presentation
         /// <summary>Puffs given off so far (tests).</summary>
         public int Puffs { get; private set; }
 
-        /// <summary>Sets how damaged the ship is (0 intact, 1 at no HP) and the material of the sparks.</summary>
-        public void Show(float damage, bool wrecked, Material? glow)
+        /// <summary>
+        /// Sets how damaged the ship is (0 intact, 1 at no HP), the material of the sparks, and the designer's smoke
+        /// (null: placeholder puffs).
+        /// </summary>
+        public void Show(float damage, bool wrecked, Material? glow, GameObject? smoke = null)
         {
             _damage = Mathf.Clamp01(damage);
             _wrecked = wrecked;
             _glow = glow;
+            _smoke = smoke;
         }
 
         /// <summary>Moves the smoke on (every frame; tests call it directly).</summary>
@@ -43,6 +48,13 @@ namespace Vortex.Client.Presentation
             _next = _time + Mathf.Lerp(1f, 0.2f, severity);
             float scale = transform.lossyScale.x;
             Vector3 at = transform.TransformPoint(new Vector3(Random.Range(-0.4f, 0.4f), 0.25f, Random.Range(-0.6f, 0.4f)));
+            Puffs++;
+            if (_smoke != null)
+            {
+                Destroy(Instantiate(_smoke, at, Quaternion.identity), 3f);
+                return;
+            }
+
             PlaceholderEffect puff = PlaceholderEffect.Create("Fumée", at, 1.6f, _glow);
             Color smoke = Color.Lerp(new Color(0.35f, 0.35f, 0.38f), new Color(0.12f, 0.12f, 0.13f), severity);
             puff.Add(new PlaceholderEffect.PieceSpec(PrimitiveType.Sphere, smoke, Vector3.zero, Quaternion.identity, Vector3.one * Random.Range(0.25f, 0.45f) * scale)
@@ -52,8 +64,6 @@ namespace Vortex.Client.Presentation
                 puff.Add(new PlaceholderEffect.PieceSpec(PrimitiveType.Sphere, new Color(4f, 2.2f, 0.6f), Vector3.zero, Quaternion.identity, Vector3.one * 0.06f * scale)
                 { Velocity = Random.onUnitSphere * 1.5f * scale, Duration = 0.25f, Rise = 0.1f, Glow = true });
             }
-
-            Puffs++;
         }
 
         private void Update() => Tick(Time.deltaTime);

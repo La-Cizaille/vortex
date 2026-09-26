@@ -53,6 +53,7 @@ namespace Vortex.Client.Presentation
             float speed = Mathf.Max(0.01f, stage.PlaybackSpeed);
             Transform? deflector = deflectorSeat >= 0 ? stage.MotionOf(deflectorSeat)?.transform : null;
             Material? glow = stage.Theme != null ? stage.Theme.GlowMaterial : null;
+            Material? plasma = stage.Theme != null ? stage.Theme.ShieldLook : null;
             ShipMotion? motion = stage.MotionOf(gameEvent.Player);
 
             // Aimed at what the bolt meets first: the deflecting ship, or the target.
@@ -82,7 +83,7 @@ namespace Vortex.Client.Presentation
                 // The deflecting ship's shield takes the bolt and sends it on (ARB-88).
                 Vector3 bounce = ShieldBubble.SurfaceTowards(deflector, start);
                 time = Leg(effect, from, start, bounce, color, time, speed);
-                ShieldBubble.Show(deflector, Seat(stage, deflectorSeat) * brightness, 1f, 0.45f / speed, glow, (time - 0.05f) / speed, 0.4f);
+                ShieldBubble.Show(deflector, Seat(stage, deflectorSeat) * brightness, 1f, 0.45f / speed, plasma, (time - 0.05f) / speed, 0.4f);
                 effect?.Add(Flash(bounce - from, color * 0.6f, 0.3f * scale, time, 0.18f, speed));
                 stage.MotionOf(deflectorSeat)?.Push((deflector.position - start).normalized * 0.15f * scale, 0.06f / speed, 0.3f / speed, time / speed);
                 start = bounce;
@@ -92,7 +93,7 @@ namespace Vortex.Client.Presentation
             time = Leg(effect, from, start, end, color, time, speed);
             if (stopped > 0f)
             {
-                ShieldBubble.Show(target, Seat(stage, gameEvent.Other) * brightness, stopped, 0.5f / speed, glow, (time - 0.05f) / speed);
+                ShieldBubble.Show(target, Seat(stage, gameEvent.Other) * brightness, stopped, 0.5f / speed, plasma, (time - 0.05f) / speed);
             }
 
             float impact = critical ? 0.7f : 0.3f;

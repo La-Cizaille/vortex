@@ -64,8 +64,8 @@ namespace Vortex.Client.Presentation
         [Header("Disposition (positions à l'écran : 0,0 en bas à gauche, 1,1 en haut à droite)")]
         [Tooltip("Position à l'écran du vaisseau du joueur.")]
         [SerializeField] private Vector2 viewerShipOnScreen = new Vector2(0.5f, 0.25f);
-        [Tooltip("Taille du vaisseau du joueur : il est près de la caméra, donc réduit pour laisser voir ses chiffres.")]
-        [SerializeField, Min(0.1f)] private float viewerShipScale = 0.6f;
+        [Tooltip("Taille du vaisseau du joueur : il est au premier plan, près de la caméra.")]
+        [SerializeField, Min(0.1f)] private float viewerShipScale = 1f;
         [Tooltip("Centre de l'arc des adversaires, à l'écran.")]
         [SerializeField] private Vector2 arcCentreOnScreen = new Vector2(0.5f, 0.62f);
         [Tooltip("Demi-largeur et demi-hauteur de l'arc des adversaires, à l'écran.")]
@@ -626,7 +626,7 @@ namespace Vortex.Client.Presentation
                 SeatModel shown = model.Seats[seat.Key];
                 if (_ships.TryGetValue(seat.Key, out Transform hull) && hull.GetComponentInChildren<HullDamage>() is HullDamage damage)
                 {
-                    damage.Show(1f - ((float)shown.Hp / Math.Max(1, model.MaxHp)), shown.Eliminated, theme.GlowMaterial);
+                    damage.Show(1f - ((float)shown.Hp / Math.Max(1, model.MaxHp)), shown.Eliminated, theme.GlowMaterial, theme.SmokePrefab);
                 }
 
                 if (model.Seats[seat.Key].Eliminated && _wrecks.Add(seat.Key) && _ships.TryGetValue(seat.Key, out Transform ship))

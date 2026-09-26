@@ -33,7 +33,7 @@ namespace Vortex.Client.Presentation
             float speed = Mathf.Max(0.01f, stage.PlaybackSpeed);
             float strength = Mathf.Clamp01(Mathf.Abs(change) / (float)bigChange);
             Color seat = stage.Theme != null ? stage.Theme.Seat(gameEvent.Player) : Color.white;
-            Material? glow = stage.Theme != null ? stage.Theme.GlowMaterial : null;
+            Material? glow = stage.Theme != null ? stage.Theme.ShieldLook : null;
             if (change > 0)
             {
                 ShieldBubble.Show(ship, Color.Lerp(seat, Color.white, 0.3f) * brightness, Mathf.Lerp(0.4f, 1f, strength), seconds / speed, glow);

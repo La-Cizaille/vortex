@@ -4,6 +4,7 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Non publié]
 ### Ajouté
+- **Caméra rapprochée** : plus basse (33° au lieu de 38°), plus proche, champ plus étroit, et le vaisseau du joueur presque deux fois plus grand ; la disposition étant fixée à l'écran, rien ne change de place. **Liste de l'atelier Blender** (ANIMATIONS §6) : tout ce qui relève des modèles et des effets, avec où le déposer ; deux nouveaux points d'accroche dans le thème, *Shield Material* (plasma du bouclier) et *Smoke Prefab* (fumée d'un vaisseau endommagé).
 - **Animations de combat** (lot 2, ANIMATIONS §5) :
   - parade : la sphère de plasma de la cible s'allume là où le tir frappe si son bouclier a arrêté une part de l'attaque ;
   - esquive : le vaisseau fait un écart quand une protection épargne toute la perte ;
