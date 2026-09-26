@@ -154,7 +154,7 @@ Polices libres (licence SIL OFL ou Apache), avec les accents du français. Chaqu
 | Titres, affiches, gros chiffres | **Anton** (OFL) | Condensée, massive, typique des affiches de propagande |
 | Avis de recherche, épitaphes (rare) | **Rye** (OFL) | Western, « WANTED », à petites doses |
 | Texte courant, règles des cartes | **Barlow** / **Barlow Condensed** (OFL) | Très lisible en petit, sur mobile |
-| Chiffres techniques du cockpit, journal | **Share Tech Mono** (OFL) | Afficheur de bord |
+| Chiffres techniques du cockpit, journal | **Share Tech Mono** (OFL) | Terminal informatique rétro : vert phosphore sur fond noir, séparateurs `/` et `:` (« > PV: 27/30 / BOUCLIER: 5 ») |
 
 Le thème a déjà deux emplacements de police, titre et texte (`ThemeSettings`). Une police mono pourra s'y ajouter.
 
