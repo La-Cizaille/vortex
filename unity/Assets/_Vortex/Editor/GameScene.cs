@@ -69,11 +69,24 @@ namespace Vortex.Editor
             UiBuilder.Plate(UiBuilder.Part<Image>(root.transform, "Fond", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), Color.white, receivesPointer: true);
             TMP_Text name = UiBuilder.Font(UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "Nom", new Vector2(0f, 1f), new Vector2(14f, -8f), new Vector2(150f, 28f)), 24f, FontStyles.Normal, TextAlignmentOptions.Left), theme.StencilFont);
             name.color = UiBuilder.Bone;
-            UiBuilder.Screen(UiBuilder.Fixed<Image>(root.transform, "Écran", new Vector2(0f, 1f), new Vector2(10f, -38f), new Vector2(150f, 50f)));
+            // A pirate radar (ARB-101): glowing figures, a faint sweeping bar, and a jump now and then (RadarScreen).
+            Image screen = UiBuilder.Screen(UiBuilder.Fixed<Image>(root.transform, "Écran", new Vector2(0f, 1f), new Vector2(10f, -38f), new Vector2(150f, 50f)));
+            screen.gameObject.AddComponent<RectMask2D>();
+            Image sweep = UiBuilder.Part<Image>(screen.transform, "Balayage", new Vector2(0f, 0.92f), Vector2.one, Vector2.zero, Vector2.zero);
+            sweep.color = new Color(theme.Terminal.r, theme.Terminal.g, theme.Terminal.b, 0.06f);
+            sweep.raycastTarget = false;
             TMP_Text hp = UiBuilder.Font(UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "PV", new Vector2(0f, 1f), new Vector2(18f, -41f), new Vector2(140f, 22f)), 17f, FontStyles.Normal, TextAlignmentOptions.Left), theme.TerminalFont);
             TMP_Text shield = UiBuilder.Font(UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "Bouclier", new Vector2(0f, 1f), new Vector2(18f, -63f), new Vector2(140f, 22f)), 17f, FontStyles.Normal, TextAlignmentOptions.Left), theme.TerminalFont);
             hp.color = theme.Terminal;
             shield.color = theme.Terminal;
+            Material glow = AssetDatabase.LoadAssetAtPath<Material>(ThemeFonts.TerminalGlowPath);
+            if (glow != null)
+            {
+                hp.fontSharedMaterial = glow;
+                shield.fontSharedMaterial = glow;
+            }
+
+            screen.gameObject.AddComponent<RadarScreen>().Assign(new[] { hp.rectTransform, shield.rectTransform }, new Graphic[] { hp, shield, sweep }, sweep.rectTransform);
             Image[] rounds = Enumerable.Range(0, 4)
                 .Select(i => Disc(root.transform, "Technologie " + (i + 1), new Vector2(0f, 1f), new Vector2(12f + (i * 24f), -94f), 18f))
                 .ToArray();

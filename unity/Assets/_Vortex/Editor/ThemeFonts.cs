@@ -45,6 +45,12 @@ namespace Vortex.Editor
             ("Terminal", "ShareTechMono/ShareTechMono-Regular.ttf", 56),
         };
 
+        /// <summary>
+        /// The terminal font with a soft green halo (a blurred underlay, which the mobile text shader supports): the glow
+        /// of the radar screens (ARB-101). Built once from the terminal font's material; delete it to rebuild it.
+        /// </summary>
+        public const string TerminalGlowPath = Folder + "/Terminal Lueur.mat";
+
         /// <summary>Path of the font asset named <paramref name="name"/>.</summary>
         public static string PathOf(string name) => Folder + "/" + name + " SDF.asset";
 
@@ -79,6 +85,24 @@ namespace Vortex.Editor
             }
 
             MakeDefault(made["Barlow Condensed"]);
+            EnsureTerminalGlow(made["Terminal"]);
+        }
+
+        private static void EnsureTerminalGlow(TMP_FontAsset terminal)
+        {
+            if (AssetDatabase.LoadAssetAtPath<Material>(TerminalGlowPath) != null)
+            {
+                return;
+            }
+
+            var glow = new Material(terminal.material) { name = "Terminal Lueur" };
+            glow.EnableKeyword("UNDERLAY_ON");
+            glow.SetColor("_UnderlayColor", new Color(0.3f, 1f, 0.48f, 0.55f));
+            glow.SetFloat("_UnderlayOffsetX", 0f);
+            glow.SetFloat("_UnderlayOffsetY", 0f);
+            glow.SetFloat("_UnderlayDilate", 0.25f);
+            glow.SetFloat("_UnderlaySoftness", 0.75f);
+            ProjectAssets.Create(glow, TerminalGlowPath);
         }
 
         private static TMP_FontAsset? EnsureFont(string name, string sourcePath, int size)
