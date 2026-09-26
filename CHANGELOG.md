@@ -4,7 +4,7 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Non publié]
 ### Ajouté
-- **Direction artistique et univers** (ARB-93, ADR-0020) : bible `docs/DIRECTION_ARTISTIQUE.md`, brouillon v1. Elle couvre le pitch (le dernier casse avant le vortex), les quatre factions, la charte d'écriture et ses limites, la voix du narrateur SINISTRA, la palette, les typographies, les matériaux, les formes, l'animation, le son et les consignes pour les illustrations Stable Diffusion.
+- **Direction artistique et univers** (ARB-93, ADR-0020) : bible `docs/DIRECTION_ARTISTIQUE.md` (ARB-93 à ARB-96). Elle couvre le pitch (le dernier casse avant le vortex), les quatre factions, la charte d'écriture et ses limites, la voix du narrateur SINISTRA, la palette, les typographies, les matériaux, les formes, l'animation, le son et les consignes pour les illustrations Stable Diffusion.
 - **Cockpit du joueur** (ARB-90) : modèle Blender construit par script (`tools/blender/build_cockpit.py`, 1 136 triangles), exporté en `Art/Cockpit/Cockpit.fbx` et pris par le thème (*Cockpit Model*). Sous le vaisseau, il remplace le panneau de chiffres (`CockpitDisplay`) :
   - plaque du nom, jauge de PV qui se remplit et change de couleur, avec le chiffre ;
   - manomètre de bouclier à aiguille ;

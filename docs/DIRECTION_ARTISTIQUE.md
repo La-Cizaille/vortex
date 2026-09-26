@@ -9,7 +9,7 @@ Ce document est la **bible** de l'apparence et du ton du jeu. Tout visuel, tout 
   - l'écran dans [`INTERFACE.md`](INTERFACE.md).
 - Cette direction ne change **ni les règles ni le moteur**. Elle passe par le thème, la table des textes, les profils d'animation et les modèles (ADR-0007, ADR-0014, ADR-0015).
 
-**Statut : brouillon v1**, à valider avec le designer, section par section. Les points encore ouverts sont marqués **[à valider]**.
+**Statut : v1 validée** sur trois planches de tendance (ARB-93 à ARB-96). Les points encore ouverts sont marqués **[à valider]**.
 
 ## 1. Pitch et piliers
 
@@ -54,7 +54,7 @@ Ce document est la **bible** de l'apparence et du ton du jeu. Tout visuel, tout 
 - **Son rôle** : elle commente la partie dans le journal, les annonces de tour et les épitaphes. Elle estime chaque dommage, classe chaque dossier, et ne rembourse jamais.
 - **Son ton** : d'une politesse glaciale, elle vouvoie, avec un vocabulaire d'assureur (sinistre, franchise, dossier classé, clause d'exclusion). Elle ne plaisante jamais : elle constate. Le rire vient de son indifférence totale à la mort des équipages.
 - **Pourquoi elle** : un narrateur unique donne une voix constante au jeu et concentre l'humour à un seul endroit, qu'on peut couper (§5.4).
-- **Texte seulement** pour l'instant : aucune voix n'est enregistrée ni synthétisée. Une voix viendrait avec le lot son (§6.8) **[à décider]**.
+- **Elle aura une voix** (ARB-96), avec le lot son (§6.8) : en attendant, elle parle en texte.
 
 ## 3. Les factions
 
@@ -115,7 +115,7 @@ Les **mots des règles ne changent pas** (PV, bouclier, surcharge, Tourment…) 
 
 ### 5.4 La voix de SINISTRA
 - Une ligne du journal garde **le fait lisible d'un coup d'œil**. La pique est un suffixe court, tiré au hasard parmi plusieurs variantes, pour ne pas lasser.
-- Une option **« Commentaires de SINISTRA »** permet de les couper (ARB-95).
+- Une option **« Commentaires de SINISTRA »** permet de les couper (ARB-95), texte et voix ensemble.
 - Exemples (à écrire pour de bon avec la revue des textes) :
   - Attaque : « Rouge perfore Bleu : 6 dégâts. *Franchise non applicable.* »
   - Coup critique : « Critique ! Bleu perd Sous-couche blindée. *Nos experts parlent de perte totale.* »
@@ -199,6 +199,7 @@ Le thème a déjà deux emplacements de police, titre et texte (`ThemeSettings`)
 
 ### 6.5 bis Les cartes deviennent des modules (ARB-95)
 Une carte n'est plus un papier : c'est un **module de vaisseau branchable**, un boîtier qu'on enfiche dans une baie du cockpit.
+- Direction validée sur la planche (ARB-96).
 - **Le boîtier** : métal noirci, vis, grille d'aération, **connecteur à broches** en bas (il entre dans la baie), une poignée ou des encoches sur le haut.
 - **L'illustration** apparaît sur un **écran** du module, légèrement teinté et balayé.
 - **Le nom** est une plaque gravée ou un pochoir. **Le texte de règle** est affiché sur un écran de terminal ou une plaque rétroéclairée, toujours net et lisible (§5.3).
@@ -218,7 +219,10 @@ Une carte n'est plus un papier : c'est un **module de vaisseau branchable**, un 
 - **Rythme** : un effet ne retarde jamais le jeu au-delà de ce qu'il raconte. La vitesse de lecture s'applique à tout.
 
 ### 6.8 Son (lot à part, plus tard)
-- **Voix de SINISTRA** **[à décider]** : aucune pour l'instant. Si on en veut une, une voix de synthèse volontairement froide et artificielle colle au personnage ; il faudra tracer la licence de l'outil et des fichiers produits.
+- **Voix de SINISTRA** (ARB-96) : une voix de synthèse volontairement froide et artificielle, à peine modulée, comme une annonce automatique.
+  - Répliques courtes, enregistrées d'avance en fichiers audio (pas de synthèse pendant la partie : rien ne dépend d'un service en ligne, rien ne sort de l'appareil).
+  - Elle double les lignes du journal et des annonces qui ont une pique, jamais le fait brut, et se coupe avec les commentaires de SINISTRA ; un volume à part dans les options.
+  - Outil et licence des fichiers produits tracés dans `art-src/LICENCES.md` ; usage commercial vérifié avant de choisir l'outil.
 - **Ambiance** : drones industriels, radio du secteur grésillante, fragments de propagande ; un jazz d'ascenseur sinistre pour la Maison.
 - **Retours de jeu** : impacts métalliques sourds, grincements de coque, alarmes, coups de tampon, bips du terminal de SINISTRA (en texte, sans voix enregistrée au début).
 - Le jeu n'a aucun son aujourd'hui : il faudra des sources libres ou faites maison, licences tracées, comme les images.
