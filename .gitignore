@@ -85,3 +85,6 @@ desktop.ini
 .idea/
 *.swp
 ~$*
+
+# Git LFS writes its hooks here when core.hooksPath is /dev/null (AI sessions): never commit them.
+/dev/null/
