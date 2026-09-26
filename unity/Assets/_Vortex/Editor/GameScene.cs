@@ -69,7 +69,7 @@ namespace Vortex.Editor
             UiBuilder.Plate(UiBuilder.Part<Image>(root.transform, "Fond", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), Color.white, receivesPointer: true);
             TMP_Text name = UiBuilder.Font(UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "Nom", new Vector2(0f, 1f), new Vector2(14f, -8f), new Vector2(150f, 28f)), 24f, FontStyles.Normal, TextAlignmentOptions.Left), theme.StencilFont);
             name.color = UiBuilder.Bone;
-            // A pirate radar (ARB-101): glowing figures, a faint sweeping bar, and a jump now and then (RadarScreen).
+            // A pirate radar (ARB-102): glowing figures, a faint sweeping bar, and a jump now and then (RadarScreen).
             Image screen = UiBuilder.Screen(UiBuilder.Fixed<Image>(root.transform, "Écran", new Vector2(0f, 1f), new Vector2(10f, -38f), new Vector2(150f, 50f)));
             screen.gameObject.AddComponent<RectMask2D>();
             Image sweep = UiBuilder.Part<Image>(screen.transform, "Balayage", new Vector2(0f, 0.92f), Vector2.one, Vector2.zero, Vector2.zero);
