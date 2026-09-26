@@ -135,7 +135,7 @@ Seule une décision que la table ne sait pas montrer ouvrirait encore la fenêtr
 ### 3.8 Informations de partie
 
 - **En haut au centre** : le numéro de manche, l'événement en cours (agrandi au survol) et le compte à rebours de la Fin des temps.
-- **Journal** : un panneau repliable, fermé par défaut, qui dit qui a fait quoi et avec quels jets de dés. On peut le remonter (molette, doigt ou barre) ; il ne suit les nouvelles lignes que si l'on est en bas (ARB-75).
+- **Journal** : un panneau repliable, fermé par défaut, qui dit qui a fait quoi et avec quels jets de dés. On peut le remonter (molette, doigt ou barre) ; il ne suit les nouvelles lignes que si l'on est en bas (ARB-75). C'est le terminal de SINISTRA : lignes vertes sur écran sombre ; après certains faits, le narrateur ajoute son constat, après un tiret (bible §5.4). L'annonce de tour porte aussi une de ses lignes. L'option « Commentaires de SINISTRA » la fait taire.
 - **Animations** : chaque événement du moteur est montré à son tour (ADR-0014). Un bouton « accélérer / passer » est disponible pendant qu'elles se jouent, et la vitesse par défaut se règle dans les options.
 
 ### 3.9 Temps de tour limité (ARB-70)
