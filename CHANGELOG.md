@@ -12,6 +12,7 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
   - deux sockets où reposent les cartes du joueur ;
   - liserés à la couleur du siège.
   Les effets en jeu, le marqueur du leader et le combo remontent au-dessus. Test `CockpitTests`.
+- **Cockpit, retours** (ARB-92) : plus petit, vaisseau du joueur remonté, cartes posées dans les sockets à la bonne profondeur ; manomètre gradué de 0 à 8 avec une zone rouge allumée quand le bouclier ne protège plus rien (`IGameSession.Protection`, calculé par le moteur) ; diode de surcharge sous l'interrupteur ; métal brossé, verre sur le manomètre, aiguille en métal ; jauge de PV en tube de verre rempli d'un liquide sur ressort visqueux ; attaches en métal par-dessus un coin de chaque carte. Seul le corps de la console répond au toucher, plus rien ne passe devant les cartes.
 - **Animations, lot 3** (ANIMATIONS §5) :
   - vaisseau contaminé par le Tourment : coque qui tire vers une teinte malade, et spores ;
   - un anneau de lumière par effet en jeu, à une couleur par type d'effet dans le thème ;
@@ -121,6 +122,8 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 - Le rapport d'équilibrage identifie le contenu par l'empreinte des quatre fichiers de contenu, et non plus du seul `cards.json`. L'option `--samples` est remplacée par `--bot`.
 
 ### Corrigé
+- **Surcharge** (ARB-91) : le jeton armé est désarmé dès qu'une commande part, et le levier du cockpit redescend de lui-même ; il restait armé après une attaque surchargée. Test `An_armed_overcharge_is_disarmed_once_the_action_is_sent`.
+- **Captures** : le cockpit est replacé et posé au repos avant la prise de vue (`SceneCapture`).
 - « Ni vu ni connu » (et toute décision qui propose son propre vaisseau) : sa propre fiche ne recevait pas le toucher. Ses chiffres reçoivent maintenant le pointeur.
 - Les vaisseaux ne bougeaient pas (ni balancement, ni recul) : le modèle importé porte son maillage sur sa propre racine, que l'animation ne déplaçait pas. Chaque vaisseau a maintenant une racine immobile, placée par la table, et le modèle bouge dessous. Test avec un modèle à un seul maillage.
 - Retours du playtest des animations : l'attaquant se tourne vers sa cible dès l'attaque déclarée (`AimFeedback`) ; le tir est un projectile laser et non plus un rayon continu (`LaserFeedback`, qui remplace `BeamFeedback`) ; la postcombustion du combo est refaite (anneau d'étincelles, jets vacillants) ; les effets lumineux utilisent un matériau additif (`Glow.mat`) qui rayonne avec le Bloom. `tools/Capture-Unity.ps1 -Phase Effects` fige ces effets pour les juger.

@@ -65,18 +65,18 @@ Pendant ma phase de marché, le marché noir s'ouvre au centre de la table (3.3)
 - **Devant moi**, en bas au centre. Le vaisseau est statique : pas d'interaction, seulement des animations et de la cosmétique, à voir plus tard.
 - **Mes deux modificateurs** sont de part et d'autre du vaisseau : ATK à gauche, DEF à droite, comme dans le marché. Ils portent leurs jetons de Tourment.
 - **Sous le vaisseau** : PV, bouclier, et **trois ronds** qui sont les technologies obtenues vers l'Élection galactique (il en faut 3 pour gagner). Chaque rond s'allume à la couleur de la technologie obtenue.
-- **Surcharge** : un petit jeton près du vaisseau, allumé quand je l'ai. Le toucher l'**arme** : il brille, et la prochaine attaque ou le prochain reparamétrage le dépense. Le toucher de nouveau le désarme (ARB-67).
+- **Surcharge** : un petit jeton près du vaisseau, allumé quand je l'ai. Le toucher l'**arme** : il brille, et la prochaine attaque ou le prochain reparamétrage le dépense. Le toucher de nouveau le désarme (ARB-67). Armer vaut pour une seule action : dès qu'une commande part, le jeton est désarmé (ARB-91).
 - **Effets temporaires** : en icônes, avec leur info-bulle.
 - **Bouton de combo** : au centre, par-dessus le bas du vaisseau, au premier plan (ARB-89). Il n'apparaît que lorsque le combo est jouable (ARB-87), à la couleur de la technologie. Au survol, il montre l'effet de la technologie.
 - **Cockpit** (ARB-90, construit) : sous le vaisseau, il remplace le panneau de chiffres ; ses sockets reçoivent les deux cartes du joueur. Il comprend :
-  - une jauge de PV qui se remplit et se vide, avec le chiffre dessus ;
-  - une jauge de bouclier en manomètre, avec une aiguille ;
-  - deux emplacements de modificateurs en creux, avec le symbole de l'emplacement ;
-  - un interrupteur pour la surcharge, levé quand le jeton est armé, son bouton allumé tant que le vaisseau en a un ; le toucher arme ou désarme le jeton ;
+  - une jauge de PV : un tube de verre rempli d'un liquide qui monte et descend lentement, du plasma qui vire au sang quand les PV baissent, avec le chiffre dessus (ARB-92) ;
+  - une jauge de bouclier en manomètre gradué de 0 à 8, sous verre, avec une aiguille en métal ; sa zone rouge, au 0, s'allume quand le bouclier ne protège plus rien, à 0 ou désactivé (ARB-92) ;
+  - deux emplacements de modificateurs en creux, où reposent les cartes ; une attache en métal passe par-dessus le coin bas gauche de la carte d'attaque et le coin bas droit de la carte de défense (ARB-92) ;
+  - un interrupteur pour la surcharge, levé tant que le jeton est armé, qui redescend de lui-même dès que l'action est partie (ARB-91) ; une diode sous lui s'allume tant que le vaisseau a un jeton (ARB-92) ; le toucher arme ou désarme le jeton ;
   - trois diodes pour les technologies obtenues ;
   - une étiquette au nom du joueur.
 
-  Le vaisseau a été avancé vers la table pour lui laisser la place (ARB-89). Toucher le cockpit répond à une décision qui propose son propre vaisseau. Les effets en jeu et le marqueur du leader passent au-dessus de lui. Sans modèle dans le thème, le panneau de chiffres de l'interface reste.
+  Le vaisseau a été avancé vers la table pour lui laisser la place (ARB-89), puis remonté quand le cockpit a été réduit (ARB-92). Toucher le cockpit répond à une décision qui propose son propre vaisseau. Les effets en jeu et le marqueur du leader passent au-dessus de lui. Sans modèle dans le thème, le panneau de chiffres de l'interface reste.
 
 ### 3.3 Marché noir
 

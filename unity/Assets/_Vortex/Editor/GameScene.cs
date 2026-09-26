@@ -200,8 +200,9 @@ namespace Vortex.Editor
             director.AssignMenus(pause, gameOver, announcement);
             director.AssignTimer(timer);
 
-            // The place of the cockpit (ARB-90): the panel's width at the bottom, its sockets over the player's cards.
-            director.AssignCockpitPlace(UiBuilder.Fixed<RectTransform>(player.transform, "Cockpit", new Vector2(0.5f, 0f), new Vector2(0f, 5f), new Vector2(920f, 240f)));
+            // The place of the cockpit (ARB-90) at the bottom, 3.84 times wider than high like the model, its sockets under
+            // the player's cards (BuildPlayerPanel).
+            director.AssignCockpitPlace(UiBuilder.Fixed<RectTransform>(player.transform, "Cockpit", new Vector2(0.5f, 0f), new Vector2(0f, 5f), new Vector2(780f, 203f)));
         }
 
         // The time left, just above the end turn button (INTERFACE.md 3.9): the seconds and a bar that empties.
@@ -430,8 +431,10 @@ namespace Vortex.Editor
         {
             RectTransform root = UiBuilder.Fixed<RectTransform>(ui, "Joueur", new Vector2(0.5f, 0f), Vector2.zero, new Vector2(1100f, 320f));
             root.gameObject.AddComponent<CanvasGroup>();
-            RectTransform attack = UiBuilder.Fixed<RectTransform>(root, "ATK", new Vector2(0.5f, 0f), new Vector2(-340f, 20f), new Vector2(150f, 210f));
-            RectTransform defense = UiBuilder.Fixed<RectTransform>(root, "DEF", new Vector2(0.5f, 0f), new Vector2(340f, 20f), new Vector2(150f, 210f));
+            // The cards lie in the cockpit's sockets: 1.42 of its heights from its centre, 0.875 of its height tall, seen
+            // from a little closer than the console (its centre is 3.6 units lower, its sockets 2.7 further out).
+            RectTransform attack = UiBuilder.Fixed<RectTransform>(root, "ATK", new Vector2(0.5f, 0f), new Vector2(-291f, 14f), new Vector2(127f, 178f));
+            RectTransform defense = UiBuilder.Fixed<RectTransform>(root, "DEF", new Vector2(0.5f, 0f), new Vector2(291f, 14f), new Vector2(127f, 178f));
 
             Image highlight = UiBuilder.Box(UiBuilder.Fixed<Image>(root, "Cadre", new Vector2(0.5f, 0f), new Vector2(0f, 6f), new Vector2(408f, 118f)), Color.white);
             // The figures catch the pointer: touching one's own panel answers a decision that offers one's own seat.
@@ -448,14 +451,14 @@ namespace Vortex.Editor
             Image overcharge = Disc(stats.transform, "Surcharge", new Vector2(0.5f, 1f), new Vector2(90f, -74f), 24f);
             overcharge.raycastTarget = true;
             Button overchargeButton = overcharge.gameObject.AddComponent<Button>();
-            TMP_Text statuses = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root, "Effets", new Vector2(0.5f, 0f), new Vector2(0f, 252f), new Vector2(560f, 28f)), 16f, FontStyles.Normal, TextAlignmentOptions.Center);
+            TMP_Text statuses = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root, "Effets", new Vector2(0.5f, 0f), new Vector2(0f, 214f), new Vector2(560f, 28f)), 16f, FontStyles.Normal, TextAlignmentOptions.Center);
             statuses.color = Muted;
             // Above the cockpit (ARB-90), which covers the bottom of the panel.
-            GameObject leader = Tag(root, new Vector2(0.5f, 0f), new Vector2(0f, 282f));
+            GameObject leader = Tag(root, new Vector2(0.5f, 0f), new Vector2(0f, 244f));
 
             // The combo on the foreground layer, over the ship: the ship is 3D and would cut through a button of the table's
             // interface.
-            (Button combo, TMP_Text comboLabel) = UiBuilder.Button(front, "Combo", new Vector2(0.5f, 0f), new Vector2(0f, 300f), new Vector2(160f, 42f));
+            (Button combo, TMP_Text comboLabel) = UiBuilder.Button(front, "Combo", new Vector2(0.5f, 0f), new Vector2(0f, 327f), new Vector2(160f, 42f));
             comboLabel.fontStyle = FontStyles.Bold;
 
             // The actions, on an arc centred above the ship (ActionArc lays them out, playtest 2): attack actions on the

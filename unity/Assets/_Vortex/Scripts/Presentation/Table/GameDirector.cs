@@ -64,7 +64,7 @@ namespace Vortex.Client.Presentation
 
         [Header("Disposition (positions à l'écran : 0,0 en bas à gauche, 1,1 en haut à droite)")]
         [Tooltip("Position à l'écran du vaisseau du joueur.")]
-        [SerializeField] private Vector2 viewerShipOnScreen = new Vector2(0.5f, 0.31f);
+        [SerializeField] private Vector2 viewerShipOnScreen = new Vector2(0.5f, 0.335f);
         [Tooltip("Taille du vaisseau du joueur : il est au premier plan, près de la caméra.")]
         [SerializeField, Min(0.1f)] private float viewerShipScale = 1.2f;
         [Tooltip("Taille des vaisseaux des adversaires.")]
@@ -454,8 +454,8 @@ namespace Vortex.Client.Presentation
             }
         }
 
-        // The player's cockpit (ARB-90): the theme's model over the player's panel, between the interface and the player's
-        // cards (a little further than them, so that they lie in its sockets). Built once per game.
+        // The player's cockpit (ARB-90): the theme's model over the player's panel, in front of the interface, as far as
+        // puts its sockets at the cards' depth, so that the player's cards lie in them. Built once per game.
         private void PlaceCockpit()
         {
             if (_cockpit != null)
@@ -472,7 +472,7 @@ namespace Vortex.Client.Presentation
             GameObject console = Instantiate(theme.CockpitModel, cardRoot, false);
             console.name = "Cockpit";
             _cockpit = console.AddComponent<CockpitDisplay>();
-            _cockpit.Bind(cockpitPlace, view, cardDepth + 0.4f, theme.GlowMaterial, () =>
+            _cockpit.Bind(cockpitPlace, view, cardDepth, theme.GlowMaterial, theme.GlassMaterial, () =>
             {
                 controls.ToggleOvercharge();
                 _dirty = true;
@@ -755,6 +755,8 @@ namespace Vortex.Client.Presentation
                     model.MaxHp,
                     me.Shield,
                     _session.Rules.MaxShield,
+                    // The engine's reckoning, which follows every effect (disabled shield...), without naming any.
+                    _session.Protection(_viewer) <= 0.0,
                     me.Overcharge > 0,
                     controls.OverchargeArmed,
                     me.Technologies.Select(theme.Technology).ToList(),
