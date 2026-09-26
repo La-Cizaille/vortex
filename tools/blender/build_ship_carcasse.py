@@ -1,4 +1,4 @@
-"""Build the crew ship Carcasse (docs/ASSETS.md section 2, ARB-76, ARB-77, ARB-99), in the art direction of
+"""Build the crew ship Carcasse (docs/ASSETS.md section 2, ARB-76, ARB-77, ARB-101), in the art direction of
 docs/DIRECTION_ARTISTIQUE.md (§2.2, §6.3, §6.4), and save it as a .blend source.
 
 Usage, without opening Blender's window:
@@ -6,7 +6,7 @@ Usage, without opening Blender's window:
     blender --background --factory-startup --disable-autoexec --python tools/blender/build_ship_carcasse.py -- \
         art-src/ships/Ship_Carcasse.blend
 
-A pirate crew ship, not a fighter (ARB-99): about 2.2 m long and 1.4 m wide, nose towards -Y, top towards +Z, origin at
+A pirate crew ship, not a fighter (ARB-101): about 2.2 m long and 1.4 m wide, nose towards -Y, top towards +Z, origin at
 its centre. Its shape mixes the designer's two references: armoured caissons with large painted panels (bow with the
 cockpit visor, crew hull with its row of portholes, a wider engine block), and visible machinery (copper pipes along
 the flanks, radiator fins on the engine block, an off-centre superstructure with its antennas, a ramp with hazard
