@@ -5,13 +5,13 @@ namespace Vortex.Core.Content
     {
         /// <summary>No technology.</summary>
         Neutral = 0,
-        /// <summary>"Ordre".</summary>
+        /// <summary>"Légion de l'Ordre" (technology Ordre).</summary>
         Blue = 1,
-        /// <summary>"Rebelles".</summary>
+        /// <summary>"Front Syndical des Mutins" (technology Rebelles).</summary>
         Red = 2,
-        /// <summary>"Abomination organique".</summary>
+        /// <summary>"Adeptes de la Corruption" (technology Abomination organique).</summary>
         Green = 3,
-        /// <summary>"Casino Cosmique".</summary>
+        /// <summary>"La Maison" (technology Casino Cosmique).</summary>
         Yellow = 4,
     }
 

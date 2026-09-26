@@ -21,6 +21,9 @@ namespace Vortex.Core.Content
         /// <summary>Maximum length of a rules text.</summary>
         public const int MaxTextLength = 600;
 
+        /// <summary>Longest flavour text, in characters: one or two lines under the rules text.</summary>
+        public const int MaxFlavorLength = 200;
+
         /// <summary>Maximum length of a ruling.</summary>
         public const int MaxRulingLength = 1000;
 
@@ -62,6 +65,7 @@ namespace Vortex.Core.Content
                 CheckText(card.Name, MaxNameLength, where + ".name", errors);
                 CheckText(card.Text, MaxTextLength, where + ".text", errors);
                 CheckText(card.Ruling, MaxRulingLength, where + ".ruling", errors);
+                CheckFlavor(card.Flavor, where + ".flavor", errors);
                 CheckCopies(card.Copies, where, errors);
             }
 
@@ -79,6 +83,7 @@ namespace Vortex.Core.Content
                 CheckText(evt.Name, MaxNameLength, where + ".name", errors);
                 CheckText(evt.Text, MaxTextLength, where + ".text", errors);
                 CheckText(evt.Ruling, MaxRulingLength, where + ".ruling", errors);
+                CheckFlavor(evt.Flavor, where + ".flavor", errors);
                 CheckCopies(evt.Copies, where, errors);
             }
 
@@ -112,6 +117,7 @@ namespace Vortex.Core.Content
                 CheckText(tech.Name, MaxNameLength, where + ".name", errors);
                 CheckText(tech.Text, MaxTextLength, where + ".text", errors);
                 CheckText(tech.Ruling, MaxRulingLength, where + ".ruling", errors);
+                CheckFlavor(tech.Flavor, where + ".flavor", errors);
             }
 
             if (colors.Count != 4)
@@ -142,6 +148,21 @@ namespace Vortex.Core.Content
             if (!Enum.IsDefined(typeof(T), value))
             {
                 errors.Add(where + ": undefined value '" + value + "'.");
+            }
+        }
+
+        // Flavour text is optional; when present it is plain text: no markup, since the client shows it inside rich text.
+        private static void CheckFlavor(string? flavor, string where, List<string> errors)
+        {
+            if (flavor is null)
+            {
+                return;
+            }
+
+            CheckText(flavor, MaxFlavorLength, where, errors);
+            if (flavor.Contains('<') || flavor.Contains('>'))
+            {
+                errors.Add(where + " contains markup ('<' or '>'), which flavour text may not.");
             }
         }
 

@@ -199,5 +199,19 @@ namespace Vortex.Core.Tests.Content
             string json = TestPaths.TechnologiesJson.Replace("\"id\": \"TECH_BLUE\"", "\"id\": \"TECH_RED\"", StringComparison.Ordinal);
             Assert.Throws<GameDataException>(() => GameDataLoader.Load(TestPaths.CardsJson, TestPaths.EventsJson, json));
         }
+
+        [Test]
+        public void Flavour_text_is_optional_plain_and_short()
+        {
+            GameData plain = GameDataLoader.Load(TestPaths.CardsJson, TestPaths.EventsJson, TestPaths.TechnologiesJson);
+            Assert.That(plain.Modifiers.All(c => c.Flavor is null), Is.True, "Absent today: no card carries one.");
+
+            string with = Replace(TestPaths.CardsJson, "\"id\": \"A_001\",", "\"id\": \"A_001\", \"flavor\": \"Rien ne se perd.\",");
+            Assert.That(LoadWithCards(with).Modifiers.Single(c => c.Id == "A_001").Flavor, Is.EqualTo("Rien ne se perd."));
+
+            Assert.Throws<GameDataException>(() => LoadWithCards(with.Replace("Rien ne se perd.", "<b>Rien</b>", StringComparison.Ordinal)), "No markup.");
+            Assert.Throws<GameDataException>(() => LoadWithCards(with.Replace("Rien ne se perd.", new string('a', GameDataValidator.MaxFlavorLength + 1), StringComparison.Ordinal)), "Short.");
+            Assert.Throws<GameDataException>(() => LoadWithCards(with.Replace("Rien ne se perd.", " ", StringComparison.Ordinal)), "Not blank.");
+        }
     }
 }
