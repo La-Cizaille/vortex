@@ -75,6 +75,10 @@ namespace Vortex.Client.Theme
         [SerializeField, Min(0.1f)] private float shipSwaySeconds = 3.4f;
         [Tooltip("Matériau des effets lumineux provisoires (tirs, réacteurs, explosions) : additif, sans lumière, teinté par chaque effet. Au-dessus du seuil du Bloom, il rayonne. Vide : les effets restent mats.")]
         [SerializeField] private Material? glowMaterial;
+        [Tooltip("Matériau du bouclier de plasma (parade, déviation, bouclier qui change) : une sphère, teintée par le jeu à la couleur du siège. Vide : le matériau lumineux provisoire.")]
+        [SerializeField] private Material? shieldMaterial;
+        [Tooltip("Fumée d'un vaisseau endommagé : un effet qui s'élève, posé sur la coque et détruit après quelques secondes. Vide : des bouffées provisoires.")]
+        [SerializeField] private GameObject? smokePrefab;
         [Tooltip("Modèle du dé à 8 faces (ASSETS §2). Il porte huit repères vides Face_1 à Face_8, dont l'axe avant sort de la face. Vide : un octaèdre généré.")]
         [SerializeField] private GameObject? dieModel;
 
@@ -144,6 +148,12 @@ namespace Vortex.Client.Theme
 
         /// <summary>Material of the luminous placeholder effects, or null.</summary>
         public Material? GlowMaterial => glowMaterial;
+
+        /// <summary>Material of the shield's plasma sphere: the designer's, or the glow material.</summary>
+        public Material? ShieldLook => shieldMaterial != null ? shieldMaterial : glowMaterial;
+
+        /// <summary>The smoke of a damaged ship, or null for the placeholder puffs.</summary>
+        public GameObject? SmokePrefab => smokePrefab;
 
         /// <summary>Sets the glow material when the theme has none (editor setup).</summary>
         public bool AssignGlowIfMissing(Material material)

@@ -36,7 +36,7 @@ namespace Vortex.Client.Presentation
             bool spared = gameEvent.Cause == HpLossCause.Attack && gameEvent.Amount >= stage.Attack.LandedDamage;
             if (!spared)
             {
-                ShieldBubble.Show(ship, (stage.Theme != null ? stage.Theme.Seat(gameEvent.Player) : Color.white) * 2f, 0.6f, 0.35f / speed, stage.Theme != null ? stage.Theme.GlowMaterial : null);
+                ShieldBubble.Show(ship, (stage.Theme != null ? stage.Theme.Seat(gameEvent.Player) : Color.white) * 2f, 0.6f, 0.35f / speed, stage.Theme != null ? stage.Theme.ShieldLook : null);
                 return wait * 0.5f;
             }
 

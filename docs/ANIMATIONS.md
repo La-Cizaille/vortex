@@ -59,7 +59,7 @@ Une animation ne décide jamais de rien : le résultat est déjà calculé par l
 
 Chaque lot se fait des deux côtés : les modèles et effets par l'atelier Blender, les retours visuels et les ajouts au moteur par le développement. Un retour visuel sans son modèle utilise un effet provisoire, comme les cartes et les vaisseaux l'ont fait.
 
-## 5. Lot 1 : ce qui est en place
+## 5. Ce qui est en place côté jeu
 
 Chaque animation marche déjà avec un effet provisoire fait de formes simples, comme le vaisseau provisoire. Les parties lumineuses (tirs, jets, étincelles) utilisent le matériau additif `Theme/Materials/Glow.mat` (champ *Glow Material* du thème), assez brillant pour le Bloom. Un effet définitif le remplace sans code : il suffit de le déposer dans le retour visuel correspondant (`Presentation/Feedback/`), ou dans le thème pour le dé. Pour juger les effets sans jouer : `tools/Capture-Unity.ps1 -Scene Game -Phase Effects [-EffectTime s]` fige un tir, un combo et une explosion à mi-course.
 
@@ -82,3 +82,21 @@ Chaque animation marche déjà avec un effet provisoire fait de formes simples, 
 **Conventions pour les modèles** (à reporter dans [`ASSETS.md`](ASSETS.md) par l'atelier Blender) :
 - **Vaisseau** : un repère vide `Canon` là où part un tir, et un repère vide `Reacteur…` (`Reacteur_Gauche`, `Reacteur_Droit`…) au bout de chaque réacteur. Sans eux, le tir part devant le nez et la flamme derrière la queue.
 - **Dé à 8 faces** : environ une unité de haut ; huit repères vides `Face_1` à `Face_8`, un par face, dont l'axe avant sort de la face et l'axe haut pointe vers le haut du chiffre. Les faces opposées font 9, comme sur un vrai d8. Le jeu tourne la face tirée vers la caméra, droite.
+
+## 6. À faire dans Blender (atelier)
+
+Tout ce qui suit revient à l'atelier Blender : le jeu a déjà le déclencheur, la place et un effet provisoire, et prend le définitif sans code. Chaque ligne dit où le déposer. Les effets lumineux gagnent à utiliser un matériau émissif ou additif dont la couleur dépasse le seuil du Bloom (1,5).
+
+| À créer | Pour | Où le déposer | Contraintes |
+|---|---|---|---|
+| **Repères sur le vaisseau** : `Canon`, `Reacteur_Gauche`, `Reacteur_Droit`… | Départ du tir, jets du combo | Dans le modèle du vaisseau (`art-src/ships/`) | Repères vides ; l'axe avant d'un réacteur pointe vers l'arrière du vaisseau |
+| **Modèle du d8** | Dés 3D | Champ *Die Model* de `Theme/ThemeSettings` | Environ une unité de haut ; repères `Face_1` à `Face_8` (axe avant hors de la face, axe haut vers le haut du chiffre) ; faces opposées = 9 ; 500 triangles au plus (ASSETS §2) |
+| **Projectile laser** | Tir | Champ *Prefab* de `Presentation/Feedback/Laser` | Vole selon son axe avant ; court, lumineux ; il prend la couleur de l'attaquant si son matériau lit la couleur de base |
+| **Jet de postcombustion** | Combo | Champ *Prefab* de `Presentation/Feedback/Thrusters` | Orienté vers l'arrière, posé sur chaque réacteur, porté par le vaisseau ; flamme vacillante, idéalement particules |
+| **Impact** (étincelles, éclats) | Dégâts | Champ *Sparks* de `Presentation/Feedback/Knockback` | Orienté vers l'extérieur du vaisseau ; le jeu l'agrandit selon la gravité (×0,6 à ×1,6) |
+| **Explosion** | Élimination | Champ *Prefab* de `Presentation/Feedback/Explosion` | Environ 1,2 s ; boule de feu, onde, débris |
+| **Plasma du bouclier** | Parade, déviation, bouclier qui change | Champ *Shield Material* de `Theme/ThemeSettings` (une sphère, teintée à la couleur du siège par le jeu) | Plus vif sur les bords (effet de Fresnel), ondulation au point d'impact, couleur du siège |
+| **Fumée d'un vaisseau endommagé** | Vaisseau endommagé | Champ *Smoke Prefab* de `Theme/ThemeSettings` (posé sur la coque, détruit après 3 s) | Panache qui s'élève, dense et sombre quand les PV sont bas |
+| **Fond spatial** | Fond, effets d'événements | Voir ASSETS §3 et le lot 2 | Panorama ; un effet par événement de manche |
+| **Paquet du marché** | Tirage des cartes | Lot 2 | Bloc au dos des cartes, épaisseur variable |
+| **Jetons 3D** (Tourment, surcharge), **épave**, **matériau contaminé** | Lots 2 et 3 | Lots 2 et 3 | Voir §2 et §3 |

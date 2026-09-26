@@ -87,8 +87,10 @@ namespace Vortex.Editor
             var camera = new GameObject("Camera", typeof(Camera)).GetComponent<Camera>();
             camera.tag = "MainCamera";
             camera.clearFlags = CameraClearFlags.SolidColor;
-            camera.fieldOfView = 45f;
-            camera.transform.SetPositionAndRotation(new Vector3(0f, 9f, -11f), Quaternion.Euler(38f, 0f, 0f));
+            // Low and close enough for the player's ship to fill the foreground, high enough to see the whole table: the
+            // layout is set in screen terms, so the camera only changes perspective and sizes, never what is where.
+            camera.fieldOfView = 42f;
+            camera.transform.SetPositionAndRotation(new Vector3(0f, 7.4f, -10.6f), Quaternion.Euler(33f, 0f, 0f));
 
             // Post-processing on, for the Bloom that makes the glowing parts of the models shine (ASSETS section 2).
             camera.GetUniversalAdditionalCameraData().renderPostProcessing = true;

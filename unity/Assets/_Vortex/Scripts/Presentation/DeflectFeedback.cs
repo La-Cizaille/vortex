@@ -26,7 +26,7 @@ namespace Vortex.Client.Presentation
             if (deflector != null)
             {
                 Color color = (stage.Theme != null ? stage.Theme.Seat(gameEvent.Other) : Color.white) * brightness;
-                ShieldBubble.Show(deflector, color, 1f, seconds / Mathf.Max(0.01f, stage.PlaybackSpeed), stage.Theme != null ? stage.Theme.GlowMaterial : null, 0f, 0.5f);
+                ShieldBubble.Show(deflector, color, 1f, seconds / Mathf.Max(0.01f, stage.PlaybackSpeed), stage.Theme != null ? stage.Theme.ShieldLook : null, 0f, 0.5f);
             }
 
             return wait;
