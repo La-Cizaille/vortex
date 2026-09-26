@@ -149,10 +149,10 @@ La chaîne de production est décrite dans l'ADR-0016, les visuels à créer et 
 blender --background --factory-startup --disable-autoexec --python tools/blender/build_icons.py -- unity/Assets/_Vortex/Art/Icons
 ```
 
-**Le vaisseau Sillage** (ARB-84) se construit aussi par script : forme, chanfreins, dépliage UV, puis les textures (lignes de panneaux, teintes, usure, relief) calculées par Blender dans `art-src/ships/`. Changer une proportion, c'est changer un nombre dans `tools/blender/build_ship_sillage.py` et relancer les deux commandes :
+**Le vaisseau Carcasse** (ARB-99) se construit aussi par script : forme, chanfreins, dépliage UV, repères, puis les textures calculées par Blender dans `art-src/ships/` (tôles, usure et rouille, crasse, bandes de danger, marquages au pochoir). Changer une proportion, c'est changer un nombre dans `tools/blender/build_ship_carcasse.py` et relancer les deux commandes :
 ```
-blender --background --factory-startup --disable-autoexec --python tools/blender/build_ship_sillage.py -- art-src/ships/Ship_Sillage.blend
-blender --background --disable-autoexec art-src/ships/Ship_Sillage.blend --python tools/blender/export_unity.py -- unity/Assets/_Vortex/Art/Ships/Ship_Sillage.fbx --budget 5000
+blender --background --factory-startup --disable-autoexec --python tools/blender/build_ship_carcasse.py -- art-src/ships/Ship_Carcasse.blend
+blender --background --disable-autoexec art-src/ships/Ship_Carcasse.blend --python tools/blender/export_unity.py -- unity/Assets/_Vortex/Art/Ships/Ship_Carcasse.fbx --budget 5000
 ```
 
 **La carte** (ARB-85) se construit par script, avec ses textures de métal brossé, puis s'exporte comme un vaisseau. Unity en fait seul le corps de `Prefabs/Card.prefab`, crée ses matériaux de métal (`Theme/Materials/CardFrame`, `CardPanel`, `CardTrim`, `CardGem`, qui t'appartiennent ensuite) et place l'illustration et les textes sur les repères `Zone_*` du modèle. Pour déplacer une zone, change son nombre dans `build_card.py` et relance :

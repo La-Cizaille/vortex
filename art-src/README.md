@@ -4,7 +4,7 @@ Les fichiers de travail des visuels : scènes Blender (`.blend`), images en calq
 
 | Dossier | Contenu | Exporté vers |
 |---|---|---|
-| `ships/` | Un fichier `.blend` par vaisseau, nommé comme son export (`Ship_Faucon.blend`), et ses textures (`Ship_Faucon_BaseColor.png`, `Ship_Faucon_Normal.png`). `Ship_Sillage` est construit par `tools/blender/build_ship_sillage.py` | `unity/Assets/_Vortex/Art/Ships/Ship_Faucon.fbx` |
+| `ships/` | Un fichier `.blend` par vaisseau, nommé comme son export (`Ship_Faucon.blend`), et ses textures (`Ship_Faucon_BaseColor.png`, `Ship_Faucon_Normal.png`). `Ship_Carcasse` est construit par `tools/blender/build_ship_carcasse.py` | `unity/Assets/_Vortex/Art/Ships/Ship_Faucon.fbx` |
 | `cards/` | Le modèle des cartes (`Card.blend`) et ses textures de métal brossé, construits par `tools/blender/build_card.py` | `unity/Assets/_Vortex/Art/Cards3D/Card.fbx` |
 | `cockpit/` | Le cockpit du joueur (`Cockpit.blend`, ARB-90, ARB-92) et son métal brossé (`Cockpit_*.png`), construits par `tools/blender/build_cockpit.py` | `unity/Assets/_Vortex/Art/Cockpit/Cockpit.fbx` |
 | `dice/` | Le dé à 8 faces | `unity/Assets/_Vortex/Art/Dice/` |
