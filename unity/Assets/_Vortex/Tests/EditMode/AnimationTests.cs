@@ -376,6 +376,73 @@ namespace Vortex.Tests.EditMode
         }
 
         [Test]
+        public void A_ship_shows_its_contamination_its_effects_and_its_turn_and_repairs_sparkle()
+        {
+            Transform ship = Ship("Vaisseau", Vector3.zero, out ShipMotion motion);
+            ShipAura aura = ship.gameObject.AddComponent<ShipAura>();
+            aura.Show(0.8f, Color.green, new[] { Color.red, Color.blue }, true, Color.yellow, null);
+            Assert.That((aura.Rings, aura.TurnShown), Is.EqualTo((2, true)), "A ring per effect in play, and the halo of its turn.");
+            for (int i = 0; i < 10; i++)
+            {
+                aura.Tick(0.3f);
+            }
+
+            Assert.That(aura.Spores, Is.GreaterThan(3), "Contaminated: spores drift off.");
+            int spores = aura.Spores;
+            aura.Show(0f, Color.green, new Color[0], false, Color.yellow, null);
+            aura.Tick(3f);
+            Assert.That((aura.Rings, aura.TurnShown, aura.Spores), Is.EqualTo((0, false, spores)), "Healthy, no effect, not its turn.");
+
+            RepairFeedback repair = ScriptableObject.CreateInstance<RepairFeedback>();
+            repair.Play(new GameEvent { Type = GameEventType.HpGained, Player = 0, Amount = 1 }, new Stage(ship, null, motion));
+            repair.Play(new GameEvent { Type = GameEventType.HpGained, Player = 0, Amount = 8 }, new Stage(ship, null, motion));
+            int[] sparkles = Object.FindObjectsByType<PlaceholderEffect>().Where(e => e.name == "Réparation").Select(e => e.PieceCount).OrderBy(n => n).ToArray();
+            Assert.That(sparkles, Has.Length.EqualTo(2));
+            Assert.That(sparkles[1], Is.GreaterThan(sparkles[0]), "More sparkles for a bigger repair.");
+        }
+
+        [Test]
+        public void The_camera_turns_around_the_winner_and_comes_back_for_the_next_game()
+        {
+            Transform ship = Ship("Vainqueur", new Vector3(3f, 0f, 2f), out ShipMotion motion);
+            var camera = new GameObject("Caméra").AddComponent<Camera>();
+            _created.Add(camera.gameObject);
+            camera.transform.SetPositionAndRotation(new Vector3(0f, 7f, -10f), Quaternion.Euler(33f, 0f, 0f));
+            var stage = new Stage(ship, null, motion) { ViewCamera = camera };
+
+            ScriptableObject.CreateInstance<VictoryFeedback>().Play(new GameEvent { Type = GameEventType.GameOver, Player = 0, Value = (int)Vortex.Core.State.WinCondition.GalacticElection }, stage);
+            Assert.That(Object.FindObjectsByType<PlaceholderEffect>().Any(e => e.name == "Pluie d'or"), Is.True, "The Election rains gold.");
+            CameraOrbit orbit = camera.GetComponent<CameraOrbit>();
+            orbit.Tick(5f);
+            Assert.That(Vector3.Dot(camera.transform.forward, (ship.position - camera.transform.position).normalized), Is.GreaterThan(0.99f), "Looking at the winner.");
+            Assert.That(camera.transform.position, Is.Not.EqualTo(new Vector3(0f, 7f, -10f)));
+            orbit.Restore();
+            Assert.That((orbit.Orbiting, camera.transform.position), Is.EqualTo((false, new Vector3(0f, 7f, -10f))), "Back for the next game.");
+        }
+
+        [Test]
+        public void Each_ship_rolls_its_initiative_die_above_itself_and_the_winner_flares()
+        {
+            Transform ship = Ship("Vaisseau", Vector3.zero, out ShipMotion motion);
+            var camera = new GameObject("Caméra").AddComponent<Camera>();
+            _created.Add(camera.gameObject);
+            var stage = new Stage(ship, null, motion) { ViewCamera = camera };
+            InitiativeFeedback initiative = ScriptableObject.CreateInstance<InitiativeFeedback>();
+
+            initiative.Play(new GameEvent { Type = GameEventType.InitiativeRolled, Player = 0, Value = 3 }, stage);
+            initiative.Play(new GameEvent { Type = GameEventType.InitiativeRolled, Player = 0, Value = 6 }, stage);
+            InitiativeRoll[] rolls = Object.FindObjectsByType<InitiativeRoll>();
+            Assert.That(rolls, Has.Length.EqualTo(1), "A roll again for a tie replaces the ship's die.");
+            _created.Add(rolls[0].gameObject);
+            Assert.That(rolls[0].transform.position.y, Is.GreaterThan(ship.position.y + 1f), "Above the ship.");
+            rolls[0].Tick(0.7f);
+            Assert.That(rolls[0].GetComponent<DieSpinner>().Value, Is.EqualTo(6), "It shows the engine's value.");
+
+            initiative.Play(new GameEvent { Type = GameEventType.InitiativeWon, Player = 0 }, stage);
+            Assert.That(Object.FindObjectsByType<PlaceholderEffect>().Any(e => e.name == "Initiative gagnée"), Is.True);
+        }
+
+        [Test]
         public void The_profile_plays_the_first_animations()
         {
             var profile = AssetDatabase.LoadAssetAtPath<FeedbackProfile>(ProjectAssets.ProfilePath);
@@ -394,6 +461,10 @@ namespace Vortex.Tests.EditMode
             Assert.That(profile.For(GameEventType.CardStolen), Is.InstanceOf<CardFlightFeedback>());
             Assert.That(profile.For(GameEventType.CardActivated), Is.InstanceOf<CardFlightFeedback>());
             Assert.That(profile.For(GameEventType.EventRevealed), Is.InstanceOf<EventFeedback>());
+            Assert.That(profile.For(GameEventType.HpGained), Is.InstanceOf<RepairFeedback>());
+            Assert.That(profile.For(GameEventType.GameOver), Is.InstanceOf<VictoryFeedback>());
+            Assert.That(profile.For(GameEventType.InitiativeRolled), Is.InstanceOf<InitiativeFeedback>());
+            Assert.That(profile.For(GameEventType.InitiativeWon), Is.InstanceOf<InitiativeFeedback>());
         }
 
         private static void CleanUpEffects()
@@ -444,7 +515,9 @@ namespace Vortex.Tests.EditMode
 
             public ThemeSettings? Theme => null;
 
-            public Camera? View => null;
+            public Camera? ViewCamera { get; set; }
+
+            public Camera? View => ViewCamera;
 
             public MarketDisplay? Markets => null;
 

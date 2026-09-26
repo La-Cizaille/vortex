@@ -86,6 +86,14 @@ namespace Vortex.Client.Theme
         [SerializeField] private GameObject? tableBackground;
         [Tooltip("Effet joué au centre de la table quand un événement de manche est révélé, par identifiant d'événement (docs/CARDS.md). Un événement sans entrée montre une vague de lumière.")]
         [SerializeField] private List<EventEffect> eventEffects = new List<EventEffect>();
+        [Tooltip("Couleur de l'anneau d'un effet en jeu autour d'un vaisseau, par type d'effet (clés status.* de la table des textes). Un effet sans entrée prend la couleur par défaut.")]
+        [SerializeField] private List<StatusColor> statusColors = new List<StatusColor>();
+        [Tooltip("Couleur par défaut de l'anneau d'un effet ; au-dessus de 1,5, il rayonne.")]
+        [SerializeField, ColorUsage(false, true)] private Color statusDefault = new Color(1.1f, 1.1f, 1.5f);
+        [Tooltip("Teinte vers laquelle glisse la coque d'un vaisseau contaminé par le Tourment.")]
+        [SerializeField] private Color sickTint = new Color32(120, 170, 60, 255);
+        [Tooltip("Couleur des spores qui s'échappent d'un vaisseau contaminé ; au-dessus de 1,5, elles rayonnent.")]
+        [SerializeField, ColorUsage(false, true)] private Color sporeColor = new Color(1.1f, 2f, 0.5f);
         [Tooltip("Modèle du dé à 8 faces (ASSETS §2). Il porte huit repères vides Face_1 à Face_8, dont l'axe avant sort de la face. Vide : un octaèdre généré.")]
         [SerializeField] private GameObject? dieModel;
 
@@ -159,6 +167,26 @@ namespace Vortex.Client.Theme
         /// <summary>Material of the shield's plasma sphere: the designer's, or the glow material.</summary>
         public Material? ShieldLook => shieldMaterial != null ? shieldMaterial : glowMaterial;
 
+        /// <summary>The colour of the ring of an effect in play, by its kind.</summary>
+        public Color StatusColorFor(string kind)
+        {
+            foreach (StatusColor entry in statusColors)
+            {
+                if (entry.Kind == kind)
+                {
+                    return entry.Color;
+                }
+            }
+
+            return statusDefault;
+        }
+
+        /// <summary>The tint a contaminated hull drifts towards.</summary>
+        public Color SickTint => sickTint;
+
+        /// <summary>The colour of the spores of a contaminated ship.</summary>
+        public Color SporeColor => sporeColor;
+
         /// <summary>The table's background, or null for the generated starfield.</summary>
         public GameObject? TableBackground => tableBackground;
 
@@ -217,6 +245,18 @@ namespace Vortex.Client.Theme
         public bool HasTextIcon(string icon) => textIcons != null && textIcons.GetSpriteIndexFromName(icon) >= 0;
 
         private void OnValidate() => Changed?.Invoke();
+
+        /// <summary>One line of the effect colours: a kind of effect and its ring's colour.</summary>
+        [Serializable]
+        public sealed class StatusColor
+        {
+            /// <summary>Kind of effect, as the engine names it (status.* keys of the text table).</summary>
+            public string Kind = string.Empty;
+
+            /// <summary>Colour of its ring; above 1.5 it glows.</summary>
+            [ColorUsage(false, true)]
+            public Color Color = Color.white;
+        }
 
         /// <summary>One line of the event effects: an event id and its effect.</summary>
         [Serializable]

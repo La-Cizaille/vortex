@@ -51,4 +51,12 @@ MonoBehaviour:
     Feedback: {fileID: 11400000, guid: 3bd4fe184023d66419d0f8e3fb4af398, type: 2}
   - EventType: 8
     Feedback: {fileID: 11400000, guid: 3bd4fe184023d66419d0f8e3fb4af398, type: 2}
+  - EventType: 21
+    Feedback: {fileID: 11400000, guid: 2fe461db0a66e5d4097513701f743b37, type: 2}
+  - EventType: 32
+    Feedback: {fileID: 11400000, guid: 56020389ff71a8946b5191eea7bc4700, type: 2}
+  - EventType: 1
+    Feedback: {fileID: 11400000, guid: 1d1b716f21f94284a8e2ba6d54067fcf, type: 2}
+  - EventType: 2
+    Feedback: {fileID: 11400000, guid: 1d1b716f21f94284a8e2ba6d54067fcf, type: 2}
   fallback: {fileID: 11400000, guid: 8c7a767d5c6036749b463a7b3db5cfc3, type: 2}

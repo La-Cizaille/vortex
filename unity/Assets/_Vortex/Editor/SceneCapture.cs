@@ -313,10 +313,24 @@ namespace Vortex.Editor
         // Layouts and anchors are normally settled over frames; settle them now, a few times for nested layouts.
         private static void Settle(Camera camera)
         {
-            // Cards on their way were never moved on here (no frame loop): they finish their trip first.
+            // Cards on their way, initiative dice and leaping dice were never moved on here (no frame loop): they finish
+            // first, as they would have long before this round.
             foreach (CardTrip trip in Object.FindObjectsByType<CardTrip>())
             {
                 trip.Tick(60f);
+            }
+
+            foreach (InitiativeRoll roll in Object.FindObjectsByType<InitiativeRoll>())
+            {
+                roll.Tick(60f);
+            }
+
+            foreach (DieSpinner die in Object.FindObjectsByType<DieSpinner>())
+            {
+                if (die.Leaping)
+                {
+                    die.Tick(60f);
+                }
             }
 
             for (int pass = 0; pass < 3; pass++)
