@@ -62,12 +62,10 @@ namespace Vortex.Editor
             shape.sizeDelta = new Vector2(300f, 170f);
             shape.pivot = new Vector2(0.5f, 1f);
 
-            // A plate of blackened metal (lot 2): the name stencilled in bone, the figures on a terminal screen.
+            // A soft panel, its edge barely visible (ARB-100): the name stencilled in bone, the figures on a terminal screen.
             ThemeSettings theme = AssetDatabase.LoadAssetAtPath<ThemeSettings>(ThemeAssets.ThemePath);
             // The turn frame is an outline only: the panel is translucent, a filled box behind it would show through.
-            Image highlight = UiBuilder.Plate(UiBuilder.Part<Image>(root.transform, "Cadre", Vector2.zero, Vector2.one, new Vector2(-4f, -4f), new Vector2(4f, 4f)), Color.white);
-            highlight.fillCenter = false;
-            highlight.pixelsPerUnitMultiplier = 0.5f;
+            Image highlight = UiBuilder.Outline(UiBuilder.Part<Image>(root.transform, "Cadre", Vector2.zero, Vector2.one, new Vector2(-3f, -3f), new Vector2(3f, 3f)));
             UiBuilder.Plate(UiBuilder.Part<Image>(root.transform, "Fond", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), Color.white, receivesPointer: true);
             TMP_Text name = UiBuilder.Font(UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "Nom", new Vector2(0f, 1f), new Vector2(14f, -8f), new Vector2(150f, 28f)), 24f, FontStyles.Normal, TextAlignmentOptions.Left), theme.StencilFont);
             name.color = UiBuilder.Bone;
@@ -519,9 +517,10 @@ namespace Vortex.Editor
         // Round, event, doom countdown and result, at the top centre (INTERFACE.md 3.8).
         private static RoundBanner BuildBanner(Transform ui)
         {
-            // A plate of blackened metal: the round stencilled in bone, the event, the doom countdown in amber (lot 2).
+            // The round stencilled in bone, the event, the doom countdown in amber (lot 2).
             ThemeSettings theme = AssetDatabase.LoadAssetAtPath<ThemeSettings>(ThemeAssets.ThemePath);
-            Image root = UiBuilder.Plate(UiBuilder.Fixed<Image>(ui, "Bandeau", new Vector2(0.5f, 1f), new Vector2(0f, -8f), new Vector2(560f, 112f)), Color.white);
+            // No frame (ARB-100): the text alone over the sky.
+            Image root = UiBuilder.Plate(UiBuilder.Fixed<Image>(ui, "Bandeau", new Vector2(0.5f, 1f), new Vector2(0f, -8f), new Vector2(560f, 112f)), Color.clear);
             TMP_Text round = UiBuilder.Font(UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "Manche", new Vector2(0.5f, 1f), new Vector2(0f, -6f), new Vector2(540f, 38f)), 34f, FontStyles.Normal, TextAlignmentOptions.Center), theme.StencilFont);
             round.color = UiBuilder.Bone;
             TMP_Text roundEvent = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "Événement", new Vector2(0.5f, 1f), new Vector2(0f, -44f), new Vector2(540f, 30f)), 22f, FontStyles.Normal, TextAlignmentOptions.Center);
