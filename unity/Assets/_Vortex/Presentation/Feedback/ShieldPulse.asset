@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 207767057a13eb24f94149e5742a9adb, type: 3}
+  m_Name: ShieldPulse
+  m_EditorClassIdentifier: Vortex.Client::Vortex.Client.Presentation.ShieldPulseFeedback
+  seconds: 0.7
+  brightness: 3
+  bigChange: 6
+  wait: 0.35

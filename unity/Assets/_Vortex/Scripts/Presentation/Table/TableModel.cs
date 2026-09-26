@@ -30,6 +30,7 @@ namespace Vortex.Client.Presentation
             AttackMarket = view.AttackMarket;
             DefenseMarket = view.DefenseMarket;
             DoomRound = rules.ForPlayers(_seats.Count)?.DoomRound ?? 0;
+            MaxHp = rules.MaxHp;
             TechnologiesToWin = rules.TechnologiesToWin;
             LeaderBounty = rules.LeaderBounty;
             GhostsChooseEvent = rules.GhostsChooseEvent;
@@ -61,6 +62,9 @@ namespace Vortex.Client.Presentation
             _seats.Any(s => s.AttackCard?.Uid == uid || s.DefenseCard?.Uid == uid)
             || AttackMarket.Visible.Any(c => c.Uid == uid)
             || DefenseMarket.Visible.Any(c => c.Uid == uid);
+
+        /// <summary>Most HP a ship can have (RULES A2).</summary>
+        public int MaxHp { get; }
 
         /// <summary>Round of the doom event at this table size (0 if none).</summary>
         public int DoomRound { get; }

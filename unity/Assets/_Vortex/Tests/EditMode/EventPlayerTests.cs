@@ -21,6 +21,8 @@ namespace Vortex.Tests.EditMode
 
             public Camera? View => null;
 
+            public AttackMemory Attack { get; } = new AttackMemory();
+
             public ShipMotion? MotionOf(int seat) => null;
         }
 

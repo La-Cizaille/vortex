@@ -113,6 +113,10 @@ namespace Vortex.Editor
             FeedbackProfile profile = AssetDatabase.LoadAssetAtPath<FeedbackProfile>(ProfilePath);
             bool changed = Animation<AimFeedback>(profile, "Aim", GameEventType.AttackDeclared);
             changed |= Animation<LaserFeedback>(profile, "Laser", GameEventType.AttackResolved);
+            changed |= Animation<DeflectFeedback>(profile, "Deflect", GameEventType.AttackRedirected);
+            changed |= Animation<CriticalFeedback>(profile, "Critical", GameEventType.CriticalHit);
+            changed |= Animation<DodgeFeedback>(profile, "Dodge", GameEventType.HpLossPrevented);
+            changed |= Animation<ShieldPulseFeedback>(profile, "ShieldPulse", GameEventType.ShieldChanged);
             changed |= Animation<KnockbackFeedback>(profile, "Knockback", GameEventType.HpLost);
             changed |= Animation<ThrusterFeedback>(profile, "Thrusters", GameEventType.TechnologyActivated);
             changed |= Animation<ExplosionFeedback>(profile, "Explosion", GameEventType.PlayerEliminated);

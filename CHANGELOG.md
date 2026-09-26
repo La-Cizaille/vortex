@@ -4,6 +4,14 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Non publié]
 ### Ajouté
+- **Animations de combat** (lot 2, ANIMATIONS §5) :
+  - parade : la sphère de plasma de la cible s'allume là où le tir frappe si son bouclier a arrêté une part de l'attaque ;
+  - esquive : le vaisseau fait un écart quand une protection épargne toute la perte ;
+  - déviation (ARB-88) : le tir frappe le bouclier du vaisseau qui dévie puis bifurque ;
+  - coup critique : éclair blanc et secousse de la caméra ;
+  - bouclier qui monte ou baisse (reparamétrage, sabotage, carte) ;
+  - vaisseau endommagé : fumée sous la moitié des PV, étincelles sous le quart.
+  Le moteur donne, pour une attaque, le bouclier effectif et les dégâts avant et après les effets (`AttackResolved.Values`), et annonce les PV qu'une protection épargne (`HpLossPrevented`). Le théâtre des retours visuels garde en mémoire l'attaque en cours (`AttackMemory`). Tests moteur et `AnimationTests`.
 - **Impacts gradués** (ANIMATIONS §5) : l'impact grandit avec les dégâts (éclair, étincelles, éclats de coque, onde de choc pour un coup lourd) et la projection devient chaotique (secousses et rotations aléatoires qui s'amortissent) ; le vaisseau revient toujours à sa place, sauf s'il est détruit. `ShipMotion.Push` sait aussi tourner le vaisseau. La capture `-Phase Effects` montre un coup lourd.
 - **Animations, lot 1** (ANIMATIONS.md §5) :
   - chaque vaisseau se balance sur place (`ShipMotion`, réglages dans le thème) ;

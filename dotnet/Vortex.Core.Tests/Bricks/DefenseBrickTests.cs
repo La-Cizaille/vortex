@@ -58,6 +58,22 @@ namespace Vortex.Core.Tests.Bricks
         }
 
         [Test]
+        public void A_protection_says_what_it_spared_and_the_attack_what_the_shield_stopped()
+        {
+            (Scenario s, int me, int foe) = Setup(2, ("D_901", B("PreventNextAttackLoss")));
+            s.Equip(foe, "D_901");
+            s.P(foe).Shield = 3;
+            Game game = s.Game(7);
+            game.ResolveAttack(me, foe, false);
+
+            GameEvent resolved = game.Events.Single(e => e.Type == GameEventType.AttackResolved);
+            Assert.That(resolved.Values, Is.EqualTo(new[] { 3, 4, 4 }), "Effective shield, damage past it, damage left after the damage effects.");
+            GameEvent spared = game.Events.Single(e => e.Type == GameEventType.HpLossPrevented);
+            Assert.That((spared.Player, spared.Other, spared.Amount, spared.Cause), Is.EqualTo((foe, me, 4, (HpLossCause?)HpLossCause.Attack)));
+            Assert.That(game.Events.Any(e => e.Type == GameEventType.HpLost), Is.False, "Nothing lost: no loss event.");
+        }
+
+        [Test]
         public void PreventFatalAttackLoss_only_triggers_on_a_fatal_loss()
         {
             (Scenario s, int me, int foe) = Setup(2, ("D_901", B("PreventFatalAttackLoss")));
