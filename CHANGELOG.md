@@ -4,6 +4,12 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Non publié]
 ### Ajouté
+- **Direction artistique, lot 2 : la table** :
+  - surfaces générées (`ThemeSprites`) : plaque de métal noirci rivetée, écran de terminal, bandes de danger ; une image du même nom les remplace ;
+  - panneaux des adversaires en plaques de métal : nom au pochoir, PV et bouclier sur un écran de terminal (« > PV: 23 ») ;
+  - bandeau de manche et boutons en métal, compte à rebours en ambre ; annonce de tour entre deux bandes de danger, nom au pochoir ; marché sur une plaque ;
+  - cockpit : nom au pochoir, PV en police terminal ;
+  - ciel plus sombre (fond suie, étoiles moins nombreuses et plus ternes) et lumière de découpe froide qui détache les vaisseaux du fond (ARB-98).
 - **Direction artistique, lot 1 : fondations** (ARB-95 à ARB-98) :
   - polices de la bible (Anton, Big Shoulders Stencil, IM Fell English, Barlow, Barlow Condensed, Share Tech Mono), sous licence OFL, épinglées et tracées dans `art-src/LICENCES.md` ; atlas TextMeshPro statiques, donnés au thème ; Barlow Condensed devient la police par défaut de l'interface ;
   - palette de la bible dans le thème (suie, os, encre, sang, vert terminal, ambre, danger), pour les lots suivants ;

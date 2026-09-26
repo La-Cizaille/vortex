@@ -174,17 +174,25 @@ namespace Vortex.Tests.EditMode
         [Test]
         public void An_armed_overcharge_is_disarmed_once_the_action_is_sent()
         {
-            // First turn: gain the token; next turn: arm it, then attack.
+            // Gain the token, turn after turn, until one of the person's turns starts with it still held (a hit may cost it).
             ReachActionPhase();
-            Assume.That(Controls.UseAction(CrewAction.Overcharge), Is.True);
-            PlayUntilOffered();
-            if (Controls.CanEndTurn)
+            for (int turn = 0; turn < 20 && _director.Session!.View.Players[0].Overcharge == 0; turn++)
             {
-                Controls.EndTurn();
+                if (Controls.Actions.Any(a => a.Action == CrewAction.Overcharge && a.Available))
+                {
+                    Controls.UseAction(CrewAction.Overcharge);
+                    PlayUntilOffered();
+                }
+
+                if (Controls.CanEndTurn)
+                {
+                    Controls.EndTurn();
+                }
+
+                ReachActionPhase();
             }
 
-            ReachActionPhase();
-            Assume.That(_director.Session!.View.Players[0].Overcharge, Is.GreaterThan(0), "The token is still held.");
+            Assume.That(_director.Session!.View.Players[0].Overcharge, Is.GreaterThan(0), "The token is held.");
             Controls.ToggleOvercharge();
             Assert.That(Controls.OverchargeArmed, Is.True);
             Command attack = _director.Session.LegalCommands(0).First(c => c.Type == CommandType.Attack);

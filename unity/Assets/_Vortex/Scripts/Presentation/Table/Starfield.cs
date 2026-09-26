@@ -32,7 +32,8 @@ namespace Vortex.Client.Presentation
             {
                 renderer.sharedMaterial = glow;
                 var block = new MaterialPropertyBlock();
-                block.SetColor(Shader.PropertyToID("_BaseColor"), new Color(0.8f, 0.82f, 0.95f));
+                // Dim, cold stars: the sky stays dark behind the table (docs/DIRECTION_ARTISTIQUE.md 6.1).
+                block.SetColor(Shader.PropertyToID("_BaseColor"), new Color(0.5f, 0.52f, 0.58f));
                 renderer.SetPropertyBlock(block);
             }
 
