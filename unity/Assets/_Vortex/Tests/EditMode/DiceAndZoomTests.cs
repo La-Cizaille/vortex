@@ -26,6 +26,12 @@ namespace Vortex.Tests.EditMode
             public float PlaybackSpeed { get; }
 
             public Transform? AnchorFor(FeedbackAnchor anchor, GameEvent gameEvent) => _anchor;
+
+            public Vortex.Client.Theme.ThemeSettings? Theme => null;
+
+            public Camera? View => null;
+
+            public ShipMotion? MotionOf(int seat) => null;
         }
 
         [Test]

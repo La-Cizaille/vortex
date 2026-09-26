@@ -4,6 +4,14 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Non publié]
 ### Ajouté
+- **Animations, lot 1** (ANIMATIONS.md §5) :
+  - chaque vaisseau se balance sur place (`ShipMotion`, réglages dans le thème) ;
+  - une attaque trace un rayon à la couleur de l'attaquant vers la cible finale, et l'attaquant recule (`BeamFeedback`) ;
+  - les dégâts projettent le vaisseau en arrière, d'autant plus loin qu'ils sont forts (`KnockbackFeedback`) ;
+  - un combo fait flamber les réacteurs à la couleur de la technologie (`ThrusterFeedback`) ;
+  - une élimination explose, puis l'épave dérive (`ExplosionFeedback`) ;
+  - les dés sont des d8 en 3D qui tournent sur eux-mêmes puis montrent la face tirée (`DieSpinner`, octaèdre généré en attendant le modèle, `PlaceholderDie`).
+  Tous marchent avec des effets provisoires en formes simples (`PlaceholderEffect`), remplaçables sans code. Les vaisseaux et le dé suivent des conventions de repères (`Canon`, `Reacteur…`, `Face_1` à `Face_8`). Tests `AnimationTests`.
 - **Troisième playtest** (ARB-87) : le combo n'apparaît que lorsqu'il est jouable, au centre sous le vaisseau ; une action d'équipage n'apparaît que lorsqu'elle est possible, à sa place fixe sur l'arc ; « Fin de tour » s'allume dès qu'aucune action d'équipage ne reste. Test `LayoutRulesTests`.
 - Plan des animations et des modèles de M5 (`docs/ANIMATIONS.md`) : chaque animation avec l'événement du moteur qui la déclenche, ce qu'il faut ajouter au moteur et au client, et le modèle ou l'effet à créer.
 - **Icônes d'emplacement des cartes** (ARB-86) : une pointe de flèche (ATK), un bouclier (DEF), un éclat (événement) et un hexagone à noyau (technologie), d'un seul trait, dessinés par `tools/blender/build_icons.py` dans `Art/Icons/`. Le disque de la carte les montre, teintées de la couleur du texte (`CardFace.BadgeIcon`, `CardDisplay`) ; sans image, il reprend le texte court. Test `A_card_shows_its_slot_icon_or_else_the_short_text`.

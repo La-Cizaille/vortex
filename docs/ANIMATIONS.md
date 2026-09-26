@@ -53,8 +53,25 @@ Une animation ne décide jamais de rien : le résultat est déjà calculé par l
 
 ## 4. Ordre proposé
 
-- **Lot 1**, le plus visible pour le moins d'effort : balancement, rayon d'attaque, recul aux dégâts, flambée de combo, d8 qui tourne, élimination. Aucun ajout au moteur.
+- **Lot 1**, le plus visible pour le moins d'effort : balancement, rayon d'attaque, recul aux dégâts, flambée de combo, d8 qui tourne, élimination. Aucun ajout au moteur. **Fait côté jeu**, avec des effets provisoires (§5) ; restent les modèles et les effets définitifs.
 - **Lot 2** : parade et esquive (après l'ajout au moteur), Tourment, fond et ses effets, paquets du marché, critique, surcharge, sabotage, trajets des cartes, dégâts renvoyés, déviation, fin des temps, vaisseau endommagé.
 - **Lot 3** : contamination, réparation, halos, tour en cours, victoire, initiative.
 
 Chaque lot se fait des deux côtés : les modèles et effets par l'atelier Blender, les retours visuels et les ajouts au moteur par le développement. Un retour visuel sans son modèle utilise un effet provisoire, comme les cartes et les vaisseaux l'ont fait.
+
+## 5. Lot 1 : ce qui est en place
+
+Chaque animation marche déjà avec un effet provisoire fait de formes simples, sans matériau ni texture, comme le vaisseau provisoire. Un effet définitif le remplace sans code : il suffit de le déposer dans le retour visuel correspondant (`Presentation/Feedback/`), ou dans le thème pour le dé.
+
+| Animation | Retour visuel ou composant | Événement | Pour la remplacer |
+|---|---|---|---|
+| Balancement | `ShipMotion`, ajouté à chaque vaisseau | État permanent | Réglages *Animations* de `Theme/ThemeSettings` (hauteur, roulis, tangage, durée). Seules les pièces du vaisseau bougent, sous un enfant `Mouvement` : la fiche qui suit le vaisseau ne tremble pas |
+| Rayon d'attaque et recul | `Beam.asset` (`BeamFeedback`) | `AttackResolved`, après les dés : le rayon va vers la cible finale | Champ *Prefab* : un rayon dont l'axe avant fait une unité de long ; le jeu l'étire entre les deux vaisseaux. L'épaisseur du rayon provisoire suit la force de l'attaque |
+| Recul aux dégâts | `Knockback.asset` (`KnockbackFeedback`) | `HpLost` d'une attaque ou d'un renvoi | Champ *Sparks* : les étincelles de l'impact. Le recul se règle (par point de PV, maximum, durées) |
+| Flambée des réacteurs | `Thrusters.asset` (`ThrusterFeedback`) | `TechnologyActivated` | Champ *Prefab* : la flamme, orientée vers l'arrière, posée sur chaque réacteur |
+| Explosion | `Explosion.asset` (`ExplosionFeedback`) | `PlayerEliminated` | Champ *Prefab* : l'explosion. L'épave dérive ensuite lentement |
+| Dé à 8 faces | `DiceTray` et `DieSpinner` | `DiceRolled`, `DieRolled` | Champ *Die Model* de `Theme/ThemeSettings`. Sans modèle, un octaèdre généré |
+
+**Conventions pour les modèles** (à reporter dans [`ASSETS.md`](ASSETS.md) par l'atelier Blender) :
+- **Vaisseau** : un repère vide `Canon` là où part un tir, et un repère vide `Reacteur…` (`Reacteur_Gauche`, `Reacteur_Droit`…) au bout de chaque réacteur. Sans eux, le tir part devant le nez et la flamme derrière la queue.
+- **Dé à 8 faces** : environ une unité de haut ; huit repères vides `Face_1` à `Face_8`, un par face, dont l'axe avant sort de la face et l'axe haut pointe vers le haut du chiffre. Les faces opposées font 9, comme sur un vrai d8. Le jeu tourne la face tirée vers la caméra, droite.

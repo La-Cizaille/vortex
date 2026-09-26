@@ -17,4 +17,12 @@ MonoBehaviour:
     Feedback: {fileID: 11400000, guid: 9709fd3a769ee6b4f94e20b6487ad7b7, type: 2}
   - EventType: 33
     Feedback: {fileID: 11400000, guid: 9709fd3a769ee6b4f94e20b6487ad7b7, type: 2}
+  - EventType: 19
+    Feedback: {fileID: 11400000, guid: 9b827a0a623cc754cb65287a380fc3ff, type: 2}
+  - EventType: 20
+    Feedback: {fileID: 11400000, guid: 3c3298bf5b49c7c4fbbe265a735c8cd0, type: 2}
+  - EventType: 14
+    Feedback: {fileID: 11400000, guid: 820df557346c98f44b944926afc48d74, type: 2}
+  - EventType: 29
+    Feedback: {fileID: 11400000, guid: 65d76fd2fb48c3f499bced1e06b12581, type: 2}
   fallback: {fileID: 11400000, guid: 8c7a767d5c6036749b463a7b3db5cfc3, type: 2}

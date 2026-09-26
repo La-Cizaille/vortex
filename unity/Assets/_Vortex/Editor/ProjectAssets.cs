@@ -31,6 +31,7 @@ namespace Vortex.Editor
         public const string DicePath = "Assets/_Vortex/Presentation/Feedback/Dice.asset";
 
         private const string PausePath = "Assets/_Vortex/Presentation/Feedback/Pause.asset";
+        private const string FeedbackFolder = "Assets/_Vortex/Presentation/Feedback/";
         private const string DataFolder = "Packages/com.vortex.core/Runtime/Data/";
 
         /// <summary>Creates every missing base asset.</summary>
@@ -41,6 +42,7 @@ namespace Vortex.Editor
             EnsureFeedbackProfile();
             ThemeAssets.EnsureAll();
             EnsureDice();
+            EnsureAnimations();
             GalleryScene.Ensure();
             GameScene.Ensure();
             MenuScene.Ensure();
@@ -102,6 +104,36 @@ namespace Vortex.Editor
                 EditorUtility.SetDirty(profile);
                 AssetDatabase.SaveAssetIfDirty(profile);
             }
+        }
+
+        // The first animations of the table (ANIMATIONS.md, lot 1): each feedback is created once and given to its event
+        // in the profile unless the profile already plays something for it; afterwards both belong to the designer.
+        private static void EnsureAnimations()
+        {
+            FeedbackProfile profile = AssetDatabase.LoadAssetAtPath<FeedbackProfile>(ProfilePath);
+            bool changed = Animation<BeamFeedback>(profile, "Beam", GameEventType.AttackResolved);
+            changed |= Animation<KnockbackFeedback>(profile, "Knockback", GameEventType.HpLost);
+            changed |= Animation<ThrusterFeedback>(profile, "Thrusters", GameEventType.TechnologyActivated);
+            changed |= Animation<ExplosionFeedback>(profile, "Explosion", GameEventType.PlayerEliminated);
+            if (changed)
+            {
+                EditorUtility.SetDirty(profile);
+                AssetDatabase.SaveAssetIfDirty(profile);
+            }
+        }
+
+        private static bool Animation<T>(FeedbackProfile profile, string name, GameEventType type)
+            where T : FeedbackAsset
+        {
+            string path = FeedbackFolder + name + ".asset";
+            if (AssetDatabase.LoadAssetAtPath<T>(path) != null)
+            {
+                return false;
+            }
+
+            T feedback = ScriptableObject.CreateInstance<T>();
+            Create(feedback, path);
+            return profile.MapIfMissing(type, feedback);
         }
 
         // A dark rounded tray; each die is a white diamond (a d8 seen from above) with its value, then the total.
