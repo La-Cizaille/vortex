@@ -47,6 +47,12 @@ namespace Vortex.ContentTool
                 Line(sb);
                 Quote(sb, e.Text);
                 Line(sb, "**Arbitrage** : " + Render(e.Ruling));
+                if (e.Flavor != null)
+                {
+                    Line(sb);
+                    Line(sb, "*Ambiance* : " + e.Flavor);
+                }
+
                 Line(sb);
                 Line(sb, "**Effets (moteur)** : " + Effects(e.Effects));
                 Line(sb);
@@ -62,6 +68,12 @@ namespace Vortex.ContentTool
                 Line(sb);
                 Quote(sb, t.Text);
                 Line(sb, "**Arbitrage** : " + Render(t.Ruling));
+                if (t.Flavor != null)
+                {
+                    Line(sb);
+                    Line(sb, "*Ambiance* : " + t.Flavor);
+                }
+
                 Line(sb);
                 Line(sb, "**Effets (moteur)** : " + Effects(t.Effects));
                 Line(sb);
@@ -95,6 +107,12 @@ namespace Vortex.ContentTool
                 Line(sb);
                 Quote(sb, c.Text);
                 Line(sb, "**Arbitrage** : " + Render(c.Ruling));
+                if (c.Flavor != null)
+                {
+                    Line(sb);
+                    Line(sb, "*Ambiance* : " + c.Flavor);
+                }
+
                 Line(sb);
                 Line(sb, "**Effets (moteur)** : " + Effects(c.Effects));
                 Line(sb);

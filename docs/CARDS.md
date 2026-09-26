@@ -714,7 +714,7 @@
 
 ## Technologies (combos)
 
-### TECH_BLUE — Ordre
+### TECH_BLUE — Légion de l'Ordre
 
 `Bleu`
 
@@ -724,7 +724,7 @@
 
 **Effets (moteur)** : [`RedirectAttacksUntilNextTurn`](BRICKS.md#redirectattacksuntilnextturn)
 
-### TECH_YELLOW — Casino Cosmique
+### TECH_YELLOW — La Maison
 
 `Jaune`
 
@@ -734,7 +734,7 @@
 
 **Effets (moteur)** : [`ExtraCrewActionsThisTurn(amount=1)`](BRICKS.md#extracrewactionsthisturn)
 
-### TECH_RED — Rebelles
+### TECH_RED — Front Syndical des Mutins
 
 `Rouge`
 
@@ -744,7 +744,7 @@
 
 **Effets (moteur)** : [`GainOvercharge(amount=1)`](BRICKS.md#gainovercharge) · [`NextOverchargedAttackAdvantage`](BRICKS.md#nextoverchargedattackadvantage)
 
-### TECH_GREEN — Abomination organique
+### TECH_GREEN — Adeptes de la Corruption
 
 `Vert`
 

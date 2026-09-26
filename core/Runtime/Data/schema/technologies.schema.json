@@ -57,6 +57,13 @@
             "minLength": 1,
             "maxLength": 600
           },
+          "flavor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "^[^<>]*$",
+            "description": "Texte d'ambiance facultatif, sous le texte de règle (ARB-95). Texte brut, sans balise ; n'énonce jamais une règle."
+          },
           "ruling": {
             "type": "string",
             "minLength": 1,

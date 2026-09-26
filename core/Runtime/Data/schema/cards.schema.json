@@ -89,6 +89,13 @@
           "maxLength": 600,
           "description": "Texte imprimé. Icônes : <ATQ> <BOU> <MOD> <TOR> <SUR> <MKT> <DIC>. **gras** autorisé."
         },
+        "flavor": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "^[^<>]*$",
+          "description": "Texte d'ambiance facultatif, sous le texte de règle (ARB-95). Texte brut, sans balise ; n'énonce jamais une règle."
+        },
         "ruling": {
           "type": "string",
           "minLength": 1,
