@@ -57,6 +57,9 @@ namespace Vortex.Client.Presentation
             return Remark(key, always: Always.Contains(key));
         }
 
+        /// <summary>Her line on a fallen captain's epitaph, or null.</summary>
+        public string? RemarkOnEpitaph() => Remark(TextKeys.QuipEpitaph, always: true);
+
         /// <summary>Her remark for the announcement of a turn, or null.</summary>
         public string? RemarkOnTurn() => Remark(TextKeys.Quip(GameEventType.TurnStarted), always: true);
 

@@ -15,6 +15,7 @@ namespace Vortex.Client.Menus
     /// </summary>
     public sealed class MainMenu : MonoBehaviour
     {
+        [SerializeField] private TMPro.TMP_Text? tagline;
         [SerializeField] private GameContent content = null!;
         [SerializeField] private ThemeSettings theme = null!;
         [SerializeField] private TextTable texts = null!;
@@ -49,6 +50,10 @@ namespace Vortex.Client.Menus
             view.backgroundColor = theme.Background;
             title.richText = false;
             title.text = texts.Get(TextKeys.MenuTitle);
+            if (tagline != null)
+            {
+                tagline.text = texts.Get(TextKeys.MenuTagline);
+            }
             MenuButtons.Label(localGame, texts.Get(TextKeys.MenuLocalGame));
             MenuButtons.Label(findGame, texts.Get(TextKeys.MenuFindGame));
             MenuButtons.Label(options, texts.Get(TextKeys.MenuOptions));
@@ -117,5 +122,8 @@ namespace Vortex.Client.Menus
         }
 
         private void Start() => Setup(MatchLauncher.Launch);
+
+        /// <summary>Wires the tagline under the title (editor setup).</summary>
+        public void AssignTagline(TMPro.TMP_Text line) => tagline = line;
     }
 }

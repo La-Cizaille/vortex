@@ -59,5 +59,13 @@ namespace Vortex.Tests.EditMode
                 Assert.That(said[i], Is.Not.EqualTo(said[i - 1]));
             }
         }
+
+        [Test]
+        public void She_adds_a_line_to_every_epitaph_when_she_speaks()
+        {
+            var narrator = new Narrator(Texts, speaks: true, () => 0.5f);
+            Assert.That(Texts.Get(TextKeys.QuipEpitaph).Split(Narrator.Separator), Has.Member(narrator.RemarkOnEpitaph()));
+            Assert.That(new Narrator(Texts, speaks: false, () => 0.5f).RemarkOnEpitaph(), Is.Null);
+        }
     }
 }
