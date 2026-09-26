@@ -40,6 +40,7 @@ Validés par le game designer (ARB-40), puis recentrés sur le **mode standard �
 | **2.4** | Fréquence des événements (une par manche, toutes les 2 ou 3 manches) et effet de chaque événement (ARB-46) | Reportée : après les premières parties réelles (ARB-58) |
 | **2.5** | Élection galactique à 3 technologies au lieu de 4 (ARB-47) | **Adoptée** : 3 technologies (ARB-51). Fréquence de l'Élection à revoir avec 2.2 |
 | **3** | Revue des cartes : tri, ajustement par famille, cartes de hasard, équilibre des couleurs. Outil visuel à construire au début de l'étape (ARB-48) | Après le prototype (ARB-58) |
+| **Pistes** | Après les playtests (ARB-103 à ARB-108) : Régénération parasitaire, Nouvel arrivage à marchés élargis, événement « Avis de recherche » à mesurer ; cartes « Remorquage » et « Pacte de non-agression » à explorer ; combo laissé ouvert | Conçues : [dossier](pistes-apres-playtests.md). En attente du moteur (session principale) |
 | **4** | Validation humaine sur un prototype Unity (ARB-49) | **En cours** : le prototype est complet (M4 terminé, ARB-58) ; restent les parties réelles |
 
 ## Outils
