@@ -4,7 +4,7 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Non publié]
 ### Ajouté
-- **Panneaux allégés** (ARB-99, ARB-100) : panneaux arrondis, fond sombre à peine présent, bord presque invisible, sans rivets ni métal brossé ; plus de cadre autour du bandeau de manche ; le tour en cours est un contour arrondi doré.
+- **Panneaux allégés** (ARB-99, ARB-100) : panneaux arrondis, fond sombre à peine présent, bord presque invisible, sans rivets ni métal brossé ; plus de cadre autour du bandeau de manche ; le tour en cours est un contour arrondi doré. PV et bouclier des adversaires sur un radar pirate (ARB-102) : lueur, barre de balayage, brèves perturbations (`RadarScreen`).
 - **Direction artistique, lot 2 : la table** :
   - surfaces générées (`ThemeSprites`) : plaque de métal noirci rivetée, écran de terminal, bandes de danger ; une image du même nom les remplace ;
   - panneaux des adversaires en plaques de métal : nom au pochoir, PV et bouclier sur un écran de terminal (« > PV: 23 ») ;
