@@ -368,6 +368,16 @@ namespace Vortex.Client.Content
         /// </summary>
         public static string Log(GameEventType type) => "log." + type;
 
+        /// <summary>
+        /// The narrator's remarks on an event type (docs/DIRECTION_ARTISTIQUE.md 5.4): variants separated by '|', one
+        /// picked at a time (<see cref="Presentation.Narrator"/>). No text, or an empty one: she keeps quiet. A remark never
+        /// names a card nor states a rule.
+        /// </summary>
+        public static string Quip(GameEventType type) => "sinistra." + type;
+
+        /// <summary>The narrator's remarks on an attack that did no damage.</summary>
+        public const string QuipMissed = "sinistra.AttackMissed";
+
         /// <summary>Name of a status kind (engine id).</summary>
         public static string Status(string kind) => "status." + kind;
 
@@ -620,6 +630,20 @@ namespace Vortex.Client.Content
             Add(Option("overcharge"), "Surcharge");
             Add(Option("posture"), "Posture défensive");
 
+            Add(Quip(GameEventType.TurnStarted), "Votre contrat expire à votre décès. Probablement bientôt.|Les formulaires de réclamation sont à votre gauche. Personne ne les lit.|Nous avons calculé vos chances. Nous ne les communiquons pas.|Respirez tant que l'air est encore couvert.");
+            Add(Quip(GameEventType.AttackResolved), "Franchise non applicable.|Dommages constatés. Responsabilité déclinée.|L'équipage concerné est prié de ne pas saigner sur les documents.|Sinistre enregistré. Délai de traitement : jamais.|Ce n'était pas couvert. Rien ne l'est.");
+            Add(Quip(GameEventType.CriticalHit), "Nos experts parlent de perte totale.|Impact critique. Les survivants seront facturés.|Pièces manquantes, membres d'équipage aussi. Non déclarés.");
+            Add(Quip(GameEventType.PlayerEliminated), "Dossier classé. Condoléances facturées séparément.|L'épave est saisie au titre des arriérés.|Décès constaté. Aucun bénéficiaire désigné.|Un capitaine de moins. Les primes des autres ne baissent pas.");
+            Add(Quip(GameEventType.MarketRecycled), "Le vendeur n'a pas survécu à la négociation.|Stock renouvelé. Provenance : ne demandez pas.|Tout part au rebut. Comme le reste du secteur.");
+            Add(Quip(GameEventType.MarketCardTaken), "Garantie : aucune. Remboursement : jamais.|Pièce d'occasion. L'ancien propriétaire n'en a plus besoin.|Achat enregistré. Le reçu est une menace.");
+            Add(Quip(GameEventType.CardStolen), "Transfert de propriété non déclaré. Nous prenons note.|Vol constaté. Couverture : inexistante.");
+            Add(Quip(GameEventType.TechnologyActivated), "Pacte conclu. Lisez les petites lignes. Trop tard.|Une faction de plus dans votre poche. Ou l'inverse.|Soutien acquis. Il se retournera au premier sang.");
+            Add(Quip(GameEventType.EventRevealed), "Conditions du secteur modifiées. Votre contrat, lui, ne change pas.|Nouvel incident dans la Marge. Non couvert, par principe.");
+            Add(Quip(GameEventType.AttackRedirected), "Réclamation transférée à un tiers. Procédure standard.");
+            Add(Quip(GameEventType.HpGained), "Réparations de fortune. Nous ne garantissons pas les soudures.|Coque rafistolée. L'échéance est seulement repoussée.");
+            Add(Quip(GameEventType.TormentPlaced), "Contamination constatée. Exclusion biologique, article 9.|Les spores ne sont pas couvertes. Elles, elles vous couvrent.");
+            Add(Quip(GameEventType.GameOver), "Partie close. Le vortex conserve tous les droits.|Fin de l'exercice. Aucun survivant n'est indemnisé.|Le secteur a un vainqueur. Le vortex, lui, a de l'appétit.");
+            Add(QuipMissed, "Aucun dommage. Nous sommes presque déçus.|Tir sans conséquence. Le dossier reste ouvert.|Le bouclier a tenu. Nous augmentons votre prime.");
             Add(Log(GameEventType.GameStarted), "Nouvelle partie à {2} joueurs.");
             Add(Log(GameEventType.InitiativeRolled), "{0} lance l'initiative : {3}.");
             Add(Log(GameEventType.InitiativeWon), "{0} gagne l'initiative.");
