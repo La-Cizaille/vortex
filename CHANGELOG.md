@@ -4,6 +4,7 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Non publié]
 ### Ajouté
+- **La carte devient un module** (lot B1 de l'atelier Blender, ARB-96, ARB-97, bible §6.5 bis). `tools/blender/build_card.py` construit le module de la planche v3 (896 triangles) : boîtier d'acier noirci vissé, poignée, connecteur à broches en laiton, plaque sombre du nom avec l'étiquette ambre de l'emplacement, écran serti de l'illustration, terminal sombre de la règle, rangée d'état (voyant et diodes de faction, usage près du fusible, identifiant), grille d'aération. Une texture peinte à la disposition de la face porte les couleurs, l'usure aux arêtes, la rouille et les lignes du terminal. Mêmes zones et mêmes matériaux : le jeu le prend sans code ; l'encre des cartes passe en os clair (`CardInk`), les faces qui portent du texte ne reflètent plus rien, et le dos prend la taille du boîtier (`Zone_Dos`).
 - **Direction artistique, lot 2 : la table** :
   - surfaces générées (`ThemeSprites`) : plaque de métal noirci rivetée, écran de terminal, bandes de danger ; une image du même nom les remplace ;
   - panneaux des adversaires en plaques de métal : nom au pochoir, PV et bouclier sur un écran de terminal (« > PV: 23 ») ;
