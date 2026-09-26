@@ -411,7 +411,7 @@ namespace Vortex.Tests.EditMode
             var stage = new Stage(ship, null, motion) { ViewCamera = camera };
 
             ScriptableObject.CreateInstance<VictoryFeedback>().Play(new GameEvent { Type = GameEventType.GameOver, Player = 0, Value = (int)Vortex.Core.State.WinCondition.GalacticElection }, stage);
-            Assert.That(Object.FindObjectsByType<PlaceholderEffect>().Any(e => e.name == "Pluie d'or"), Is.True, "The Election rains gold.");
+            Assert.That(Object.FindObjectsByType<PlaceholderEffect>().Any(e => e.name == "Tracts"), Is.True, "The elected is buried under leaflets.");
             CameraOrbit orbit = camera.GetComponent<CameraOrbit>();
             orbit.Tick(5f);
             Assert.That(Vector3.Dot(camera.transform.forward, (ship.position - camera.transform.position).normalized), Is.GreaterThan(0.99f), "Looking at the winner.");

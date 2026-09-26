@@ -79,12 +79,49 @@ namespace Vortex.Client.Presentation
             _settle = Mathf.Max(0f, seconds);
             _settleTime = 0f;
             Value = value;
+            Light(value);
             if (_settle <= 0f)
             {
                 transform.rotation = _to;
             }
 
             return true;
+        }
+
+        /// <summary>Name of the die's light (the casino die of the art direction): lit when the highest face comes up.</summary>
+        public const string LightName = "Voyant";
+
+        private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+        private static readonly int EmissionColorId = Shader.PropertyToID("_EmissionColor");
+
+        /// <summary>True while the die's light is on (tests).</summary>
+        public bool Lit { get; private set; }
+
+        // The light goes on for the highest face the die has (a critical), off for any other.
+        private void Light(int value)
+        {
+            Transform? bulb = FaceMarker(LightName);
+            if (bulb == null || !bulb.TryGetComponent(out Renderer renderer))
+            {
+                return;
+            }
+
+            int highest = 0;
+            while (FaceMarker(Vortex.Client.Theme.PlaceholderDie.FacePrefix + (highest + 1)) != null)
+            {
+                highest++;
+            }
+
+            Lit = value == highest;
+            var block = new MaterialPropertyBlock();
+            if (Lit)
+            {
+                var gold = new Color(1f, 0.72f, 0.3f);
+                block.SetColor(BaseColorId, gold);
+                block.SetColor(EmissionColorId, gold * 4f);
+            }
+
+            renderer.SetPropertyBlock(block);
         }
 
         /// <summary>True while the die leaps (tests).</summary>
