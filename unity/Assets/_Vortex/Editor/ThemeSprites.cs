@@ -5,8 +5,8 @@ using UnityEngine;
 namespace Vortex.Editor
 {
     /// <summary>
-    /// The interface's generated surfaces (docs/DIRECTION_ARTISTIQUE.md 6.4, lot 2): a light riveted frame over a
-    /// translucent dark fill for what is on board, a terminal screen for the figures, hazard stripes for alerts. They are placeholders in the
+    /// The interface's generated surfaces (docs/DIRECTION_ARTISTIQUE.md 6.4, lot 2): a soft rounded panel for what
+    /// is on board, a rounded outline for the seat whose turn it is, a terminal screen for the figures, hazard stripes for alerts. They are placeholders in the
     /// sense of the project: a designer's image with the same name replaces them. Each is drawn once, never overwritten:
     /// delete one to redraw it.
     /// </summary>
@@ -21,17 +21,24 @@ namespace Vortex.Editor
         /// <summary>Terminal screen, nine-sliced.</summary>
         public const string ScreenPath = Folder + "/Ecran.png";
 
+        /// <summary>Rounded outline, nine-sliced: the frame of the seat whose turn it is.</summary>
+        public const string OutlinePath = Folder + "/Contour.png";
+
         /// <summary>Hazard stripes, tiled.</summary>
         public const string HazardPath = Folder + "/Danger.png";
 
         private const int PlateSize = 128;
-        private const int PlateBorder = 26;
+        private const int PlateBorder = 24;
+        private const float Radius = 16f;
         private const int ScreenSize = 64;
         private const int ScreenBorder = 10;
         private const int HazardSize = 64;
 
         /// <summary>The riveted plate.</summary>
         public static Sprite Plate => AssetDatabase.LoadAssetAtPath<Sprite>(PlatePath);
+
+        /// <summary>The rounded outline.</summary>
+        public static Sprite Outline => AssetDatabase.LoadAssetAtPath<Sprite>(OutlinePath);
 
         /// <summary>The terminal screen.</summary>
         public static Sprite Screen => AssetDatabase.LoadAssetAtPath<Sprite>(ScreenPath);
@@ -43,6 +50,7 @@ namespace Vortex.Editor
         public static void Ensure()
         {
             Draw(PlatePath, DrawPlate(), PlateBorder, tiled: false);
+            Draw(OutlinePath, DrawOutline(), PlateBorder, tiled: false);
             Draw(ScreenPath, DrawScreen(), ScreenBorder, tiled: false);
             Draw(HazardPath, DrawHazard(), 0, tiled: true);
         }
@@ -75,49 +83,53 @@ namespace Vortex.Editor
             Debug.Log("Created " + path);
         }
 
-        // A light frame (playtest of lot 2: the brushed, opaque plates were heavy): a translucent dark fill that lets the
-        // table show through, a thin steel rim, and a small rivet in each corner. No texture: it tints cleanly.
+        // A soft panel (ARB-100): rounded corners, a faint dark fill, a hairline edge barely there. It frames without
+        // weighing: the table shows through, and what matters is the text and the figures on it.
         private static Texture2D DrawPlate()
         {
             var texture = new Texture2D(PlateSize, PlateSize, TextureFormat.RGBA32, false);
-            var fill = new Color(0.055f, 0.06f, 0.068f, 0.62f);
-            var rim = new Color(0.42f, 0.44f, 0.47f, 0.95f);
-            var shade = new Color(0.02f, 0.02f, 0.025f, 0.8f);
             for (int y = 0; y < PlateSize; y++)
             {
                 for (int x = 0; x < PlateSize; x++)
                 {
-                    int edge = Mathf.Min(Mathf.Min(x, y), Mathf.Min(PlateSize - 1 - x, PlateSize - 1 - y));
-                    texture.SetPixel(x, y, edge < 2 ? rim : edge < 3 ? shade : fill);
+                    float d = RoundedDistance(x, y, PlateSize, Radius);
+                    float inside = Mathf.Clamp01(0.5f - d);
+                    float edge = Mathf.Clamp01(1f - Mathf.Abs(d + 0.5f));
+                    var fill = new Color(0.055f, 0.06f, 0.07f, 0.5f * inside);
+                    texture.SetPixel(x, y, Color.Lerp(fill, new Color(0.7f, 0.72f, 0.76f, 0.14f), edge * 0.8f));
                 }
-            }
-
-            foreach (Vector2Int corner in new[] { new Vector2Int(9, 9), new Vector2Int(PlateSize - 10, 9), new Vector2Int(9, PlateSize - 10), new Vector2Int(PlateSize - 10, PlateSize - 10) })
-            {
-                Rivet(texture, corner);
             }
 
             texture.Apply();
             return texture;
         }
 
-        private static void Rivet(Texture2D texture, Vector2Int centre)
+        // A rounded outline, 3 px, white: the frame of the seat whose turn it is, tinted by the game.
+        private static Texture2D DrawOutline()
         {
-            for (int y = -5; y <= 5; y++)
+            var texture = new Texture2D(PlateSize, PlateSize, TextureFormat.RGBA32, false);
+            for (int y = 0; y < PlateSize; y++)
             {
-                for (int x = -5; x <= 5; x++)
+                for (int x = 0; x < PlateSize; x++)
                 {
-                    float d = Mathf.Sqrt((x * x) + (y * y));
-                    if (d > 2.8f)
-                    {
-                        continue;
-                    }
-
-                    // Small domed head: lit at the top left, a dark ring around it.
-                    float v = d > 2f ? 0.08f : 0.5f + (0.04f * (y - x));
-                    texture.SetPixel(centre.x + x, centre.y + y, new Color(v, v, v * 1.03f, 1f));
+                    float d = RoundedDistance(x, y, PlateSize, Radius);
+                    float alpha = Mathf.Clamp01(1.5f - Mathf.Abs(d + 1.5f));
+                    texture.SetPixel(x, y, new Color(1f, 1f, 1f, alpha));
                 }
             }
+
+            texture.Apply();
+            return texture;
+        }
+
+        // Signed distance, in pixels, from the pixel centre to the edge of a rounded square (negative inside).
+        private static float RoundedDistance(int x, int y, int size, float radius)
+        {
+            float half = size / 2f;
+            float px = Mathf.Abs(x + 0.5f - half) - (half - radius);
+            float py = Mathf.Abs(y + 0.5f - half) - (half - radius);
+            float outside = new Vector2(Mathf.Max(px, 0f), Mathf.Max(py, 0f)).magnitude;
+            return outside + Mathf.Min(Mathf.Max(px, py), 0f) - radius;
         }
 
         // A dark green screen with a thin frame and scan lines.

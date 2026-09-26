@@ -80,7 +80,7 @@ namespace Vortex.Editor
         /// <summary>Bone: the light text on blackened metal (docs/DIRECTION_ARTISTIQUE.md 6.1).</summary>
         public static readonly Color Bone = new Color32(207, 196, 168, 255);
 
-        /// <summary>A plate of blackened metal (ThemeSprites), nine-sliced, tinted; the rounded box while it is not drawn.</summary>
+        /// <summary>A soft rounded panel (ThemeSprites), nine-sliced, tinted; the rounded box while it is not drawn.</summary>
         public static Image Plate(Image image, Color tint, bool receivesPointer = false)
         {
             Sprite plate = ThemeSprites.Plate;
@@ -88,6 +88,17 @@ namespace Vortex.Editor
             image.type = Image.Type.Sliced;
             image.color = tint;
             image.raycastTarget = receivesPointer;
+            return image;
+        }
+
+        /// <summary>A rounded outline (ThemeSprites), nine-sliced; the rounded box while it is not drawn.</summary>
+        public static Image Outline(Image image)
+        {
+            Sprite outline = ThemeSprites.Outline;
+            image.sprite = outline != null ? outline : RoundedBox;
+            image.type = Image.Type.Sliced;
+            image.color = Color.white;
+            image.raycastTarget = false;
             return image;
         }
 
@@ -123,7 +134,7 @@ namespace Vortex.Editor
             return label;
         }
 
-        /// <summary>A button: a metal plate with a centred label in bone.</summary>
+        /// <summary>A button: a soft rounded panel with a centred label in bone.</summary>
         public static (Button Button, TMP_Text Label) Button(Transform parent, string name, Vector2 anchor, Vector2 position, Vector2 size)
         {
             Image background = Plate(Fixed<Image>(parent, name, anchor, position, size), Color.white, receivesPointer: true);
