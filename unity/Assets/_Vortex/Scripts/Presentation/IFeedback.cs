@@ -1,4 +1,5 @@
 using UnityEngine;
+using Vortex.Client.Theme;
 using Vortex.Core.Events;
 
 namespace Vortex.Client.Presentation
@@ -21,6 +22,15 @@ namespace Vortex.Client.Presentation
 
         /// <summary>Playback speed (1 = normal): a feedback that animates by itself runs this much faster.</summary>
         float PlaybackSpeed { get; }
+
+        /// <summary>The camera of the table, or null (3D effects placed over the interface, like the dice, need it).</summary>
+        Camera? View { get; }
+
+        /// <summary>The theme of the game (seat and technology colours), or null when the scene has none.</summary>
+        ThemeSettings? Theme { get; }
+
+        /// <summary>How the ship of a seat moves (recoil, knockback), or null when the seat has no ship.</summary>
+        ShipMotion? MotionOf(int seat);
     }
 
     /// <summary>Places a feedback can target; the scene resolves them for each event.</summary>

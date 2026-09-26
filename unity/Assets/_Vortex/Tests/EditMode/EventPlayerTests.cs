@@ -16,6 +16,12 @@ namespace Vortex.Tests.EditMode
             public Transform? AnchorFor(FeedbackAnchor anchor, GameEvent gameEvent) => null;
 
             public float PlaybackSpeed => 1f;
+
+            public Vortex.Client.Theme.ThemeSettings? Theme => null;
+
+            public Camera? View => null;
+
+            public ShipMotion? MotionOf(int seat) => null;
         }
 
         private sealed class FixedFeedback : IFeedback

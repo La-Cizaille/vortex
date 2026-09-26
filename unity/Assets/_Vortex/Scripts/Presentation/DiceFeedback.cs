@@ -65,6 +65,11 @@ namespace Vortex.Client.Presentation
 
                 float speed = Mathf.Max(0.01f, stage.PlaybackSpeed);
                 DiceTray shown = Instantiate(tray, at, false);
+                if (stage.View != null)
+                {
+                    shown.UseDice3D(stage.View, stage.Theme != null ? stage.Theme.DieModel : null);
+                }
+
                 shown.Roll(values, sum, rollSeconds / speed, holdSeconds / speed);
             }
 

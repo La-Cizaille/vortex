@@ -309,6 +309,15 @@ namespace Vortex.Client.Presentation
         public float PlaybackSpeed => _player?.Speed ?? 1f;
 
         /// <inheritdoc/>
+        ThemeSettings? IFeedbackStage.Theme => theme;
+
+        /// <inheritdoc/>
+        Camera? IFeedbackStage.View => view;
+
+        /// <inheritdoc/>
+        public ShipMotion? MotionOf(int seat) => _ships.TryGetValue(seat, out Transform ship) ? ship.GetComponent<ShipMotion>() : null;
+
+        /// <inheritdoc/>
         public Transform? AnchorFor(FeedbackAnchor anchor, GameEvent gameEvent) => anchor switch
         {
             FeedbackAnchor.Player => Ship(gameEvent.Player),
@@ -676,6 +685,8 @@ namespace Vortex.Client.Presentation
                 ship.transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
             }
 
+            // Each ship sways on its own rhythm (ANIMATIONS.md §2): the phase follows the seat.
+            ShipMotion.Attach(ship.transform, theme.ShipSwayHeight, theme.ShipSwayRoll, theme.ShipSwayPitch, theme.ShipSwaySeconds, seat * 0.37f);
             _ships[seat] = ship.transform;
             return ship.transform;
         }
@@ -728,6 +739,10 @@ namespace Vortex.Client.Presentation
             }
 
             ship.Rotate(0f, 0f, 25f, Space.Self);
+            if (ship.TryGetComponent(out ShipMotion motion))
+            {
+                motion.Wreck();
+            }
         }
 
         private static void Discard(GameObject target)

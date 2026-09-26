@@ -65,6 +65,16 @@ namespace Vortex.Client.Theme
         [Header("Animations")]
         [Tooltip("Vitesse de lecture des événements par défaut (1 = normale).")]
         [SerializeField, Min(0.25f)] private float playbackSpeed = 1f;
+        [Tooltip("Vaisseaux au repos : hauteur du balancement, en unités de la scène.")]
+        [SerializeField, Min(0f)] private float shipSwayHeight = 0.05f;
+        [Tooltip("Vaisseaux au repos : roulis, en degrés de part et d'autre.")]
+        [SerializeField, Min(0f)] private float shipSwayRoll = 2.5f;
+        [Tooltip("Vaisseaux au repos : tangage, en degrés de part et d'autre.")]
+        [SerializeField, Min(0f)] private float shipSwayPitch = 1.2f;
+        [Tooltip("Vaisseaux au repos : durée d'un balancement complet, en secondes.")]
+        [SerializeField, Min(0.1f)] private float shipSwaySeconds = 3.4f;
+        [Tooltip("Modèle du dé à 8 faces (ASSETS §2). Il porte huit repères vides Face_1 à Face_8, dont l'axe avant sort de la face. Vide : un octaèdre généré.")]
+        [SerializeField] private GameObject? dieModel;
 
         [Header("Sons")]
         [Tooltip("Tic des dernières secondes d'un tour limité. Vide : un bip généré en attendant le son définitif.")]
@@ -117,6 +127,21 @@ namespace Vortex.Client.Theme
 
         /// <summary>Default event playback speed.</summary>
         public float PlaybackSpeed => playbackSpeed;
+
+        /// <summary>Height of a ship's sway at rest, in scene units.</summary>
+        public float ShipSwayHeight => shipSwayHeight;
+
+        /// <summary>Roll of a ship's sway at rest, in degrees each way.</summary>
+        public float ShipSwayRoll => shipSwayRoll;
+
+        /// <summary>Pitch of a ship's sway at rest, in degrees each way.</summary>
+        public float ShipSwayPitch => shipSwayPitch;
+
+        /// <summary>Duration of a full sway, in seconds.</summary>
+        public float ShipSwaySeconds => shipSwaySeconds;
+
+        /// <summary>The d8 model with its Face_1 to Face_8 markers, or null for the generated one.</summary>
+        public GameObject? DieModel => dieModel;
 
         /// <summary>Tick of the last seconds of a timed turn, or null for the generated placeholder (ARB-80).</summary>
         public AudioClip? TimerTick => timerTick;

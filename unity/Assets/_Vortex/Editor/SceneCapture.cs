@@ -271,6 +271,11 @@ namespace Vortex.Editor
                     card.Place();
                 }
 
+                foreach (DieSpinner die in Object.FindObjectsByType<DieSpinner>())
+                {
+                    die.Place();
+                }
+
                 camera.Render();
             }
         }
