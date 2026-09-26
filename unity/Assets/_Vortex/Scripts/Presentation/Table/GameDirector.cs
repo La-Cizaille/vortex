@@ -431,8 +431,26 @@ namespace Vortex.Client.Presentation
 
             _outcomeShown = true;
             banner.Show(_model);
-            gameOver.Show(banner.OutcomeText);
+            gameOver.Show(banner.OutcomeText, Verdict(_model), Epitaphs(_model));
         }
+
+        // The stamp of the end poster: the last ship standing is wanted, the elected is elected, a draw closes the file.
+        private string Verdict(TableModel model) => texts.Get(model.Outcome?.Condition switch
+        {
+            WinCondition.Domination => TextKeys.GameOverWanted,
+            WinCondition.GalacticElection => TextKeys.GameOverElected,
+            _ => TextKeys.GameOverClosed,
+        });
+
+        // One epitaph per fallen captain: "Ci-gît ..." and, when the narrator speaks, one of her lines.
+        private string Epitaphs(TableModel model) => string.Join("\n", model.Seats
+            .Where(s => s.Eliminated)
+            .Select(s =>
+            {
+                string line = string.Format(CultureInfo.InvariantCulture, texts.Get(TextKeys.EpitaphOf), s.Name);
+                string? remark = _narrator?.RemarkOnEpitaph();
+                return remark is null ? line : line + " " + remark;
+            }));
 
         // Several people on this device: the view turns to the person whose turn starts (INTERFACE.md 4). A decision asked
         // of another person, or a bot's turn, never moves it.

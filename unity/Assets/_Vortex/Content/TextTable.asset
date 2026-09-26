@@ -118,7 +118,7 @@ MonoBehaviour:
   - Key: log.OverchargeChanged
     Text: 'Surcharge de {0} : {3}.'
   - Key: log.TormentPlaced
-    Text: "Jeton de Tourment pos\xE9 (carte de {0})."
+    Text: "Jeton de Tourment pos\xE9 sur {4}."
   - Key: log.TormentsRemoved
     Text: "{2} jetons de Tourment retir\xE9s (cartes de {0})."
   - Key: log.StatusAdded
@@ -380,7 +380,7 @@ MonoBehaviour:
   - Key: menu.back
     Text: Retour
   - Key: local.title
-    Text: Partie locale
+    Text: Registre des contrats
   - Key: local.players
     Text: 'Joueurs : {0}'
   - Key: local.launch
@@ -414,7 +414,7 @@ MonoBehaviour:
   - Key: common.no
     Text: non
   - Key: options.title
-    Text: Options
+    Text: Notice technique
   - Key: options.speed
     Text: "Vitesse des animations : \xD7{0}"
   - Key: options.full-screen
@@ -557,3 +557,15 @@ MonoBehaviour:
     Text: "Partie close. Le vortex conserve tous les droits.|Fin de l'exercice. Aucun survivant n'est indemnis\xE9.|Le secteur a un vainqueur. Le vortex, lui, a de l'app\xE9tit."
   - Key: sinistra.AttackMissed
     Text: "Aucun dommage. Nous sommes presque d\xE9\xE7us.|Tir sans cons\xE9quence. Le dossier reste ouvert.|Le bouclier a tenu. Nous augmentons votre prime."
+  - Key: game-over.wanted
+    Text: "RECHERCH\xC9"
+  - Key: game-over.elected
+    Text: "\xC9LU"
+  - Key: game-over.closed
+    Text: "DOSSIER CLASS\xC9"
+  - Key: game-over.epitaph
+    Text: "Ci-g\xEEt {0}."
+  - Key: sinistra.Epitaph
+    Text: "Il avait un bouclier et des principes. Il n'a plus ni l'un ni l'autre.|Mort en service. Le service n'a rien remarqu\xE9.|Aucune famille \xE0 pr\xE9venir. Nous avons v\xE9rifi\xE9, par \xE9conomie.|Sa dette lui survit. Elle est en meilleure sant\xE9.|Parti comme il a v\xE9cu : sans couverture."
+  - Key: menu.tagline
+    Text: Le dernier grand casse avant la fin des temps.

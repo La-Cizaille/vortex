@@ -2,7 +2,9 @@ using System.Linq;
 using NUnit.Framework;
 using TMPro;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using Vortex.Client.Menus;
 using Vortex.Client.Content;
 using Vortex.Client.Presentation;
 using Vortex.Client.Theme;
@@ -73,6 +75,23 @@ namespace Vortex.Tests.EditMode
             finally
             {
                 Object.DestroyImmediate(panel);
+            }
+        }
+
+        [Test]
+        public void The_end_of_a_game_is_a_poster_with_its_stamp_and_the_epitaphs_of_the_fallen()
+        {
+            try
+            {
+                EditorSceneManager.OpenScene(GameScene.ScenePath, OpenSceneMode.Single);
+                GameOverPanel panel = Object.FindAnyObjectByType<GameOverPanel>(FindObjectsInactive.Include);
+                panel.Show("Victoire de Vous : Domination", "RECHERCHÉ", "Ci-gît Bot.");
+                Assert.That(panel.Poster, Is.EqualTo(("RECHERCHÉ", "Ci-gît Bot.")));
+                Assert.That(panel.Text, Is.EqualTo("Victoire de Vous : Domination"));
+            }
+            finally
+            {
+                EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             }
         }
     }

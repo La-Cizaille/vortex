@@ -1,7 +1,9 @@
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using Vortex.Client.Menus;
+using Vortex.Client.Theme;
 
 namespace Vortex.Editor
 {
@@ -15,16 +17,26 @@ namespace Vortex.Editor
         public static readonly Color WindowColor = new Color(0.04f, 0.05f, 0.1f, 0.95f);
 
         /// <summary>Background of the text fields.</summary>
-        public static readonly Color FieldColor = new Color(1f, 1f, 1f, 0.08f);
+        public static readonly Color FieldColor = new Color(0.08f, 0.07f, 0.06f, 0.12f);
 
         /// <summary>Hints and secondary texts.</summary>
         public static readonly Color Muted = new Color32(150, 156, 175, 255);
+
+        /// <summary>The theme, for its fonts (editor setup).</summary>
+        public static ThemeSettings Theme => AssetDatabase.LoadAssetAtPath<ThemeSettings>(ThemeAssets.ThemePath);
+
+        /// <summary>A label in ink, for the paper windows.</summary>
+        public static TMP_Text Inked(TMP_Text label)
+        {
+            label.color = UiBuilder.Ink;
+            return label;
+        }
 
         /// <summary>A screen-wide veil that takes the pointer: what is behind it cannot be touched.</summary>
         public static Image Veil(Transform parent, string name)
         {
             Image veil = UiBuilder.Part<Image>(parent, name, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
-            veil.color = new Color(0f, 0f, 0f, 0.6f);
+            veil.color = new Color(0f, 0f, 0f, 0.72f);
             veil.raycastTarget = true;
             return veil;
         }
@@ -32,7 +44,8 @@ namespace Vortex.Editor
         /// <summary>A window whose parts stack in a column, centred on its anchor; its height follows its content.</summary>
         public static Image Window(Transform parent, string name, Vector2 anchor, Vector2 position, float width)
         {
-            Image window = UiBuilder.Box(UiBuilder.Fixed<Image>(parent, name, anchor, position, new Vector2(width, 100f)), WindowColor, receivesPointer: true);
+            // A poster on the wall of the sector (docs/DIRECTION_ARTISTIQUE.md 6.5): ink on yellowed paper.
+            Image window = UiBuilder.Paper(UiBuilder.Fixed<Image>(parent, name, anchor, position, new Vector2(width, 100f)), receivesPointer: true);
             window.rectTransform.pivot = new Vector2(0.5f, 0.5f);
             VerticalLayoutGroup column = window.gameObject.AddComponent<VerticalLayoutGroup>();
             column.padding = new RectOffset(32, 32, 28, 28);
@@ -49,7 +62,9 @@ namespace Vortex.Editor
         /// <summary>A title line of a window.</summary>
         public static TMP_Text Title(Transform window, float size)
         {
-            TMP_Text title = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(window, "Titre", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), size, FontStyles.Bold, TextAlignmentOptions.Center);
+            TMP_Text title = UiBuilder.Font(UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(window, "Titre", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), size, FontStyles.Normal, TextAlignmentOptions.Center), Theme.TitleFont);
+            title.color = UiBuilder.Blood;
+            title.characterSpacing = 2f;
             Height(title.gameObject, size * 1.6f);
             return title;
         }
@@ -58,6 +73,7 @@ namespace Vortex.Editor
         public static TMP_Text Line(Transform window, string name, float size)
         {
             TMP_Text line = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(window, name, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), size, FontStyles.Normal, TextAlignmentOptions.Center);
+            line.color = UiBuilder.Ink;
             Height(line.gameObject, size * 1.6f);
             return line;
         }
@@ -66,6 +82,10 @@ namespace Vortex.Editor
         public static Button Button(Transform parent, string name, float height, float width = -1f, float fontSize = 24f)
         {
             (Button button, TMP_Text label) = UiBuilder.Button(parent, name, Vector2.zero, Vector2.zero, new Vector2(width > 0f ? width : 100f, height));
+            // On the paper windows: a solid ink button, the label in bone (lot 4).
+            Image background = button.GetComponent<Image>();
+            background.sprite = UiBuilder.RoundedBox;
+            background.color = new Color(0.1f, 0.095f, 0.09f, 1f);
             label.fontSize = fontSize;
             label.enableAutoSizing = true;
             label.fontSizeMin = 12f;
@@ -104,8 +124,9 @@ namespace Vortex.Editor
             RectTransform area = UiBuilder.Part<RectTransform>(background.transform, "Zone de texte", Vector2.zero, Vector2.one, new Vector2(14f, 6f), new Vector2(-14f, -6f));
             area.gameObject.AddComponent<RectMask2D>();
             TMP_Text hint = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(area, "Indication", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), 22f, FontStyles.Italic, TextAlignmentOptions.Left);
-            hint.color = Muted;
+            hint.color = new Color(UiBuilder.Ink.r, UiBuilder.Ink.g, UiBuilder.Ink.b, 0.45f);
             TMP_Text text = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(area, "Texte", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), 22f, FontStyles.Normal, TextAlignmentOptions.Left);
+            text.color = UiBuilder.Ink;
             TMP_InputField field = background.gameObject.AddComponent<TMP_InputField>();
             field.targetGraphic = background;
             field.textViewport = area;

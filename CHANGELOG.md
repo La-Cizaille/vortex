@@ -4,6 +4,7 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Non publié]
 ### Ajouté
+- **Direction artistique, lot 4 : les menus en affiches** (bible §6.5) : les fenêtres deviennent des affiches (papier jauni aux bords déchirés, `Affiche.png`), titres en Anton couleur sang, texte à l'encre, boutons pleins à l'encre ; accueil en mur d'affiches, bandeau de sang « VORTEX » et accroche ; partie locale en « Registre des contrats », options en « Notice technique » ; fin de partie en affiche tamponnée (« RECHERCHÉ », « ÉLU » ou « DOSSIER CLASSÉ ») avec l'épitaphe de chaque capitaine tombé, suivie d'une ligne de SINISTRA (`sinistra.Epitaph`) ; tests dans `ArtDirectionTests` et `NarratorTests`.
 - **La table dans la direction artistique** (lot B3 de l'atelier Blender, bible §2.3, §2.4, §4, §6.3 à §6.5 bis) :
   - **cockpit refait** : acier noirci et verni aux arêtes écaillées, rouille qui coule, crasse, rivets ; **baies** au cadre peint à la couleur du siège, avec une prise à broches qui reçoit le connecteur du module ; faisceau de câbles, conduit blindé, vanne à volant, poignées ; plaque de surcharge à bandes de danger ; marquages au pochoir. Mêmes pièces nommées : le jeu n'a rien à changer. Les pièces fixes sont fusionnées : 14 objets au lieu d'une soixantaine ;
   - **dé de casino de la Maison** (`build_die.py`) : laque noire, chiffres gravés à l'or terni, arêtes en laiton, voyant sous le 8 ; il remplace l'octaèdre provisoire ;
@@ -147,6 +148,7 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 - Le rapport d'équilibrage identifie le contenu par l'empreinte des quatre fichiers de contenu, et non plus du seul `cards.json`. L'option `--samples` est remplacée par `--bot`.
 
 ### Corrigé
+- Journal : « Jeton de Tourment posé (carte de —) » pour un jeton posé sur une carte des marchés ; la ligne nomme maintenant la carte (« Jeton de Tourment posé sur … »).
 - **Surcharge** (ARB-91) : le jeton armé est désarmé dès qu'une commande part, et le levier du cockpit redescend de lui-même ; il restait armé après une attaque surchargée. Test `An_armed_overcharge_is_disarmed_once_the_action_is_sent`.
 - **Captures** : le cockpit est replacé et posé au repos avant la prise de vue (`SceneCapture`).
 - « Ni vu ni connu » (et toute décision qui propose son propre vaisseau) : sa propre fiche ne recevait pas le toucher. Ses chiffres reçoivent maintenant le pointeur.

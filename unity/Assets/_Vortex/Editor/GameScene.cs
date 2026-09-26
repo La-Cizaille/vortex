@@ -281,15 +281,30 @@ namespace Vortex.Editor
         {
             Image veil = MenuBuilder.Veil(parent, "Fin de partie");
             veil.color = new Color(0f, 0f, 0f, 0.35f);
-            Image window = MenuBuilder.Window(veil.transform, "Fenêtre", new Vector2(0.5f, 0.5f), new Vector2(0f, -40f), 760f);
-            TMP_Text outcome = MenuBuilder.Line(window.transform, "Résultat", 40f);
+            // A poster (docs/DIRECTION_ARTISTIQUE.md 6.5): the verdict stencilled in a stamp, how the game ended, the
+            // epitaphs of the others, then the buttons.
+            Image window = MenuBuilder.Window(veil.transform, "Fenêtre", new Vector2(0.5f, 0.5f), new Vector2(0f, -20f), 760f);
+            Image stamp = UiBuilder.Outline(UiBuilder.Part<Image>(window.transform, "Tampon", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero));
+            stamp.color = UiBuilder.Blood;
+            stamp.pixelsPerUnitMultiplier = 0.4f;
+            stamp.gameObject.AddComponent<LayoutElement>().preferredHeight = 130f;
+            TMP_Text verdict = UiBuilder.Font(UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(stamp.transform, "Verdict", Vector2.zero, Vector2.one, new Vector2(10f, 6f), new Vector2(-10f, -6f)), 96f, FontStyles.Normal, TextAlignmentOptions.Center), MenuBuilder.Theme.StencilFont);
+            verdict.color = UiBuilder.Blood;
+            verdict.enableAutoSizing = true;
+            verdict.fontSizeMin = 30f;
+            verdict.fontSizeMax = 96f;
+            TMP_Text outcome = MenuBuilder.Line(window.transform, "Résultat", 34f);
             outcome.fontStyle = FontStyles.Bold;
-            outcome.color = new Color32(255, 214, 102, 255);
+            TMP_Text epitaphs = UiBuilder.Font(MenuBuilder.Line(window.transform, "Épitaphes", 22f), MenuBuilder.Theme.EngravedFont);
+            epitaphs.fontStyle = FontStyles.Italic;
+            epitaphs.GetComponent<LayoutElement>().preferredHeight = -1f;
+            epitaphs.GetComponent<LayoutElement>().minHeight = 0f;
             HorizontalLayoutGroup buttons = MenuBuilder.Row(window.transform, "Boutons", 72f);
             Button replay = MenuBuilder.Button(buttons.transform, "Rejouer", 64f, 300f, 28f);
             Button menu = MenuBuilder.Button(buttons.transform, "Menu", 64f, 300f, 28f);
             GameOverPanel panel = veil.gameObject.AddComponent<GameOverPanel>();
             panel.Assign(veil.gameObject, outcome, replay, menu);
+            panel.AssignPoster(verdict, epitaphs);
             veil.gameObject.SetActive(false);
             return panel;
         }
@@ -545,7 +560,8 @@ namespace Vortex.Editor
             TMP_Text doom = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "Fin des temps", new Vector2(0.5f, 1f), new Vector2(0f, -76f), new Vector2(540f, 26f)), 18f, FontStyles.Normal, TextAlignmentOptions.Center);
             doom.color = theme.Amber;
             TMP_Text outcome = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "Résultat", new Vector2(0.5f, 0f), new Vector2(0f, -56f), new Vector2(1000f, 48f)), 36f, FontStyles.Bold, TextAlignmentOptions.Center);
-            outcome.color = new Color32(255, 214, 102, 255);
+            // The end poster tells the outcome now (lot 4): the banner keeps the text for it, unseen.
+            outcome.color = Color.clear;
             RoundBanner banner = root.gameObject.AddComponent<RoundBanner>();
             banner.Assign(round, roundEvent, doom, outcome);
             return banner;
