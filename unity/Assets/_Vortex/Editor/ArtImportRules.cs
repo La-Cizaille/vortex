@@ -10,7 +10,8 @@ namespace Vortex.Editor
     /// content id (<c>A_005.png</c>), gets mobile import settings and joins the card art catalog; deleting it brings the
     /// placeholder back. An image in <c>Art/Icons/</c> becomes a small sprite. A model anywhere under <c>Art/</c> gets
     /// lean import settings, and any other image there is a model texture; the card model in <c>Art/Cards3D/</c> becomes
-    /// the body of the card prefab; the die and the sky behind the table join the theme (<see cref="ThemeArtSync"/>).
+    /// the body of the card prefab; the die and the sky behind the table join the theme (<see cref="ThemeArtSync"/>), the effects' material becomes
+    /// the effect prefabs (<see cref="EffectSync"/>).
     /// Settings are applied on the first import only, so the designer can fine-tune them
     /// afterwards.
     /// </summary>
@@ -194,6 +195,11 @@ namespace Vortex.Editor
             {
                 ThemeArtSync.Sync();
             }
+
+            if (changes.Any(paths => paths.Any(p => IsIn(p, EffectSync.EffectsFolder))))
+            {
+                EffectSync.Sync();
+            }
         }
 
         private void OnPreprocessTexture()
@@ -210,6 +216,13 @@ namespace Vortex.Editor
             else if (IsIn(assetPath, IconsFolder))
             {
                 ConfigureIconTexture((TextureImporter)assetImporter);
+            }
+            else if (IsIn(assetPath, EffectSync.EffectsFolder))
+            {
+                // The effects' images: model textures whose transparent pixels keep their neighbours' colour.
+                var importer = (TextureImporter)assetImporter;
+                ConfigureModelTexture(importer, assetPath);
+                importer.alphaIsTransparency = true;
             }
             else if (IsIn(assetPath, ThemeArtSync.BackgroundsFolder))
             {

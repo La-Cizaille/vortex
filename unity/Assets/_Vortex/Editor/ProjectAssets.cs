@@ -43,6 +43,7 @@ namespace Vortex.Editor
             ThemeAssets.EnsureAll();
             EnsureDice();
             EnsureAnimations();
+            EffectSync.Sync();
             GalleryScene.Ensure();
             GameScene.Ensure();
             MenuScene.Ensure();

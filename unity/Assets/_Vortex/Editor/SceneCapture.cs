@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
@@ -137,8 +138,10 @@ namespace Vortex.Editor
 
         // The animations of the table frozen mid-way (ANIMATIONS.md §5), to judge them without playing: seat 2 aims at
         // seat 0 and fires into its shield, seat 3 powers up, seat 4 explodes, seat 5 takes a heavy hit, seat 1 gets a
-        // Torment token and the round's event sends its wave. The frame loop does not run here: effects and ships are
-        // moved on by hand, by the same amount of time.
+        // Torment token and the round's event sends its wave; seat 4 smokes and seat 2's overcharge crackles, with the
+        // theme's effects. The feedbacks are the project's own (their effect prefabs, lot B4), or fresh ones without the
+        // project's. The frame loop does not run here: effects, particles, bolts and ships are moved on by hand, by the
+        // same amount of time.
         private static void PlayEffects(GameDirector director, float seconds)
         {
             IFeedbackStage stage = director;
@@ -150,28 +153,58 @@ namespace Vortex.Editor
                 Object.DestroyImmediate(left.gameObject);
             }
 
-            var shot = new GameEvent { Type = GameEventType.AttackResolved, Player = 1 % seats, Other = 0, Value = 10, Amount = 5, Values = new System.Collections.Generic.List<int> { 5, 5, 5 } };
-            ScriptableObject.CreateInstance<AimFeedback>().Play(new GameEvent { Type = GameEventType.AttackDeclared, Player = shot.Player, Other = 0 }, stage);
-            Advance(0.6f);
-            ScriptableObject.CreateInstance<LaserFeedback>().Play(shot, stage);
-            if (seats > 2)
+            foreach (TimedRemoval left in Object.FindObjectsByType<TimedRemoval>())
             {
-                ScriptableObject.CreateInstance<ThrusterFeedback>().Play(new GameEvent { Type = GameEventType.TechnologyActivated, Player = 2, Value = (int)TechColor.Blue }, stage);
+                Object.DestroyImmediate(left.gameObject);
             }
 
-            ScriptableObject.CreateInstance<TormentFeedback>().Play(new GameEvent { Type = GameEventType.TormentPlaced, Player = 0, Value = 1 }, stage);
-            ScriptableObject.CreateInstance<EventFeedback>().Play(new GameEvent { Type = GameEventType.EventRevealed, Id = "EVT_CAPTURE" }, stage);
+            foreach (ProjectileFlight left in Object.FindObjectsByType<ProjectileFlight>())
+            {
+                Object.DestroyImmediate(left.gameObject);
+            }
+
+            var shot = new GameEvent { Type = GameEventType.AttackResolved, Player = 1 % seats, Other = 0, Value = 10, Amount = 5, Values = new System.Collections.Generic.List<int> { 5, 5, 5 } };
+            Feedback<AimFeedback>("Aim").Play(new GameEvent { Type = GameEventType.AttackDeclared, Player = shot.Player, Other = 0 }, stage);
+            Advance(0.6f);
+            Feedback<LaserFeedback>("Laser").Play(shot, stage);
+            if (seats > 2)
+            {
+                Feedback<ThrusterFeedback>("Thrusters").Play(new GameEvent { Type = GameEventType.TechnologyActivated, Player = 2, Value = (int)TechColor.Blue }, stage);
+            }
+
+            Feedback<TormentFeedback>("Torment").Play(new GameEvent { Type = GameEventType.TormentPlaced, Player = 0, Value = 1 }, stage);
+            Feedback<EventFeedback>("RoundEvent").Play(new GameEvent { Type = GameEventType.EventRevealed, Id = "EVT_CAPTURE" }, stage);
             if (seats > 4)
             {
-                ScriptableObject.CreateInstance<KnockbackFeedback>().Play(new GameEvent { Type = GameEventType.HpLost, Player = 4, Amount = 12, Cause = HpLossCause.Attack }, stage);
+                Feedback<KnockbackFeedback>("Knockback").Play(new GameEvent { Type = GameEventType.HpLost, Player = 4, Amount = 12, Cause = HpLossCause.Attack }, stage);
             }
 
             if (seats > 3)
             {
-                ScriptableObject.CreateInstance<ExplosionFeedback>().Play(new GameEvent { Type = GameEventType.PlayerEliminated, Player = 3 }, stage);
+                Feedback<ExplosionFeedback>("Explosion").Play(new GameEvent { Type = GameEventType.PlayerEliminated, Player = 3 }, stage);
             }
 
+            ThemeEffect(stage.Theme != null ? stage.Theme.SmokePrefab : null, stage, 4 % seats, false);
+            ThemeEffect(stage.Theme != null ? stage.Theme.ArcPrefab : null, stage, 2 % seats, true);
             Advance(seconds);
+        }
+
+        // The project's feedback asset, or a fresh one.
+        private static T Feedback<T>(string name)
+            where T : ScriptableObject
+        {
+            T asset = AssetDatabase.LoadAssetAtPath<T>(ProjectAssets.ProfilePath.Substring(0, ProjectAssets.ProfilePath.LastIndexOf('/') + 1) + name + ".asset");
+            return asset != null ? asset : ScriptableObject.CreateInstance<T>();
+        }
+
+        // A theme effect on a ship's hull, as the table places it (HullDamage, OverchargeArcs).
+        private static void ThemeEffect(GameObject? prefab, IFeedbackStage stage, int seat, bool carried)
+        {
+            Transform? ship = stage.MotionOf(seat)?.transform;
+            if (prefab != null && ship != null)
+            {
+                Object.Instantiate(prefab, ShipParts.HullOf(ship), carried ? ship.rotation : Quaternion.identity, carried ? ship : null);
+            }
         }
 
         private static void Advance(float seconds)
@@ -189,6 +222,31 @@ namespace Vortex.Editor
                     if (effect != null)
                     {
                         effect.Tick(step);
+                    }
+                }
+
+                foreach (TimedRemoval timed in Object.FindObjectsByType<TimedRemoval>())
+                {
+                    if (timed != null)
+                    {
+                        timed.Tick(step);
+                    }
+                }
+
+                foreach (ProjectileFlight bolt in Object.FindObjectsByType<ProjectileFlight>())
+                {
+                    if (bolt != null)
+                    {
+                        bolt.Tick(step);
+                    }
+                }
+
+                // Particle systems: each outermost one, with the systems inside it.
+                foreach (ParticleSystem particles in Object.FindObjectsByType<ParticleSystem>())
+                {
+                    if (particles != null && (particles.transform.parent == null || particles.transform.parent.GetComponentInParent<ParticleSystem>() == null))
+                    {
+                        particles.Simulate(step, true, false, false);
                     }
                 }
             }

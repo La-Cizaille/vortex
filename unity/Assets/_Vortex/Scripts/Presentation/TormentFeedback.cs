@@ -38,7 +38,7 @@ namespace Vortex.Client.Presentation
             bool placed = gameEvent.Type == GameEventType.TormentPlaced;
             if (placed && prefab != null)
             {
-                Destroy(Instantiate(prefab, hull, Quaternion.identity, ship), seconds / speed);
+                TimedRemoval.After(Instantiate(prefab, hull, Quaternion.identity, ship), seconds / speed);
             }
             else
             {

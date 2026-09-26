@@ -12,3 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 900e3db4bdb4970488ca016a2783899d, type: 3}
   m_Name: Knockback
   m_EditorClassIdentifier: Vortex.Client::Vortex.Client.Presentation.KnockbackFeedback
+  heavyDamage: 10
+  lightThrow: 0.2
+  heavyThrow: 1.1
+  heavySpin: {x: 18, y: 28, z: 45}
+  sparks: {fileID: 8978493528920559650, guid: 9590f971054e2ee43a3c0c1ecbf1fc34, type: 3}
+  brightness: 3
+  wait: 0.45
+  otherWait: 0.15

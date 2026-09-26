@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb1c99147a1756845ab0f8c1d3651d6f, type: 3}
   m_Name: Explosion
   m_EditorClassIdentifier: Vortex.Client::Vortex.Client.Presentation.ExplosionFeedback
-  prefab: {fileID: 0}
+  prefab: {fileID: 3868411818217013766, guid: f421cccd24357c5429cfedb96cb4def5, type: 3}
   seconds: 1.2
   debris: 14
   wait: 1
