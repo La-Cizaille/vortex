@@ -64,8 +64,11 @@ namespace Vortex.Editor
 
             // A plate of blackened metal (lot 2): the name stencilled in bone, the figures on a terminal screen.
             ThemeSettings theme = AssetDatabase.LoadAssetAtPath<ThemeSettings>(ThemeAssets.ThemePath);
-            Image highlight = UiBuilder.Box(UiBuilder.Part<Image>(root.transform, "Cadre", Vector2.zero, Vector2.one, new Vector2(-4f, -4f), new Vector2(4f, 4f)), Color.white);
-            UiBuilder.Plate(UiBuilder.Part<Image>(root.transform, "Fond", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), new Color(0.78f, 0.78f, 0.8f, 1f), receivesPointer: true);
+            // The turn frame is an outline only: the panel is translucent, a filled box behind it would show through.
+            Image highlight = UiBuilder.Plate(UiBuilder.Part<Image>(root.transform, "Cadre", Vector2.zero, Vector2.one, new Vector2(-4f, -4f), new Vector2(4f, 4f)), Color.white);
+            highlight.fillCenter = false;
+            highlight.pixelsPerUnitMultiplier = 0.5f;
+            UiBuilder.Plate(UiBuilder.Part<Image>(root.transform, "Fond", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), Color.white, receivesPointer: true);
             TMP_Text name = UiBuilder.Font(UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root.transform, "Nom", new Vector2(0f, 1f), new Vector2(14f, -8f), new Vector2(150f, 28f)), 24f, FontStyles.Normal, TextAlignmentOptions.Left), theme.StencilFont);
             name.color = UiBuilder.Bone;
             UiBuilder.Screen(UiBuilder.Fixed<Image>(root.transform, "Écran", new Vector2(0f, 1f), new Vector2(10f, -38f), new Vector2(150f, 50f)));
@@ -397,7 +400,7 @@ namespace Vortex.Editor
         private static (MarketDisplay Market, Button RecycleAttack, Button RecycleDefense, Button EndMarket) BuildMarket(Transform ui)
         {
             // 1180 wide: the panels of the opponents at the ends of the arc stay clear of it.
-            Image root = UiBuilder.Plate(UiBuilder.Fixed<Image>(ui, "Marché noir", new Vector2(0.5f, 0.5f), new Vector2(0f, -20f), new Vector2(1180f, 210f)), new Color(1f, 1f, 1f, 0.92f));
+            Image root = UiBuilder.Plate(UiBuilder.Fixed<Image>(ui, "Marché noir", new Vector2(0.5f, 0.5f), new Vector2(0f, -20f), new Vector2(1180f, 210f)), Color.white);
             (RectTransform attackRow, TMP_Text attackLabel, TMP_Text attackDeck, Button recycleAttack) = MarketHalf(root.transform, "ATK", 0f, 0.5f);
             (RectTransform defenseRow, TMP_Text defenseLabel, TMP_Text defenseDeck, Button recycleDefense) = MarketHalf(root.transform, "DEF", 0.5f, 1f);
             (Button endMarket, TMP_Text endLabel) = UiBuilder.Button(root.transform, "Passer le marché", new Vector2(0.5f, 1f), new Vector2(0f, 46f), new Vector2(220f, 40f));
