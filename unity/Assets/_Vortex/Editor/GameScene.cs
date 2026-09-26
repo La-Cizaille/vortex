@@ -264,10 +264,14 @@ namespace Vortex.Editor
             CanvasGroup group = box.gameObject.AddComponent<CanvasGroup>();
             group.blocksRaycasts = false;
             group.interactable = false;
-            TMP_Text text = UiBuilder.Font(UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(box.transform, "Texte", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero), 56f, FontStyles.Normal, TextAlignmentOptions.Center), theme.StencilFont);
+            TMP_Text text = UiBuilder.Font(UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(box.transform, "Texte", new Vector2(0f, 0.3f), Vector2.one, Vector2.zero, Vector2.zero), 52f, FontStyles.Normal, TextAlignmentOptions.Center), theme.StencilFont);
             text.color = UiBuilder.Bone;
+
+            // The narrator's line, on the terminal (docs/DIRECTION_ARTISTIQUE.md 5.4).
+            TMP_Text aside = UiBuilder.Font(UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(box.transform, "SINISTRA", Vector2.zero, new Vector2(1f, 0.32f), new Vector2(20f, 6f), new Vector2(-20f, 0f)), 20f, FontStyles.Normal, TextAlignmentOptions.Center), theme.TerminalFont);
+            aside.color = theme.Terminal;
             TurnAnnouncement announcement = box.gameObject.AddComponent<TurnAnnouncement>();
-            announcement.Assign(group, text);
+            announcement.Assign(group, text, aside);
             box.gameObject.SetActive(false);
             return announcement;
         }
@@ -552,12 +556,16 @@ namespace Vortex.Editor
         {
             RectTransform root = UiBuilder.Part<RectTransform>(ui, "Journal", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             (Button toggle, TMP_Text toggleLabel) = UiBuilder.Button(root, "Bouton", Vector2.zero, new Vector2(20f, 20f), new Vector2(160f, 48f));
-            Image panel = UiBuilder.Box(UiBuilder.Fixed<Image>(root, "Panneau", Vector2.zero, new Vector2(20f, 76f), new Vector2(500f, 300f)), Panel, receivesPointer: true);
+            // SINISTRA's terminal (docs/DIRECTION_ARTISTIQUE.md 5.4): green lines on a dark screen.
+            ThemeSettings theme = AssetDatabase.LoadAssetAtPath<ThemeSettings>(ThemeAssets.ThemePath);
+            Image panel = UiBuilder.Screen(UiBuilder.Fixed<Image>(root, "Panneau", Vector2.zero, new Vector2(20f, 76f), new Vector2(560f, 300f)));
+            panel.raycastTarget = true;
 
             // A scroll view (wheel, drag or bar): the lines grow downwards from the top and the view follows the last one.
             RectTransform view = UiBuilder.Part<RectTransform>(panel.transform, "Vue", Vector2.zero, Vector2.one, new Vector2(14f, 10f), new Vector2(-26f, -10f));
             view.gameObject.AddComponent<RectMask2D>();
-            TMP_Text lines = UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(view, "Lignes", new Vector2(0f, 1f), Vector2.one, Vector2.zero, Vector2.zero), 15f, FontStyles.Normal, TextAlignmentOptions.TopLeft);
+            TMP_Text lines = UiBuilder.Font(UiBuilder.Label(UiBuilder.Part<TextMeshProUGUI>(view, "Lignes", new Vector2(0f, 1f), Vector2.one, Vector2.zero, Vector2.zero), 14f, FontStyles.Normal, TextAlignmentOptions.TopLeft), theme.TerminalFont);
+            lines.color = Color.Lerp(theme.Terminal, UiBuilder.Bone, 0.45f);
             lines.rectTransform.pivot = new Vector2(0.5f, 1f);
             lines.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
@@ -572,8 +580,8 @@ namespace Vortex.Editor
             barShape.offsetMax = new Vector2(-8f, -10f);
             Scrollbar bar = barObject.GetComponent<Scrollbar>();
             bar.direction = Scrollbar.Direction.BottomToTop;
-            barObject.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.06f);
-            bar.handleRect.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.3f);
+            barObject.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.04f);
+            bar.handleRect.GetComponent<Image>().color = new Color(theme.Terminal.r, theme.Terminal.g, theme.Terminal.b, 0.35f);
 
             ScrollRect scroll = panel.gameObject.AddComponent<ScrollRect>();
             scroll.viewport = view;

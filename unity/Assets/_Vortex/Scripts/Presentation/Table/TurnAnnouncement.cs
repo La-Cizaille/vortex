@@ -9,6 +9,7 @@ namespace Vortex.Client.Presentation
     /// </summary>
     public sealed class TurnAnnouncement : MonoBehaviour
     {
+        [SerializeField] private TMP_Text? remark;
         [SerializeField] private CanvasGroup group = null!;
         [SerializeField] private TMP_Text text = null!;
         [Tooltip("Durée d'affichage, en secondes.")]
@@ -21,11 +22,23 @@ namespace Vortex.Client.Presentation
         /// <summary>Text shown, or empty when hidden (tests).</summary>
         public string Text => group.gameObject.activeSelf ? text.text : string.Empty;
 
-        /// <summary>Shows a message (a name from the public view: rich text off).</summary>
-        public void Show(string message)
+        /// <summary>The narrator's remark shown under the message, or empty (tests).</summary>
+        public string Remark => remark != null && group.gameObject.activeSelf ? remark.text : string.Empty;
+
+        /// <summary>
+        /// Shows a message (a name from the public view: rich text off) and, under it, the narrator's
+        /// <paramref name="aside"/> when there is one.
+        /// </summary>
+        public void Show(string message, string? aside = null)
         {
             text.richText = false;
             text.text = message;
+            if (remark != null)
+            {
+                remark.richText = false;
+                remark.text = aside ?? string.Empty;
+            }
+
             _left = duration;
             group.alpha = 1f;
             group.gameObject.SetActive(true);
@@ -55,8 +68,9 @@ namespace Vortex.Client.Presentation
         }
 
         /// <summary>Wires the parts of the layout (editor setup).</summary>
-        public void Assign(CanvasGroup canvasGroup, TMP_Text label)
+        public void Assign(CanvasGroup canvasGroup, TMP_Text label, TMP_Text? aside = null)
         {
+            remark = aside;
             group = canvasGroup;
             text = label;
         }

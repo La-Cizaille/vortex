@@ -529,3 +529,31 @@ MonoBehaviour:
     Text: "{0} \xE9vite {2} PV de perte."
   - Key: options.commentary
     Text: 'Commentaires de SINISTRA : {0}'
+  - Key: sinistra.TurnStarted
+    Text: "Votre contrat expire \xE0 votre d\xE9c\xE8s. Probablement bient\xF4t.|Les formulaires de r\xE9clamation sont \xE0 votre gauche. Personne ne les lit.|Nous avons calcul\xE9 vos chances. Nous ne les communiquons pas.|Respirez tant que l'air est encore couvert."
+  - Key: sinistra.AttackResolved
+    Text: "Franchise non applicable.|Dommages constat\xE9s. Responsabilit\xE9 d\xE9clin\xE9e.|L'\xE9quipage concern\xE9 est pri\xE9 de ne pas saigner sur les documents.|Sinistre enregistr\xE9. D\xE9lai de traitement : jamais.|Ce n'\xE9tait pas couvert. Rien ne l'est."
+  - Key: sinistra.CriticalHit
+    Text: "Nos experts parlent de perte totale.|Impact critique. Les survivants seront factur\xE9s.|Pi\xE8ces manquantes, membres d'\xE9quipage aussi. Non d\xE9clar\xE9s."
+  - Key: sinistra.PlayerEliminated
+    Text: "Dossier class\xE9. Condol\xE9ances factur\xE9es s\xE9par\xE9ment.|L'\xE9pave est saisie au titre des arri\xE9r\xE9s.|D\xE9c\xE8s constat\xE9. Aucun b\xE9n\xE9ficiaire d\xE9sign\xE9.|Un capitaine de moins. Les primes des autres ne baissent pas."
+  - Key: sinistra.MarketRecycled
+    Text: "Le vendeur n'a pas surv\xE9cu \xE0 la n\xE9gociation.|Stock renouvel\xE9. Provenance : ne demandez pas.|Tout part au rebut. Comme le reste du secteur."
+  - Key: sinistra.MarketCardTaken
+    Text: "Garantie : aucune. Remboursement : jamais.|Pi\xE8ce d'occasion. L'ancien propri\xE9taire n'en a plus besoin.|Achat enregistr\xE9. Le re\xE7u est une menace."
+  - Key: sinistra.CardStolen
+    Text: "Transfert de propri\xE9t\xE9 non d\xE9clar\xE9. Nous prenons note.|Vol constat\xE9. Couverture : inexistante."
+  - Key: sinistra.TechnologyActivated
+    Text: Pacte conclu. Lisez les petites lignes. Trop tard.|Une faction de plus dans votre poche. Ou l'inverse.|Soutien acquis. Il se retournera au premier sang.
+  - Key: sinistra.EventRevealed
+    Text: "Conditions du secteur modifi\xE9es. Votre contrat, lui, ne change pas.|Nouvel incident dans la Marge. Non couvert, par principe."
+  - Key: sinistra.AttackRedirected
+    Text: "R\xE9clamation transf\xE9r\xE9e \xE0 un tiers. Proc\xE9dure standard."
+  - Key: sinistra.HpGained
+    Text: "R\xE9parations de fortune. Nous ne garantissons pas les soudures.|Coque rafistol\xE9e. L'\xE9ch\xE9ance est seulement repouss\xE9e."
+  - Key: sinistra.TormentPlaced
+    Text: "Contamination constat\xE9e. Exclusion biologique, article 9.|Les spores ne sont pas couvertes. Elles, elles vous couvrent."
+  - Key: sinistra.GameOver
+    Text: "Partie close. Le vortex conserve tous les droits.|Fin de l'exercice. Aucun survivant n'est indemnis\xE9.|Le secteur a un vainqueur. Le vortex, lui, a de l'app\xE9tit."
+  - Key: sinistra.AttackMissed
+    Text: "Aucun dommage. Nous sommes presque d\xE9\xE7us.|Tir sans cons\xE9quence. Le dossier reste ouvert.|Le bouclier a tenu. Nous augmentons votre prime."

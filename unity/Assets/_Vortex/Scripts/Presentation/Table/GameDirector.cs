@@ -110,6 +110,7 @@ namespace Vortex.Client.Presentation
         private TableModel? _model;
         private TableContext? _context;
         private GameLogFormatter? _log;
+        private Narrator? _narrator;
         private CommandLabels? _labels;
         private PanelState _panel;
         private bool _controlsOffered;
@@ -207,6 +208,7 @@ namespace Vortex.Client.Presentation
             _context = new TableContext(theme, cardArt, texts, data, cardPrefab, cardRoot, view, cardDepth, zoom);
             zoom.Bind(_context);
             _log = new GameLogFormatter(texts, data);
+            _narrator = new Narrator(texts, UserOptions.Load(theme.PlaybackSpeed).Commentary, () => UnityEngine.Random.value);
             _labels = new CommandLabels(_context);
             ulong gameSeed = setup.Seed != 0 ? setup.Seed : (ulong)DateTime.UtcNow.Ticks;
             _session = new LocalHotSeatSession(content.CreateEngine(setup.Rules), gameSeed, setup.Seats);
@@ -412,6 +414,11 @@ namespace Vortex.Client.Presentation
                 _player.Speed = options.Speed;
                 playback.Refresh();
             }
+
+            if (_narrator != null)
+            {
+                _narrator.Speaks = options.Commentary;
+            }
         }
 
         // Once the last events are played: the winner and how, with "Rejouer" and "Menu".
@@ -502,7 +509,7 @@ namespace Vortex.Client.Presentation
             _viewer = seat;
             PlaceSeats();
             ShowAll(redrawCards: true);
-            announcement.Show(string.Format(CultureInfo.InvariantCulture, texts.Get(TextKeys.TurnOf), _model!.Seats[seat].Name));
+            announcement.Show(string.Format(CultureInfo.InvariantCulture, texts.Get(TextKeys.TurnOf), _model!.Seats[seat].Name), _narrator?.RemarkOnTurn());
         }
 
         private void Update() => Advance(Time.deltaTime);
@@ -693,7 +700,9 @@ namespace Vortex.Client.Presentation
             string? line = _log!.Describe(gameEvent, _model!.Seats);
             if (line != null)
             {
-                log.Add(line);
+                // The fact, then the narrator's remark when she has one.
+                string? remark = _narrator?.RemarkOn(gameEvent);
+                log.Add(remark is null ? line : line + " — " + remark);
             }
         }
 
