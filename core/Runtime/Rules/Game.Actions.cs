@@ -342,7 +342,7 @@ namespace Vortex.Core.Rules
 
             own.Vars.Clear();
             market.Visible[index] = own;
-            Emit(new GameEvent { Type = GameEventType.MarketCardRevealed, CardUid = own.Uid, Id = own.CardId, Value = (int)slot });
+            Emit(new GameEvent { Type = GameEventType.MarketCardRevealed, CardUid = own.Uid, Id = own.CardId, Value = (int)slot, Amount = index });
             var left = new SlotChangeInfo(player, slot, own);
             Raise((e, s) => e.OnLeftSlot(this, s, left), cause);
             Equip(player, marketCard, cause);
@@ -455,7 +455,7 @@ namespace Vortex.Core.Rules
                 }
 
                 market.Visible.Add(card);
-                Emit(new GameEvent { Type = GameEventType.MarketCardRevealed, CardUid = card.Uid, Id = card.CardId, Value = (int)slot });
+                Emit(new GameEvent { Type = GameEventType.MarketCardRevealed, CardUid = card.Uid, Id = card.CardId, Value = (int)slot, Amount = market.Visible.Count - 1 });
             }
         }
 
@@ -479,7 +479,7 @@ namespace Vortex.Core.Rules
             MarketState market = State.Market(slot);
             CardInstance card = market.Visible[index];
             market.Visible.RemoveAt(index);
-            Emit(new GameEvent { Type = GameEventType.MarketCardTaken, Player = player, CardUid = card.Uid, Id = card.CardId, Value = (int)slot });
+            Emit(new GameEvent { Type = GameEventType.MarketCardTaken, Player = player, CardUid = card.Uid, Id = card.CardId, Value = (int)slot, Amount = index });
             Equip(player, card, cause);
             RefillMarket(slot);
         }

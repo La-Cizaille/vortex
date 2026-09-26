@@ -107,7 +107,7 @@ namespace Vortex.Tests.EditMode
                 seed: 3,
                 rules: posture ? new RuleOptions(2, 0, false) : null));
             Dictionary<CrewAction, Vector2> at = _director.Controls.Actions
-                .Where(a => a.gameObject.activeSelf)
+                .Where(a => a.InRules)
                 .ToDictionary(a => a.Action, a => ((RectTransform)a.transform).anchoredPosition);
 
             Assert.That(at.ContainsKey(CrewAction.DefensivePosture), Is.EqualTo(posture));

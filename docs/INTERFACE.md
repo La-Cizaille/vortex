@@ -39,8 +39,8 @@ Disposition à 5 joueurs, vue du joueur dont c'est le tour :
 |                                                                      |
 |                        (SUR)          (REP)                          |
 |                    (ATQ)                  (SAB)                      |
-|                [Combo]      VAISSEAU     o surcharge                 |
-|               [ATK]                          [DEF]    [temps: 1:30]  |
+|                             VAISSEAU     o surcharge                 |
+|               [ATK]         [Combo]          [DEF]    [temps: 1:30]  |
 |  [Journal]           PV 30 - Bouclier 5 - ( )( )( )    [Fin de tour] |
 +----------------------------------------------------------------------+
 ```
@@ -67,7 +67,7 @@ Pendant ma phase de marché, le marché noir s'ouvre au centre de la table (3.3)
 - **Sous le vaisseau** : PV, bouclier, et **trois ronds** qui sont les technologies obtenues vers l'Élection galactique (il en faut 3 pour gagner). Chaque rond s'allume à la couleur de la technologie obtenue.
 - **Surcharge** : un petit jeton près du vaisseau, allumé quand je l'ai. Le toucher l'**arme** : il brille, et la prochaine attaque ou le prochain reparamétrage le dépense. Le toucher de nouveau le désarme (ARB-67).
 - **Effets temporaires** : en icônes, avec leur info-bulle.
-- **Bouton de combo** : à côté de mes cartes, puisqu'il les réunit. Il est allumé, à la couleur de la technologie, quand mes deux modificateurs ont la même couleur non neutre et que le combo est jouable. Au survol, il montre l'effet de la technologie.
+- **Bouton de combo** : au centre, sous le vaisseau. Il n'apparaît que lorsque le combo est jouable (ARB-87), à la couleur de la technologie. Au survol, il montre l'effet de la technologie.
 
 ### 3.3 Marché noir
 
@@ -82,6 +82,7 @@ Pendant ma phase de marché, le marché noir s'ouvre au centre de la table (3.3)
 ### 3.4 Actions d'équipage
 
 - Elles apparaissent **en arc de cercle centré au-dessus de mon vaisseau** (ARB-74), chacune avec une icône simple : à gauche les actions d'attaque (Attaque à l'extrémité, Surcharge), à droite les actions de bouclier (Reparamétrage, Posture défensive si l'option est activée, Sabotage à l'extrémité).
+- **Seules les actions possibles apparaissent** (ARB-87) : aucune pendant le marché ; ensuite, celles que le moteur autorise. Chacune garde sa place sur l'arc, même quand ses voisines sont cachées.
 - **Au survol**, une fenêtre précise l'effet de l'action, tel qu'il s'appliquerait maintenant (par exemple : Reparamétrage à 2 dés avec la surcharge).
 - **Actions avec une cible** (Attaque, Sabotage) : glisser l'icône vers un adversaire.
 - **Actions sans cible** (Reparamétrage, Surcharge, Posture défensive) : un simple toucher.
@@ -120,7 +121,7 @@ Seule une décision que la table ne sait pas montrer ouvrirait encore la fenêtr
 ### 3.7 Déroulé du tour
 
 - Le tour suit les phases des règles (RULES A5) : marché, puis actions (cartes, combo, action d'équipage), puis fin de tour.
-- **Fin de tour** : un bouton à droite, qui change de couleur quand il ne reste rien d'utile à faire. Pas de fenêtre de confirmation.
+- **Fin de tour** : un bouton à droite, qui s'allume dès qu'il ne reste plus d'action d'équipage possible (ARB-87), même s'il reste une carte ou un combo qu'on peut choisir de garder. Pas de fenêtre de confirmation.
 
 ### 3.8 Informations de partie
 
@@ -181,7 +182,7 @@ Chaque geste envoie une commande du moteur à la session. Le moteur la valide : 
 
 ## 7. Questions ouvertes
 
-Aucune pour l'instant. Les dernières (temps de tour, marché réduit, choix sur la table) sont tranchées : ARB-80 à ARB-82.
+- **Esquive et déviation** ([`ANIMATIONS.md`](ANIMATIONS.md) §2) : une attaque déviée se montre-t-elle comme une esquive, ou a-t-elle sa propre animation (le rayon qui bifurque vers la nouvelle cible) ?
 
 ## 8. Ce qui est construit
 
@@ -192,11 +193,11 @@ Tout ce qui précède est construit, sauf ce que la dernière ligne annonce pour
 | M4.3, habillage | Cartes, visuels provisoires générés, galerie. |
 | M4.4, table | La scène `Game` : bandeau, adversaires en arc dans l'ordre du tour, marché noir, vaisseau et cartes du joueur, jetons de Tourment, technologies, surcharge, effets temporaires, tour en cours, épave d'un joueur éliminé, marqueur du leader (option), journal, vitesse de lecture. Le panneau qui liste tous les coups autorisés reste un outil de développement, désactivé par défaut (objet `Partie`, *Show Command Panel*). |
 | M4.5, lisibilité | Zoom sur toute carte de la table ; dés animés sur les valeurs du moteur ; cartes en objets 3D (ARB-73) ; appui long au doigt à la place du survol ; événement de la manche agrandi au survol du bandeau ; carte qu'un achat remplacerait marquée en rouge ; mention « Fantôme » sur l'épave (option). |
-| M4.5, gestes | Actions d'équipage en arc centré sur le vaisseau, attaque à gauche et bouclier à droite (ARB-71, ARB-74) ; achat et utilisation d'une carte par glisser ; combo ; jeton de surcharge armé d'un toucher (ARB-67) ; « Fin de tour » qui s'allume quand il ne reste rien à faire ; aperçus calculés par le moteur (ADR-0018) ; raison de chaque refus, donnée par le moteur ; fiche d'un adversaire agrandie au survol, sans clignotement. |
+| M4.5, gestes | Actions d'équipage en arc centré sur le vaisseau, attaque à gauche et bouclier à droite, visibles seulement quand elles sont possibles (ARB-71, ARB-74, ARB-87) ; combo sous le vaisseau, visible seulement quand il est jouable ; achat et utilisation d'une carte par glisser ; combo ; jeton de surcharge armé d'un toucher (ARB-67) ; « Fin de tour » qui s'allume quand aucune action d'équipage ne reste ; aperçus calculés par le moteur (ADR-0018) ; raison de chaque refus, donnée par le moteur ; fiche d'un adversaire agrandie au survol, sans clignotement. |
 | M4.5, journal | Panneau repliable qu'on peut remonter ; il ne suit les nouvelles lignes que si l'on est en bas (ARB-75). |
 | M4.5, marché réduit | Bande sous le bandeau en dehors de ma phase de marché, ouverte d'elle-même à ma phase de marché, bouton « Marché » pour la consulter (ARB-81). |
 | M4.5, décisions | Prises sur la table, sans bouton (ARB-82) : question en bandeau, fiches et cartes allumées, faces de d8, événements au centre, actions imposées sur l'arc, voler ou détruire en glissant, passer en touchant la carte grise ou sa fiche. |
 | M4.5, temps de tour | Durée réglable (illimitée par défaut), barre et secondes au-dessus de « Fin de tour », alerte et tic dans les dix dernières secondes, fin de tour à l'expiration, 15 secondes pour une décision hors de son tour (ARB-80). |
 | M4.6, menus | Scène `Menu` ouverte en premier (ADR-0019) : accueil, partie locale, menu de développement (absent des builds publiés), options ; en partie, pause, fin de partie et pivot de la vue vers chaque humain (« Tour de X »). |
 | M4.7, vérification | Parties complètes à 2, 3, 4 et 5 joueurs, une personne aux gestes contre des bots, sans erreur ; une image déposée change la carte sans code (`MilestoneTests`). |
-| M5, à venir | Modèles 3D (Blender, ADR-0016, [`ASSETS.md`](ASSETS.md)), icônes (effets temporaires, texte des cartes, cadenas de l'action imposée), fond stellaire animé, audio (le tic du temps de tour est aujourd'hui un bip généré), builds Android et Windows (ARB-72). |
+| M5, à venir | Animations et modèles : plan dans [`ANIMATIONS.md`](ANIMATIONS.md). Modèles 3D (Blender, ADR-0016, [`ASSETS.md`](ASSETS.md)), icônes (effets temporaires, texte des cartes, cadenas de l'action imposée), fond stellaire animé, audio (le tic du temps de tour est aujourd'hui un bip généré), builds Android et Windows (ARB-72). |

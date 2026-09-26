@@ -29,6 +29,12 @@ namespace Vortex.Client.Presentation
         /// <summary>True when the engine allows the action now.</summary>
         public bool Available { get; private set; }
 
+        /// <summary>
+        /// False for an action the rules of the game leave out (the defensive posture when its option is off): it never
+        /// shows and takes no place on the arc.
+        /// </summary>
+        public bool InRules { get; set; } = true;
+
         /// <summary>True for the actions aimed at an opponent (dragged), false for the others (tapped).</summary>
         public bool NeedsTarget => NeedsTargetFor(action);
 
@@ -47,11 +53,12 @@ namespace Vortex.Client.Presentation
             SetAvailable(false);
         }
 
-        /// <summary>Lights or dims the button.</summary>
+        /// <summary>Shows the button while the action is possible, and hides it otherwise (ARB-87); its place on the arc stays.</summary>
         public void SetAvailable(bool available)
         {
             Available = available;
             group.alpha = available ? 1f : unavailableAlpha;
+            gameObject.SetActive(available && InRules);
         }
 
         /// <inheritdoc/>
