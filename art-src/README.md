@@ -6,8 +6,10 @@ Les fichiers de travail des visuels : scènes Blender (`.blend`), images en calq
 |---|---|---|
 | `ships/` | Un fichier `.blend` par vaisseau, nommé comme son export (`Ship_Faucon.blend`), et ses textures (`Ship_Faucon_BaseColor.png`, `Ship_Faucon_Normal.png`). `Ship_Carcasse` est construit par `tools/blender/build_ship_carcasse.py` | `unity/Assets/_Vortex/Art/Ships/Ship_Faucon.fbx` |
 | `cards/` | Le modèle des cartes (`Card.blend`) et ses textures de métal brossé, construits par `tools/blender/build_card.py` | `unity/Assets/_Vortex/Art/Cards3D/Card.fbx` |
-| `cockpit/` | Le cockpit du joueur (`Cockpit.blend`, ARB-90, ARB-92) et son métal brossé (`Cockpit_*.png`), construits par `tools/blender/build_cockpit.py` | `unity/Assets/_Vortex/Art/Cockpit/Cockpit.fbx` |
-| `dice/` | Le dé à 8 faces | `unity/Assets/_Vortex/Art/Dice/` |
+| `cockpit/` | Le cockpit du joueur (`Cockpit.blend`, ARB-90, ARB-92, lot B3) et ses textures d'acier noirci et d'acier nu (`Cockpit_*.png`), construits par `tools/blender/build_cockpit.py` | `unity/Assets/_Vortex/Art/Cockpit/Cockpit.fbx` |
+| `dice/` | Le dé à 8 faces (`D8.blend`) et ses textures, construits par `tools/blender/build_die.py` | `unity/Assets/_Vortex/Art/Dice/D8.fbx` |
+| `backgrounds/` | Le fond de la table (`Fond.blend` : toile de fond et vortex) et ses textures, construits par `tools/blender/build_background.py` | `unity/Assets/_Vortex/Art/Backgrounds/Fond.fbx` |
+| `market/` | Le rack du marché noir (`Marche.blend`) et ses textures, construits par `tools/blender/build_market.py` | `unity/Assets/_Vortex/Art/Market/Marche.fbx` |
 | `props/` | Décor : planètes, station… | `unity/Assets/_Vortex/Art/Props/` |
 | `images/` | Sources des illustrations et icônes (calques, formats de travail) | `unity/Assets/_Vortex/Art/Cards/`, `Art/Icons/` |
 

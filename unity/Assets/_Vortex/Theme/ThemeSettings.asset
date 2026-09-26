@@ -57,7 +57,7 @@ MonoBehaviour:
   shieldMaterial: {fileID: 0}
   smokePrefab: {fileID: 0}
   arcPrefab: {fileID: 0}
-  tableBackground: {fileID: 0}
+  tableBackground: {fileID: 5181726139699177051, guid: 6acf239d7c05d174f933cbad844d74f2, type: 3}
   eventEffects: []
   statusColors: []
   statusDefault: {r: 1.1, g: 1.1, b: 1.5, a: 1}
@@ -65,5 +65,5 @@ MonoBehaviour:
   sporeColor: {r: 1.1, g: 2, b: 0.5, a: 1}
   cockpitModel: {fileID: 919132149155446097, guid: 27985f4f984063e449dd60773a97aebe, type: 3}
   glassMaterial: {fileID: 2100000, guid: c2f8f221a066fdc41b60bb9dde439197, type: 2}
-  dieModel: {fileID: 0}
+  dieModel: {fileID: 919132149155446097, guid: da17a4cae908acb47a864ffd15b54f3f, type: 3}
   timerTick: {fileID: 0}

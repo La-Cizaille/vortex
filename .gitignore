@@ -88,3 +88,6 @@ desktop.ini
 
 # Git LFS writes its hooks here when core.hooksPath is /dev/null (AI sessions): never commit them.
 /dev/null/
+
+# Python bytecode (the Blender scripts import tools/blender/front_view.py)
+__pycache__/

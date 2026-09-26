@@ -161,6 +161,19 @@ blender --background --factory-startup --disable-autoexec --python tools/blender
 blender --background --disable-autoexec art-src/cards/Card.blend --python tools/blender/export_unity.py -- unity/Assets/_Vortex/Art/Cards3D/Card.fbx --budget 1000
 ```
 
+**La table** (lot B3) se construit aussi par script, chaque modèle avec ses textures, peintes en vue de face pour le cockpit et le rack (`tools/blender/front_view.py`, partagé). Le dé et le fond entrent seuls dans le thème à l'import, s'il n'en a pas déjà (`ThemeArtSync`) ; le rack attend d'être branché :
+```
+blender --background --factory-startup --disable-autoexec --python tools/blender/build_cockpit.py -- art-src/cockpit/Cockpit.blend
+blender --background --disable-autoexec art-src/cockpit/Cockpit.blend --python tools/blender/export_unity.py -- unity/Assets/_Vortex/Art/Cockpit/Cockpit.fbx --budget 4000
+blender --background --factory-startup --disable-autoexec --python tools/blender/build_die.py -- art-src/dice/D8.blend
+blender --background --disable-autoexec art-src/dice/D8.blend --python tools/blender/export_unity.py -- unity/Assets/_Vortex/Art/Dice/D8.fbx --budget 500
+blender --background --factory-startup --disable-autoexec --python tools/blender/build_background.py -- art-src/backgrounds/Fond.blend
+blender --background --disable-autoexec art-src/backgrounds/Fond.blend --python tools/blender/export_unity.py -- unity/Assets/_Vortex/Art/Backgrounds/Fond.fbx --budget 100
+blender --background --factory-startup --disable-autoexec --python tools/blender/build_market.py -- art-src/market/Marche.blend
+blender --background --disable-autoexec art-src/market/Marche.blend --python tools/blender/export_unity.py -- unity/Assets/_Vortex/Art/Market/Marche.fbx --budget 3000
+```
+Le fond est fait pour la caméra de la table (`GameScene`) : si elle change de place, changer ses nombres en tête de `build_background.py`.
+
 ## Fusion des fichiers Unity
 Ajouter UnityYAMLMerge dans votre configuration Git locale (le chemin dépend de votre version d'Unity) :
 ```
