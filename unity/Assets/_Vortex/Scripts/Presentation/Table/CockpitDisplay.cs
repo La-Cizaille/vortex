@@ -47,6 +47,9 @@ namespace Vortex.Client.Presentation
         /// <summary>What a touch of the console does (a decision that offers the player's own seat), or null.</summary>
         public Action? Tapped { get; set; }
 
+        /// <summary>Whether the token is armed now, read every frame so the lever drops as soon as it is disarmed.</summary>
+        public Func<bool>? Armed { get; set; }
+
         /// <summary>The gauge's fill, from 0 to 1 (tests).</summary>
         public float Fill => _fill != null ? _fill.localScale.x : 0f;
 
@@ -273,6 +276,17 @@ namespace Vortex.Client.Presentation
             return box ?? new Bounds(Vector3.zero, new Vector3(3.84f, 1f, 0.1f));
         }
 
-        private void LateUpdate() => Place();
+        private void LateUpdate()
+        {
+            Place();
+
+            // The lever follows the armed state as it changes (disarmed after each command), easing towards it.
+            if (Armed != null && _lever != null)
+            {
+                SwitchUp = Armed();
+                Quaternion wanted = SwitchUp ? Quaternion.AngleAxis(LeverTilt, Vector3.right) * _leverRest : _leverRest;
+                _lever.localRotation = Quaternion.Slerp(_lever.localRotation, wanted, 1f - Mathf.Exp(-12f * Time.deltaTime));
+            }
+        }
     }
 }

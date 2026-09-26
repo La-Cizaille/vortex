@@ -478,6 +478,7 @@ namespace Vortex.Client.Presentation
                 _dirty = true;
             });
             _cockpit.Tapped = () => controls.ChooseSeat(_viewer);
+            _cockpit.Armed = () => controls.OverchargeArmed;
         }
 
         // The sky behind the table: the theme's background, or a generated starfield around the camera. Built once per game.
