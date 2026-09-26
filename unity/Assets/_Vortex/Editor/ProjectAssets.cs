@@ -121,6 +121,9 @@ namespace Vortex.Editor
             changed |= Animation<CardFlightFeedback>(profile, "CardFlight", GameEventType.MarketCardTaken, GameEventType.CardStolen, GameEventType.CardActivated);
             changed |= Animation<EventFeedback>(profile, "RoundEvent", GameEventType.EventRevealed);
             changed |= Animation<MarketDeckFeedback>(profile, "MarketDecks", GameEventType.MarketCardRevealed, GameEventType.MarketRecycled);
+            changed |= Animation<RepairFeedback>(profile, "Repair", GameEventType.HpGained);
+            changed |= Animation<VictoryFeedback>(profile, "Victory", GameEventType.GameOver);
+            changed |= Animation<InitiativeFeedback>(profile, "Initiative", GameEventType.InitiativeRolled, GameEventType.InitiativeWon);
             changed |= Animation<KnockbackFeedback>(profile, "Knockback", GameEventType.HpLost);
             changed |= Animation<ThrusterFeedback>(profile, "Thrusters", GameEventType.TechnologyActivated);
             changed |= Animation<ExplosionFeedback>(profile, "Explosion", GameEventType.PlayerEliminated);

@@ -47,9 +47,10 @@ namespace Vortex.Client.Presentation
             PlaceholderEffect.Create("Onde de combo", ship.position + (Vector3.up * 0.1f * scale), 0.8f / speed, glow)
                 .AddRing(color * brightness, 20, pulseRadius * scale, 0.07f * scale, 0.8f / speed);
 
-            IReadOnlyList<Vector3> engines = ShipParts.EnginesOf(ship);
+            // The engines of the model itself: the aura around the ship (rings, halo) is not part of it.
             ShipMotion? motion = stage.MotionOf(gameEvent.Player);
             Transform carrier = motion != null ? motion.Body : ship;
+            IReadOnlyList<Vector3> engines = ShipParts.EnginesOf(carrier);
             foreach (Vector3 engine in engines)
             {
                 Jet(engine, ship, carrier, color, glow, scale, speed);

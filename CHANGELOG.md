@@ -4,6 +4,14 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Non publié]
 ### Ajouté
+- **Animations, lot 3** (ANIMATIONS §5) :
+  - vaisseau contaminé par le Tourment : coque qui tire vers une teinte malade, et spores ;
+  - un anneau de lumière par effet en jeu, à une couleur par type d'effet dans le thème ;
+  - un halo sous le vaisseau dont c'est le tour (`ShipAura`) ;
+  - étincelles de réparation ;
+  - victoire : la caméra tourne autour du vainqueur, avec une pluie d'or pour l'Élection et des salves pour la Domination (`CameraOrbit`) ;
+  - initiative : chaque vaisseau lance son d8 au-dessus de lui.
+  Les captures finissent les dés d'initiative et les sauts de dé au lieu de les figer. Tests `AnimationTests`.
 - **Paquets du marché** (ANIMATIONS §5) : un paquet en tête de chaque rangée, le modèle de carte vu de dos, aussi épais qu'il reste de cartes (`DeckDisplay`). Une carte révélée part du paquet, se retourne en vol et se pose sur sa place, vide jusqu'à son arrivée ; un recyclage renvoie les cartes au paquet (`MarketDeckFeedback`). Les cartes du marché passent de 133 à 120 unités de haut pour laisser la place au paquet. Tests `MarketDeckTests`.
 - **Client agnostique du contenu** : un test vérifie que le code du client ne nomme aucune carte, aucun événement, aucune technologie (`ConventionTests`), comme celui du moteur.
 - **Quatrième playtest** (ARB-89, ARB-90) :

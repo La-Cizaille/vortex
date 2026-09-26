@@ -22,6 +22,8 @@ namespace Vortex.Client.Presentation
         private float _leapTime;
         private float _closer = 1f;
         private System.Action<Vector3>? _landed;
+        private Vector3? _hover;
+        private float _hoverSize = 1f;
 
         /// <summary>The value shown once settled, or 0 while spinning.</summary>
         public int Value { get; private set; }
@@ -35,6 +37,21 @@ namespace Vortex.Client.Presentation
             _degreesPerSecond = degreesPerSecond;
 
             // Cosmetic spin axis, tilted so that the die tumbles rather than turns flat.
+            _axis = (Vector3.up + (Random.insideUnitSphere * 0.8f)).normalized;
+            transform.rotation = Random.rotation;
+            Place();
+        }
+
+        /// <summary>
+        /// Floats over a point of the table instead of a place of the interface (a ship's initiative roll), facing
+        /// <paramref name="view"/>, <paramref name="size"/> units high.
+        /// </summary>
+        public void Hover(Vector3 point, Camera view, float size, float degreesPerSecond)
+        {
+            _hover = point;
+            _hoverSize = size;
+            _view = view;
+            _degreesPerSecond = degreesPerSecond;
             _axis = (Vector3.up + (Random.insideUnitSphere * 0.8f)).normalized;
             transform.rotation = Random.rotation;
             Place();
@@ -140,6 +157,13 @@ namespace Vortex.Client.Presentation
         /// <summary>Moves the die over its place now (captures lay the interface out before drawing).</summary>
         public void Place()
         {
+            if (_hover is Vector3 point)
+            {
+                transform.position = point;
+                transform.localScale = Vector3.one * _hoverSize;
+                return;
+            }
+
             if (_place == null || _view == null)
             {
                 return;

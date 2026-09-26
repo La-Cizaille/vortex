@@ -219,6 +219,12 @@ namespace Vortex.Client.Presentation
             _player.EventStarted += OnEventStarted;
             _player.Idle += Resync;
 
+            // A new game: the camera comes back from its turn around the last winner.
+            if (view.TryGetComponent(out CameraOrbit orbit))
+            {
+                orbit.Restore();
+            }
+
             PlaceSeats();
             PlaceBackground();
             market.Bind(_context);
@@ -425,6 +431,23 @@ namespace Vortex.Client.Presentation
             if (_setup!.Humans > 1 && _session.Decision is null && actor >= 0 && actor != _viewer && !_session.IsBot(actor))
             {
                 TurnViewTo(actor);
+            }
+        }
+
+        // What lasts around a ship (ANIMATIONS.md §3): its contamination by Torment (spores, and its hull drifting to a sick
+        // tint), a ring per effect in play, and a halo under it on its turn.
+        private void ShowAura(ShipAura aura, int seat, SeatModel shown, TableModel model)
+        {
+            int torments = (shown.AttackCard?.Torments ?? 0) + (shown.DefenseCard?.Torments ?? 0);
+            float contamination = shown.Eliminated ? 0f : Mathf.Clamp01(torments / 6f);
+            var effects = shown.Eliminated
+                ? new List<Color>()
+                : shown.Statuses.Where(s => s.Active).Select(s => theme.StatusColorFor(s.Kind)).ToList();
+            bool turn = model.Outcome is null && model.CurrentPlayer == seat && !shown.Eliminated;
+            aura.Show(contamination, theme.SporeColor, effects, turn, theme.Highlight * 0.35f, theme.GlowMaterial);
+            if (!shown.Eliminated && MotionOf(seat) is ShipMotion motion)
+            {
+                ShipCatalog.PaintSeat(motion.Body.gameObject, Color.Lerp(theme.Seat(seat), theme.SickTint, contamination * 0.6f));
             }
         }
 
@@ -674,6 +697,11 @@ namespace Vortex.Client.Presentation
                     damage.Show(1f - ((float)shown.Hp / Math.Max(1, model.MaxHp)), shown.Eliminated, theme.GlowMaterial, theme.SmokePrefab);
                 }
 
+                if (_ships.TryGetValue(seat.Key, out Transform auraRoot) && auraRoot.GetComponent<ShipAura>() is ShipAura aura)
+                {
+                    ShowAura(aura, seat.Key, shown, model);
+                }
+
                 if (_ships.TryGetValue(seat.Key, out Transform charged) && charged.GetComponentInChildren<OverchargeArcs>() is OverchargeArcs arcs)
                 {
                     arcs.Show(shown.Overcharge > 0 && !shown.Eliminated, seat.Key == _viewer && controls.OverchargeArmed, theme.Overcharge, theme.GlowMaterial, theme.ArcPrefab);
@@ -755,6 +783,7 @@ namespace Vortex.Client.Presentation
             ShipMotion.Attach(root, ship.transform, theme.ShipSwayHeight, theme.ShipSwayRoll, theme.ShipSwayPitch, theme.ShipSwaySeconds, seat * 0.37f);
             ship.AddComponent<HullDamage>();
             ship.AddComponent<OverchargeArcs>();
+            root.gameObject.AddComponent<ShipAura>();
             _ships[seat] = root;
             return root;
         }
