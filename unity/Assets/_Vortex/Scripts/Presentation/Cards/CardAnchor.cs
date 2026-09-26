@@ -22,6 +22,9 @@ namespace Vortex.Client.Presentation
         /// <summary>While true, the card stays where it is put (it is being dragged); it goes back to its place after.</summary>
         public bool Held { get; set; }
 
+        /// <summary>While true, the card is hidden: a copy of it is still on its way to this place (a card revealed).</summary>
+        public bool Concealed { get; set; }
+
         /// <summary>The place followed, in screen pixels of the camera, as last placed.</summary>
         public Rect ScreenRect { get; private set; }
 
@@ -46,7 +49,7 @@ namespace Vortex.Client.Presentation
 
             Rect place = ScreenRectOf(_slot);
             ScreenRect = place;
-            bool shown = _slot.gameObject.activeInHierarchy && place.height > 0f && (_clip == null || ScreenRectOf(_clip).Overlaps(place));
+            bool shown = !Concealed && _slot.gameObject.activeInHierarchy && place.height > 0f && (_clip == null || ScreenRectOf(_clip).Overlaps(place));
             _card.SetVisible(shown);
             if (!shown)
             {

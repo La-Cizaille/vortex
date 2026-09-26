@@ -20,6 +20,23 @@ namespace Vortex.Client.Presentation
         private bool _burnsUp;
         private Material? _glow;
         private Color _flame;
+        private float _turnFrom;
+        private float _turnTo = 360f;
+        private System.Action? _arrived;
+
+        /// <summary>
+        /// Sets how the card turns on itself during the trip, in degrees around its upright axis (default: one full turn;
+        /// from 180 to 360 it flips face up, from 0 to 180 face down), and what to do once it arrives. Call it after
+        /// <see cref="Fly"/>.
+        /// </summary>
+        public CardTrip Turning(float from, float to, System.Action? arrived = null)
+        {
+            _turnFrom = from;
+            _turnTo = to;
+            _arrived = arrived;
+            Tick(0f);
+            return this;
+        }
 
         /// <summary>How far along its trip the card is, from 0 to 1 (tests).</summary>
         public float Progress => Mathf.Clamp01(_time / _seconds);
@@ -29,7 +46,7 @@ namespace Vortex.Client.Presentation
         /// camera's way (<paramref name="facing"/>), <paramref name="height"/> units tall, along a curve
         /// <paramref name="arc"/> units high; <paramref name="burnsUp"/> ends it in a flash of <paramref name="flame"/>.
         /// </summary>
-        public void Fly(Vector3 from, Vector3 to, Quaternion facing, float height, float arc, float seconds, bool burnsUp, Color flame, Material? glow)
+        public CardTrip Fly(Vector3 from, Vector3 to, Quaternion facing, float height, float arc, float seconds, bool burnsUp, Color flame, Material? glow)
         {
             _from = from;
             _to = to;
@@ -41,6 +58,7 @@ namespace Vortex.Client.Presentation
             _flame = flame;
             _glow = glow;
             Tick(0f);
+            return this;
         }
 
         /// <summary>Moves the card on (every frame; tests call it directly). Returns false once it has arrived.</summary>
@@ -52,7 +70,7 @@ namespace Vortex.Client.Presentation
             transform.position = Vector3.Lerp(_from, _to, eased) + (Vector3.up * _arc * 4f * eased * (1f - eased));
 
             // One turn on itself during the trip; a card that burns up shrinks as it arrives.
-            transform.rotation = _facing * Quaternion.Euler(0f, 360f * eased, 0f);
+            transform.rotation = _facing * Quaternion.Euler(0f, Mathf.Lerp(_turnFrom, _turnTo, eased), 0f);
             float size = _height / Mathf.Max(0.01f, GetComponent<CardDisplay>().Size.y);
             float shrink = _burnsUp ? Mathf.Clamp01((1f - t) / 0.25f) : 1f;
             transform.localScale = Vector3.one * size * shrink;
@@ -61,6 +79,8 @@ namespace Vortex.Client.Presentation
                 return true;
             }
 
+            _arrived?.Invoke();
+            _arrived = null;
             if (_burnsUp)
             {
                 PlaceholderEffect.Create("Carte consumée", _to, 0.45f, _glow)
@@ -82,5 +102,12 @@ namespace Vortex.Client.Presentation
         }
 
         private void Update() => Tick(Time.deltaTime);
+
+        // A trip cut short (a new game, the scene closing) still lets its place show its card.
+        private void OnDestroy()
+        {
+            _arrived?.Invoke();
+            _arrived = null;
+        }
     }
 }

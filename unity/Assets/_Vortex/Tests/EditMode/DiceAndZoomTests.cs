@@ -31,6 +31,8 @@ namespace Vortex.Tests.EditMode
 
             public Camera? View => null;
 
+            public MarketDisplay? Markets => null;
+
             public CardDisplay? NewCard(string cardId) => null;
 
             public bool TakePlacedByHand(int uid) => false;

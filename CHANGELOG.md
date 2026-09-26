@@ -4,6 +4,8 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Non publié]
 ### Ajouté
+- **Paquets du marché** (ANIMATIONS §5) : un paquet en tête de chaque rangée, le modèle de carte vu de dos, aussi épais qu'il reste de cartes (`DeckDisplay`). Une carte révélée part du paquet, se retourne en vol et se pose sur sa place, vide jusqu'à son arrivée ; un recyclage renvoie les cartes au paquet (`MarketDeckFeedback`). Les cartes du marché passent de 133 à 120 unités de haut pour laisser la place au paquet. Tests `MarketDeckTests`.
+- **Client agnostique du contenu** : un test vérifie que le code du client ne nomme aucune carte, aucun événement, aucune technologie (`ConventionTests`), comme celui du moteur.
 - **Quatrième playtest** (ARB-89, ARB-90) :
   - le combo passe par-dessus le vaisseau ;
   - le vaisseau du joueur avance et les vaisseaux grossissent ;

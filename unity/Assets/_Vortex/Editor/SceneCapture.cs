@@ -347,6 +347,11 @@ namespace Vortex.Editor
                     die.Place();
                 }
 
+                foreach (DeckDisplay deck in Object.FindObjectsByType<DeckDisplay>())
+                {
+                    deck.Place();
+                }
+
                 camera.Render();
             }
         }
