@@ -9,7 +9,7 @@ namespace Vortex.Client.Presentation
     /// A combo (<see cref="GameEventType.TechnologyActivated"/>, ANIMATIONS.md §2): the ship powers up. A pulse in the
     /// technology's colour spreads around it, then each engine lights up with an afterburner jet (a white-hot core in a
     /// flickering sheath of the technology's colour) while the ship surges forward. The jets start from each
-    /// <c>Reacteur…</c> marker of the model (behind the ship without one); with a prefab, the prefab is the jet.
+    /// <c>Reacteur…</c> marker of the model (two outlets at its back without them); with a prefab, the prefab is the jet.
     /// </summary>
     [CreateAssetMenu(menuName = "Vortex/Retours visuels/Réacteurs", fileName = "ThrusterFeedback")]
     public sealed class ThrusterFeedback : FeedbackAsset
@@ -47,17 +47,12 @@ namespace Vortex.Client.Presentation
             PlaceholderEffect.Create("Onde de combo", ship.position + (Vector3.up * 0.1f * scale), 0.8f / speed, glow)
                 .AddRing(color * brightness, 20, pulseRadius * scale, 0.07f * scale, 0.8f / speed);
 
-            IReadOnlyList<Transform> engines = ShipParts.EnginesOf(ship, out Vector3 behind);
+            IReadOnlyList<Vector3> engines = ShipParts.EnginesOf(ship);
             ShipMotion? motion = stage.MotionOf(gameEvent.Player);
             Transform carrier = motion != null ? motion.Body : ship;
-            if (engines.Count == 0)
+            foreach (Vector3 engine in engines)
             {
-                Jet(behind, ship, carrier, color, glow, scale, speed);
-            }
-
-            foreach (Transform engine in engines)
-            {
-                Jet(engine.position, ship, carrier, color, glow, scale, speed);
+                Jet(engine, ship, carrier, color, glow, scale, speed);
             }
 
             motion?.Push(ship.forward * surge * scale, 0.25f / speed, 0.9f / speed, 0.15f / speed);

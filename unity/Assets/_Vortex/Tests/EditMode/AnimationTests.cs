@@ -105,8 +105,9 @@ namespace Vortex.Tests.EditMode
             PlaceholderEffect[] impacts = Object.FindObjectsByType<PlaceholderEffect>().Where(e => e.name == "Impact").OrderBy(e => e.PieceCount).ToArray();
             Assert.That(impacts, Has.Length.EqualTo(2));
             Assert.That(impacts[1].PieceCount, Is.GreaterThan(impacts[0].PieceCount * 2), "A heavier hit makes a bigger impact.");
-            motion.Tick(3f);
-            Assert.That((motion.PushOffset, motion.PushSpin), Is.EqualTo((Vector3.zero, Vector3.zero)), "Back where it was, after the jolts.");
+            motion.Tick(4f);
+            Assert.That(motion.PushOffset.magnitude, Is.LessThan(0.001f), "Back where it was: the elastic settled.");
+            Assert.That(motion.PushSpin.magnitude, Is.LessThan(0.1f));
 
             knockback.Play(new GameEvent { Type = GameEventType.HpLost, Player = 0, Amount = 3, Cause = HpLossCause.Torment }, stage);
             motion.Tick(0.1f);
@@ -121,7 +122,7 @@ namespace Vortex.Tests.EditMode
             var combo = new GameEvent { Type = GameEventType.TechnologyActivated, Player = 0, Value = (int)TechColor.Red };
 
             thrusters.Play(combo, new Stage(ship, null, motion));
-            Assert.That(Object.FindObjectsByType<PlaceholderEffect>().Length, Is.EqualTo(2), "The pulse, and without markers one jet behind the ship.");
+            Assert.That(Object.FindObjectsByType<PlaceholderEffect>().Length, Is.EqualTo(3), "The pulse, and without markers two jets at the back of the model (playtest 4).");
             CleanUpEffects();
 
             Marker(ship, "Reacteur_Gauche");
@@ -265,20 +266,73 @@ namespace Vortex.Tests.EditMode
         }
 
         [Test]
-        public void A_stolen_card_flies_between_ships_and_a_used_card_burns_up_in_the_middle()
+        public void A_stolen_card_flies_as_a_3D_card_and_a_card_placed_by_hand_does_not()
         {
             Transform thief = Ship("Voleur", new Vector3(-4f, 0f, 0f), out ShipMotion motion);
             Transform victim = Ship("Victime", new Vector3(4f, 0f, 0f), out ShipMotion _);
-            var centre = new GameObject("Centre").transform;
-            _created.Add(centre.gameObject);
+            CardDisplay prefab = AssetDatabase.LoadAssetAtPath<GameObject>(ThemeAssets.CardPrefabPath).GetComponent<CardDisplay>();
+            var stage = new Stage(thief, victim, motion) { Cards = () => Object.Instantiate(prefab) };
             CardFlightFeedback flight = ScriptableObject.CreateInstance<CardFlightFeedback>();
 
-            flight.Play(new GameEvent { Type = GameEventType.CardStolen, Player = 0, Other = 1, CardUid = 5 }, new Stage(thief, victim, motion));
-            Assert.That(Object.FindObjectsByType<PlaceholderEffect>().Single().PieceCount, Is.EqualTo(6), "A few steps along its curve.");
-            CleanUpEffects();
+            flight.Play(new GameEvent { Type = GameEventType.CardStolen, Player = 0, Other = 1, CardUid = 5, Id = "A_001" }, stage);
+            CardTrip trip = Object.FindObjectsByType<CardTrip>().Single();
+            _created.Add(trip.gameObject);
+            Assert.That(trip.transform.position.x, Is.EqualTo(4f).Within(0.5f), "It leaves the victim's ship.");
+            trip.Tick(0.25f);
+            Assert.That(trip.transform.position.y, Is.GreaterThan(1f), "It flies on a curve above the table.");
+            Assert.That(trip.Tick(5f), Is.False, "Arrived: gone, the table shows it in its place.");
 
-            flight.Play(new GameEvent { Type = GameEventType.CardActivated, Player = 0, CardUid = 5 }, new Stage(thief, null, motion, centre));
-            Assert.That(Object.FindObjectsByType<PlaceholderEffect>().Single().PieceCount, Is.GreaterThan(6), "It burns up in the middle.");
+            stage.PlacedByHand.Add(6);
+            flight.Play(new GameEvent { Type = GameEventType.CardActivated, Player = 0, CardUid = 6, Id = "A_001" }, stage);
+            Assert.That(Object.FindObjectsByType<CardTrip>(), Is.Empty, "Dropped where it goes by hand: no trip.");
+        }
+
+        [Test]
+        public void A_thrown_ship_flies_past_its_place_on_the_elastic_and_a_wreck_drifts_off()
+        {
+            Transform ship = Ship("Vaisseau", Vector3.zero, out ShipMotion motion);
+            motion.Throw(new Vector3(0f, 0f, 6f), Vector3.zero);
+            float farthest = 0f;
+            float past = 0f;
+            for (int i = 0; i < 200; i++)
+            {
+                motion.Tick(0.01f);
+                farthest = Mathf.Max(farthest, motion.PushOffset.z);
+                past = Mathf.Min(past, motion.PushOffset.z);
+            }
+
+            Assert.That(farthest, Is.GreaterThan(0.5f), "Thrown off freely.");
+            Assert.That(past, Is.LessThan(0f), "The elastic brings it back a little past its place.");
+
+            motion.Wreck();
+            motion.Throw(new Vector3(0f, 0f, 6f), Vector3.zero);
+            motion.Tick(3f);
+            Assert.That(motion.PushOffset.z, Is.GreaterThan(1f), "A wreck has no elastic: it drifts off.");
+        }
+
+        [Test]
+        public void A_critical_die_leaps_towards_the_camera_and_lands_with_a_burst()
+        {
+            GameObject die = PlaceholderDie.Build(null, Color.white, Color.black);
+            _created.Add(die);
+            var camera = new GameObject("Caméra").AddComponent<Camera>();
+            _created.Add(camera.gameObject);
+            var canvas = new GameObject("Toile", typeof(RectTransform)).AddComponent<Canvas>();
+            _created.Add(canvas.gameObject);
+            var place = new GameObject("Place", typeof(RectTransform)).GetComponent<RectTransform>();
+            place.SetParent(canvas.transform, false);
+            DieSpinner spinner = die.AddComponent<DieSpinner>();
+            spinner.Follow(place, camera, 3f, 720f);
+            spinner.Show(8, 0f);
+            float rest = Vector3.Distance(die.transform.position, camera.transform.position);
+
+            Vector3? landed = null;
+            spinner.Leap(0.6f, at => landed = at);
+            spinner.Tick(0.3f);
+            Assert.That(Vector3.Distance(die.transform.position, camera.transform.position), Is.LessThan(rest * 0.7f), "Towards the camera.");
+            spinner.Tick(0.4f);
+            Assert.That((spinner.Leaping, landed.HasValue), Is.EqualTo((false, true)), "Landed, with its burst.");
+            Assert.That(Vector3.Distance(die.transform.position, camera.transform.position), Is.EqualTo(rest).Within(0.01f), "Back in its place.");
         }
 
         [Test]
@@ -391,6 +445,14 @@ namespace Vortex.Tests.EditMode
             public ThemeSettings? Theme => null;
 
             public Camera? View => null;
+
+            public System.Func<CardDisplay>? Cards { get; set; }
+
+            public HashSet<int> PlacedByHand { get; } = new HashSet<int>();
+
+            public CardDisplay? NewCard(string cardId) => Cards?.Invoke();
+
+            public bool TakePlacedByHand(int uid) => PlacedByHand.Remove(uid);
 
             public AttackMemory Attack => Memory;
 

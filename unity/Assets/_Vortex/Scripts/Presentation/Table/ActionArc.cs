@@ -14,7 +14,7 @@ namespace Vortex.Client.Presentation
     public sealed class ActionArc : MonoBehaviour
     {
         [Tooltip("Centre de l'arc (le vaisseau), en unités d'interface, depuis le bas du panneau du joueur.")]
-        [SerializeField] private Vector2 centre = new Vector2(0f, 270f);
+        [SerializeField] private Vector2 centre = new Vector2(0f, 335f);
         [Tooltip("Rayon de l'arc, en unités d'interface.")]
         [SerializeField, Min(10f)] private float radius = 135f;
         [Tooltip("Ouverture de l'arc de part et d'autre de la verticale, en degrés.")]

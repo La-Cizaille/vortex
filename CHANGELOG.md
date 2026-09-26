@@ -4,6 +4,15 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Non publié]
 ### Ajouté
+- **Quatrième playtest** (ARB-89, ARB-90) :
+  - le combo passe par-dessus le vaisseau ;
+  - le vaisseau du joueur avance et les vaisseaux grossissent ;
+  - deux jets au combo, pris à l'arrière du modèle sans repères ;
+  - projection élastique aux dégâts, dans le sens du tir (`ShipMotion.Throw`) ;
+  - les cartes voyagent avec leur modèle 3D (`CardTrip`), sauf celles posées à la main ;
+  - le dé d'un critique saute vers la caméra et retombe avec un éclat d'énergie ;
+  - cockpit du joueur décrit pour l'atelier Blender (INTERFACE §3.2, ANIMATIONS §6).
+  Le plateau de dés reste affiché pendant que les événements suivants commencent. Tests `AnimationTests`.
 - **Animations, suite du lot 2** (ANIMATIONS §5) :
   - Tourment : spores et frisson ; purification quand les jetons s'en vont ;
   - surcharge : arcs électriques sur la coque tant que le jeton est présent ;
@@ -94,6 +103,7 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 - Le rapport d'équilibrage identifie le contenu par l'empreinte des quatre fichiers de contenu, et non plus du seul `cards.json`. L'option `--samples` est remplacée par `--bot`.
 
 ### Corrigé
+- « Ni vu ni connu » (et toute décision qui propose son propre vaisseau) : sa propre fiche ne recevait pas le toucher. Ses chiffres reçoivent maintenant le pointeur.
 - Les vaisseaux ne bougeaient pas (ni balancement, ni recul) : le modèle importé porte son maillage sur sa propre racine, que l'animation ne déplaçait pas. Chaque vaisseau a maintenant une racine immobile, placée par la table, et le modèle bouge dessous. Test avec un modèle à un seul maillage.
 - Retours du playtest des animations : l'attaquant se tourne vers sa cible dès l'attaque déclarée (`AimFeedback`) ; le tir est un projectile laser et non plus un rayon continu (`LaserFeedback`, qui remplace `BeamFeedback`) ; la postcombustion du combo est refaite (anneau d'étincelles, jets vacillants) ; les effets lumineux utilisent un matériau additif (`Glow.mat`) qui rayonne avec le Bloom. `tools/Capture-Unity.ps1 -Phase Effects` fige ces effets pour les juger.
 - Après une carte qui recycle un marché puis fait choisir une de ses nouvelles cartes (« Les affaires sont les affaires »), aucune carte ne pouvait être touchée ni glissée : pendant une décision, la vue publique est encore l'état d'avant la commande (ADR-0009), et la table montrait l'ancien marché. Les marchés de la table suivent maintenant leurs événements (`TableModel`), qui disent la place de chaque carte prise ou révélée (`Amount`). Une décision dont une carte n'est pas sur la table s'ouvre dans sa fenêtre au lieu d'attendre un toucher impossible. Tests `MarketModelTests` et moteur.

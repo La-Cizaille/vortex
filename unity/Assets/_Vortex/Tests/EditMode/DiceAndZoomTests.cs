@@ -31,6 +31,10 @@ namespace Vortex.Tests.EditMode
 
             public Camera? View => null;
 
+            public CardDisplay? NewCard(string cardId) => null;
+
+            public bool TakePlacedByHand(int uid) => false;
+
             public AttackMemory Attack { get; } = new AttackMemory();
 
             public ShipMotion? MotionOf(int seat) => null;
@@ -62,7 +66,7 @@ namespace Vortex.Tests.EditMode
                 var feedback = AssetDatabase.LoadAssetAtPath<DiceFeedback>(ProjectAssets.DicePath);
                 var roll = new GameEvent { Type = GameEventType.DiceRolled, Player = 0, Values = new System.Collections.Generic.List<int> { 2, 5 }, Amount = 7 };
                 float wait = feedback.Play(roll, new Stage(parent.transform, 4f));
-                Assert.That(wait, Is.EqualTo(1.4f).Within(1e-4), "The wait is in playback seconds; the event player applies the speed.");
+                Assert.That(wait, Is.EqualTo(0.6f + (0.8f * 0.4f)).Within(1e-4), "In playback seconds: the roll, then part of the hold; the result stays while the next events start.");
 
                 DiceTray tray = parent.GetComponentInChildren<DiceTray>();
                 Assert.That(tray, Is.Not.Null);

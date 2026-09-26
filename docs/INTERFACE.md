@@ -67,7 +67,16 @@ Pendant ma phase de marché, le marché noir s'ouvre au centre de la table (3.3)
 - **Sous le vaisseau** : PV, bouclier, et **trois ronds** qui sont les technologies obtenues vers l'Élection galactique (il en faut 3 pour gagner). Chaque rond s'allume à la couleur de la technologie obtenue.
 - **Surcharge** : un petit jeton près du vaisseau, allumé quand je l'ai. Le toucher l'**arme** : il brille, et la prochaine attaque ou le prochain reparamétrage le dépense. Le toucher de nouveau le désarme (ARB-67).
 - **Effets temporaires** : en icônes, avec leur info-bulle.
-- **Bouton de combo** : au centre, sous le vaisseau. Il n'apparaît que lorsque le combo est jouable (ARB-87), à la couleur de la technologie. Au survol, il montre l'effet de la technologie.
+- **Bouton de combo** : au centre, par-dessus le bas du vaisseau, au premier plan (ARB-89). Il n'apparaît que lorsque le combo est jouable (ARB-87), à la couleur de la technologie. Au survol, il montre l'effet de la technologie.
+- **Cockpit** (ARB-90, à venir avec les modèles de l'atelier Blender) : sous le vaisseau, il remplacera les chiffres actuels. Il comprendra :
+  - une jauge de PV qui se remplit et se vide, avec le chiffre dessus ;
+  - une jauge de bouclier en manomètre, avec une aiguille ;
+  - deux emplacements de modificateurs en creux, avec le symbole de l'emplacement ;
+  - un interrupteur pour la surcharge ;
+  - trois diodes pour les technologies obtenues ;
+  - une étiquette au nom du joueur.
+
+  Le vaisseau a été avancé vers la table pour lui laisser la place (ARB-89).
 
 ### 3.3 Marché noir
 

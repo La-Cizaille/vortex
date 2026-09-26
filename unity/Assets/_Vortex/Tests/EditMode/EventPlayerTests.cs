@@ -21,6 +21,10 @@ namespace Vortex.Tests.EditMode
 
             public Camera? View => null;
 
+            public CardDisplay? NewCard(string cardId) => null;
+
+            public bool TakePlacedByHand(int uid) => false;
+
             public AttackMemory Attack { get; } = new AttackMemory();
 
             public ShipMotion? MotionOf(int seat) => null;

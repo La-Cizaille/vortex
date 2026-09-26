@@ -9,10 +9,10 @@ namespace Vortex.Client.Presentation
     /// <list type="bullet">
     /// <item>the impact grows with it: a bigger flash, more and faster sparks, hull debris from a medium hit, a
     /// shockwave ring for a heavy one;</item>
-    /// <item>the ship is thrown back away from the middle of the table, then shaken by a few smaller jolts in random
-    /// directions and spun around its axes, the harder the more it loses.</item>
+    /// <item>the ship is thrown like a ball on an elastic (playtest 4), in the direction of the shot, tumbling, the harder
+    /// the more it loses; the elastic brings it back, a little past its place, and it settles.</item>
     /// </list>
-    /// Every jolt comes back: the ship ends where it was, unless it is destroyed (<see cref="ShipMotion.Wreck"/>). Damage
+    /// It always ends where it was, unless it is destroyed (<see cref="ShipMotion.Wreck"/>): then it drifts away. Damage
     /// sent back (cause Reflect) first flies back as a bolt from the ship that returns it. Other losses (Torment, events,
     /// costs) only wait: they have their own animations.
     /// </summary>
@@ -24,13 +24,8 @@ namespace Vortex.Client.Presentation
         [Tooltip("Projection la plus faible puis la plus forte, en unités de la scène.")]
         [SerializeField, Min(0f)] private float lightThrow = 0.2f;
         [SerializeField, Min(0f)] private float heavyThrow = 1.1f;
-        [Tooltip("Rotation la plus forte du vaisseau projeté, en degrés (tangage, lacet, roulis).")]
+        [Tooltip("Rotation la plus forte du vaisseau projeté, en degrés (tangage, lacet, roulis) ; l'élastique le ramène.")]
         [SerializeField] private Vector3 heavySpin = new Vector3(18f, 28f, 45f);
-        [Tooltip("Nombre de secousses qui suivent la projection, pour l'impact le plus fort.")]
-        [SerializeField, Range(0, 8)] private int heavyJolts = 4;
-        [Tooltip("Durée de la projection, puis du retour, en secondes à vitesse normale.")]
-        [SerializeField, Min(0.01f)] private float outSeconds = 0.09f;
-        [SerializeField, Min(0.01f)] private float backSeconds = 0.9f;
         [Tooltip("Impact posé sur la coque (effet provisoire sinon). Son échelle suit la gravité.")]
         [SerializeField] private GameObject? sparks;
         [Tooltip("Éclat des effets lumineux : au-dessus du seuil du Bloom (1,5), ils rayonnent.")]
@@ -56,8 +51,10 @@ namespace Vortex.Client.Presentation
 
             float speed = Mathf.Max(0.01f, stage.PlaybackSpeed);
             float severity = Mathf.Clamp01((float)gameEvent.Amount / heavyDamage);
+            // Away from the ship that caused the loss when there is one (the shot's direction), else from the middle.
+            Transform? attacker = gameEvent.Other >= 0 ? stage.AnchorFor(FeedbackAnchor.Other, gameEvent) : null;
             Transform? centre = stage.AnchorFor(FeedbackAnchor.Table, gameEvent);
-            Vector3 away = centre != null ? ship.position - centre.position : -ship.forward;
+            Vector3 away = attacker != null && attacker != ship ? ship.position - attacker.position : centre != null ? ship.position - centre.position : -ship.forward;
             away.y = 0f;
             away = away.sqrMagnitude > 0.0001f ? away.normalized : -ship.forward;
             float scale = ship.lossyScale.x;
@@ -78,12 +75,12 @@ namespace Vortex.Client.Presentation
         private static Vector3 RandomSigns() =>
             new Vector3(Random.value < 0.5f ? -1f : 1f, Random.value < 0.5f ? -1f : 1f, Random.value < 0.5f ? -1f : 1f);
 
-        // The throw, then the jolts: each one comes back by itself, so the ship ends where it was.
         private static float ReturnBolt(Transform source, Transform ship, IFeedbackStage stage, float speed)
         {
             Vector3 from = ShipParts.HullOf(source);
             Vector3 along = ShipParts.HullOf(ship) - from;
             float travel = along.magnitude / 20f;
+
             // A white-hot bolt: the damage is the attacker's own, sent back.
             var color = new Color(3f, 3f, 3.6f);
             PlaceholderEffect.Create("Renvoi", from, travel / speed, stage.Theme != null ? stage.Theme.GlowMaterial : null)
@@ -92,6 +89,8 @@ namespace Vortex.Client.Presentation
             return travel;
         }
 
+        // Thrown like a ball on an elastic (playtest 4): away from the shot, tumbling, harder the heavier the hit; the
+        // elastic brings it back. Cosmetic chaos only, never a game value.
         private void Throw(ShipMotion? motion, Vector3 away, float severity, float scale, float speed, float delay)
         {
             if (motion == null)
@@ -99,21 +98,18 @@ namespace Vortex.Client.Presentation
                 return;
             }
 
-            // Cosmetic chaos only, never a game value.
-            float distance = Mathf.Lerp(lightThrow, heavyThrow, severity) * scale;
-            Vector3 spin = Vector3.Scale(heavySpin * Mathf.Lerp(0.2f, 1f, severity), RandomSigns());
-            motion.Push((away + (Vector3.up * 0.25f * severity)) * distance, spin, outSeconds / speed, backSeconds / speed, delay / speed);
-
-            int jolts = Mathf.RoundToInt(heavyJolts * severity);
-            for (int i = 0; i < jolts; i++)
+            // The distance the elastic lets it reach, turned into a starting speed; a little random slant.
+            float reach = Mathf.Lerp(lightThrow, heavyThrow, severity) * scale;
+            Vector3 direction = Quaternion.Euler(0f, Random.Range(-20f, 20f), 0f) * away;
+            Vector3 velocity = ((direction * 1f) + (Vector3.up * 0.35f * severity)) * reach * Mathf.Sqrt(ShipMotion.Stiffness) * 1.4f * speed;
+            Vector3 spin = Vector3.Scale(heavySpin * Mathf.Lerp(0.3f, 1f, severity), RandomSigns()) * 6f * speed;
+            if (delay > 0f)
             {
-                float fade = 1f - ((float)i / Mathf.Max(1, jolts));
-                Vector3 direction = Random.onUnitSphere;
-                direction.y *= 0.4f;
-                Vector3 shake = Vector3.Scale(heavySpin * 0.5f * severity * fade, RandomSigns());
-                float after = (delay + outSeconds + (0.08f * (i + 1))) / speed;
-                motion.Push(direction * distance * 0.35f * fade, shake, 0.05f / speed, 0.25f / speed, after);
+                motion.ThrowAfter(delay / speed, velocity, spin);
+                return;
             }
+
+            motion.Throw(velocity, spin);
         }
 
         private void Impact(Vector3 hull, Vector3 away, float severity, float scale, float speed, IFeedbackStage stage, float delay)
