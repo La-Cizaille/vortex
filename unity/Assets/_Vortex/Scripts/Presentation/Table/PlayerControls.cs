@@ -673,6 +673,9 @@ namespace Vortex.Client.Presentation
                 return false;
             }
 
+            // Arming is a choice made for one action (ARB-67): once a command leaves, the token is disarmed again.
+            OverchargeArmed = false;
+            overchargeGlow.enabled = false;
             _host.Submit(_seat, command);
             return true;
         }
