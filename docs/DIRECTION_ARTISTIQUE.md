@@ -152,6 +152,7 @@ Ils se rejoignent dans le cockpit et les menus : du métal noirci couvert d'affi
 
 Règles :
 - **Éclairage bas** : de grandes zones d'ombre, des sources de lumière rares et justifiées. Ce qui brille attire l'œil parce que tout le reste est sombre.
+- **La lisibilité passe avant l'ambiance** (ARB-98) : chaque vaisseau garde une lumière de découpe qui détache sa silhouette du fond, les cibles et la sélection restent éclairées, les chiffres et les cartes gardent leur contraste. Toute capture de validation se juge d'abord là-dessus.
 - Les informations de jeu (chiffres, cibles, sélection) gardent un contraste franc : l'ambiance ne les noie jamais.
 - Les couleurs des sièges et des factions ne changent pas sans vérifier leur contraste entre elles et sur le nouveau fond.
 - Une information ne passe jamais par la couleur seule : forme, emblème, motif ou texte l'accompagnent (daltonisme).
@@ -170,6 +171,7 @@ Polices libres (licence SIL OFL ou Apache), avec les accents du français. Chaqu
 Le thème a déjà deux emplacements de police, titre et texte (`ThemeSettings`). Une police mono pourra s'y ajouter.
 
 ### 6.3 Matériaux 3D (registre A)
+- **Tous les modèles peuvent être repris** (ARB-98), aucun n'est intouchable, à condition de garder la lisibilité et les pièces et repères nommés que le jeu lit (ASSETS §2, ANIMATIONS §6).
 - **Low-poly texturé** (ARB-77, ARB-97) : peu de polygones, mais des textures riches et détaillées ; c'est la texture qui porte câbles fins, vis, marquages et usure.
 - **Textures externes permises** (ARB-97) : banques CC0 connues (Poly Haven, ambientCG), chaque fichier noté avec sa source, sa licence et son empreinte dans `art-src/LICENCES.md`.
 - **Les peintures extérieures restent brillantes** : on est dans l'espace, la coque est laquée et vernie, avec des reflets francs (brillance élevée dans URP), mais **dans des teintes profondes**, jamais acidulées. L'usure se limite aux **arêtes, éclats, rayures et abords des rivets**, où la rouille et la tôle nue apparaissent. L'intérieur (cockpit, soutes) est plus mat, plus sale.
