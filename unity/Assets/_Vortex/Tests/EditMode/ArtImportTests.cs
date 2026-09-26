@@ -303,6 +303,22 @@ namespace Vortex.Tests.EditMode
                     .ToArray();
                 Assert.That(materials.Length, Is.LessThanOrEqualTo(3), path + ": " + string.Join(", ", materials));
                 Assert.That(materials, Has.Some.StartsWith(ShipCatalog.SeatMaterialName), path + ": a part takes the seat colour.");
+
+                // Markers (ANIMATIONS §5), when the model has them: on the ship, the muzzle ahead of its centre and the
+                // engines behind it. A wrong axis at the export would throw them off.
+                Bounds around = bounds;
+                around.Expand(0.1f);
+                foreach (Transform marker in model.GetComponentsInChildren<Transform>())
+                {
+                    bool muzzle = marker.name == ShipParts.Muzzle;
+                    if (!muzzle && !marker.name.StartsWith(ShipParts.Engine, System.StringComparison.Ordinal))
+                    {
+                        continue;
+                    }
+
+                    Assert.That(around.Contains(marker.position), Is.True, path + ": " + marker.name + " sits on the ship.");
+                    Assert.That(marker.position.z, muzzle ? Is.GreaterThan(bounds.center.z) : Is.LessThan(bounds.center.z), path + ": " + marker.name + " is on its end of the ship.");
+                }
             }
         }
 

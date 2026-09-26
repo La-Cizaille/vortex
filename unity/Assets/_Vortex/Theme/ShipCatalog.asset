@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8e405153d81d0f4f94c408c0544ad08, type: 3}
   m_Name: ShipCatalog
   m_EditorClassIdentifier: Vortex.Client::Vortex.Client.Theme.ShipCatalog
-  defaultShip: {fileID: 919132149155446097, guid: b9120b254eac01241be83abcd66cc3da, type: 3}
+  defaultShip: {fileID: 919132149155446097, guid: 7d43997ee13da0d4294a6b643a6881d5, type: 3}
   seats: []
