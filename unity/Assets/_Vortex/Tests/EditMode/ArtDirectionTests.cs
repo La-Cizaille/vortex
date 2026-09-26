@@ -2,6 +2,7 @@ using System.Linq;
 using NUnit.Framework;
 using TMPro;
 using UnityEditor;
+using UnityEngine;
 using Vortex.Client.Content;
 using Vortex.Client.Presentation;
 using Vortex.Client.Theme;
@@ -37,6 +38,42 @@ namespace Vortex.Tests.EditMode
             var without = new TechnologyDefinition("TECH_BLUE", TechColor.Blue, "Légion de l'Ordre", "Règle.", "Arbitrage.", null);
             Assert.That(CardFace.Of(with, texts).Flavor, Is.EqualTo("L'Ordre ne rit pas."));
             Assert.That(CardFace.Of(without, texts).Flavor, Is.Empty);
+        }
+
+        [Test]
+        public void An_opponents_figures_sit_on_a_radar_that_sweeps_and_glitches_but_always_settles_back()
+        {
+            var panel = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(GameScene.SeatPanelPath));
+            try
+            {
+                RadarScreen radar = panel.GetComponentInChildren<RadarScreen>();
+                Assert.That(radar, Is.Not.Null, "The panel's screen is a radar.");
+                TMP_Text hp = panel.transform.Find("PV").GetComponent<TMP_Text>();
+                Vector2 rest = hp.rectTransform.anchoredPosition;
+                float alpha = hp.color.a;
+
+                radar.Tick(RadarScreen.SweepSeconds / 4f);
+                Assert.That(radar.Sweep, Is.EqualTo(0.25f).Within(0.01f), "The bar sweeps down.");
+
+                bool glitched = false;
+                for (int frame = 0; frame < 1000; frame++)
+                {
+                    radar.Tick(1f / 30f);
+                    glitched |= radar.Glitching;
+                }
+
+                Assert.That(glitched, Is.True, "Now and then the picture jumps.");
+                while (radar.Glitching)
+                {
+                    radar.Tick(1f / 30f);
+                }
+
+                Assert.That((hp.rectTransform.anchoredPosition, hp.color.a), Is.EqualTo((rest, alpha)), "And the figures settle back where they were.");
+            }
+            finally
+            {
+                Object.DestroyImmediate(panel);
+            }
         }
     }
 }
