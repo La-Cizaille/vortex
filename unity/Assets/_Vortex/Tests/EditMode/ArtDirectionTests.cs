@@ -94,5 +94,64 @@ namespace Vortex.Tests.EditMode
                 EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             }
         }
+
+        [Test]
+        public void The_vortex_grows_as_the_end_of_times_nears_and_swells_when_an_event_is_revealed()
+        {
+            var sky = new GameObject("Fond");
+            GameObject disc = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            disc.name = VortexDisplay.PartName;
+            disc.transform.SetParent(sky.transform, false);
+            disc.transform.localScale = new Vector3(2f, 2f, 0.01f);
+            try
+            {
+                VortexDisplay vortex = VortexDisplay.Attach(sky);
+                Assert.That(vortex.HasVortex, Is.True);
+                vortex.ShowProgress(0.5f);
+                for (int i = 0; i < 100; i++)
+                {
+                    vortex.Tick(0.1f);
+                }
+
+                Assert.That(vortex.Progress, Is.EqualTo(0.5f).Within(0.01f));
+                float grown = disc.transform.localScale.x;
+                Assert.That(grown, Is.EqualTo(2f * (1f + (VortexDisplay.Growth * 0.5f))).Within(0.01f), "Halfway to the end: part of its growth.");
+
+                vortex.Pulse();
+                vortex.Tick(0.6f);
+                Assert.That(disc.transform.localScale.x, Is.GreaterThan(grown), "An event: it swells.");
+                vortex.Tick(1f);
+                Assert.That(disc.transform.localScale.x, Is.EqualTo(grown).Within(0.01f), "Then settles back.");
+            }
+            finally
+            {
+                Object.DestroyImmediate(sky);
+            }
+        }
+
+        [Test]
+        public void The_casino_die_lights_up_on_its_highest_face_only()
+        {
+            var theme = AssetDatabase.LoadAssetAtPath<ThemeSettings>(ThemeAssets.ThemePath);
+            Assume.That(theme.DieModel, Is.Not.Null, "The theme has the casino die.");
+            var eye = new GameObject("Caméra").AddComponent<Camera>();
+            var place = new GameObject("Place", typeof(RectTransform)).GetComponent<RectTransform>();
+            GameObject die = Object.Instantiate(theme.DieModel!);
+            try
+            {
+                DieSpinner spinner = die.AddComponent<DieSpinner>();
+                spinner.Follow(place, eye, 5f, 0f);
+                Assert.That(spinner.Show(8, 0f), Is.True);
+                Assert.That(spinner.Lit, Is.True, "An 8: the light is on.");
+                spinner.Show(3, 0f);
+                Assert.That(spinner.Lit, Is.False, "Any other face: off.");
+            }
+            finally
+            {
+                Object.DestroyImmediate(die);
+                Object.DestroyImmediate(eye.gameObject);
+                Object.DestroyImmediate(place.gameObject);
+            }
+        }
     }
 }

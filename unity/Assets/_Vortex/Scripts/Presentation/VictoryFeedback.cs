@@ -6,7 +6,7 @@ namespace Vortex.Client.Presentation
 {
     /// <summary>
     /// The end of the game (<see cref="GameEventType.GameOver"/>, ANIMATIONS.md §3): the camera turns slowly around the
-    /// winner, coming closer (<see cref="CameraOrbit"/>). A Galactic Election rains gold on it; a Domination bursts in its
+    /// winner, coming closer (<see cref="CameraOrbit"/>). A Galactic Election buries it under falling propaganda leaflets (DIRECTION_ARTISTIQUE §6.7: grave, not festive); a Domination bursts in its
     /// colour. A draw shows nothing more. The next game puts the camera back.
     /// </summary>
     [CreateAssetMenu(menuName = "Vortex/Retours visuels/Victoire", fileName = "VictoryFeedback")]
@@ -18,8 +18,10 @@ namespace Vortex.Client.Presentation
         [SerializeField, Range(0f, 0.9f)] private float closer = 0.35f;
         [Tooltip("Durée du mouvement de caméra, en secondes à vitesse normale.")]
         [SerializeField, Min(0.1f)] private float seconds = 3f;
-        [Tooltip("Couleur de la pluie d'or de l'Élection galactique ; au-dessus de 1,5, elle rayonne.")]
-        [SerializeField, ColorUsage(false, true)] private Color gold = new Color(3f, 2.3f, 0.6f);
+        [Tooltip("Couleur des tracts qui tombent sur l'élu de l'Élection galactique (papier jauni).")]
+        [SerializeField] private Color tract = new Color32(207, 196, 168, 255);
+        [Tooltip("Couleur des tracts imprimés en rouge sang, mêlés aux autres.")]
+        [SerializeField] private Color bloodTract = new Color32(142, 27, 27, 255);
         [Tooltip("Attente avant l'événement suivant, en secondes à vitesse normale.")]
         [SerializeField, Min(0f)] private float wait = 1.5f;
 
@@ -40,13 +42,14 @@ namespace Vortex.Client.Presentation
             float scale = ship.lossyScale.x;
             if ((WinCondition)gameEvent.Value == WinCondition.GalacticElection)
             {
-                // Gold falling from above, all around the winner; cosmetic scatter only.
-                PlaceholderEffect rain = PlaceholderEffect.Create("Pluie d'or", ship.position + (Vector3.up * 4f * scale), seconds / speed, glow);
-                for (int i = 0; i < 60; i++)
+                // Leaflets drifting down around the elected, slowly, turning; paper, not light. Cosmetic scatter only.
+                PlaceholderEffect rain = PlaceholderEffect.Create("Tracts", ship.position + (Vector3.up * 4f * scale), seconds / speed, null);
+                for (int i = 0; i < 50; i++)
                 {
                     Vector3 start = Vector3.Scale(Random.insideUnitSphere, new Vector3(2.5f, 0.5f, 2.5f)) * scale;
-                    rain.Add(new PlaceholderEffect.PieceSpec(PrimitiveType.Sphere, gold, start, Quaternion.identity, Vector3.one * Random.Range(0.05f, 0.12f) * scale)
-                    { Velocity = Vector3.down * Random.Range(1.5f, 2.5f) * scale * speed, Delay = Random.Range(0f, 1.5f) / speed, Duration = 1.6f / speed, Rise = 0.1f, Flicker = 0.4f, Glow = true });
+                    Color paper = i % 3 == 0 ? bloodTract : tract;
+                    rain.Add(new PlaceholderEffect.PieceSpec(PrimitiveType.Cube, paper, start, Random.rotation, new Vector3(0.16f, 0.008f, 0.11f) * scale)
+                    { Velocity = (Vector3.down * Random.Range(0.7f, 1.2f) + (Random.insideUnitSphere * 0.3f)) * scale * speed, Delay = Random.Range(0f, 1.5f) / speed, Duration = 2.4f / speed, Rise = 0f, Flicker = 0f, Glow = false });
                 }
             }
             else

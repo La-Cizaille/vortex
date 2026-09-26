@@ -111,6 +111,7 @@ namespace Vortex.Client.Presentation
         private TableContext? _context;
         private GameLogFormatter? _log;
         private Narrator? _narrator;
+        private VortexDisplay? _vortex;
         private CommandLabels? _labels;
         private PanelState _panel;
         private bool _controlsOffered;
@@ -518,6 +519,7 @@ namespace Vortex.Client.Presentation
             _background = theme.TableBackground != null
                 ? Instantiate(theme.TableBackground, Vector3.zero, Quaternion.identity, shipRow)
                 : Starfield.Create(shipRow, view.transform.position, 450, 60f, theme.GlowMaterial).gameObject;
+            _vortex = VortexDisplay.Attach(_background);
         }
 
         private void TurnViewTo(int seat)
@@ -715,6 +717,11 @@ namespace Vortex.Client.Presentation
                 _dirty |= _model!.Apply(gameEvent);
             }
 
+            if (gameEvent.Type == GameEventType.EventRevealed)
+            {
+                _vortex?.Pulse();
+            }
+
             string? line = _log!.Describe(gameEvent, _model!.Seats);
             if (line != null)
             {
@@ -772,6 +779,13 @@ namespace Vortex.Client.Presentation
             }
 
             market.Show(model, redrawCards);
+
+            // The vortex grows as the end of times nears (DIRECTION_ARTISTIQUE §2.4).
+            if (_vortex != null && model.DoomRound > 0)
+            {
+                _vortex.ShowProgress((float)model.Round / model.DoomRound);
+            }
+
             banner.Show(model);
             if (_cockpit != null && _session != null)
             {
