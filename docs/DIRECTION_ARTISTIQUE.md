@@ -18,8 +18,8 @@ Ce document est la **bible** de l'apparence et du ton du jeu. Tout visuel, tout 
 
 **Piliers**
 1. **Fun d'abord.** Chaque coup se lit, se sent et se paie tout de suite. L'humour accompagne le jeu sans jamais le ralentir.
-2. **Humour noir, sarcastique, adulte.** On rit de la mort, de la cupidité, de la bureaucratie et de la politique d'un univers fictif. On ne rit jamais aux dépens du joueur réel ni de personnes réelles (§5.2).
-3. **Pirates bricoleurs.** Tout est usé, rafistolé, volé, repeint. Rien n'est neuf, rien n'est garanti.
+2. **Un monde sombre, une voix cruelle.** L'univers est pris au sérieux : sombre, lourd, sans issue, jamais cartoon. L'humour vient du **sarcasme froid** posé sur ce monde, pas de gags visuels. **L'image est grave, le texte est cruel** : c'est ce décalage qui fait rire (ARB-94). On ne rit jamais aux dépens du joueur réel ni de personnes réelles (§5.2).
+3. **Pirates en sursis.** Tout est usé, rafistolé, volé. Les équipages sont épuisés, les coques ont déjà servi à d'autres morts. Rien n'est neuf, rien n'est garanti, personne n'est sauvé.
 4. **Satire électorale.** L'Élection galactique est une campagne : affiches, promesses, pots-de-vin, votes achetés.
 5. **Lisible avant tout.** Une information de jeu reste nette dans n'importe quelle ambiance : la blague vit **à côté** de l'information, jamais à sa place (§5.3).
 
@@ -51,7 +51,7 @@ Ce document est la **bible** de l'apparence et du ton du jeu. Tout visuel, tout 
 ### 2.6 La voix du secteur : SINISTRA **[à valider]**
 - **Qui** : l'IA d'expertise des **Assurances Horizon Final**, dont le slogan est *« Nous couvrons tout. Sauf vous. »*
 - **Son rôle** : elle commente la partie dans le journal, les annonces de tour et les épitaphes. Elle estime chaque dommage, classe chaque dossier, et ne rembourse jamais.
-- **Son ton** : d'une politesse glaciale, elle vouvoie, avec un vocabulaire d'assureur (sinistre, franchise, dossier classé, clause d'exclusion).
+- **Son ton** : d'une politesse glaciale, elle vouvoie, avec un vocabulaire d'assureur (sinistre, franchise, dossier classé, clause d'exclusion). Elle ne plaisante jamais : elle constate. Le rire vient de son indifférence totale à la mort des équipages.
 - **Pourquoi elle** : un narrateur unique donne une voix constante au jeu et concentre l'humour à un seul endroit, qu'on peut couper (§5.4).
 
 ## 3. Les factions
@@ -61,9 +61,9 @@ Les quatre technologies deviennent quatre factions. Obtenir une technologie, c'e
 | Technologie (couleur) | Faction | Qui ils sont | Visuel | Ton | Lien avec la mécanique |
 |---|---|---|---|---|---|
 | **Ordre** (bleu) | **La Légion de l'Ordre** | Des fantassins d'élite en armure lourde, dernière force régulière de la Marge. Disciplinés, fanatiques, sans le moindre humour : ce sont eux, les pas rigolos. | Armures lourdes, visières, bannières, rangs serrés. Emblème : un éclair | **Sérieux, martial**. L'humour vient de ce qui les entoure, jamais d'eux | Dévier une attaque : interceptée et redirigée, « conformément au protocole » |
-| **Casino Cosmique** (jaune) | **La Maison** | La pègre du jeu. Elle possède la moitié des dettes du secteur et l'autre moitié des croupiers. | Néons, dorures criardes, jetons, tapis vert. Emblème : une pièce | Bonimenteur, faussement généreux | Deux actions d'équipage : **« double mise »** |
-| **Rebelles** (rouge) | **Le Front Syndical des Mutins** | Des équipages en grève perpétuelle, armés jusqu'aux dents. Ils votent tout, sauf le retour au travail. | Pochoirs, peinture à la bombe, drapeaux rapiécés. Emblème : un poing levé | Militant, grandiloquent | Surcharge et avantage : **« mouvement social »** |
-| **Abomination organique** (vert) | **Les Adeptes de la Corruption** | Un culte fongique. La contamination y est une communion ; les membres ne sont plus tout à fait des gens. | Chair, mycélium, bioluminescence verte, coques colonisées. Emblème : un champignon | Doucereux, prosélyte | Tourment réactivé : **« grande communion »** |
+| **Casino Cosmique** (jaune) | **La Maison** | La pègre du jeu et de l'usure. Elle possède les dettes du secteur, et se rembourse en pièces détachées, mécaniques ou non. | Salles enfumées, dorures ternies, néons malades, jetons, tables de jeu. Emblème : une pièce | Mielleux, menaçant | Deux actions d'équipage : **« double mise »** |
+| **Rebelles** (rouge) | **Le Front Syndical des Mutins** | Des équipages mutinés qui ont pendu leurs officiers et votent tout à main levée, y compris les exécutions. | Pochoirs rouges, drapeaux déchirés, barricades de ferraille. Emblème : un poing levé | Militant, fanatique | Surcharge et avantage : **« mouvement social »** |
+| **Abomination organique** (vert) | **Les Adeptes de la Corruption** | Un culte fongique. La contamination y est une communion ; les fidèles ne sont plus tout à fait des gens, ni tout à fait vivants. | Chair, mycélium, bioluminescence verdâtre, coques colonisées, horreur organique suggérée. Emblème : un champignon | Doucereux, inquiétant | Tourment réactivé : **« grande communion »** |
 
 Les couleurs des technologies restent celles du thème : les joueurs les connaissent déjà, et chaque faction a en plus son emblème (§6.6), qui ne repose pas sur la couleur seule.
 
@@ -87,18 +87,19 @@ Les **mots des règles ne changent pas** (PV, bouclier, surcharge, Tourment…) 
 ## 5. Charte d'écriture
 
 ### 5.1 Le ton
-- **Sec, court, grinçant.** La chute tombe à la fin de la phrase. Une blague qu'il faut expliquer est retirée.
-- **Adulte** : l'humour est noir (mort, cupidité, absurdité administrative), mais pas vulgaire pour rien. Un juron bien placé reste permis.
+- **Sec, court, glacial.** La chute tombe à la fin de la phrase. Une blague qu'il faut expliquer est retirée.
+- **Sombre** : l'humour est noir (mort, cupidité, absurdité administrative, cruauté ordinaire). Pas de clin d'œil, pas de gag, pas de ton bon enfant : on constate l'horreur avec indifférence, et c'est cette indifférence qui fait rire.
+- **Adulte**, pas vulgaire pour rien. Un juron bien placé reste permis.
 - **Français d'abord**, avec les mots du milieu : jargon de casino, de syndicat, d'assurance, de piraterie.
 - On garde l'esprit des noms de cartes actuels (Langue de bois, Chance de cocu, Vautours…) : jeux de mots, expressions détournées, références populaires.
 
 ### 5.2 Les limites (validées, ARB-93)
-- **Oui** : humour noir sur la mort, la cupidité, la bureaucratie, la religion et la politique **fictives** du secteur ; violence cartoon, exagérée, sans gore réaliste.
+- **Oui** : humour noir sur la mort, la cupidité, la bureaucratie, la religion et la politique **fictives** du secteur ; violence **sérieuse et pesante** (coques éventrées, équipages perdus, horreur organique **suggérée**), sans gore détaillé.
 - **Non** :
   - aucune personne réelle, aucun parti réel, aucune religion réelle ;
   - aucune blague qui vise un groupe de personnes (origine, genre, orientation, handicap…) ;
   - aucun contenu sexuel explicite.
-- Ces limites visent aussi une classification d'âge raisonnable sur les boutiques (PEGI 12 à 16 selon la violence finale).
+- Ces limites visent aussi une classification d'âge raisonnable sur les boutiques (PEGI 16 probable avec ce ton).
 
 ### 5.3 Où va l'humour
 | Texte | Registre | Règle |
@@ -116,33 +117,37 @@ Les **mots des règles ne changent pas** (PV, bouclier, surcharge, Tourment…) 
   - Attaque : « Rouge perfore Bleu : 6 dégâts. *Franchise non applicable.* »
   - Coup critique : « Critique ! Bleu perd Sous-couche blindée. *Nos experts parlent de perte totale.* »
   - Élimination : « Le vaisseau de Vert est déclaré épave. *Dossier classé. Merci de votre fidélité.* »
-  - Annonce de tour : « À vous, capitaine Jaune. *Tâchez de survivre : les formulaires sont longs.* »
-  - Marché noir recyclé : « Rouge vide l'étal. *Le vendeur pleure, puis recompte.* »
+  - Annonce de tour : « À vous, capitaine Jaune. *Votre contrat expire à votre décès. Probablement bientôt.* »
+  - Marché noir recyclé : « Rouge vide l'étal. *Le vendeur n'a pas survécu à la négociation.* »
   - Approche du vortex : « Le vortex passe. *Il ne rembourse pas non plus.* »
   - Épitaphe de fin de partie : « Ci-gît Bleu. Il avait un bouclier et des principes. Il n'a plus ni l'un ni l'autre. »
   - Astuce : « Un bouclier désactivé protège exactement autant qu'une prière. »
 
 ## 6. Direction visuelle
 
-Deux registres, choisis par le designer (ARB-93) :
-- **A, pour la 3D : le futur usé, rouille et néon.** Tôles rivetées, rustines, rouille, enseignes au néon.
-- **C, pour la 2D : le pulp rétro de propagande.** Affiches électorales, avis de recherche, tampons, sérigraphie des années 50 à 70.
+Deux registres, choisis par le designer (ARB-93), assombris après la première planche (ARB-94) :
+- **A, pour la 3D : l'industriel usé et sombre.** Coques lourdes et cabossées, tôle brute, rouille, suie, lumières rares. Réaliste dans les proportions et le poids, **jamais cartoon**.
+- **C, pour la 2D : la propagande autoritaire.** Affiches en deux ou trois couleurs (noir, os, rouge sang), photocopies dégradées, tampons, avis de recherche. Le graphisme d'un régime, pas celui d'une bande dessinée.
 
-Ils se rejoignent dans le cockpit et les menus : du métal usé couvert d'affiches collées et d'autocollants.
+Ils se rejoignent dans le cockpit et les menus : du métal noirci couvert d'affiches arrachées.
+
+**Ce qui fait rire n'est jamais l'image.** Les visuels et les animations restent graves ; le sarcasme vient des textes (§5).
 
 ### 6.1 Palette
 | Rôle | Couleurs | Usage |
 |---|---|---|
-| **Fond** | Graisse `#17181B`, tôle `#4D5358`, rouille `#8A4B2A` | Coques, cockpit, panneaux, ciel |
-| **Papier** | Papier d'affiche `#E9DDC0`, encre `#1C1A17` | Menus, affiches, cartes à texte, tampons |
-| **Néon** (accent, rare) | Magenta `#FF2E88`, cyan `#2EE6FF` | Ce qui brille : réacteurs, enseignes, sélection, tour en cours |
-| **Danger** | Jaune `#FFC21A` sur noir, en bandes | Surcharge, avertissements, fin des temps |
-| **Factions** | Les couleurs actuelles des technologies (bleu, jaune, rouge, vert) | Cartes, emblèmes, diodes |
+| **Fond** | Suie `#0E0F11`, graisse `#17181B`, tôle `#3E4347`, rouille `#6E3A22` | Coques, cockpit, panneaux, ciel |
+| **Papier** | Os `#CFC4A8` (papier jauni), encre `#141312` | Menus, affiches, cartes à texte, tampons |
+| **Sang** | `#8E1B1B` | Affiches, tampons, verdicts |
+| **Lumières** (rares) | Ambre sale `#E0922F`, vert terminal `#4DFF7A`, néon malade `#C23A6B` | Réacteurs, écrans de bord, enseignes de la Maison |
+| **Danger** | Jaune `#D9A514` sur noir, en bandes usées | Surcharge, avertissements, vortex |
+| **Factions** | Les couleurs des technologies, un peu désaturées sur les décors (bleu, jaune, rouge, vert) | Cartes, emblèmes, diodes |
 | **Sièges** | Les cinq couleurs actuelles | Peinture des vaisseaux, liserés |
 | **Retours de jeu** | Perte (rouge), soin (vert), surcharge (ambre), comme aujourd'hui | Chiffres, jauges, effets |
 
 Règles :
-- Le néon reste un **accent** : s'il est partout, plus rien ne ressort.
+- **Éclairage bas** : de grandes zones d'ombre, des sources de lumière rares et justifiées. Ce qui brille attire l'œil parce que tout le reste est sombre.
+- Les informations de jeu (chiffres, cibles, sélection) gardent un contraste franc : l'ambiance ne les noie jamais.
 - Les couleurs des sièges et des factions ne changent pas sans vérifier leur contraste entre elles et sur le nouveau fond.
 - Une information ne passe jamais par la couleur seule : forme, emblème, motif ou texte l'accompagnent (daltonisme).
 
@@ -152,7 +157,8 @@ Polices libres (licence SIL OFL ou Apache), avec les accents du français. Chaqu
 | Rôle | Candidate | Pourquoi |
 |---|---|---|
 | Titres, affiches, gros chiffres | **Anton** (OFL) | Condensée, massive, typique des affiches de propagande |
-| Avis de recherche, épitaphes (rare) | **Rye** (OFL) | Western, « WANTED », à petites doses |
+| Pochoirs (coques, caisses, verdicts) | **Big Shoulders Stencil** (OFL) | Marquage militaire et industriel |
+| Épitaphes, citations (rare) | **IM Fell English** (OFL) | Caractère gravé, funèbre |
 | Texte courant, règles des cartes | **Barlow** / **Barlow Condensed** (OFL) | Très lisible en petit, sur mobile |
 | Chiffres techniques du cockpit, journal | **Share Tech Mono** (OFL) | Terminal informatique rétro : vert phosphore sur fond noir, séparateurs `/` et `:` (« > PV: 27/30 / BOUCLIER: 5 ») |
 
@@ -160,28 +166,28 @@ Le thème a déjà deux emplacements de police, titre et texte (`ThemeSettings`)
 
 ### 6.3 Matériaux 3D (registre A)
 - **Low-poly texturé** (ARB-77), inchangé : le détail vient des textures.
-- **Les peintures extérieures restent brillantes** : on est dans l'espace, la coque est laquée et vernie, avec des reflets francs (brillance élevée dans URP). L'usure se limite aux **arêtes, éclats, rayures et abords des rivets**, où la rouille et la tôle nue apparaissent. L'intérieur (cockpit, soutes) peut être plus mat et plus usé.
-- La tôle porte des rivets, des soudures et des rustines d'une autre couleur.
-- On y colle des **décalcomanies** : logos de faction, numéros de coque, et des mentions d'assureur (« NON COUVERT », « VÉHICULE DE REMPLACEMENT »).
-- **Néons émissifs** pour tout ce qui brille (le Bloom est déjà réglé) : réacteurs, feux, enseignes.
-- La peinture `Siege` reste en niveaux de gris clairs, teintée par le jeu (ARB-76). Elle devient une **peinture écaillée**, qui laisse voir la tôle dessous.
-- Textures générées par les scripts Blender quand c'est possible (bruit de rouille, de crasse, d'écaillage, à la manière du métal brossé des cartes). Elles restent reproductibles.
+- **Les peintures extérieures restent brillantes** : on est dans l'espace, la coque est laquée et vernie, avec des reflets francs (brillance élevée dans URP), mais **dans des teintes profondes**, jamais acidulées. L'usure se limite aux **arêtes, éclats, rayures et abords des rivets**, où la rouille et la tôle nue apparaissent. L'intérieur (cockpit, soutes) est plus mat, plus sale.
+- La tôle porte des rivets, des soudures, des traces de brûlure et des rustines.
+- Les **marquages** sont fonctionnels et sinistres : numéros de coque au pochoir, avertissements, décomptes de victimes, mentions d'assureur (« NON COUVERT »).
+- **Lumières émissives rares** (le Bloom est déjà réglé) : réacteurs, feux de position, écrans. Pas d'enseigne partout.
+- La peinture `Siege` reste en niveaux de gris clairs, teintée par le jeu (ARB-76), avec l'usure aux arêtes.
+- Textures générées par les scripts Blender quand c'est possible (bruit de rouille, de suie, d'écaillage, à la manière du métal brossé des cartes). Elles restent reproductibles.
 
 ### 6.4 Formes
-- **Vaisseaux** : bricolés, asymétriques, avec des pièces rapportées (un réacteur de trop, un canon scotché). Chacun garde une silhouette lisible de loin.
+- **Vaisseaux** : massifs, industriels, asymétriques par réparation plutôt que par fantaisie. Silhouettes lourdes et lisibles de loin.
 - **Interface** : deux familles.
-  - Les **plaques de tôle rivetées** pour tout ce qui est « à bord » : cockpit, panneaux des sièges, arc d'actions.
-  - Le **papier collé** pour tout ce qui est « dans le secteur » : menus, bandeau de manche, fin de partie, bulles d'aide. Papier déchiré, ruban adhésif, punaises.
-- **Tampons encreurs** pour les verdicts : « ÉLIMINÉ », « DOSSIER CLASSÉ », « ÉLU ».
-- **Étiquettes à imprimante Dymo** pour les petits libellés à bord.
+  - Les **plaques de métal noirci** pour tout ce qui est « à bord » : cockpit, panneaux des sièges, arc d'actions. Écrans de terminal verts.
+  - Le **papier jauni** pour tout ce qui est « dans le secteur » : menus, bandeau de manche, fin de partie, bulles d'aide. Affiches arrachées, photocopies, agrafes.
+- **Tampons** pour les verdicts : « ÉLIMINÉ », « DOSSIER CLASSÉ », « ÉLU ».
+- Pas de formes rondes et joyeuses, pas d'inclinaisons fantaisistes : les éléments sont droits, lourds, administratifs.
 
 ### 6.5 Écrans clés **[à valider sur la planche]**
-- **Accueil** : un mur d'affiches électorales à moitié arrachées, les quatre factions qui se recouvrent l'une l'autre, le vortex en fond.
-- **Partie locale** : un registre de l'assurance, où l'on « souscrit » un contrat par capitaine.
-- **Annonce de tour** : un bandeau de tôle avec le nom du capitaine au pochoir.
+- **Accueil** : un mur d'affiches de propagande arrachées, sous une lumière blafarde, le vortex en fond.
+- **Partie locale** : un registre d'assurance, où l'on « souscrit » un contrat par capitaine.
+- **Annonce de tour** : un bandeau de métal avec le nom du capitaine au pochoir.
 - **Fin de partie** :
   - l'**avis de recherche** du vainqueur (Domination) ;
-  - ou son **affiche de campagne** barrée « ÉLU » (Élection) ;
+  - ou son **affiche de propagande** tamponnée « ÉLU » (Élection) ;
   - avec les épitaphes des autres, tamponnées « DOSSIER CLASSÉ ».
 - **Pause** : une notice d'assurance, avec ses petites lignes.
 
@@ -191,13 +197,13 @@ Le thème a déjà deux emplacements de police, titre et texte (`ThemeSettings`)
 - Les icônes des emplacements (ATK, DEF, EVT, TECH ; ARB-86) passent au même style de pochoir.
 
 ### 6.7 Animation et retours de jeu
-- **Exagération cartoon** : on appuie sur l'anticipation, l'impact et le rebond, comme le recul élastique déjà en place (ARB-89).
-- **Gags visuels courts**, jamais bloquants : une pièce qui se détache sous un coup, une rustine qui saute, une fumée noire qui tousse, un tampon qui s'écrase sur une épave.
+- **Poids et gravité**, pas d'exagération cartoon : les coups sont lourds, les coques encaissent, les débris restent. Le recul élastique actuel (ARB-89) est à revoir vers un recul plus massif, amorti plus vite **[à valider en jeu]**.
+- **Pas de gags visuels.** Ce qui se passe à l'écran est sérieux : fumée, étincelles, dépressurisation, débris.
 - **Rythme** : un effet ne retarde jamais le jeu au-delà de ce qu'il raconte. La vitesse de lecture s'applique à tout.
 
 ### 6.8 Son (lot à part, plus tard)
-- **Ambiance** : radio pirate du secteur, surf rock et synthés des années 70, avec un casino lounge pour la Maison.
-- **Retours de jeu** : bruits métalliques, grincements, coups de tampon, bips de la voix de SINISTRA (en texte, sans voix enregistrée au début).
+- **Ambiance** : drones industriels, radio du secteur grésillante, fragments de propagande ; un jazz d'ascenseur sinistre pour la Maison.
+- **Retours de jeu** : impacts métalliques sourds, grincements de coque, alarmes, coups de tampon, bips du terminal de SINISTRA (en texte, sans voix enregistrée au début).
 - Le jeu n'a aucun son aujourd'hui : il faudra des sources libres ou faites maison, licences tracées, comme les images.
 
 ## 7. Illustrations des cartes (Stable Diffusion, par le designer)
@@ -210,14 +216,14 @@ Le designer génère les illustrations de son côté. Pour qu'elles tiennent ens
   - Unity la ramène à 1024 px de large au plus.
 - **Fichier** : PNG nommé d'après l'identifiant (`A_005.png`, `EVT_TROU_NOIR.png`, `TECH_BLUE.png`), déposé dans `unity/Assets/_Vortex/Art/Cards/`. Le jeu le prend tout seul, et l'illustration provisoire revient si on l'enlève.
 - **Style commun (registre C)** :
-  - pulp rétro et affiche de propagande, sérigraphie, trame de demi-teintes ;
-  - palette réduite (§6.1), grain et usure ;
+  - illustration sombre de science-fiction industrielle, peinture réaliste, éclairage bas et contrasté ;
+  - palette réduite (§6.1), grain, usure ; jamais cartoon, jamais acidulé ;
   - un sujet central lisible en petit.
 - **Sans texte dans l'image** : le jeu écrit le nom et le texte. Les lettres générées sont presque toujours fausses.
 - **Cohérence** :
   - même modèle et mêmes réglages pour toute la série ;
   - une couleur dominante par faction, celle de la carte ;
-  - les cartes neutres restent dans les tons papier et rouille.
+  - les cartes neutres restent dans les tons suie, rouille et os.
 - **Licences** :
   - noter le modèle utilisé et sa licence dans `art-src/LICENCES.md` (usage commercial permis ou non) ;
   - ne pas demander le style d'un artiste vivant nommé ;
