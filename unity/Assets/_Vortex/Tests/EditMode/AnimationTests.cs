@@ -171,6 +171,87 @@ namespace Vortex.Tests.EditMode
         }
 
         [Test]
+        public void A_deflected_bolt_bounces_off_the_deflecting_shield_to_the_new_target()
+        {
+            Transform attacker = Ship("Attaquant", new Vector3(0f, 0f, -5f), out ShipMotion aiming);
+            Transform target = Ship("Cible", new Vector3(8f, 0f, 3f), out ShipMotion _);
+            Transform deflector = Ship("Dévieur", new Vector3(-6f, 0f, 3f), out ShipMotion deflecting);
+            var stage = new Stage(attacker, target, aiming, null, (2, deflecting));
+
+            ScriptableObject.CreateInstance<AimFeedback>().Play(new GameEvent { Type = GameEventType.AttackDeclared, Player = 0, Other = 2 }, stage);
+            ScriptableObject.CreateInstance<DeflectFeedback>().Play(new GameEvent { Type = GameEventType.AttackRedirected, Player = 1, Other = 2 }, stage);
+            Assert.That(stage.Attack.Deflector, Is.EqualTo(2));
+            CleanUpEffects();
+
+            ScriptableObject.CreateInstance<LaserFeedback>().Play(new GameEvent { Type = GameEventType.AttackResolved, Player = 0, Other = 1, Value = 8, Amount = 5, Values = new List<int> { 0, 8, 8 } }, stage);
+            PlaceholderEffect shot = Object.FindObjectsByType<PlaceholderEffect>().Single(e => e.name == "Tir laser");
+            Assert.That(shot.PieceCount, Is.EqualTo(5), "Muzzle flash, first leg, flash on the deflecting shield, second leg, impact.");
+            Assert.That(Object.FindObjectsByType<PlaceholderEffect>().Count(e => e.name == "Bouclier"), Is.EqualTo(1), "The deflecting ship's shield lights up.");
+            Assert.That((stage.Attack.Deflector, stage.Attack.LandedDamage), Is.EqualTo((-1, 5)), "Drawn: the deflection is forgotten, the damage kept.");
+        }
+
+        [Test]
+        public void A_shield_that_stops_part_of_a_bolt_lights_up_and_a_protection_that_spares_it_all_makes_the_ship_dodge()
+        {
+            Transform attacker = Ship("Attaquant", new Vector3(0f, 0f, -5f), out ShipMotion aiming);
+            Transform target = Ship("Cible", new Vector3(0f, 0f, 5f), out ShipMotion dodging);
+            var stage = new Stage(attacker, target, aiming, null, (1, dodging));
+
+            ScriptableObject.CreateInstance<LaserFeedback>().Play(new GameEvent { Type = GameEventType.AttackResolved, Player = 0, Other = 1, Value = 8, Amount = 3, Values = new List<int> { 5, 3, 3 } }, stage);
+            Assert.That(Object.FindObjectsByType<PlaceholderEffect>().Count(e => e.name == "Bouclier"), Is.EqualTo(1), "The shield stopped 5 of 8: it lights up.");
+
+            // Seen from the target's side: seat 0 of this stage is the target.
+            var spared = new GameEvent { Type = GameEventType.HpLossPrevented, Player = 0, Other = 1, Amount = 3, Cause = HpLossCause.Attack };
+            ScriptableObject.CreateInstance<DodgeFeedback>().Play(spared, new Stage(target, attacker, dodging) { Memory = stage.Attack });
+            dodging.Tick(0.14f);
+            Assert.That(Mathf.Abs(dodging.PushOffset.x), Is.GreaterThan(0.5f), "All of it spared: the ship swerves aside.");
+            dodging.Tick(2f);
+            Assert.That(dodging.PushOffset, Is.EqualTo(Vector3.zero), "And comes back.");
+        }
+
+        [Test]
+        public void A_critical_hit_shakes_the_camera_which_comes_back_to_its_place()
+        {
+            var camera = new GameObject("Caméra").AddComponent<Camera>();
+            _created.Add(camera.gameObject);
+            camera.transform.localPosition = new Vector3(1f, 2f, 3f);
+            CameraShake shake = camera.gameObject.AddComponent<CameraShake>();
+            shake.Shake(0.2f, 0.5f);
+            shake.Tick(0.1f);
+            Assert.That(camera.transform.localPosition, Is.Not.EqualTo(new Vector3(1f, 2f, 3f)));
+            shake.Tick(1f);
+            Assert.That((shake.Shaking, camera.transform.localPosition), Is.EqualTo((false, new Vector3(1f, 2f, 3f))));
+        }
+
+        [Test]
+        public void A_shield_change_lights_the_shield_and_a_damaged_ship_smokes()
+        {
+            Transform ship = Ship("Vaisseau", Vector3.zero, out ShipMotion motion);
+            var stage = new Stage(ship, null, motion);
+            ShieldPulseFeedback pulse = ScriptableObject.CreateInstance<ShieldPulseFeedback>();
+            Assert.That(pulse.Play(new GameEvent { Type = GameEventType.ShieldChanged, Player = 0, Value = 5, Amount = 5 }, stage), Is.Zero, "No change, nothing to show.");
+            pulse.Play(new GameEvent { Type = GameEventType.ShieldChanged, Player = 0, Value = 7, Amount = 2 }, stage);
+            pulse.Play(new GameEvent { Type = GameEventType.ShieldChanged, Player = 0, Value = 1, Amount = 7 }, stage);
+            Assert.That(Object.FindObjectsByType<PlaceholderEffect>().Count(e => e.name == "Bouclier"), Is.EqualTo(2));
+
+            HullDamage hull = motion.Body.gameObject.AddComponent<HullDamage>();
+            hull.Show(0.3f, false, null);
+            hull.Tick(3f);
+            Assert.That(hull.Puffs, Is.Zero, "Above half its HP, no smoke.");
+            hull.Show(0.9f, false, null);
+            for (int i = 0; i < 20; i++)
+            {
+                hull.Tick(0.25f);
+            }
+
+            Assert.That(hull.Puffs, Is.GreaterThan(5), "Badly damaged: it smokes.");
+            int puffs = hull.Puffs;
+            hull.Show(1f, true, null);
+            hull.Tick(3f);
+            Assert.That(hull.Puffs, Is.EqualTo(puffs), "A wreck does not smoke.");
+        }
+
+        [Test]
         public void The_profile_plays_the_first_animations()
         {
             var profile = AssetDatabase.LoadAssetAtPath<FeedbackProfile>(ProjectAssets.ProfilePath);
@@ -179,6 +260,10 @@ namespace Vortex.Tests.EditMode
             Assert.That(profile.For(GameEventType.HpLost), Is.InstanceOf<KnockbackFeedback>());
             Assert.That(profile.For(GameEventType.TechnologyActivated), Is.InstanceOf<ThrusterFeedback>());
             Assert.That(profile.For(GameEventType.PlayerEliminated), Is.InstanceOf<ExplosionFeedback>());
+            Assert.That(profile.For(GameEventType.AttackRedirected), Is.InstanceOf<DeflectFeedback>());
+            Assert.That(profile.For(GameEventType.CriticalHit), Is.InstanceOf<CriticalFeedback>());
+            Assert.That(profile.For(GameEventType.HpLossPrevented), Is.InstanceOf<DodgeFeedback>());
+            Assert.That(profile.For(GameEventType.ShieldChanged), Is.InstanceOf<ShieldPulseFeedback>());
         }
 
         private static void CleanUpEffects()
@@ -212,19 +297,26 @@ namespace Vortex.Tests.EditMode
             private readonly ShipMotion _motion;
             private readonly Transform? _table;
 
-            public Stage(Transform player, Transform? other, ShipMotion motion, Transform? table = null)
+            private readonly (int Seat, ShipMotion Motion) _extra;
+
+            public Stage(Transform player, Transform? other, ShipMotion motion, Transform? table = null, (int Seat, ShipMotion Motion) extra = default)
             {
                 _player = player;
                 _other = other;
                 _motion = motion;
                 _table = table;
+                _extra = extra;
             }
+
+            public AttackMemory Memory { get; set; } = new AttackMemory();
 
             public float PlaybackSpeed => 1f;
 
             public ThemeSettings? Theme => null;
 
             public Camera? View => null;
+
+            public AttackMemory Attack => Memory;
 
             public Transform? AnchorFor(FeedbackAnchor anchor, GameEvent gameEvent) => anchor switch
             {
@@ -234,7 +326,7 @@ namespace Vortex.Tests.EditMode
                 _ => null,
             };
 
-            public ShipMotion? MotionOf(int seat) => seat == 0 ? _motion : null;
+            public ShipMotion? MotionOf(int seat) => seat == 0 ? _motion : (_extra.Motion != null && seat == _extra.Seat ? _extra.Motion : null);
         }
     }
 }

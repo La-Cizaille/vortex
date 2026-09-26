@@ -136,13 +136,13 @@ namespace Vortex.Editor
         }
 
         // The animations of the table frozen mid-way (ANIMATIONS.md §5), to judge them without playing: seat 2 aims at
-        // seat 0 and fires, seat 3 powers up, seat 4 explodes, seat 5 takes a heavy hit. The frame loop does not run here: effects and ships are
+        // seat 0 and fires into its shield, seat 3 powers up, seat 4 explodes, seat 5 takes a heavy hit. The frame loop does not run here: effects and ships are
         // moved on by hand, by the same amount of time.
         private static void PlayEffects(GameDirector director, float seconds)
         {
             IFeedbackStage stage = director;
             int seats = director.Ships.Count;
-            var shot = new GameEvent { Type = GameEventType.AttackResolved, Player = 1 % seats, Other = 0, Value = 10 };
+            var shot = new GameEvent { Type = GameEventType.AttackResolved, Player = 1 % seats, Other = 0, Value = 10, Amount = 5, Values = new System.Collections.Generic.List<int> { 5, 5, 5 } };
             ScriptableObject.CreateInstance<AimFeedback>().Play(new GameEvent { Type = GameEventType.AttackDeclared, Player = shot.Player, Other = 0 }, stage);
             Advance(0.6f);
             ScriptableObject.CreateInstance<LaserFeedback>().Play(shot, stage);

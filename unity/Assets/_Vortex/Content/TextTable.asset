@@ -525,3 +525,5 @@ MonoBehaviour:
     Text: "\xC9VT"
   - Key: card.badge.technology
     Text: TECH
+  - Key: log.HpLossPrevented
+    Text: "{0} \xE9vite {2} PV de perte."

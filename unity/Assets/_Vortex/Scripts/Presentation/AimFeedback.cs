@@ -20,6 +20,7 @@ namespace Vortex.Client.Presentation
         /// <inheritdoc/>
         public override float Play(GameEvent gameEvent, IFeedbackStage stage)
         {
+            stage.Attack.Begin();
             Transform? target = stage.AnchorFor(FeedbackAnchor.Other, gameEvent);
             if (target != null)
             {

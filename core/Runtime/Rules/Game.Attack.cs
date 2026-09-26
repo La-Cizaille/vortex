@@ -64,6 +64,7 @@ namespace Vortex.Core.Rules
             // 8. Damage.
             int raw = Math.Max(0, attack.Value - attack.EffectiveShield);
             attack.Damage = Math.Max(0, Calculate(raw, (e, s, m) => e.ModifyDamage(this, s, attack, m)));
+            int afterEffects = attack.Damage;
 
             // 9. Critical effect: the target chooses the modifier destroyed, or takes extra damage.
             if (attack.Critical)
@@ -81,7 +82,16 @@ namespace Vortex.Core.Rules
                 }
             }
 
-            Emit(new GameEvent { Type = GameEventType.AttackResolved, Player = attacker, Other = attack.Target, Value = attack.Value, Amount = attack.Damage });
+            // What stopped the attack, for the client to tell a parry by the shield from damage cancelled by an effect.
+            Emit(new GameEvent
+            {
+                Type = GameEventType.AttackResolved,
+                Player = attacker,
+                Other = attack.Target,
+                Value = attack.Value,
+                Amount = attack.Damage,
+                Values = new List<int> { attack.EffectiveShield, raw, afterEffects },
+            });
 
             // 10. Application ("perte de PV", cause Attack).
             attack.HpLost = LoseHp(new HpLossInfo(attack.Target, attack.Damage, HpLossCause.Attack, attacker, null, attack));

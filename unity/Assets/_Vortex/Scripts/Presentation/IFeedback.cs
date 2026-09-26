@@ -29,6 +29,9 @@ namespace Vortex.Client.Presentation
         /// <summary>The theme of the game (seat and technology colours), or null when the scene has none.</summary>
         ThemeSettings? Theme { get; }
 
+        /// <summary>What the stage remembers of the attack being played (deflection, critical hit).</summary>
+        AttackMemory Attack { get; }
+
         /// <summary>How the ship of a seat moves (recoil, knockback), or null when the seat has no ship.</summary>
         ShipMotion? MotionOf(int seat);
     }

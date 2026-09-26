@@ -637,6 +637,7 @@ namespace Vortex.Client.Content
             Add(Log(GameEventType.CriticalHit), "Coup critique sur {1}.");
             Add(Log(GameEventType.AttackResolved), "Attaque de {3} contre {1} : {2} dégâts.");
             Add(Log(GameEventType.HpLost), "{0} perd {2} PV.");
+            Add(Log(GameEventType.HpLossPrevented), "{0} évite {2} PV de perte.");
             Add(Log(GameEventType.HpGained), "{0} gagne {2} PV.");
             Add(Log(GameEventType.ShieldChanged), "Bouclier de {0} : {3}.");
             Add(Log(GameEventType.ShieldChangeRefused), "Le bouclier de {0} ne peut pas être modifié.");

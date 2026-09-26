@@ -98,6 +98,7 @@ namespace Vortex.Client.Presentation
         private MatchSetup? _setup;
         private bool _paused;
         private bool _outcomeShown;
+        private readonly AttackMemory _attack = new AttackMemory();
         private TurnClock _clock = new TurnClock(0f, MatchSetup.DecisionSeconds);
         private EventPlayer? _player;
         private TableModel? _model;
@@ -310,6 +311,9 @@ namespace Vortex.Client.Presentation
 
         /// <inheritdoc/>
         ThemeSettings? IFeedbackStage.Theme => theme;
+
+        /// <inheritdoc/>
+        AttackMemory IFeedbackStage.Attack => _attack;
 
         /// <inheritdoc/>
         Camera? IFeedbackStage.View => view;
@@ -619,6 +623,12 @@ namespace Vortex.Client.Presentation
             foreach (KeyValuePair<int, SeatDisplay> seat in _seats)
             {
                 seat.Value.Show(model.Seats[seat.Key], model, redrawCards);
+                SeatModel shown = model.Seats[seat.Key];
+                if (_ships.TryGetValue(seat.Key, out Transform hull) && hull.GetComponentInChildren<HullDamage>() is HullDamage damage)
+                {
+                    damage.Show(1f - ((float)shown.Hp / Math.Max(1, model.MaxHp)), shown.Eliminated, theme.GlowMaterial);
+                }
+
                 if (model.Seats[seat.Key].Eliminated && _wrecks.Add(seat.Key) && _ships.TryGetValue(seat.Key, out Transform ship))
                 {
                     Wreck(ship);
@@ -692,6 +702,7 @@ namespace Vortex.Client.Presentation
 
             // Each ship sways on its own rhythm: the phase follows the seat.
             ShipMotion.Attach(root, ship.transform, theme.ShipSwayHeight, theme.ShipSwayRoll, theme.ShipSwayPitch, theme.ShipSwaySeconds, seat * 0.37f);
+            ship.AddComponent<HullDamage>();
             _ships[seat] = root;
             return root;
         }

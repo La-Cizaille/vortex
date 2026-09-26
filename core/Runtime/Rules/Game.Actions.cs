@@ -103,6 +103,11 @@ namespace Vortex.Core.Rules
             }
 
             int amount = Math.Max(0, Calculate(Math.Max(0, loss.Amount), (e, s, m) => e.ModifyHpLoss(this, s, loss, m)));
+            if (amount < loss.Amount)
+            {
+                Emit(new GameEvent { Type = GameEventType.HpLossPrevented, Player = loss.Player, Other = loss.SourcePlayer, Amount = loss.Amount - amount, Cause = loss.Cause });
+            }
+
             amount = Math.Min(amount, p.Hp);
             loss.Lost = amount;
             if (amount == 0)

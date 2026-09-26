@@ -46,7 +46,11 @@ namespace Vortex.Core.Events
         DiceRolled = 17,
         /// <summary>Critical hit on Other.</summary>
         CriticalHit = 18,
-        /// <summary>Attack computed: Player = attacker, Other = target, Value = attack value, Amount = damage.</summary>
+        /// <summary>
+        /// Attack computed: Player = attacker, Other = target, Value = attack value, Amount = damage; Values = the target's
+        /// effective shield, the damage past the shield, and the damage left after the effects that reduce it (before the
+        /// critical bonus).
+        /// </summary>
         AttackResolved = 19,
         /// <summary>HP lost: Player, Amount, Cause.</summary>
         HpLost = 20,
@@ -82,6 +86,11 @@ namespace Vortex.Core.Events
         LeaderBountyApplied = 35,
         /// <summary>An event drawn for an eliminated player's choice was set aside: Player = chooser, Id = event.</summary>
         EventSetAside = 36,
+        /// <summary>
+        /// An effect spared part or all of a loss (a protection, a cap): Player = who was spared, Other = the source player
+        /// or -1, Amount = HP spared, Cause. When nothing is left, no <see cref="HpLost"/> follows.
+        /// </summary>
+        HpLossPrevented = 37,
     }
 
     /// <summary>
