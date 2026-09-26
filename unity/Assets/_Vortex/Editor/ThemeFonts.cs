@@ -47,7 +47,7 @@ namespace Vortex.Editor
 
         /// <summary>
         /// The terminal font with a soft green halo (a blurred underlay, which the mobile text shader supports): the glow
-        /// of the radar screens (ARB-101). Built once from the terminal font's material; delete it to rebuild it.
+        /// of the radar screens (ARB-102). Built once from the terminal font's material; delete it to rebuild it.
         /// </summary>
         public const string TerminalGlowPath = Folder + "/Terminal Lueur.mat";
 
