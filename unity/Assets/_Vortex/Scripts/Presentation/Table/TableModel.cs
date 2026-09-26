@@ -11,9 +11,9 @@ namespace Vortex.Client.Presentation
 {
     /// <summary>
     /// What the table shows (ADR-0014). The engine resolves a command at once; while its events play one by one, this
-    /// model follows them, so that hit points, shields, overcharge, eliminations, technologies, the round and the
-    /// current player change on screen when their event plays. Cards, markets and statuses change when the playback
-    /// is over and the model is rebuilt from the final public view. While a command waits for a decision, the public
+    /// model follows them, so that hit points, shields, overcharge, eliminations, technologies, the round, the current
+    /// player and the markets change on screen when their event plays. Equipped cards and statuses change when the
+    /// playback is over and the model is rebuilt from the final public view. While a command waits for a decision, the public
     /// view is still the state before that command (ADR-0009), so the model is rebuilt only once no decision is pending.
     /// </summary>
     public sealed class TableModel
@@ -51,10 +51,16 @@ namespace Vortex.Client.Presentation
         public GameOutcome? Outcome { get; private set; }
 
         /// <summary>Attack black market.</summary>
-        public MarketView AttackMarket { get; }
+        public MarketView AttackMarket { get; private set; }
 
         /// <summary>Defense black market.</summary>
-        public MarketView DefenseMarket { get; }
+        public MarketView DefenseMarket { get; private set; }
+
+        /// <summary>Whether a card of the table (equipped or in a market) has this uid.</summary>
+        public bool Shows(int uid) =>
+            _seats.Any(s => s.AttackCard?.Uid == uid || s.DefenseCard?.Uid == uid)
+            || AttackMarket.Visible.Any(c => c.Uid == uid)
+            || DefenseMarket.Visible.Any(c => c.Uid == uid);
 
         /// <summary>Round of the doom event at this table size (0 if none).</summary>
         public int DoomRound { get; }
@@ -149,12 +155,66 @@ namespace Vortex.Client.Presentation
                 case GameEventType.TechnologyActivated when seat != null:
                     seat.AddTechnology((TechColor)gameEvent.Value);
                     return true;
+                // The markets follow their cards, so that a decision among newly revealed cards finds them on the
+                // table while the public view is still the state before the command (ADR-0009).
+                case GameEventType.MarketRecycled:
+                    return ChangeMarket((CardSlot)gameEvent.Value, (visible, market) =>
+                    {
+                        int discarded = visible.Count;
+                        visible.Clear();
+                        return (market.DeckCount, market.DiscardCount + discarded);
+                    });
+                case GameEventType.MarketCardTaken:
+                    return ChangeMarket((CardSlot)gameEvent.Value, (visible, market) =>
+                    {
+                        int index = gameEvent.Amount >= 0 && gameEvent.Amount < visible.Count && visible[gameEvent.Amount].Uid == gameEvent.CardUid
+                            ? gameEvent.Amount
+                            : visible.FindIndex(c => c.Uid == gameEvent.CardUid);
+                        if (index >= 0)
+                        {
+                            visible.RemoveAt(index);
+                        }
+
+                        return (market.DeckCount, market.DiscardCount);
+                    });
+                case GameEventType.MarketCardRevealed when gameEvent.Id != null:
+                    return ChangeMarket((CardSlot)gameEvent.Value, (visible, market) =>
+                    {
+                        CardView card = CardView.Create(gameEvent.CardUid, gameEvent.Id, 0);
+                        if (gameEvent.Amount >= 0 && gameEvent.Amount < visible.Count)
+                        {
+                            // It replaces a card in place (a swap): the deck is untouched.
+                            visible[gameEvent.Amount] = card;
+                            return (market.DeckCount, market.DiscardCount);
+                        }
+
+                        visible.Add(card);
+                        return (Math.Max(0, market.DeckCount - 1), market.DiscardCount);
+                    });
                 case GameEventType.GameOver:
                     Outcome = new GameOutcome { Winner = gameEvent.Player, Condition = (WinCondition)gameEvent.Value, Round = Round };
                     return true;
                 default:
                     return false;
             }
+        }
+
+        private bool ChangeMarket(CardSlot slot, Func<List<CardView>, MarketView, (int Deck, int Discard)> change)
+        {
+            MarketView market = slot == CardSlot.Attack ? AttackMarket : DefenseMarket;
+            var visible = market.Visible.ToList();
+            (int deck, int discard) = change(visible, market);
+            MarketView changed = MarketView.Create(visible, deck, discard);
+            if (slot == CardSlot.Attack)
+            {
+                AttackMarket = changed;
+            }
+            else
+            {
+                DefenseMarket = changed;
+            }
+
+            return true;
         }
     }
 }

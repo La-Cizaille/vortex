@@ -20,6 +20,9 @@ namespace Vortex.Client.Presentation
         /// <summary>Highlights the seats a dragged action may target, or a decision offers (null: back to normal).</summary>
         void ShowTargets(IReadOnlyCollection<int>? seats);
 
+        /// <summary>Whether a card with this uid is on the table now (a decision among cards not shown opens its window).</summary>
+        bool ShowsCard(int uid);
+
         /// <summary>Marks cards of the table (seats and markets) by uid with a colour (null: every card back to normal).</summary>
         void MarkCards(IReadOnlyDictionary<int, Color>? marks);
 

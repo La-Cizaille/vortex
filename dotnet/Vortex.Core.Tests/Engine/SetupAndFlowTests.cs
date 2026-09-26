@@ -87,6 +87,18 @@ namespace Vortex.Core.Tests.Engine
         }
 
         [Test]
+        public void Market_events_say_where_a_card_leaves_and_where_the_new_one_comes()
+        {
+            var s = Scenario.Start();
+            int p = s.Current;
+            EngineResult r = s.MustAccept(p, Command.PickMarket(CardSlot.Attack, 2));
+            GameEvent taken = r.Events.Single(e => e.Type == GameEventType.MarketCardTaken);
+            GameEvent revealed = r.Events.Single(e => e.Type == GameEventType.MarketCardRevealed);
+            Assert.That((taken.Amount, revealed.Amount), Is.EqualTo((2, 4)), "Taken from its place; the new card comes at the end.");
+            Assert.That(s.State.AttackMarket.Visible[4].Uid, Is.EqualTo(revealed.CardUid));
+        }
+
+        [Test]
         public void Picking_replaces_the_equipped_card_which_goes_to_the_discard_with_its_tokens()
         {
             var s = Scenario.Start();

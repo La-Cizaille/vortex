@@ -57,6 +57,7 @@ namespace Vortex.Client.Presentation
             shieldSide = shieldActions;
         }
 
-        private static bool Shown(ActionButton? button) => button != null && button.gameObject.activeSelf;
+        // An action keeps its place whether it is possible now or not (ARB-87): only the rules of the game remove one.
+        private static bool Shown(ActionButton? button) => button != null && button.InRules;
     }
 }

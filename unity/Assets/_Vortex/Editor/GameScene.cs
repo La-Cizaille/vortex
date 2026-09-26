@@ -402,7 +402,7 @@ namespace Vortex.Editor
         }
 
         // The player's own seat at the bottom: modifiers on each side of the ship, figures under it (INTERFACE.md 3.2), the
-        // crew actions in a half-circle above the ship (3.4), the combo above the attack card, the overcharge token
+        // crew actions in a half-circle above the ship (3.4), the combo under the ship, shown only when ready (ARB-87), the overcharge token
         // armable by a tap (ARB-67).
         private static (SeatDisplay Seat, ActionButton[] Actions, Button Combo, Button Overcharge, Graphic OverchargeGlow) BuildPlayerPanel(Transform ui)
         {
@@ -429,7 +429,7 @@ namespace Vortex.Editor
             statuses.color = Muted;
             GameObject leader = Tag(root, new Vector2(0.5f, 0f), new Vector2(0f, 160f));
 
-            (Button combo, TMP_Text comboLabel) = UiBuilder.Button(root, "Combo", new Vector2(0.5f, 0f), new Vector2(-340f, 244f), new Vector2(150f, 40f));
+            (Button combo, TMP_Text comboLabel) = UiBuilder.Button(root, "Combo", new Vector2(0.5f, 0f), new Vector2(0f, 190f), new Vector2(150f, 40f));
             comboLabel.fontStyle = FontStyles.Bold;
 
             // The actions, on an arc centred above the ship (ActionArc lays them out, playtest 2): attack actions on the
@@ -438,8 +438,9 @@ namespace Vortex.Editor
             ActionButton[] shieldSide = { BuildAction(root, CrewAction.RerollShield), BuildAction(root, CrewAction.DefensivePosture), BuildAction(root, CrewAction.Sabotage) };
             ActionArc arc = root.gameObject.AddComponent<ActionArc>();
             arc.Assign(attackSide, shieldSide);
-            shieldSide[1].gameObject.SetActive(false);
+            shieldSide[1].InRules = false;
             arc.Arrange();
+            shieldSide[1].gameObject.SetActive(false);
             ActionButton[] actions = attackSide.Concat(shieldSide).ToArray();
 
             SeatDisplay seat = root.gameObject.AddComponent<SeatDisplay>();

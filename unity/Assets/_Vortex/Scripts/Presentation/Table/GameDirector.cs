@@ -490,6 +490,9 @@ namespace Vortex.Client.Presentation
         void IControlsHost.ShowTargets(IReadOnlyCollection<int>? seats) => ShowTargets(seats);
 
         /// <inheritdoc/>
+        bool IControlsHost.ShowsCard(int uid) => _model != null && _model.Shows(uid);
+
+        /// <inheritdoc/>
         void IControlsHost.MarkCards(IReadOnlyDictionary<int, Color>? marks)
         {
             Func<int, Color?> mark = uid => marks != null && marks.TryGetValue(uid, out Color color) ? color : (Color?)null;

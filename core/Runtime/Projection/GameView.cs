@@ -168,6 +168,10 @@ namespace Vortex.Core.Projection
         public int Torments { get; private set; }
 
         internal static CardView Of(CardInstance c) => new CardView { Uid = c.Uid, CardId = c.CardId, Torments = c.Torments };
+
+        /// <summary>A card copy as a client rebuilds it from public events (a market card revealed).</summary>
+        public static CardView Create(int uid, string cardId, int torments) =>
+            new CardView { Uid = uid, CardId = cardId ?? throw new ArgumentNullException(nameof(cardId)), Torments = torments };
     }
 
     /// <summary>Public view of a market: face-up cards and pile sizes only.</summary>
@@ -186,6 +190,10 @@ namespace Vortex.Core.Projection
         {
             return new MarketView { Visible = m.Visible.Select(CardView.Of).ToList(), DeckCount = m.Deck.Count, DiscardCount = m.Discard.Count };
         }
+
+        /// <summary>A market as a client rebuilds it from public events, before the public view catches up.</summary>
+        public static MarketView Create(IReadOnlyList<CardView> visible, int deckCount, int discardCount) =>
+            new MarketView { Visible = visible ?? throw new ArgumentNullException(nameof(visible)), DeckCount = deckCount, DiscardCount = discardCount };
     }
 
     /// <summary>Public view of a status.</summary>

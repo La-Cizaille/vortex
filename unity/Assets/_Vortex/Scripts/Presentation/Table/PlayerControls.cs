@@ -76,6 +76,12 @@ namespace Vortex.Client.Presentation
         /// <summary>True when ending the turn is allowed.</summary>
         public bool CanEndTurn => endTurn.interactable;
 
+        /// <summary>True when the combo button shows: only while a combo is ready (ARB-87).</summary>
+        public bool ComboShown => combo.gameObject.activeSelf;
+
+        /// <summary>True when the end of turn button is lit: no crew action is left (ARB-87).</summary>
+        public bool EndTurnLit { get; private set; }
+
         /// <summary>True when leaving the market phase is allowed.</summary>
         public bool CanEndMarket => endMarket.gameObject.activeSelf && endMarket.interactable;
 
@@ -124,7 +130,7 @@ namespace Vortex.Client.Presentation
             bool postureEnabled = rules.DefensivePostureBonus > 0;
             foreach (ActionButton button in actions)
             {
-                button.gameObject.SetActive(button.Action != CrewAction.DefensivePosture || postureEnabled);
+                button.InRules = button.Action != CrewAction.DefensivePosture || postureEnabled;
                 button.Bind(this, icons.Find(IconName(button.Action)), texts.Get(TextKeys.ActionShort(button.Action)));
             }
 
@@ -181,7 +187,7 @@ namespace Vortex.Client.Presentation
 
             bool turn = pending is null;
             _choices = pending is null ? null : DecisionChoices.From(pending, view);
-            if (_choices != null && (_choices.Unplaced > 0 || _choices.Middle.Count > board.MiddleCapacity))
+            if (_choices != null && (_choices.Unplaced > 0 || _choices.Middle.Count > board.MiddleCapacity || !OnTable(_choices)))
             {
                 _choices = null;
             }
@@ -196,11 +202,14 @@ namespace Vortex.Client.Presentation
             PlayerView me = view.Players[seat];
             bool comboReady = turn && Has(c => c.Type == CommandType.ActivateTechnology);
             combo.interactable = comboReady;
+            combo.gameObject.SetActive(comboReady);
             comboBackground.color = comboReady && me.AttackSlot != null ? _context!.Theme.Technology(TechOf(me.AttackSlot)) : Dim(_context!.Theme.MutedText);
 
             bool canEnd = turn && Has(c => c.Type == CommandType.EndTurn);
             endTurn.interactable = canEnd;
-            bool nothingElse = canEnd && _legal.All(c => c.Type == CommandType.EndTurn);
+            // Lit once no crew action is left (ARB-87): cards and the combo may be kept for later on purpose.
+            bool nothingElse = canEnd && !_legal.Any(c => IsCrewAction(c.Type));
+            EndTurnLit = nothingElse;
             endTurnBackground.color = nothingElse ? _context.Theme.Highlight : new Color(1f, 1f, 1f, 0.12f);
             endTurnLabel.color = nothingElse ? new Color32(40, 30, 10, 255) : _context.Theme.Text;
 
@@ -254,7 +263,9 @@ namespace Vortex.Client.Presentation
             }
 
             combo.interactable = false;
+            combo.gameObject.SetActive(false);
             endTurn.interactable = false;
+            EndTurnLit = false;
             endMarket.gameObject.SetActive(false);
             recycleAttack.gameObject.SetActive(false);
             recycleDefense.gameObject.SetActive(false);
@@ -449,6 +460,11 @@ namespace Vortex.Client.Presentation
             return matching.FirstOrDefault(c => c.UseOvercharge == armed) ?? matching.FirstOrDefault();
         }
 
+        /// <summary>Whether a command type is a crew action (RULES A5.4).</summary>
+        public static bool IsCrewAction(CommandType type) =>
+            type == CommandType.Attack || type == CommandType.Sabotage || type == CommandType.RerollShield
+            || type == CommandType.Overcharge || type == CommandType.DefensivePosture;
+
         /// <summary>Command type of a crew action.</summary>
         public static CommandType TypeOf(CrewAction action) => action switch
         {
@@ -567,6 +583,14 @@ namespace Vortex.Client.Presentation
         private bool Has(Func<Command, bool> predicate) => Offered && _legal.Any(predicate);
 
         private bool SubmitFirst(Func<Command, bool> predicate) => Send(Offered ? _legal.FirstOrDefault(predicate) : null);
+
+        // Every card a decision offers is on the table, or the decision goes to its window rather than waiting for a touch
+        // that cannot come.
+        private bool OnTable(DecisionChoices choices) =>
+            _host != null
+            && choices.Cards.Keys.All(_host.ShowsCard)
+            && choices.Drops.Keys.All(k => _host.ShowsCard(k.Card))
+            && choices.DropsInMiddle.Keys.All(_host.ShowsCard);
 
         private bool Answer(string? key) => key != null && SubmitFirst(c => c.Type == CommandType.AnswerDecision && c.Option == key);
 

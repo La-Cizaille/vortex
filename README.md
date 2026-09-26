@@ -76,6 +76,7 @@ Le premier lance les tests Unity. Le deuxième crée les assets de base qui manq
 | Comment se joue une partie | [`RULES.md`](docs/RULES.md), partie A |
 | Pourquoi une règle ou une carte fonctionne ainsi | [`ARBITRAGES.md`](docs/ARBITRAGES.md) |
 | Les visuels à créer et leur format | [`ASSETS.md`](docs/ASSETS.md) |
+| Ce qui s'anime, quand, et avec quel modèle | [`ANIMATIONS.md`](docs/ANIMATIONS.md) |
 | Ce que le joueur voit et comment il agit | [`INTERFACE.md`](docs/INTERFACE.md) |
 | Le texte et l'interprétation d'une carte | [`CARDS.md`](docs/CARDS.md) (généré depuis `core/Runtime/Data/`) |
 | Les objectifs et l'avancement de l'équilibrage | [`balance/README.md`](docs/balance/README.md) |

@@ -19,11 +19,14 @@ namespace Vortex.Core.Events
         TurnStarted = 5,
         /// <summary>Market phase over: Player.</summary>
         MarketEnded = 6,
-        /// <summary>Card taken from a market: Player, Id = card id, CardUid.</summary>
+        /// <summary>Card taken from a market: Player, Id = card id, CardUid, Value = slot, Amount = its position in the market.</summary>
         MarketCardTaken = 7,
         /// <summary>Market recycled: Value = slot (0 ATK, 1 DEF).</summary>
         MarketRecycled = 8,
-        /// <summary>Card put into a market: Id, CardUid, Value = slot.</summary>
+        /// <summary>
+        /// Card put into a market: Id, CardUid, Value = slot, Amount = its position (the end of the market, or the place of
+        /// the card it replaces).
+        /// </summary>
         MarketCardRevealed = 9,
         /// <summary>Card equipped: Player, Id, CardUid.</summary>
         CardEquipped = 10,
