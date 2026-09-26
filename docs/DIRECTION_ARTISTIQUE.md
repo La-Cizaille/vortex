@@ -170,7 +170,8 @@ Polices libres (licence SIL OFL ou Apache), avec les accents du français. Chaqu
 Le thème a déjà deux emplacements de police, titre et texte (`ThemeSettings`). Une police mono pourra s'y ajouter.
 
 ### 6.3 Matériaux 3D (registre A)
-- **Low-poly texturé** (ARB-77), inchangé : le détail vient des textures.
+- **Low-poly texturé** (ARB-77, ARB-97) : peu de polygones, mais des textures riches et détaillées ; c'est la texture qui porte câbles fins, vis, marquages et usure.
+- **Textures externes permises** (ARB-97) : banques CC0 connues (Poly Haven, ambientCG), chaque fichier noté avec sa source, sa licence et son empreinte dans `art-src/LICENCES.md`.
 - **Les peintures extérieures restent brillantes** : on est dans l'espace, la coque est laquée et vernie, avec des reflets francs (brillance élevée dans URP), mais **dans des teintes profondes**, jamais acidulées. L'usure se limite aux **arêtes, éclats, rayures et abords des rivets**, où la rouille et la tôle nue apparaissent. L'intérieur (cockpit, soutes) est plus mat, plus sale.
 - La tôle porte des rivets, des soudures, des traces de brûlure et des rustines.
 - **Machinerie apparente** : faisceaux de câbles gainés, valves à volant, tuyaux, boîtiers électroniques, radiateurs, antennes. Sur les vaisseaux, le cockpit, le dé et la table.
@@ -255,7 +256,7 @@ Une fiche de prompts par faction (formulations de base, éléments à éviter) s
 
 ## 8. Renommages
 
-- Les noms de cartes, d'événements et de factions **peuvent changer**, avec la validation du designer, dans le cadre du travail d'équilibrage (ARB-93).
+- Les noms de cartes, d'événements et de factions **peuvent changer**, avec la validation du designer, dans le cadre du travail d'équilibrage (ARB-93). Les renommages de cartes et leurs textes attendent la prochaine passe d'équilibrage (ARB-97).
 - Circuit :
   1. une proposition dans la revue des assets ;
   2. la validation du designer ;
