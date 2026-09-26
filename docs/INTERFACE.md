@@ -182,7 +182,7 @@ Chaque geste envoie une commande du moteur à la session. Le moteur la valide : 
 
 ## 7. Questions ouvertes
 
-- **Esquive et déviation** ([`ANIMATIONS.md`](ANIMATIONS.md) §2) : une attaque déviée se montre-t-elle comme une esquive, ou a-t-elle sa propre animation (le rayon qui bifurque vers la nouvelle cible) ?
+Aucune pour l'instant. La dernière, sur l'animation d'une attaque déviée, est tranchée : ARB-88.
 
 ## 8. Ce qui est construit
 
