@@ -68,15 +68,15 @@ Pendant ma phase de marché, le marché noir s'ouvre au centre de la table (3.3)
 - **Surcharge** : un petit jeton près du vaisseau, allumé quand je l'ai. Le toucher l'**arme** : il brille, et la prochaine attaque ou le prochain reparamétrage le dépense. Le toucher de nouveau le désarme (ARB-67).
 - **Effets temporaires** : en icônes, avec leur info-bulle.
 - **Bouton de combo** : au centre, par-dessus le bas du vaisseau, au premier plan (ARB-89). Il n'apparaît que lorsque le combo est jouable (ARB-87), à la couleur de la technologie. Au survol, il montre l'effet de la technologie.
-- **Cockpit** (ARB-90, à venir avec les modèles de l'atelier Blender) : sous le vaisseau, il remplacera les chiffres actuels. Il comprendra :
+- **Cockpit** (ARB-90, construit) : sous le vaisseau, il remplace le panneau de chiffres ; ses sockets reçoivent les deux cartes du joueur. Il comprend :
   - une jauge de PV qui se remplit et se vide, avec le chiffre dessus ;
   - une jauge de bouclier en manomètre, avec une aiguille ;
   - deux emplacements de modificateurs en creux, avec le symbole de l'emplacement ;
-  - un interrupteur pour la surcharge ;
+  - un interrupteur pour la surcharge, levé quand le jeton est armé, son bouton allumé tant que le vaisseau en a un ; le toucher arme ou désarme le jeton ;
   - trois diodes pour les technologies obtenues ;
   - une étiquette au nom du joueur.
 
-  Le vaisseau a été avancé vers la table pour lui laisser la place (ARB-89).
+  Le vaisseau a été avancé vers la table pour lui laisser la place (ARB-89). Toucher le cockpit répond à une décision qui propose son propre vaisseau. Les effets en jeu et le marqueur du leader passent au-dessus de lui. Sans modèle dans le thème, le panneau de chiffres de l'interface reste.
 
 ### 3.3 Marché noir
 

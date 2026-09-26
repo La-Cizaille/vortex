@@ -70,6 +70,7 @@ namespace Vortex.Editor
             EnsureFolder(ArtImportRules.IconsFolder, "Icônes (PNG transparents) : actions d'équipage, icônes du texte des cartes, technologies, jetons. Noms et tailles : docs/ASSETS.md.");
             Ensure<ThemeSettings>(ThemePath);
             EnsureGlow();
+            EnsureCockpit();
             Ensure<CardArtCatalog>(CardArtPath);
             Ensure<ShipCatalog>(ShipsPath);
             Ensure<IconCatalog>(IconsPath);
@@ -298,6 +299,21 @@ namespace Vortex.Editor
 
             ThemeSettings theme = AssetDatabase.LoadAssetAtPath<ThemeSettings>(ThemePath);
             if (theme != null && theme.AssignGlowIfMissing(glow))
+            {
+                EditorUtility.SetDirty(theme);
+                AssetDatabase.SaveAssetIfDirty(theme);
+            }
+        }
+
+        /// <summary>The cockpit model exported from Blender (ARB-90, tools/blender/build_cockpit.py).</summary>
+        public const string CockpitModelPath = "Assets/_Vortex/Art/Cockpit/Cockpit.fbx";
+
+        // The cockpit goes to the theme once it has been exported, only when the theme has none.
+        private static void EnsureCockpit()
+        {
+            GameObject model = AssetDatabase.LoadAssetAtPath<GameObject>(CockpitModelPath);
+            ThemeSettings theme = AssetDatabase.LoadAssetAtPath<ThemeSettings>(ThemePath);
+            if (model != null && theme != null && theme.AssignCockpitIfMissing(model))
             {
                 EditorUtility.SetDirty(theme);
                 AssetDatabase.SaveAssetIfDirty(theme);

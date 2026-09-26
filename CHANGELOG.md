@@ -4,6 +4,14 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Non publié]
 ### Ajouté
+- **Cockpit du joueur** (ARB-90) : modèle Blender construit par script (`tools/blender/build_cockpit.py`, 1 136 triangles), exporté en `Art/Cockpit/Cockpit.fbx` et pris par le thème (*Cockpit Model*). Sous le vaisseau, il remplace le panneau de chiffres (`CockpitDisplay`) :
+  - plaque du nom, jauge de PV qui se remplit et change de couleur, avec le chiffre ;
+  - manomètre de bouclier à aiguille ;
+  - interrupteur de surcharge, qu'on touche pour armer le jeton ;
+  - trois diodes de technologies ;
+  - deux sockets où reposent les cartes du joueur ;
+  - liserés à la couleur du siège.
+  Les effets en jeu, le marqueur du leader et le combo remontent au-dessus. Test `CockpitTests`.
 - **Animations, lot 3** (ANIMATIONS §5) :
   - vaisseau contaminé par le Tourment : coque qui tire vers une teinte malade, et spores ;
   - un anneau de lumière par effet en jeu, à une couleur par type d'effet dans le thème ;

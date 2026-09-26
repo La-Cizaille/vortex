@@ -199,6 +199,9 @@ namespace Vortex.Editor
             PauseMenu pause = BuildPause(ui, front.transform);
             director.AssignMenus(pause, gameOver, announcement);
             director.AssignTimer(timer);
+
+            // The place of the cockpit (ARB-90): the panel's width at the bottom, its sockets over the player's cards.
+            director.AssignCockpitPlace(UiBuilder.Fixed<RectTransform>(player.transform, "Cockpit", new Vector2(0.5f, 0f), new Vector2(0f, 5f), new Vector2(920f, 240f)));
         }
 
         // The time left, just above the end turn button (INTERFACE.md 3.9): the seconds and a bar that empties.
@@ -445,13 +448,14 @@ namespace Vortex.Editor
             Image overcharge = Disc(stats.transform, "Surcharge", new Vector2(0.5f, 1f), new Vector2(90f, -74f), 24f);
             overcharge.raycastTarget = true;
             Button overchargeButton = overcharge.gameObject.AddComponent<Button>();
-            TMP_Text statuses = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root, "Effets", new Vector2(0.5f, 0f), new Vector2(0f, 128f), new Vector2(560f, 28f)), 16f, FontStyles.Normal, TextAlignmentOptions.Center);
+            TMP_Text statuses = UiBuilder.Label(UiBuilder.Fixed<TextMeshProUGUI>(root, "Effets", new Vector2(0.5f, 0f), new Vector2(0f, 252f), new Vector2(560f, 28f)), 16f, FontStyles.Normal, TextAlignmentOptions.Center);
             statuses.color = Muted;
-            GameObject leader = Tag(root, new Vector2(0.5f, 0f), new Vector2(0f, 160f));
+            // Above the cockpit (ARB-90), which covers the bottom of the panel.
+            GameObject leader = Tag(root, new Vector2(0.5f, 0f), new Vector2(0f, 282f));
 
             // The combo on the foreground layer, over the ship: the ship is 3D and would cut through a button of the table's
             // interface.
-            (Button combo, TMP_Text comboLabel) = UiBuilder.Button(front, "Combo", new Vector2(0.5f, 0f), new Vector2(0f, 150f), new Vector2(160f, 42f));
+            (Button combo, TMP_Text comboLabel) = UiBuilder.Button(front, "Combo", new Vector2(0.5f, 0f), new Vector2(0f, 300f), new Vector2(160f, 42f));
             comboLabel.fontStyle = FontStyles.Bold;
 
             // The actions, on an arc centred above the ship (ActionArc lays them out, playtest 2): attack actions on the

@@ -43,5 +43,15 @@ MonoBehaviour:
   shipSwayPitch: 1.2
   shipSwaySeconds: 3.4
   glowMaterial: {fileID: 2100000, guid: 236b2e8d87956f24d97d9a1dee8a6033, type: 2}
+  shieldMaterial: {fileID: 0}
+  smokePrefab: {fileID: 0}
+  arcPrefab: {fileID: 0}
+  tableBackground: {fileID: 0}
+  eventEffects: []
+  statusColors: []
+  statusDefault: {r: 1.1, g: 1.1, b: 1.5, a: 1}
+  sickTint: {r: 0.47058824, g: 0.6666667, b: 0.23529412, a: 1}
+  sporeColor: {r: 1.1, g: 2, b: 0.5, a: 1}
+  cockpitModel: {fileID: 919132149155446097, guid: 27985f4f984063e449dd60773a97aebe, type: 3}
   dieModel: {fileID: 0}
   timerTick: {fileID: 0}
