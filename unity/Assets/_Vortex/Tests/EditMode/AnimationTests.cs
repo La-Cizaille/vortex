@@ -101,7 +101,12 @@ namespace Vortex.Tests.EditMode
             motion.Tick(0.1f);
             Assert.That(small, Is.GreaterThan(0f), "Away from the middle of the table.");
             Assert.That(motion.PushOffset.z, Is.GreaterThan(small), "Further for more damage.");
-            motion.Tick(2f);
+            Assert.That(motion.PushSpin.magnitude, Is.GreaterThan(10f), "Spun around by a heavy hit.");
+            PlaceholderEffect[] impacts = Object.FindObjectsByType<PlaceholderEffect>().Where(e => e.name == "Impact").OrderBy(e => e.PieceCount).ToArray();
+            Assert.That(impacts, Has.Length.EqualTo(2));
+            Assert.That(impacts[1].PieceCount, Is.GreaterThan(impacts[0].PieceCount * 2), "A heavier hit makes a bigger impact.");
+            motion.Tick(3f);
+            Assert.That((motion.PushOffset, motion.PushSpin), Is.EqualTo((Vector3.zero, Vector3.zero)), "Back where it was, after the jolts.");
 
             knockback.Play(new GameEvent { Type = GameEventType.HpLost, Player = 0, Amount = 3, Cause = HpLossCause.Torment }, stage);
             motion.Tick(0.1f);

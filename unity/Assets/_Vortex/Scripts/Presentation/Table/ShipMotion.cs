@@ -66,10 +66,20 @@ namespace Vortex.Client.Presentation
         /// Moves the body by <paramref name="offset"/> (world space) in <paramref name="outSeconds"/>, then back in
         /// <paramref name="backSeconds"/>, starting after <paramref name="delay"/>. Pushes add up.
         /// </summary>
-        public void Push(Vector3 offset, float outSeconds, float backSeconds, float delay = 0f)
+        public void Push(Vector3 offset, float outSeconds, float backSeconds, float delay = 0f) =>
+            Push(offset, Vector3.zero, outSeconds, backSeconds, delay);
+
+        /// <summary>
+        /// Moves the body by <paramref name="offset"/> (world space) and tilts it by <paramref name="spin"/> (degrees around
+        /// its own axes: pitch, yaw, roll), then brings it back, like <see cref="Push(Vector3, float, float, float)"/>.
+        /// </summary>
+        public void Push(Vector3 offset, Vector3 spin, float outSeconds, float backSeconds, float delay = 0f)
         {
-            _pushes.Add(new Move(offset, Mathf.Max(0.01f, outSeconds), Mathf.Max(0.01f, backSeconds), Mathf.Max(0f, delay)));
+            _pushes.Add(new Move(offset, spin, Mathf.Max(0.01f, outSeconds), Mathf.Max(0.01f, backSeconds), Mathf.Max(0f, delay)));
         }
+
+        /// <summary>How far the pushes tilt the body now, in degrees (tests).</summary>
+        public Vector3 PushSpin { get; private set; }
 
         /// <summary>Turns the ship's nose towards a point of the table in <paramref name="seconds"/>; it stays aimed until released.</summary>
         public void Aim(Vector3 target, float seconds)
@@ -135,6 +145,7 @@ namespace Vortex.Client.Presentation
             }
 
             Vector3 pushed = Vector3.zero;
+            Vector3 spun = Vector3.zero;
             for (int i = _pushes.Count - 1; i >= 0; i--)
             {
                 Move push = _pushes[i];
@@ -156,11 +167,13 @@ namespace Vortex.Client.Presentation
                     ? EaseOut(push.Time / push.Out)
                     : 1f - EaseInOut((push.Time - push.Out) / push.Back);
                 pushed += push.Offset * reach;
+                spun += push.Spin * reach;
             }
 
             PushOffset = pushed;
+            PushSpin = spun;
             _body.localPosition = position + transform.InverseTransformVector(pushed);
-            _body.localRotation = Quaternion.Euler(0f, _yaw, 0f) * rotation;
+            _body.localRotation = Quaternion.Euler(0f, _yaw, 0f) * rotation * Quaternion.Euler(spun);
         }
 
         private void TurnTo(float yaw, float seconds)
@@ -183,15 +196,17 @@ namespace Vortex.Client.Presentation
 
         private struct Move
         {
-            public Move(Vector3 offset, float outSeconds, float backSeconds, float delay)
+            public Move(Vector3 offset, Vector3 spin, float outSeconds, float backSeconds, float delay)
             {
                 Offset = offset;
+                Spin = spin;
                 Out = outSeconds;
                 Back = backSeconds;
                 Time = -delay;
             }
 
             public Vector3 Offset;
+            public Vector3 Spin;
             public float Out;
             public float Back;
             public float Time;

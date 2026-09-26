@@ -4,6 +4,7 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Non publié]
 ### Ajouté
+- **Impacts gradués** (ANIMATIONS §5) : l'impact grandit avec les dégâts (éclair, étincelles, éclats de coque, onde de choc pour un coup lourd) et la projection devient chaotique (secousses et rotations aléatoires qui s'amortissent) ; le vaisseau revient toujours à sa place, sauf s'il est détruit. `ShipMotion.Push` sait aussi tourner le vaisseau. La capture `-Phase Effects` montre un coup lourd.
 - **Animations, lot 1** (ANIMATIONS.md §5) :
   - chaque vaisseau se balance sur place (`ShipMotion`, réglages dans le thème) ;
   - une attaque trace un rayon à la couleur de l'attaquant vers la cible finale, et l'attaquant recule (`BeamFeedback`) ;
