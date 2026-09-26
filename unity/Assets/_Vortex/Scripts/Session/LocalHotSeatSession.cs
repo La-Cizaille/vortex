@@ -94,6 +94,9 @@ namespace Vortex.Client.Session
         public CommandError? Explain(int seat, Command command) => _engine.Explain(_state, seat, command);
 
         /// <inheritdoc/>
+        public double Protection(int seat) => _engine.AverageEffectiveShield(_state, seat);
+
+        /// <inheritdoc/>
         public SessionResult Submit(int seat, Command command)
         {
             if (command is null)

@@ -366,6 +366,12 @@ namespace Vortex.Editor
                     deck.Place();
                 }
 
+                foreach (CockpitDisplay cockpit in Object.FindObjectsByType<CockpitDisplay>())
+                {
+                    cockpit.Place();
+                    cockpit.Settle();
+                }
+
                 camera.Render();
             }
         }

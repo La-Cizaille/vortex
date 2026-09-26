@@ -70,6 +70,7 @@ namespace Vortex.Editor
             EnsureFolder(ArtImportRules.IconsFolder, "Icônes (PNG transparents) : actions d'équipage, icônes du texte des cartes, technologies, jetons. Noms et tailles : docs/ASSETS.md.");
             Ensure<ThemeSettings>(ThemePath);
             EnsureGlow();
+            EnsureGlass();
             EnsureCockpit();
             Ensure<CardArtCatalog>(CardArtPath);
             Ensure<ShipCatalog>(ShipsPath);
@@ -299,6 +300,37 @@ namespace Vortex.Editor
 
             ThemeSettings theme = AssetDatabase.LoadAssetAtPath<ThemeSettings>(ThemePath);
             if (theme != null && theme.AssignGlowIfMissing(glow))
+            {
+                EditorUtility.SetDirty(theme);
+                AssetDatabase.SaveAssetIfDirty(theme);
+            }
+        }
+
+        /// <summary>The glass of the cockpit (dial glass, gauge tube).</summary>
+        public const string GlassMaterialPath = "Assets/_Vortex/Theme/Materials/Glass.mat";
+
+        // Glass: lit, transparent with a faint tint, very smooth, so the scene's light draws a highlight on it.
+        private static void EnsureGlass()
+        {
+            Material glass = AssetDatabase.LoadAssetAtPath<Material>(GlassMaterialPath);
+            if (glass == null)
+            {
+                glass = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                glass.SetFloat("_Surface", 1f);
+                glass.SetFloat("_Blend", 0f);
+                glass.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                glass.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                glass.SetFloat("_ZWrite", 0f);
+                glass.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+                glass.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                glass.SetColor("_BaseColor", new Color(0.8f, 0.9f, 1f, 0.12f));
+                glass.SetFloat("_Metallic", 0f);
+                glass.SetFloat("_Smoothness", 0.95f);
+                ProjectAssets.Create(glass, GlassMaterialPath);
+            }
+
+            ThemeSettings theme = AssetDatabase.LoadAssetAtPath<ThemeSettings>(ThemePath);
+            if (theme != null && theme.AssignGlassIfMissing(glass))
             {
                 EditorUtility.SetDirty(theme);
                 AssetDatabase.SaveAssetIfDirty(theme);

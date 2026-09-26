@@ -46,6 +46,12 @@ namespace Vortex.Client.Session
 
         /// <summary>Why the seat may not submit a command now, or null when it may (the reason shown next to a greyed-out move).</summary>
         CommandError? Explain(int seat, Command command);
+
+        /// <summary>
+        /// Protection of the seat: its effective shield (RULES A6 step 7) against a plain attack, averaged over its alive
+        /// opponents, with every active effect. 0 while its shield is disabled, whatever its stored value.
+        /// </summary>
+        double Protection(int seat);
     }
 
     /// <summary>Outcome of a submitted command.</summary>
