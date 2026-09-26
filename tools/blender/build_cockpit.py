@@ -1,4 +1,6 @@
-"""Build the player's cockpit model (ARB-90, docs/ANIMATIONS.md section 6) and save it as a .blend source.
+"""Build the player's cockpit model (ARB-90, ARB-92, docs/ANIMATIONS.md section 6) in the art direction of
+docs/DIRECTION_ARTISTIQUE.md (§6.3, §6.4, §6.5 bis: blackened metal, visible machinery, bays for the modules), and save
+it as a .blend source.
 
 Usage, without opening Blender's window:
 
@@ -7,18 +9,23 @@ Usage, without opening Blender's window:
 Then export it for Unity:
 
     blender --background --disable-autoexec art-src/cockpit/Cockpit.blend --python tools/blender/export_unity.py -- \
-        unity/Assets/_Vortex/Art/Cockpit/Cockpit.fbx --budget 3000
+        unity/Assets/_Vortex/Art/Cockpit/Cockpit.fbx --budget 4000
 
 A console under the player's ship, 3.84 x 1 m and 0.1 m deep, the proportions of the player's panel in the interface.
 It stands upright like a card: width along X, height along Z, depth along Y, its front facing +Y (-Z in Unity, towards
 the camera). Seen from the front, from left to right:
-- the attack socket, a dark recess framed by a raised bezel, where the attack card lies; a metal clamp comes over the
-  card's bottom left corner, so the card looks plugged in;
-- the name plate, over the hit point gauge: a glass tube between two metal caps, filled with a glowing liquid;
-- under them, the overcharge toggle switch with its diode below, and the three technology diodes;
+- a grab handle and bolts on the console's end;
+- the attack bay, where the attack module is plugged: a dark recess in a frame painted in the seat colour, a pin socket
+  at the bottom that takes the module's connector, and a steel clamp over the module's bottom left corner;
+- an armoured conduit, from top to bottom;
+- the name plate, a painted plate, over the hit point gauge: a glass tube between two metal caps, filled with a glowing
+  liquid;
+- under them, the overcharge toggle switch on a plate in hazard stripes, with its diode below, the three technology
+  diodes, and a valve with its handwheel;
 - the shield manometer: a metal bezel, a face graduated from 0 to 8 with a red zone at 0, the needle, and a glass;
-- the defense socket, its clamp over the card's bottom right corner.
-A trim in the seat colour runs along the top and the bottom.
+- the defense bay, its clamp over the module's bottom right corner; the other end's handle and bolts.
+A strip painted in the seat colour runs along the top, with stencil markings; a bundle of sheathed cables, held by
+steel clips, runs along the bottom from one bay to the other.
 
 The parts the game moves or reads carry fixed names, with their origin where they pivot:
 - Remplissage_PV: the liquid, origin at its left end; the game scales it along X (1 = full);
@@ -29,41 +36,54 @@ The parts the game moves or reads carry fixed names, with their origin where the
 - Diode_1, Diode_2, Diode_3: the technology diodes, whose colour and glow the game sets;
 - Zone_Rouge: the red zone of the dial, lit while the shield protects nothing;
 - Verre_Cadran, Tube_PV: the glass parts, which the game may give its glass material;
+- Console: the console's body alone, whose box answers a touch (it stays behind the modules);
 - empties Zone_Nom, Zone_PV, Chiffre_0 to Chiffre_8, Socket_ATK, Socket_DEF: where the game writes the name, the hit
   points and the dial's figures, and lays the cards; their X and Z scales give the zone's size.
+Every other part is joined into one object, Habillage, so the console draws in few calls.
 
-The card plane: the game sets the console so that the cards lie at Y = CARD_PLANE (in front of the socket floor, behind
-the bezel's top), under the clamps.
+The card plane: the game sets the console so that the cards lie at Y = CARD_PLANE (in front of the bay floor, behind
+the frame's top), under the clamps.
 
-Materials: Console (dark brushed metal), Panneau, Levier, Aiguille (light brushed metal), Siege (painted in the seat
-colour, like the ships), Socket, Piste, Encre, Diode, Jauge (the liquid), Pointe (the needle's tip), Alerte (the red
-zone), Verre (glass). The brushed metal is computed here, in the manner of the cards (build_card.py): its colours,
-already tinted (Cockpit_Dark_BaseColor, Cockpit_Light_BaseColor) and its relief (Cockpit_Normal) are written next to the
-.blend file and plugged straight into the shaders, so the FBX file links them.
+Materials: Console (blackened varnished steel), Siege (painted in the seat colour, like the ships), Panneau (painted
+plates: the name plate, the dial's face, the switch plate), Socket (bay floor), Piste (gauge trough), Levier and
+Aiguille (worn bare steel), Gaine and Gaine_Rouge (cable sheaths), Encre, Diode, Jauge (the liquid), Pointe (the
+needle's tip), Alerte (the red zone), Verre (glass). The console, painted and floor materials share one texture drawn
+here in the front view (every part's UVs are a front projection): chipped edges showing bare metal, rust streaks, grime
+in the hollows, rivets, scratches, hazard stripes and stencil markings in the art direction's stencil font. The steel
+parts have their own brushed texture. The images are written next to the .blend file and plugged straight into the
+shaders, so the FBX file links them.
 """
 
 import math
 import os
+import shutil
 import sys
+import tempfile
 
 import bpy
+import mathutils
 import numpy as np
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import front_view as fv  # noqa: E402  (next to this script)
 
 WIDTH = 3.84
 HEIGHT = 1.0
 BACK = -0.06
 FRONT = 0.04
-CARD_PLANE = 0.057  # where the cards lie, between the socket floor and the bezel's top
+CARD_PLANE = 0.057  # where the cards lie, between the bay floor and the frame's top
 
-SOCKETS = (-1.42, 1.42)  # centres x of the attack and defense sockets, as seen from the front
+SOCKETS = (-1.42, 1.42)  # centres x of the attack and defense bays, as seen from the front
 SOCKET_SIZE = (0.7, 0.93)  # inside of the recess: width, height (a card of the panel is 0.625 x 0.875)
-CARD_SIZE = (0.625, 0.875)
 BEZEL = 0.035
 BEZEL_TOP = 0.075
 CLAMP_LEG = 0.24  # length of each leg of a clamp, from its outer corner
 CLAMP_WIDTH = 0.1  # width of a clamp's plate, which covers the card's corner
 CLAMP_FOOT = 0.045  # width of the foot that holds the plate, outside the card
 CLAMP_FRONT = (0.085, 0.1)  # depth of the plate, in front of the card
+# The pin socket at the bottom of a bay: the module's connector (build_card.py, 0.76 of the card's width, at its very
+# bottom) goes into it, so its top covers the connector's lower half.
+PIN_SOCKET = (0.26, -0.425, 0.068)  # half-width, top z, front y
 
 NAME_PLATE = (-0.95, 0.14, 0.27, 0.43)  # x0, x1, z0, z1
 GAUGE = (-0.95, 0.14, 0.03, 0.19)  # the trough behind the tube
@@ -77,83 +97,66 @@ SWITCH_DIODE = (-0.78, -0.37, 0.04)  # centre x, z, radius
 DIODES = (-0.42, -0.22, -0.02)  # centres x
 DIODE_Z = -0.22
 DIODE_RADIUS = 0.055
+VALVE = (0.1, -0.35, 0.058)  # centre x, z, radius of the handwheel
+CONDUIT = (-0.99, 0.021)  # x, radius
+TOP_STRIP = (-0.955, 1.0, 0.44, 0.49)  # x0, x1, z0, z1
+CABLES = [(-0.44, 0.009, "Gaine"), (-0.458, 0.014, "Gaine"), (-0.478, 0.011, "Gaine_Rouge")]  # z, radius, material
+CLIPS = (-0.62, -0.1, 0.42, 0.9)  # x of the cable clips
+END_STRIP = 1.865  # x of the handles and bolts on both ends, beyond the bays
 SIDES = 24
-TEXTURE_SIZE = 1024
 
-DARK_METAL = (0.11, 0.12, 0.14)
-LIGHT_METAL = (0.74, 0.76, 0.8)
+# Texture of the front view: square texels, 1.9 mm each.
+TEX_W, TEX_H = 2048, 512
+STEEL_W, STEEL_H = 1024, 256
+
+REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+STENCIL_FONT = os.path.join(REPO, "unity", "Assets", "_Vortex", "Art", "Fonts", "BigShouldersStencil", "BigShouldersStencilDisplay-Black.ttf")
+# Stencil markings on the seat strip (§6.3): text, x0, x1, z0, z1 in the front view.
+MARKINGS = [
+    ("0427", -0.9, -0.66, 0.449, 0.482),
+    ("GARANTIE ANNULÉE", 0.32, 0.96, 0.449, 0.482),
+]
+
+# Linear colours (the texture is written in sRGB at the end).
+BLACKENED = 0.03
+BARE_STEEL = np.array([0.15, 0.155, 0.165])
+RUST = np.array([0.1, 0.028, 0.01])
+PAINT = 0.55  # the seat paint, which the game multiplies by the seat colour
+BONE = np.array([0.62, 0.55, 0.39])  # #CFC4A8
+DIAL_FACE = np.array([0.68, 0.62, 0.47])
+HAZARD = np.array([0.69, 0.37, 0.006])  # #D9A514
+INK = np.array([0.007, 0.0065, 0.006])  # #141312
+BRASS = np.array([0.45, 0.3, 0.08])
 
 # name: (colour, metallic, smoothness, emission, texture)
 COLOURS = {
-    "Console": (DARK_METAL, 0.85, 0.55, None, "Cockpit_Dark_BaseColor"),
-    "Panneau": (LIGHT_METAL, 0.9, 0.5, None, "Cockpit_Light_BaseColor"),
-    "Levier": (LIGHT_METAL, 1.0, 0.7, None, "Cockpit_Light_BaseColor"),
-    "Aiguille": (LIGHT_METAL, 1.0, 0.8, None, "Cockpit_Light_BaseColor"),
-    "Siege": ((0.85, 0.85, 0.85), 0.6, 0.4, None, None),
-    "Socket": ((0.025, 0.028, 0.035), 0.5, 0.2, None, None),
-    "Piste": ((0.015, 0.015, 0.02), 0.2, 0.3, None, None),
+    "Console": ((1.0, 1.0, 1.0), 0.7, 0.55, None, "Cockpit"),
+    "Siege": ((1.0, 1.0, 1.0), 0.25, 0.62, None, "Cockpit"),
+    "Panneau": ((1.0, 1.0, 1.0), 0.1, 0.35, None, "Cockpit"),
+    "Socket": ((1.0, 1.0, 1.0), 0.4, 0.2, None, "Cockpit"),
+    "Piste": ((1.0, 1.0, 1.0), 0.3, 0.3, None, "Cockpit"),
+    "Levier": ((1.0, 1.0, 1.0), 0.9, 0.6, None, "Cockpit_Acier"),
+    "Aiguille": ((1.0, 1.0, 1.0), 0.9, 0.7, None, "Cockpit_Acier"),
+    "Gaine": ((0.018, 0.018, 0.02), 0.0, 0.35, None, None),
+    "Gaine_Rouge": ((0.16, 0.03, 0.018), 0.0, 0.35, None, None),
     "Jauge": ((0.25, 0.85, 0.35), 0.0, 0.9, (0.25, 0.85, 0.35), None),
     "Pointe": ((0.9, 0.12, 0.08), 0.3, 0.6, None, None),
     "Alerte": ((0.5, 0.04, 0.03), 0.0, 0.4, None, None),
-    "Encre": ((0.06, 0.06, 0.07), 0.0, 0.3, None, None),
+    "Encre": ((0.02, 0.02, 0.022), 0.3, 0.3, None, None),
     "Diode": ((0.2, 0.2, 0.22), 0.0, 0.8, None, None),
     "Verre": ((0.85, 0.92, 1.0), 0.0, 0.95, None, None),
 }
+ATLAS_MATERIALS = ("Console", "Siege", "Panneau", "Socket", "Piste")
 
-
-# ------------------------------------------------------------------------------------------------------- textures
-
-def streaks(rng, size, along, across):
-    """Tileable noise stretched along X: a Gaussian blur of `along` pixels along X and `across` pixels along Y."""
-    noise = rng.standard_normal((size, size))
-    fy = np.fft.fftfreq(size)[:, None]
-    fx = np.fft.fftfreq(size)[None, :]
-    kernel = np.exp(-2 * math.pi ** 2 * ((along * fx) ** 2 + (across * fy) ** 2))
-    field = np.real(np.fft.ifft2(np.fft.fft2(noise) * kernel))
-    return (field - field.mean()) / field.std()
-
-
-def brushed_metal(directory):
-    """The brushed metal of the cards, tinted dark and light, and its relief."""
-    rng = np.random.default_rng(3)
-    size = TEXTURE_SIZE
-    # The console is 3.84 times wider than high and its UVs span it whole: streaks shorter along X than on the cards.
-    brush = 0.7 * streaks(rng, size, 30, 1.2) + 0.3 * streaks(rng, size, 6, 0.8)
-    sheen = streaks(rng, size, 60, 120)
-    shade = np.clip(0.88 + 0.05 * brush + 0.035 * sheen, 0, 1)
-
-    height = 0.5 * brush
-    dx = (np.roll(height, -1, axis=1) - np.roll(height, 1, axis=1)) / 2
-    dy = (np.roll(height, -1, axis=0) - np.roll(height, 1, axis=0)) / 2
-    strength = 0.2
-    nx, ny, nz = -dx * strength, -dy * strength, np.ones_like(height)
-    length = np.sqrt(nx ** 2 + ny ** 2 + nz ** 2)
-    one = np.ones_like(shade)
-
-    def tinted(tint):
-        return np.dstack([np.clip(shade * tint[0] / 0.88, 0, 1), np.clip(shade * tint[1] / 0.88, 0, 1), np.clip(shade * tint[2] / 0.88, 0, 1), one])
-
-    maps = {
-        "Cockpit_Dark_BaseColor": (tinted(DARK_METAL), "sRGB"),
-        "Cockpit_Light_BaseColor": (tinted(LIGHT_METAL), "sRGB"),
-        "Cockpit_Normal": (np.dstack([nx / length * 0.5 + 0.5, ny / length * 0.5 + 0.5, nz / length * 0.5 + 0.5, one]), "Non-Color"),
-    }
-    images = {}
-    for name, (pixels, space) in maps.items():
-        image = bpy.data.images.new(name, size, size, alpha=False)
-        image.colorspace_settings.name = space
-        image.pixels.foreach_set(pixels.astype(np.float32).ravel())
-        path = os.path.join(directory, name + ".png")
-        image.filepath_raw = path
-        image.file_format = "PNG"
-        image.save()
-        image.filepath = path
-        images[name] = image
-    return images
-
+# Parts the game reads or moves, kept apart; everything else joins Habillage.
+KEPT = {"Console", "Remplissage_PV", "Aiguille_Bouclier", "Pointe aiguille", "Levier_Surcharge", "Bouton du levier",
+        "Diode_Surcharge", "Diode_1", "Diode_2", "Diode_3", "Zone_Rouge", "Verre_Cadran", "Tube_PV"}
+MOVING = {"Aiguille_Bouclier", "Pointe aiguille", "Levier_Surcharge", "Bouton du levier", "Remplissage_PV"}
 
 IMAGES = {}
 
+
+# ----------------------------------------------------------------------------------------------------------- materials
 
 def material(name):
     found = bpy.data.materials.get(name)
@@ -169,12 +172,11 @@ def material(name):
     if texture is not None:
         # Straight into the shader, so that the FBX file links it; the relief through a normal map node.
         image = nodes.new("ShaderNodeTexImage")
-        image.image = IMAGES[texture]
+        image.image = IMAGES[texture + "_BaseColor"]
         links.new(image.outputs["Color"], shader.inputs["Base Color"])
         relief = nodes.new("ShaderNodeTexImage")
-        relief.image = IMAGES["Cockpit_Normal"]
+        relief.image = IMAGES[texture + "_Normal"]
         normal_map = nodes.new("ShaderNodeNormalMap")
-        normal_map.inputs["Strength"].default_value = 0.6
         links.new(relief.outputs["Color"], normal_map.inputs["Color"])
         links.new(normal_map.outputs["Normal"], shader.inputs["Normal"])
     if emission is not None:
@@ -191,173 +193,68 @@ def material(name):
     return made
 
 
-# ----------------------------------------------------------------------------------------------------------- shapes
-
-def front_uv(obj):
-    """One planar projection of the front for every face, read the right way from the front: the streaks run along X."""
-    mesh = obj.data
-    layer = mesh.uv_layers.new(name="UVMap")
-    offset = obj.location
-    for loop in mesh.loops:
-        co = mesh.vertices[loop.vertex_index].co
-        x, z = -(co.x + offset.x), co.z + offset.z  # front-view x, as the helpers take it
-        layer.data[loop.index].uv = (0.5 + x / WIDTH, 0.5 + z / HEIGHT)
+def new_images():
+    for name, width, height in (("Cockpit", TEX_W, TEX_H), ("Cockpit_Acier", STEEL_W, STEEL_H)):
+        for image in fv.textured_images(name, width, height):
+            IMAGES[image.name] = image
 
 
-def finish(obj, name, material_name, parent):
-    obj.data.materials.append(material(material_name))
-    bpy.context.scene.collection.objects.link(obj)
-    if parent is not None:
-        obj.parent = parent
-    fix_normals(obj)
-    front_uv(obj)
-    return obj
-
-
-def prism(name, outline, y0, y1, material_name, origin=(0.0, 0.0, 0.0), parent=None):
-    """An object made of a flat outline (x right as seen from the front, z up) pushed from depth y0 to y1.
-
-    Seen from the front (+Y), Blender's +X points to the left: x is mirrored when the mesh is built. The vertices are
-    relative to origin, given in the same front-view terms, so that a moving part turns around it.
-    """
-    ox, oy, oz = origin
-    count = len(outline)
-    vertices = [(-(x - ox), y0 - oy, z - oz) for x, z in outline] + [(-(x - ox), y1 - oy, z - oz) for x, z in outline]
-    # The outline is counter-clockwise seen from the front; mirrored, it is clockwise, so the caps are wound to face out.
-    faces = [tuple(range(count)), tuple(reversed(range(count, 2 * count)))]
-    for i in range(count):
-        j = (i + 1) % count
-        faces.append((i, count + i, count + j, j))
-    mesh = bpy.data.meshes.new(name)
-    mesh.from_pydata(vertices, [], faces)
-    mesh.validate()
-    obj = bpy.data.objects.new(name, mesh)
-    obj.location = (-ox, oy, oz)
-    return finish(obj, name, material_name, parent)
-
-
-def cylinder_x(name, x0, x1, y, z, radius, material_name, origin=None, sides=16):
-    """A cylinder along X (front view) from x0 to x1, its axis at depth y and height z; origin defaults to its middle."""
-    ox, oy, oz = origin if origin is not None else ((x0 + x1) / 2, y, z)
-    ring = [(y + radius * math.cos(2 * math.pi * i / sides), z + radius * math.sin(2 * math.pi * i / sides)) for i in range(sides)]
-    vertices = [(-(x0 - ox), cy - oy, cz - oz) for cy, cz in ring] + [(-(x1 - ox), cy - oy, cz - oz) for cy, cz in ring]
-    faces = [tuple(range(sides)), tuple(reversed(range(sides, 2 * sides)))]
-    for i in range(sides):
-        j = (i + 1) % sides
-        faces.append((i, j, sides + j, sides + i))
-    mesh = bpy.data.meshes.new(name)
-    mesh.from_pydata(vertices, [], faces)
-    mesh.validate()
-    obj = bpy.data.objects.new(name, mesh)
-    obj.location = (-ox, oy, oz)
-    return finish(obj, name, material_name, None)
-
-
-def fix_normals(obj):
-    bpy.context.view_layer.objects.active = obj
-    for other in bpy.context.selected_objects:
-        other.select_set(False)
-    obj.select_set(True)
-    bpy.ops.object.mode_set(mode="EDIT")
-    bpy.ops.mesh.select_all(action="SELECT")
-    bpy.ops.mesh.normals_make_consistent(inside=False)
-    bpy.ops.object.mode_set(mode="OBJECT")
-    obj.select_set(False)
-
-
-def rectangle(x0, x1, z0, z1):
-    return [(x0, z0), (x1, z0), (x1, z1), (x0, z1)]
-
-
-def rounded(x0, x1, z0, z1, radius, segments=4):
-    centres = [(x1 - radius, z0 + radius, -90), (x1 - radius, z1 - radius, 0), (x0 + radius, z1 - radius, 90), (x0 + radius, z0 + radius, 180)]
-    points = []
-    for cx, cz, start in centres:
-        for step in range(segments + 1):
-            angle = math.radians(start + 90 * step / segments)
-            points.append((cx + radius * math.cos(angle), cz + radius * math.sin(angle)))
-    return points
-
-
-def circle(cx, cz, radius, sides=SIDES):
-    return [(cx + radius * math.cos(2 * math.pi * i / sides), cz + radius * math.sin(2 * math.pi * i / sides)) for i in range(sides)]
-
-
-def arc_band(cx, cz, inner, outer, start, end, steps=6):
-    """A band of the dial between two radii, from angle start to end (degrees, counter-clockwise from the right)."""
-    angles = [math.radians(start + (end - start) * i / steps) for i in range(steps + 1)]
-    outside = [(cx + outer * math.cos(a), cz + outer * math.sin(a)) for a in angles]
-    inside = [(cx + inner * math.cos(a), cz + inner * math.sin(a)) for a in reversed(angles)]
-    return outside + inside
-
-
-def ell(corner_x, corner_z, leg, width, towards_right):
-    """An L seen from the front, its outer corner at the bottom, one leg along X (right or left), the other up."""
-    points = [(0.0, 0.0), (leg, 0.0), (leg, width), (width, width), (width, leg), (0.0, leg)]
-    if towards_right:
-        return [(corner_x + x, corner_z + z) for x, z in points]
-    return [(corner_x - x, corner_z + z) for x, z in reversed(points)]  # mirrored: reversed to stay counter-clockwise
-
-
-def empty(name, x, y, z, width, height):
-    """A plain-axes empty at (x, y, z) in front-view terms, whose X and Z scales give a zone's size."""
-    obj = bpy.data.objects.new(name, None)
-    obj.empty_display_type = "PLAIN_AXES"
-    obj.location = (-x, y, z)
-    obj.scale = (width, 1.0, height)
-    bpy.context.scene.collection.objects.link(obj)
-    return obj
+CANVAS = fv.Canvas(WIDTH, HEIGHT, TEX_W, TEX_H)
+MODEL = fv.Model(CANVAS, material)
 
 
 # ------------------------------------------------------------------------------------------------------------ parts
 
-def sockets():
-    """The sockets: a dark floor framed by a raised bezel, and a clamp over the card's outer bottom corner."""
+def bays():
+    """The bays: a dark floor in a frame painted in the seat colour, a pin socket at the bottom, and a steel clamp
+    over the module's outer bottom corner."""
     for label, cx in zip(("ATK", "DEF"), SOCKETS):
         w, h = SOCKET_SIZE[0] / 2, SOCKET_SIZE[1] / 2
-        prism("Socket " + label, rectangle(cx - w, cx + w, -h, h), FRONT, FRONT + 0.002, "Socket")
-        prism("Cadre " + label + " haut", rectangle(cx - w - BEZEL, cx + w + BEZEL, h, h + BEZEL), FRONT, BEZEL_TOP, "Console")
-        prism("Cadre " + label + " bas", rectangle(cx - w - BEZEL, cx + w + BEZEL, -h - BEZEL, -h), FRONT, BEZEL_TOP, "Console")
-        prism("Cadre " + label + " gauche", rectangle(cx - w - BEZEL, cx - w, -h, h), FRONT, BEZEL_TOP, "Console")
-        prism("Cadre " + label + " droit", rectangle(cx + w, cx + w + BEZEL, -h, h), FRONT, BEZEL_TOP, "Console")
-        empty("Socket_" + label, cx, CARD_PLANE, 0.0, SOCKET_SIZE[0], SOCKET_SIZE[1])
+        MODEL.prism("Socket " + label, fv.rectangle(cx - w, cx + w, -h, h), FRONT, FRONT + 0.002, "Socket")
+        MODEL.prism("Cadre " + label + " haut", fv.rectangle(cx - w - BEZEL, cx + w + BEZEL, h, h + BEZEL), FRONT, BEZEL_TOP, "Siege")
+        MODEL.prism("Cadre " + label + " bas", fv.rectangle(cx - w - BEZEL, cx + w + BEZEL, -h - BEZEL, -h), FRONT, BEZEL_TOP, "Siege")
+        MODEL.prism("Cadre " + label + " gauche", fv.rectangle(cx - w - BEZEL, cx - w, -h, h), FRONT, BEZEL_TOP, "Siege")
+        MODEL.prism("Cadre " + label + " droit", fv.rectangle(cx + w, cx + w + BEZEL, -h, h), FRONT, BEZEL_TOP, "Siege")
+        half, top, front = PIN_SOCKET
+        MODEL.prism("Prise " + label, fv.chamfered(cx - half, cx + half, -h, top, 0.012), FRONT, front, "Console")
+        MODEL.empty("Socket_" + label, cx, CARD_PLANE, 0.0, SOCKET_SIZE[0], SOCKET_SIZE[1])
 
-        # The clamp: its outer corner on the bezel, a foot outside the card up to the plate, the plate over the card's
+        # The clamp: its outer corner on the frame, a foot outside the card up to the plate, the plate over the card's
         # corner. Attack: bottom left; defense: bottom right.
         right = label == "ATK"
         side = -1 if right else 1
         corner_x, corner_z = cx + side * (w + BEZEL / 2), -h - BEZEL / 2
-        prism("Pied attache " + label, ell(corner_x, corner_z, CLAMP_LEG, CLAMP_FOOT, right), BEZEL_TOP, CLAMP_FRONT[0], "Levier")
-        prism("Attache_" + label, ell(corner_x, corner_z, CLAMP_LEG, CLAMP_WIDTH, right), CLAMP_FRONT[0], CLAMP_FRONT[1], "Levier")
+        MODEL.prism("Pied attache " + label, fv.ell(corner_x, corner_z, CLAMP_LEG, CLAMP_FOOT, right), BEZEL_TOP, CLAMP_FRONT[0], "Levier")
+        MODEL.prism("Attache " + label, fv.ell(corner_x, corner_z, CLAMP_LEG, CLAMP_WIDTH, right), CLAMP_FRONT[0], CLAMP_FRONT[1], "Levier")
         rivet_x = corner_x - side * CLAMP_WIDTH / 2
-        prism("Rivet " + label, circle(rivet_x, corner_z + CLAMP_WIDTH / 2, 0.018, 8), CLAMP_FRONT[1], CLAMP_FRONT[1] + 0.006, "Console")
+        MODEL.prism("Rivet " + label, fv.circle(rivet_x, corner_z + CLAMP_WIDTH / 2, 0.018, 6), CLAMP_FRONT[1], CLAMP_FRONT[1] + 0.008, "Levier")
 
 
 def gauge():
     """The name plate, then the hit point gauge: a glass tube between metal caps, and the liquid the game scales."""
     x0, x1, z0, z1 = NAME_PLATE
-    prism("Plaque du nom", rounded(x0, x1, z0, z1, 0.03), FRONT, FRONT + 0.02, "Panneau")
-    empty("Zone_Nom", (x0 + x1) / 2, FRONT + 0.022, (z0 + z1) / 2, x1 - x0 - 0.06, z1 - z0 - 0.03)
+    MODEL.prism("Plaque du nom", fv.chamfered(x0, x1, z0, z1, 0.025), FRONT, FRONT + 0.02, "Panneau")
+    MODEL.empty("Zone_Nom", (x0 + x1) / 2, FRONT + 0.022, (z0 + z1) / 2, x1 - x0 - 0.06, z1 - z0 - 0.03)
 
     x0, x1, z0, z1 = GAUGE
     zc = (z0 + z1) / 2
     axis = FRONT + TUBE_RADIUS + 0.005
-    prism("Piste PV", rounded(x0, x1, z0, z1, 0.03), FRONT, FRONT + 0.01, "Piste")
+    MODEL.prism("Piste PV", fv.rounded(x0, x1, z0, z1, 0.03), FRONT, FRONT + 0.01, "Piste")
     inside0, inside1 = x0 + CAP_LENGTH, x1 - CAP_LENGTH
-    cylinder_x("Embout gauche", x0, inside0, axis, zc, TUBE_RADIUS + 0.012, "Levier")
-    cylinder_x("Embout droit", inside1, x1, axis, zc, TUBE_RADIUS + 0.012, "Levier")
-    cylinder_x("Tube_PV", inside0, inside1, axis, zc, TUBE_RADIUS, "Verre")
-    cylinder_x("Remplissage_PV", inside0, inside1, axis, zc, LIQUID_RADIUS, "Jauge", origin=(inside0, axis, zc))
-    empty("Zone_PV", (x0 + x1) / 2, axis + TUBE_RADIUS + 0.01, zc, inside1 - inside0 - 0.1, z1 - z0 - 0.02)
+    MODEL.cylinder_x("Embout gauche", x0, inside0, axis, zc, TUBE_RADIUS + 0.012, "Levier", sides=8)
+    MODEL.cylinder_x("Embout droit", inside1, x1, axis, zc, TUBE_RADIUS + 0.012, "Levier", sides=8)
+    MODEL.cylinder_x("Tube_PV", inside0, inside1, axis, zc, TUBE_RADIUS, "Verre")
+    MODEL.cylinder_x("Remplissage_PV", inside0, inside1, axis, zc, LIQUID_RADIUS, "Jauge", origin=(inside0, axis, zc))
+    MODEL.empty("Zone_PV", (x0 + x1) / 2, axis + TUBE_RADIUS + 0.01, zc, inside1 - inside0 - 0.1, z1 - z0 - 0.02)
 
 
 def switch_and_diodes():
-    """The overcharge switch, its diode under it, and the technology diodes."""
+    """The overcharge switch on its hazard plate, its diode under it, and the technology diodes."""
     sx, sz = SWITCH
-    prism("Platine interrupteur", rounded(sx - 0.12, sx + 0.12, sz - 0.11, sz + 0.11, 0.03), FRONT, FRONT + 0.015, "Panneau")
+    MODEL.prism("Platine interrupteur", fv.chamfered(sx - 0.12, sx + 0.12, sz - 0.11, sz + 0.11, 0.025), FRONT, FRONT + 0.015, "Panneau")
     hinge = FRONT + 0.015
-    lever = prism("Levier_Surcharge", circle(sx, sz, 0.025, 8), hinge, hinge + 0.16, "Levier", origin=(sx, hinge, sz))
-    knob = prism("Bouton du levier", circle(sx, sz, 0.045, 10), hinge + 0.16, hinge + 0.2, "Levier", origin=(sx, hinge, sz))
+    lever = MODEL.prism("Levier_Surcharge", fv.circle(sx, sz, 0.025, 8), hinge, hinge + 0.16, "Levier", origin=(sx, hinge, sz))
+    knob = MODEL.prism("Bouton du levier", fv.circle(sx, sz, 0.045, 10), hinge + 0.16, hinge + 0.2, "Levier", origin=(sx, hinge, sz))
     bpy.context.view_layer.update()
     knob.parent = lever
     knob.matrix_parent_inverse = lever.matrix_world.inverted()
@@ -367,68 +264,230 @@ def switch_and_diodes():
     bpy.context.view_layer.update()
 
     dx, dz, radius = SWITCH_DIODE
-    prism("Bague diode surcharge", circle(dx, dz, radius + 0.02, 12), FRONT, FRONT + 0.01, "Encre")
-    prism("Diode_Surcharge", circle(dx, dz, radius, 12), FRONT + 0.01, FRONT + 0.035, "Diode", origin=(dx, FRONT + 0.01, dz))
+    MODEL.prism("Bague diode surcharge", fv.circle(dx, dz, radius + 0.02, 12), FRONT, FRONT + 0.012, "Levier")
+    MODEL.prism("Diode_Surcharge", fv.circle(dx, dz, radius, 12), FRONT + 0.01, FRONT + 0.035, "Diode", origin=(dx, FRONT + 0.01, dz))
 
     for number, x in enumerate(DIODES, start=1):
-        prism("Bague diode " + str(number), circle(x, DIODE_Z, DIODE_RADIUS + 0.02, 12), FRONT, FRONT + 0.01, "Encre")
-        prism("Diode_" + str(number), circle(x, DIODE_Z, DIODE_RADIUS, 12), FRONT + 0.01, FRONT + 0.035, "Diode",
+        MODEL.prism("Bague diode " + str(number), fv.circle(x, DIODE_Z, DIODE_RADIUS + 0.02, 12), FRONT, FRONT + 0.012, "Levier")
+        MODEL.prism("Diode_" + str(number), fv.circle(x, DIODE_Z, DIODE_RADIUS, 12), FRONT + 0.01, FRONT + 0.035, "Diode",
               origin=(x, FRONT + 0.01, DIODE_Z))
 
 
 def manometer():
-    """A metal bezel, a light face, a red zone at 0, nine marks and their figures, the needle pointing up (4), a glass."""
+    """A metal bezel, a painted face, a red zone at 0, nine marks and their figures, the needle pointing up (4), a glass."""
     cx, cz, radius = DIAL
-    prism("Fond cadran", circle(cx, cz, radius + 0.045), FRONT, FRONT + 0.03, "Console")
+    MODEL.prism("Fond cadran", fv.circle(cx, cz, radius + 0.045), FRONT, FRONT + 0.03, "Console")
     for half, start in (("haut", 0), ("bas", 180)):
-        prism("Bague cadran " + half, arc_band(cx, cz, radius, radius + 0.045, start, start + 180, 12), FRONT, FRONT + 0.075, "Levier")
-    prism("Cadran", circle(cx, cz, radius), FRONT + 0.03, FRONT + 0.035, "Panneau")
+        MODEL.prism("Bague cadran " + half, fv.arc_band(cx, cz, radius, radius + 0.045, start, start + 180, 12), FRONT, FRONT + 0.075, "Levier")
+    for angle in range(45, 360, 90):
+        bx, bz = cx + (radius + 0.0225) * math.cos(math.radians(angle)), cz + (radius + 0.0225) * math.sin(math.radians(angle))
+        MODEL.prism("Vis cadran %d" % angle, fv.circle(bx, bz, 0.013, 6), FRONT + 0.075, FRONT + 0.082, "Console")
+    MODEL.prism("Cadran", fv.circle(cx, cz, radius), FRONT + 0.03, FRONT + 0.035, "Panneau")
 
     def angle_of(mark):
         return 90 + DIAL_SWEEP - mark * DIAL_SWEEP / 4
 
-    prism("Zone_Rouge", arc_band(cx, cz, radius * 0.72, radius * 0.97, angle_of(0) + 3, angle_of(0.8), 8), FRONT + 0.035, FRONT + 0.037, "Alerte")
+    MODEL.prism("Zone_Rouge", fv.arc_band(cx, cz, radius * 0.72, radius * 0.97, angle_of(0) + 3, angle_of(0.8), 8), FRONT + 0.035, FRONT + 0.037, "Alerte")
     for mark in range(9):
         angle = math.radians(angle_of(mark))
         ux, uz = math.cos(angle), math.sin(angle)
         px, pz = -uz, ux  # across the mark
         inner, outer, half = radius * 0.74, radius * 0.92, 0.02 if mark % 4 == 0 else 0.012
-        prism("Graduation " + str(mark), [
+        MODEL.prism("Graduation " + str(mark), [
             (cx + ux * inner - px * half, cz + uz * inner - pz * half),
             (cx + ux * outer - px * half, cz + uz * outer - pz * half),
             (cx + ux * outer + px * half, cz + uz * outer + pz * half),
             (cx + ux * inner + px * half, cz + uz * inner + pz * half),
         ], FRONT + 0.037, FRONT + 0.039, "Encre")
         figure = radius * 0.55
-        empty("Chiffre_" + str(mark), cx + ux * figure, FRONT + 0.03, cz + uz * figure, 0.1, 0.075)
+        MODEL.empty("Chiffre_" + str(mark), cx + ux * figure, FRONT + 0.03, cz + uz * figure, 0.1, 0.075)
 
     needle_base = FRONT + 0.042
-    needle = prism("Aiguille_Bouclier", [(cx - 0.022, cz - 0.06), (cx + 0.022, cz - 0.06), (cx + 0.007, cz + radius * 0.88), (cx - 0.007, cz + radius * 0.88)],
+    needle = MODEL.prism("Aiguille_Bouclier", [(cx - 0.022, cz - 0.06), (cx + 0.022, cz - 0.06), (cx + 0.007, cz + radius * 0.88), (cx - 0.007, cz + radius * 0.88)],
                    needle_base, needle_base + 0.008, "Aiguille", origin=(cx, needle_base, cz))
-    tip = prism("Pointe aiguille", [(cx - 0.0095, cz + radius * 0.62), (cx + 0.0095, cz + radius * 0.62), (cx + 0.0072, cz + radius * 0.885), (cx - 0.0072, cz + radius * 0.885)],
+    tip = MODEL.prism("Pointe aiguille", [(cx - 0.0095, cz + radius * 0.62), (cx + 0.0095, cz + radius * 0.62), (cx + 0.0072, cz + radius * 0.885), (cx - 0.0072, cz + radius * 0.885)],
                 needle_base + 0.008, needle_base + 0.011, "Pointe", origin=(cx, needle_base, cz))
     bpy.context.view_layer.update()
     tip.parent = needle
     tip.matrix_parent_inverse = needle.matrix_world.inverted()
-    prism("Moyeu", circle(cx, cz, 0.038, 12), needle_base, needle_base + 0.02, "Levier")
-    prism("Verre_Cadran", circle(cx, cz, radius + 0.01), FRONT + 0.068, FRONT + 0.072, "Verre")
+    MODEL.prism("Moyeu", fv.circle(cx, cz, 0.038, 12), needle_base, needle_base + 0.02, "Levier")
+    MODEL.prism("Verre_Cadran", fv.circle(cx, cz, radius + 0.01), FRONT + 0.068, FRONT + 0.072, "Verre")
 
 
-def build(directory):
+def machinery():
+    """The machinery (§6.3): the seat strip, the cable bundle and its clips, the conduit, the valve, the end handles."""
+    x0, x1, z0, z1 = TOP_STRIP
+    MODEL.prism("Liseré haut", fv.chamfered(x0, x1, z0, z1, 0.012), FRONT, FRONT + 0.012, "Siege")
+
+    # Cables from one bay to the other, sagging a little between the clips.
+    stops = [-1.06, *CLIPS, 1.06]
+    for number, (z, radius, sheath) in enumerate(CABLES):
+        depth = FRONT + radius + 0.002
+        points = []
+        for a, b in zip(stops, stops[1:]):
+            for step in range(3):
+                t = step / 3
+                sag = 0.012 * math.sin(math.pi * t) * (1 + 0.3 * number)
+                points.append((a + (b - a) * t, depth, z - sag))
+        points.append((stops[-1], depth, z))
+        MODEL.tube("Cable %d" % number, points, radius, sheath)
+    for number, x in enumerate(CLIPS):
+        MODEL.prism("Collier %d" % number, fv.chamfered(x - 0.02, x + 0.02, -0.495, -0.422, 0.008), FRONT, FRONT + 0.036, "Levier")
+
+    # The armoured conduit between the attack bay and the name plate, with its flanges.
+    cx, radius = CONDUIT
+    MODEL.tube("Conduit", [(cx, FRONT + radius, -0.5), (cx, FRONT + radius, 0.5)], radius, "Console", sides=8)
+    for z in (-0.3, 0.12, 0.38):
+        MODEL.tube("Bride %.2f" % z, [(cx, FRONT + radius, z - 0.012), (cx, FRONT + radius, z + 0.012)], radius + 0.009, "Levier", sides=8)
+
+    # The valve: a pipe from the cable bundle, a handwheel on its hub.
+    vx, vz, vr = VALVE
+    MODEL.tube("Tuyau vanne", [(vx, FRONT + 0.016, -0.43), (vx, FRONT + 0.016, vz), (vx + 0.3, FRONT + 0.016, vz)], 0.014, "Levier", sides=6)
+    wheel = [(vx + vr * math.cos(2 * math.pi * k / 12), FRONT + 0.05, vz + vr * math.sin(2 * math.pi * k / 12)) for k in range(13)]
+    MODEL.tube("Volant", wheel, 0.0075, "Levier", sides=5)
+    for k in range(3):
+        a = 2 * math.pi * k / 3 + math.pi / 2
+        MODEL.tube("Rayon %d" % k, [(vx, FRONT + 0.05, vz), (vx + vr * math.cos(a), FRONT + 0.05, vz + vr * math.sin(a))], 0.005, "Levier", sides=4)
+    MODEL.prism("Moyeu vanne", fv.circle(vx, vz, 0.016, 6), FRONT + 0.016, FRONT + 0.058, "Console")
+
+    # A grab handle and three bolts on each end of the console, beyond the bays.
+    for side in (-1, 1):
+        x = side * END_STRIP
+        MODEL.tube("Poignee %d" % side, [(x, FRONT, -0.26), (x, FRONT + 0.05, -0.22), (x, FRONT + 0.05, 0.22), (x, FRONT, 0.26)], 0.016, "Levier", sides=6)
+        for z in (-0.4, 0.0, 0.4):
+            MODEL.prism("Boulon %d %.1f" % (side, z), fv.circle(x, z, 0.02, 6), FRONT, FRONT + 0.014, "Levier")
+
+
+def build():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     scene = bpy.context.scene
     scene.unit_settings.system = "METRIC"
     scene.unit_settings.scale_length = 1.0
-    IMAGES.update(brushed_metal(directory))
+    new_images()
 
     half_w, half_h = WIDTH / 2, HEIGHT / 2
-    prism("Console", rounded(-half_w, half_w, -half_h, half_h, 0.08), BACK, FRONT, "Console")
-    prism("Liseré haut", rectangle(-half_w + 0.12, half_w - 0.12, half_h - 0.06, half_h - 0.035), FRONT, FRONT + 0.012, "Siege")
-    prism("Liseré bas", rectangle(-half_w + 0.12, half_w - 0.12, -half_h + 0.035, -half_h + 0.06), FRONT, FRONT + 0.012, "Siege")
-    sockets()
+    MODEL.prism("Console", fv.chamfered(-half_w, half_w, -half_h, half_h, 0.06), BACK, FRONT, "Console")
+    bays()
     gauge()
     switch_and_diodes()
     manometer()
+    machinery()
+
+
+# ---------------------------------------------------------------------------------------------------------- textures
+
+def kind_of(name, material_name):
+    if material_name == "Siege":
+        return "paint"
+    if material_name == "Panneau":
+        return {"Plaque du nom": "plate", "Cadran": "dial"}.get(name, "hazard")
+    if material_name == "Socket":
+        return "floor"
+    if material_name == "Piste":
+        return "trough"
+    if name.startswith("Prise"):
+        return "socket"
+    return "metal"
+
+
+def paint_cockpit():
+    """The front-view texture of the console, the painted parts and the bay floors, and its relief."""
+    rng = np.random.default_rng(7)
+    shape = (TEX_H, TEX_W)
+
+    # Which surface shows at each pixel (the frontmost part drawn with this texture), its depth, the depth of anything
+    # (glass shows what is behind it, and the moving parts' shadows would not follow them), and the outlines.
+    kinds, depth, front, outline = MODEL.surfaces(
+        ATLAS_MATERIALS, kind_of, FRONT, skip={"Console"},
+        casts_no_shadow=lambda name, material_name: material_name == "Verre" or name in MOVING)
+    kinds["metal"] = kinds.pop("base") | kinds.pop("metal", np.zeros(shape, dtype=bool))
+    metal = kinds["metal"]
+    painted = np.zeros(shape, dtype=bool)
+    for kind in ("paint", "plate", "dial", "hazard"):
+        painted |= kinds.get(kind, painted)
+    body = CANVAS.fill(fv.chamfered(-WIDTH / 2, WIDTH / 2, -HEIGHT / 2, HEIGHT / 2, 0.06))
+    outline |= fv.outlines(body.astype(np.int64))  # the console's own edge wears too
+
+    height = np.zeros(shape)
+    colour = np.zeros(shape + (3,))
+
+    # Blackened steel: a dark base, mottled, a little lighter where the varnish has worn thin.
+    mottle = fv.fractal(rng, (96, 32, 8), shape)
+    colour[:] = (BLACKENED * (0.6 + 0.6 * mottle))[..., None]
+    base = {
+        "paint": np.array([PAINT] * 3),
+        "plate": BONE,
+        "dial": DIAL_FACE,
+        "floor": np.array([0.012, 0.012, 0.013]),
+        "trough": np.array([0.008, 0.008, 0.009]),
+        "socket": np.array([0.014, 0.014, 0.015]),
+    }
+    for kind, value in base.items():
+        if kind in kinds:
+            colour[kinds[kind]] = value * (0.9 + 0.2 * mottle[kinds[kind]])[..., None]
+
+    # Hazard stripes on the switch plate, the bay floors ribbed, the pin sockets' slot and contacts.
+    if "hazard" in kinds:
+        stripes = np.mod((CANVAS.X[None, :] + CANVAS.Z[:, None]) / 0.05, 1.0) < 0.5
+        yellow = kinds["hazard"] & stripes
+        colour[kinds["hazard"]] = np.array([0.018, 0.018, 0.02])
+        colour[yellow] = HAZARD * (0.85 + 0.2 * mottle[yellow])[..., None]
+    if "floor" in kinds:
+        ribs = np.mod(CANVAS.Z[:, None] / 0.024, 1.0) < 0.2
+        height -= np.where(kinds["floor"] & ribs, 0.4, 0.0)
+    if "socket" in kinds:
+        for cx in SOCKETS:
+            half, top, _ = PIN_SOCKET
+            slot = kinds["socket"] & (np.abs(CANVAS.X[None, :] - cx) < half - 0.02) & (CANVAS.Z[:, None] > top - 0.014) & (CANVAS.Z[:, None] < top - 0.005)
+            colour[slot] = 0.002
+            height -= np.where(slot, 1.0, 0.0)
+            contacts = slot & (np.mod((CANVAS.X[None, :] - cx) / 0.025, 1.0) < 0.45)
+            colour[contacts] = BRASS
+
+    # Rivets: along the bay frames, around the plates, on the console's ends and along the seat strip.
+    rivets = []
+    for cx in SOCKETS:
+        w, h = SOCKET_SIZE[0] / 2 + BEZEL / 2, SOCKET_SIZE[1] / 2 + BEZEL / 2
+        rivets += [(cx + t, h) for t in np.arange(-w + 0.04, w - 0.02, 0.09)]
+        rivets += [(cx + side * w, z) for side in (-1, 1) for z in np.arange(-h + 0.05, h - 0.02, 0.09)]
+    for x0, x1, z0, z1 in (NAME_PLATE, (SWITCH[0] - 0.12, SWITCH[0] + 0.12, SWITCH[1] - 0.11, SWITCH[1] + 0.11)):
+        rivets += [(x0 + 0.02, z0 + 0.02), (x1 - 0.02, z0 + 0.02), (x0 + 0.02, z1 - 0.02), (x1 - 0.02, z1 - 0.02)]
+    for side in (-1, 1):
+        rivets += [(side * 1.895, z) for z in np.arange(-0.42, 0.44, 0.06)]
+    rivets += [(x, 0.465) for x in np.arange(TOP_STRIP[0] + 0.03, TOP_STRIP[1], 0.14)]
+    rivets += [(x, z) for x in np.arange(-0.62, 0.3, 0.07) for z in (-0.49,)]
+    rivet_mask = CANVAS.rivets(rivets, 0.0075, colour, height)
+
+    # The name plate and the dial's face keep a clean middle, where the game writes; then years of use.
+    clean = np.zeros(shape, dtype=np.float32)
+    for kind in ("plate", "dial"):
+        if kind in kinds:
+            clean = np.maximum(clean, np.where(kinds[kind], fv.blur(kinds[kind].astype(np.float32), 14), 0.0))
+    clean = fv.smoothstep(clean, 0.55, 0.9)
+    chips = fv.weather(CANVAS, rng, colour, height, dict(
+        metal=metal, painted=painted, clean=clean, rivets=rivet_mask, body=body, outline=outline, depth=depth, front=front),
+        dict(bare_steel=BARE_STEEL, blackened=BLACKENED, rust=RUST, scratches=(450, 0.09), shadow=(10, 0.035), low=(0.1, 0.5)))
+
+    # Stencil markings in ink on the seat strip.
+    folder = tempfile.mkdtemp(prefix="vortex_cockpit_")
+    try:
+        for text, x0, x1, z0, z1 in MARKINGS:
+            cover = CANVAS.stamp(fv.render_text(text, STENCIL_FONT, folder), x0, x1, z0, z1) * 0.88 * (1 - 0.5 * chips)
+            colour = colour * (1 - cover[..., None]) + INK * cover[..., None]
+    finally:
+        shutil.rmtree(folder, ignore_errors=True)
+
+    # The console's edge shows the chips too; outside the console, nothing is seen.
+    pixels = np.dstack([fv.to_srgb(colour), np.ones(shape)])
+    IMAGES["Cockpit_BaseColor"].pixels.foreach_set(pixels.astype(np.float32).ravel())
+    IMAGES["Cockpit_Normal"].pixels.foreach_set(fv.normal_from(fv.blur(height, 1), 1.2).astype(np.float32).ravel())
+
+
+def paint_steel():
+    """Worn bare steel for the clamps, the lever, the needle, the rings and the machinery."""
+    colour, height = fv.brushed_steel(np.random.default_rng(11), (STEEL_H, STEEL_W), 0.11, RUST)
+    IMAGES["Cockpit_Acier_BaseColor"].pixels.foreach_set(np.dstack([fv.to_srgb(colour), np.ones((STEEL_H, STEEL_W))]).astype(np.float32).ravel())
+    IMAGES["Cockpit_Acier_Normal"].pixels.foreach_set(fv.normal_from(height, 0.6).astype(np.float32).ravel())
 
 
 def main():
@@ -438,11 +497,17 @@ def main():
     output = os.path.abspath(argv[0])
     directory = os.path.dirname(output)
     os.makedirs(directory, exist_ok=True)
-    build(directory)
+    build()
+    paint_cockpit()
+    paint_steel()
+    fv.save_images(IMAGES.values(), directory)
+    MODEL.join("Habillage", KEPT)
+    bpy.data.orphans_purge(do_local_ids=True, do_linked_ids=True, do_recursive=True)
     bpy.context.preferences.filepaths.save_version = 0  # no .blend1 backup: the previous version is in Git
     bpy.ops.wm.save_as_mainfile(filepath=output, relative_remap=True)
-    triangles = sum(sum(len(p.vertices) - 2 for p in o.data.polygons) for o in bpy.data.objects if o.type == "MESH")
-    print("Cockpit saved to", output, "-", triangles, "triangles")
+    meshes = [o for o in bpy.data.objects if o.type == "MESH"]
+    triangles = sum(sum(len(p.vertices) - 2 for p in o.data.polygons) for o in meshes)
+    print("Cockpit saved to", output, "-", triangles, "triangles,", len(meshes), "objects")
 
 
 main()

@@ -10,7 +10,8 @@ namespace Vortex.Editor
     /// content id (<c>A_005.png</c>), gets mobile import settings and joins the card art catalog; deleting it brings the
     /// placeholder back. An image in <c>Art/Icons/</c> becomes a small sprite. A model anywhere under <c>Art/</c> gets
     /// lean import settings, and any other image there is a model texture; the card model in <c>Art/Cards3D/</c> becomes
-    /// the body of the card prefab. Settings are applied on the first import only, so the designer can fine-tune them
+    /// the body of the card prefab; the die and the sky behind the table join the theme (<see cref="ThemeArtSync"/>).
+    /// Settings are applied on the first import only, so the designer can fine-tune them
     /// afterwards.
     /// </summary>
     public sealed class ArtImportRules : AssetPostprocessor
@@ -38,6 +39,9 @@ namespace Vortex.Editor
 
         /// <summary>Largest side of a model texture, in pixels: 1024 for a ship, 2048 for a planet (docs/ASSETS.md §2).</summary>
         public const int ModelTextureMaxSize = 2048;
+
+        /// <summary>Largest side of a texture of the sky behind the table: it covers the whole view (docs/ASSETS.md §3).</summary>
+        public const int BackgroundTextureMaxSize = 4096;
 
         /// <summary>End of a normal map's file name (<c>Ship_Faucon_Normal.png</c>), docs/ASSETS.md section 2.</summary>
         public const string NormalMapSuffix = "_Normal";
@@ -127,6 +131,26 @@ namespace Vortex.Editor
         }
 
         /// <summary>
+        /// Settings of a new texture of the sky behind the table: a model texture (<see cref="ConfigureModelTexture"/>),
+        /// up to 4096 pixels since it fills the screen behind the table, clamped at its edges.
+        /// </summary>
+        public static void ConfigureBackgroundTexture(TextureImporter importer, string fileName)
+        {
+            ConfigureModelTexture(importer, fileName);
+            importer.maxTextureSize = BackgroundTextureMaxSize;
+            importer.wrapMode = UnityEngine.TextureWrapMode.Clamp;
+            importer.alphaIsTransparency = importer.DoesSourceTextureHaveAlpha();
+            importer.SetPlatformTextureSettings(new TextureImporterPlatformSettings
+            {
+                name = "Android",
+                overridden = true,
+                maxTextureSize = BackgroundTextureMaxSize,
+                format = TextureImporterFormat.ASTC_6x6,
+                compressionQuality = 50,
+            });
+        }
+
+        /// <summary>
         /// Settings of a new model: no cameras or lights from the file, compressed meshes kept off the CPU, and static
         /// (models have no animation yet, docs/ASSETS.md section 2), so no Animator is added to every ship.
         /// </summary>
@@ -165,6 +189,11 @@ namespace Vortex.Editor
             {
                 CardPrefabSync.Sync();
             }
+
+            if (changes.Any(paths => paths.Any(p => IsIn(p, ThemeArtSync.DiceFolder) || IsIn(p, ThemeArtSync.BackgroundsFolder))))
+            {
+                ThemeArtSync.Sync();
+            }
         }
 
         private void OnPreprocessTexture()
@@ -181,6 +210,10 @@ namespace Vortex.Editor
             else if (IsIn(assetPath, IconsFolder))
             {
                 ConfigureIconTexture((TextureImporter)assetImporter);
+            }
+            else if (IsIn(assetPath, ThemeArtSync.BackgroundsFolder))
+            {
+                ConfigureBackgroundTexture((TextureImporter)assetImporter, assetPath);
             }
             else if (IsIn(assetPath, ArtFolder))
             {

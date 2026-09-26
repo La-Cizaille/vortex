@@ -80,6 +80,7 @@ namespace Vortex.Editor
             EnsureTexts();
             EnsureCardPrefab();
             CardPrefabSync.Sync();
+            ThemeArtSync.Sync();
             SyncCardArt();
             SyncIcons();
         }

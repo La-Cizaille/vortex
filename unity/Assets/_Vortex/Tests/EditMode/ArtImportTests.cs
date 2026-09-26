@@ -322,6 +322,79 @@ namespace Vortex.Tests.EditMode
             }
         }
 
+        [Test]
+        public void The_die_model_follows_the_d8_conventions()
+        {
+            // docs/ANIMATIONS.md §5 and docs/ASSETS.md §2: about one unit high, 500 triangles at most, a marker Face_n on
+            // each face, its forward axis out of the face and its up axis towards the top of the number (the upper
+            // corner for the upper faces), opposite faces adding up to 9.
+            var model = AssetDatabase.LoadAssetAtPath<GameObject>(ThemeArtSync.DieModelPath);
+            if (model == null)
+            {
+                Assert.Ignore("No die model yet.");
+                return;
+            }
+
+            MeshFilter[] meshes = model.GetComponentsInChildren<MeshFilter>();
+            Bounds bounds = meshes[0].sharedMesh.bounds;
+            Assert.That(bounds.size.y, Is.InRange(0.8f, 1.2f), "one unit high");
+            Assert.That(meshes.Sum(mesh => Triangles(mesh.sharedMesh)), Is.LessThanOrEqualTo(500), "triangle budget");
+
+            Transform[] parts = model.GetComponentsInChildren<Transform>();
+            for (int value = 1; value <= 8; value++)
+            {
+                Transform face = parts.Single(part => part.name == PlaceholderDie.FacePrefix + value);
+                Transform opposite = parts.Single(part => part.name == PlaceholderDie.FacePrefix + (9 - value));
+                Vector3 outward = (face.position - model.transform.position).normalized;
+                Assert.That(Vector3.Dot(face.forward, outward), Is.GreaterThan(0.99f), face.name + ": forward leaves the face");
+                Assert.That(Vector3.Dot(face.forward, opposite.forward), Is.LessThan(-0.99f), face.name + ": opposite face adds up to 9");
+                Assert.That(Vector3.Dot(face.up, Vector3.up * Mathf.Sign(outward.y)), Is.GreaterThan(0.5f), face.name + ": up to the vertical corner");
+            }
+
+            var theme = AssetDatabase.LoadAssetAtPath<ThemeSettings>(ThemeAssets.ThemePath);
+            Assert.That(theme.DieModel, Is.SameAs(model), "the theme plays the die model");
+        }
+
+        [Test]
+        public void The_sky_behind_the_table_is_unlit_and_the_vortex_stands_in_front_of_the_backdrop()
+        {
+            // tools/blender/build_background.py: a backdrop and the vortex, drawn unlit; the vortex, blended over the
+            // backdrop, stands between it and the game camera, and inside what the camera sees.
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(ThemeArtSync.BackgroundPrefabPath);
+            if (prefab == null)
+            {
+                Assert.Ignore("No table background yet.");
+                return;
+            }
+
+            MeshRenderer[] renderers = prefab.GetComponentsInChildren<MeshRenderer>();
+            Assert.That(renderers.Select(r => r.name), Is.EquivalentTo(new[] { "Fond", ThemeArtSync.VortexPart }));
+            Assert.That(renderers.All(r => r.sharedMaterial.shader.name == "Universal Render Pipeline/Unlit"), "unlit");
+            Transform vortex = renderers.Single(r => r.name == ThemeArtSync.VortexPart).transform;
+            Transform backdrop = renderers.Single(r => r.name == "Fond").transform;
+
+            var camera = new GameObject("Caméra").AddComponent<Camera>();
+            try
+            {
+                camera.fieldOfView = 42f;
+                camera.aspect = 16f / 9f;
+                camera.transform.SetPositionAndRotation(new Vector3(0f, 7.4f, -10.6f), Quaternion.Euler(33f, 0f, 0f));
+                Vector3 seen = camera.WorldToViewportPoint(vortex.position);
+                Assert.That(seen.x, Is.InRange(0.3f, 0.7f), "the vortex is ahead");
+                Assert.That(seen.y, Is.InRange(0.6f, 0.85f), "the vortex looms over the table's middle");
+                Bounds far = backdrop.GetComponent<MeshFilter>().sharedMesh.bounds;
+                Assert.That(Vector3.Distance(camera.transform.position, vortex.position),
+                    Is.LessThan(Vector3.Distance(camera.transform.position, backdrop.TransformPoint(far.center))), "in front of the backdrop");
+            }
+            finally
+            {
+                Object.DestroyImmediate(camera.gameObject);
+            }
+
+            var theme = AssetDatabase.LoadAssetAtPath<ThemeSettings>(ThemeAssets.ThemePath);
+            Assert.That(theme.TableBackground, Is.SameAs(prefab), "the theme places it behind the table");
+        }
+
         // Every material of a mesh is a sub-mesh of its own.
         private static int Triangles(Mesh mesh) =>
             Enumerable.Range(0, mesh.subMeshCount).Sum(subMesh => (int)mesh.GetIndexCount(subMesh) / 3);
