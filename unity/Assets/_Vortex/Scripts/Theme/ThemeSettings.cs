@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using Vortex.Core.Content;
@@ -79,6 +80,12 @@ namespace Vortex.Client.Theme
         [SerializeField] private Material? shieldMaterial;
         [Tooltip("Fumée d'un vaisseau endommagé : un effet qui s'élève, posé sur la coque et détruit après quelques secondes. Vide : des bouffées provisoires.")]
         [SerializeField] private GameObject? smokePrefab;
+        [Tooltip("Arc électrique d'un vaisseau surchargé : un effet court, posé sur la coque et détruit après une seconde. Vide : des arcs provisoires.")]
+        [SerializeField] private GameObject? arcPrefab;
+        [Tooltip("Fond de la table (panorama, ciel étoilé), posé à l'origine de la scène au début de la partie. Vide : un champ d'étoiles généré.")]
+        [SerializeField] private GameObject? tableBackground;
+        [Tooltip("Effet joué au centre de la table quand un événement de manche est révélé, par identifiant d'événement (docs/CARDS.md). Un événement sans entrée montre une vague de lumière.")]
+        [SerializeField] private List<EventEffect> eventEffects = new List<EventEffect>();
         [Tooltip("Modèle du dé à 8 faces (ASSETS §2). Il porte huit repères vides Face_1 à Face_8, dont l'axe avant sort de la face. Vide : un octaèdre généré.")]
         [SerializeField] private GameObject? dieModel;
 
@@ -152,6 +159,26 @@ namespace Vortex.Client.Theme
         /// <summary>Material of the shield's plasma sphere: the designer's, or the glow material.</summary>
         public Material? ShieldLook => shieldMaterial != null ? shieldMaterial : glowMaterial;
 
+        /// <summary>The table's background, or null for the generated starfield.</summary>
+        public GameObject? TableBackground => tableBackground;
+
+        /// <summary>The effect of an event of the round, or null for the generic wave.</summary>
+        public GameObject? EventEffectFor(string eventId)
+        {
+            foreach (EventEffect entry in eventEffects)
+            {
+                if (entry.EventId == eventId)
+                {
+                    return entry.Effect;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>The electric arc of an overcharged ship, or null for the placeholder arcs.</summary>
+        public GameObject? ArcPrefab => arcPrefab;
+
         /// <summary>The smoke of a damaged ship, or null for the placeholder puffs.</summary>
         public GameObject? SmokePrefab => smokePrefab;
 
@@ -190,5 +217,16 @@ namespace Vortex.Client.Theme
         public bool HasTextIcon(string icon) => textIcons != null && textIcons.GetSpriteIndexFromName(icon) >= 0;
 
         private void OnValidate() => Changed?.Invoke();
+
+        /// <summary>One line of the event effects: an event id and its effect.</summary>
+        [Serializable]
+        public sealed class EventEffect
+        {
+            /// <summary>Identifier of the event (docs/CARDS.md).</summary>
+            public string EventId = string.Empty;
+
+            /// <summary>What plays in the middle of the table.</summary>
+            public GameObject? Effect;
+        }
     }
 }

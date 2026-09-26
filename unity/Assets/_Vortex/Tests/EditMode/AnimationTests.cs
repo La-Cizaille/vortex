@@ -252,6 +252,76 @@ namespace Vortex.Tests.EditMode
         }
 
         [Test]
+        public void Torment_bursts_into_spores_and_cleansing_rises_off_the_ship()
+        {
+            Transform ship = Ship("Vaisseau", Vector3.zero, out ShipMotion motion);
+            TormentFeedback torment = ScriptableObject.CreateInstance<TormentFeedback>();
+            torment.Play(new GameEvent { Type = GameEventType.TormentPlaced, Player = 0, CardUid = 3, Value = 1 }, new Stage(ship, null, motion));
+            torment.Play(new GameEvent { Type = GameEventType.TormentsRemoved, Player = 0, CardUid = 3, Amount = 1 }, new Stage(ship, null, motion));
+            torment.Play(new GameEvent { Type = GameEventType.TormentPlaced, Player = -1, CardUid = 9, Value = 1 }, new Stage(ship, null, motion));
+            Assert.That(Object.FindObjectsByType<PlaceholderEffect>().Select(e => e.name), Is.EquivalentTo(new[] { "Spores", "Purification" }), "A token on a market card has no ship.");
+            motion.Tick(0.05f);
+            Assert.That(motion.PushOffset, Is.Not.EqualTo(Vector3.zero), "The ship shudders.");
+        }
+
+        [Test]
+        public void A_stolen_card_flies_between_ships_and_a_used_card_burns_up_in_the_middle()
+        {
+            Transform thief = Ship("Voleur", new Vector3(-4f, 0f, 0f), out ShipMotion motion);
+            Transform victim = Ship("Victime", new Vector3(4f, 0f, 0f), out ShipMotion _);
+            var centre = new GameObject("Centre").transform;
+            _created.Add(centre.gameObject);
+            CardFlightFeedback flight = ScriptableObject.CreateInstance<CardFlightFeedback>();
+
+            flight.Play(new GameEvent { Type = GameEventType.CardStolen, Player = 0, Other = 1, CardUid = 5 }, new Stage(thief, victim, motion));
+            Assert.That(Object.FindObjectsByType<PlaceholderEffect>().Single().PieceCount, Is.EqualTo(6), "A few steps along its curve.");
+            CleanUpEffects();
+
+            flight.Play(new GameEvent { Type = GameEventType.CardActivated, Player = 0, CardUid = 5 }, new Stage(thief, null, motion, centre));
+            Assert.That(Object.FindObjectsByType<PlaceholderEffect>().Single().PieceCount, Is.GreaterThan(6), "It burns up in the middle.");
+        }
+
+        [Test]
+        public void A_round_event_sends_a_wave_and_damage_sent_back_flies_back_first()
+        {
+            Transform ship = Ship("Vaisseau", new Vector3(0f, 0f, -4f), out ShipMotion motion);
+            Transform reflector = Ship("Talion", new Vector3(0f, 0f, 4f), out ShipMotion _);
+            var centre = new GameObject("Centre").transform;
+            _created.Add(centre.gameObject);
+
+            ScriptableObject.CreateInstance<EventFeedback>().Play(new GameEvent { Type = GameEventType.EventRevealed, Id = "EVT_TEST" }, new Stage(ship, null, motion, centre));
+            Assert.That(Object.FindObjectsByType<PlaceholderEffect>().Single().name, Is.EqualTo("Vague d'événement"), "No effect in the theme: the generic wave.");
+            CleanUpEffects();
+
+            KnockbackFeedback knockback = ScriptableObject.CreateInstance<KnockbackFeedback>();
+            float direct = knockback.Play(new GameEvent { Type = GameEventType.HpLost, Player = 0, Amount = 4, Cause = HpLossCause.Attack }, new Stage(ship, reflector, motion, centre));
+            float sentBack = knockback.Play(new GameEvent { Type = GameEventType.HpLost, Player = 0, Other = 1, Amount = 4, Cause = HpLossCause.Reflect }, new Stage(ship, reflector, motion, centre));
+            Assert.That(Object.FindObjectsByType<PlaceholderEffect>().Count(e => e.name == "Renvoi"), Is.EqualTo(1));
+            Assert.That(sentBack, Is.GreaterThan(direct), "The hit waits for the bolt sent back.");
+        }
+
+        [Test]
+        public void The_sky_is_one_mesh_of_stars_and_an_overcharged_ship_crackles()
+        {
+            Starfield sky = Starfield.Create(null, Vector3.zero, 300, 60f, null);
+            _created.Add(sky.gameObject);
+            Assert.That((sky.Stars, sky.GetComponent<MeshFilter>().sharedMesh.vertexCount), Is.EqualTo((300, 1200)));
+
+            Transform ship = Ship("Vaisseau", Vector3.zero, out ShipMotion motion);
+            OverchargeArcs arcs = motion.Body.gameObject.AddComponent<OverchargeArcs>();
+            arcs.Show(false, false, Color.cyan, null);
+            arcs.Tick(2f);
+            Assert.That(arcs.Sparks, Is.Zero, "No token, no sparks.");
+            arcs.Show(true, true, Color.cyan, null);
+            for (int i = 0; i < 20; i++)
+            {
+                arcs.Tick(0.1f);
+            }
+
+            Assert.That(arcs.Sparks, Is.GreaterThan(5));
+        }
+
+        [Test]
         public void The_profile_plays_the_first_animations()
         {
             var profile = AssetDatabase.LoadAssetAtPath<FeedbackProfile>(ProjectAssets.ProfilePath);
@@ -264,6 +334,12 @@ namespace Vortex.Tests.EditMode
             Assert.That(profile.For(GameEventType.CriticalHit), Is.InstanceOf<CriticalFeedback>());
             Assert.That(profile.For(GameEventType.HpLossPrevented), Is.InstanceOf<DodgeFeedback>());
             Assert.That(profile.For(GameEventType.ShieldChanged), Is.InstanceOf<ShieldPulseFeedback>());
+            Assert.That(profile.For(GameEventType.TormentPlaced), Is.InstanceOf<TormentFeedback>());
+            Assert.That(profile.For(GameEventType.TormentsRemoved), Is.InstanceOf<TormentFeedback>());
+            Assert.That(profile.For(GameEventType.MarketCardTaken), Is.InstanceOf<CardFlightFeedback>());
+            Assert.That(profile.For(GameEventType.CardStolen), Is.InstanceOf<CardFlightFeedback>());
+            Assert.That(profile.For(GameEventType.CardActivated), Is.InstanceOf<CardFlightFeedback>());
+            Assert.That(profile.For(GameEventType.EventRevealed), Is.InstanceOf<EventFeedback>());
         }
 
         private static void CleanUpEffects()

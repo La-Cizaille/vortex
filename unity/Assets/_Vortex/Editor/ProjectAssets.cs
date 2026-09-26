@@ -117,6 +117,9 @@ namespace Vortex.Editor
             changed |= Animation<CriticalFeedback>(profile, "Critical", GameEventType.CriticalHit);
             changed |= Animation<DodgeFeedback>(profile, "Dodge", GameEventType.HpLossPrevented);
             changed |= Animation<ShieldPulseFeedback>(profile, "ShieldPulse", GameEventType.ShieldChanged);
+            changed |= Animation<TormentFeedback>(profile, "Torment", GameEventType.TormentPlaced, GameEventType.TormentsRemoved);
+            changed |= Animation<CardFlightFeedback>(profile, "CardFlight", GameEventType.MarketCardTaken, GameEventType.CardStolen, GameEventType.CardActivated);
+            changed |= Animation<EventFeedback>(profile, "RoundEvent", GameEventType.EventRevealed);
             changed |= Animation<KnockbackFeedback>(profile, "Knockback", GameEventType.HpLost);
             changed |= Animation<ThrusterFeedback>(profile, "Thrusters", GameEventType.TechnologyActivated);
             changed |= Animation<ExplosionFeedback>(profile, "Explosion", GameEventType.PlayerEliminated);
@@ -127,7 +130,7 @@ namespace Vortex.Editor
             }
         }
 
-        private static bool Animation<T>(FeedbackProfile profile, string name, GameEventType type)
+        private static bool Animation<T>(FeedbackProfile profile, string name, params GameEventType[] types)
             where T : FeedbackAsset
         {
             string path = FeedbackFolder + name + ".asset";
@@ -138,7 +141,13 @@ namespace Vortex.Editor
 
             T feedback = ScriptableObject.CreateInstance<T>();
             Create(feedback, path);
-            return profile.MapIfMissing(type, feedback);
+            bool mapped = false;
+            foreach (GameEventType type in types)
+            {
+                mapped |= profile.MapIfMissing(type, feedback);
+            }
+
+            return mapped;
         }
 
         // A dark rounded tray; each die is a white diamond (a d8 seen from above) with its value, then the total.
