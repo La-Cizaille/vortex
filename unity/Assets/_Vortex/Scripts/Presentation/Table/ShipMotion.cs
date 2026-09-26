@@ -4,14 +4,13 @@ using UnityEngine;
 namespace Vortex.Client.Presentation
 {
     /// <summary>
-    /// How a ship moves by itself (ANIMATIONS.md §2): a slow sway, rolling and bobbing as if it hovered in place, and the
-    /// short pushes the feedbacks give it (recoil of a shot, knockback of a hit). Only the ship's body moves: its root
-    /// stays where the table put it, so the panel that follows the ship does not shake. A wreck drifts slowly instead.
+    /// How a ship moves by itself (ANIMATIONS.md §2): a slow sway, rolling and bobbing as if it hovered in place, the
+    /// short pushes the feedbacks give it (recoil of a shot, knockback of a hit), and a turn towards the target it aims
+    /// at. Only the ship's body (the model) moves, under a still root that the table places: the panel that follows the
+    /// ship does not shake, and a model whose mesh is on its own root moves too. A wreck drifts slowly instead.
     /// </summary>
     public sealed class ShipMotion : MonoBehaviour
     {
-        /// <summary>Name of the child that carries the ship's parts and moves.</summary>
-        public const string BodyName = "Mouvement";
 
         private readonly List<Move> _pushes = new List<Move>();
         private Transform _body = null!;
@@ -21,6 +20,13 @@ namespace Vortex.Client.Presentation
         private float _period = 3f;
         private float _phase;
         private float _time;
+        private float _yaw;
+        private float _yawFrom;
+        private float _yawTo;
+        private float _turn;
+        private float _turnTime;
+        private float _releaseIn;
+        private float _releaseSeconds;
 
         /// <summary>True once the ship is a wreck.</summary>
         public bool Wrecked { get; private set; }
@@ -28,26 +34,22 @@ namespace Vortex.Client.Presentation
         /// <summary>How far the pushes move the body now (tests).</summary>
         public Vector3 PushOffset { get; private set; }
 
-        /// <summary>
-        /// Adds the motion to a ship: its parts move under a new body child. <paramref name="phase"/> (0 to 1) shifts the sway,
-        /// so that the ships of a table do not move together.
-        /// </summary>
-        public static ShipMotion Attach(Transform ship, float height, float rollDegrees, float pitchDegrees, float periodSeconds, float phase)
-        {
-            var body = new GameObject(BodyName).transform;
-            body.SetParent(ship, false);
-            var parts = new List<Transform>();
-            foreach (Transform part in ship)
-            {
-                if (part != body)
-                {
-                    parts.Add(part);
-                }
-            }
+        /// <summary>The ship's model, which moves (tests).</summary>
+        public Transform Body => _body;
 
-            foreach (Transform part in parts)
+        /// <summary>The turn of the body towards its aim, in degrees (tests).</summary>
+        public float Yaw => _yaw;
+
+        /// <summary>
+        /// Adds the motion to a ship: <paramref name="ship"/> is the still root the table places, <paramref name="body"/>
+        /// the model under it, which moves. <paramref name="phase"/> (0 to 1) shifts the sway, so that the ships of a table
+        /// do not move together.
+        /// </summary>
+        public static ShipMotion Attach(Transform ship, Transform body, float height, float rollDegrees, float pitchDegrees, float periodSeconds, float phase)
+        {
+            if (body.parent != ship)
             {
-                part.SetParent(body, false);
+                throw new System.ArgumentException("The body must be a child of the ship's root.", nameof(body));
             }
 
             ShipMotion motion = ship.gameObject.AddComponent<ShipMotion>();
@@ -62,11 +64,32 @@ namespace Vortex.Client.Presentation
 
         /// <summary>
         /// Moves the body by <paramref name="offset"/> (world space) in <paramref name="outSeconds"/>, then back in
-        /// <paramref name="backSeconds"/>. Pushes add up.
+        /// <paramref name="backSeconds"/>, starting after <paramref name="delay"/>. Pushes add up.
         /// </summary>
-        public void Push(Vector3 offset, float outSeconds, float backSeconds)
+        public void Push(Vector3 offset, float outSeconds, float backSeconds, float delay = 0f)
         {
-            _pushes.Add(new Move(offset, Mathf.Max(0.01f, outSeconds), Mathf.Max(0.01f, backSeconds)));
+            _pushes.Add(new Move(offset, Mathf.Max(0.01f, outSeconds), Mathf.Max(0.01f, backSeconds), Mathf.Max(0f, delay)));
+        }
+
+        /// <summary>Turns the ship's nose towards a point of the table in <paramref name="seconds"/>; it stays aimed until released.</summary>
+        public void Aim(Vector3 target, float seconds)
+        {
+            _releaseIn = 0f;
+            Vector3 local = transform.InverseTransformPoint(target);
+            TurnTo(Mathf.Atan2(local.x, local.z) * Mathf.Rad2Deg, seconds);
+        }
+
+        /// <summary>Turns the ship back to its place in the table, in <paramref name="seconds"/>, after <paramref name="delay"/>.</summary>
+        public void Release(float seconds, float delay = 0f)
+        {
+            if (delay <= 0f)
+            {
+                TurnTo(0f, seconds);
+                return;
+            }
+
+            _releaseIn = delay;
+            _releaseSeconds = seconds;
         }
 
         /// <summary>The ship is destroyed: no more sway, a slow drift, and no pushes left.</summary>
@@ -74,12 +97,28 @@ namespace Vortex.Client.Presentation
         {
             Wrecked = true;
             _pushes.Clear();
+            TurnTo(0f, 0f);
         }
 
         /// <summary>Moves the body on (every frame; tests call it directly).</summary>
         public void Tick(float deltaTime)
         {
             _time += deltaTime;
+            if (_releaseIn > 0f)
+            {
+                _releaseIn -= deltaTime;
+                if (_releaseIn <= 0f)
+                {
+                    TurnTo(0f, _releaseSeconds);
+                }
+            }
+
+            if (_turnTime < _turn)
+            {
+                _turnTime += deltaTime;
+                _yaw = Mathf.LerpAngle(_yawFrom, _yawTo, EaseInOut(Mathf.Clamp01(_turnTime / _turn)));
+            }
+
             float angle = 2f * Mathf.PI * (_time / _period + _phase);
             Vector3 position;
             Quaternion rotation;
@@ -100,6 +139,12 @@ namespace Vortex.Client.Presentation
             {
                 Move push = _pushes[i];
                 push.Time += deltaTime;
+                if (push.Time < 0f)
+                {
+                    _pushes[i] = push;
+                    continue;
+                }
+
                 if (push.Time >= push.Out + push.Back)
                 {
                     _pushes.RemoveAt(i);
@@ -115,7 +160,19 @@ namespace Vortex.Client.Presentation
 
             PushOffset = pushed;
             _body.localPosition = position + transform.InverseTransformVector(pushed);
-            _body.localRotation = rotation;
+            _body.localRotation = Quaternion.Euler(0f, _yaw, 0f) * rotation;
+        }
+
+        private void TurnTo(float yaw, float seconds)
+        {
+            _yawFrom = _yaw;
+            _yawTo = yaw;
+            _turn = Mathf.Max(0f, seconds);
+            _turnTime = 0f;
+            if (_turn <= 0f)
+            {
+                _yaw = yaw;
+            }
         }
 
         private static float EaseOut(float t) => 1f - ((1f - t) * (1f - t));
@@ -126,12 +183,12 @@ namespace Vortex.Client.Presentation
 
         private struct Move
         {
-            public Move(Vector3 offset, float outSeconds, float backSeconds)
+            public Move(Vector3 offset, float outSeconds, float backSeconds, float delay)
             {
                 Offset = offset;
                 Out = outSeconds;
                 Back = backSeconds;
-                Time = 0f;
+                Time = -delay;
             }
 
             public Vector3 Offset;

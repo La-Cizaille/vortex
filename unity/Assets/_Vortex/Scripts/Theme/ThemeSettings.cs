@@ -73,6 +73,8 @@ namespace Vortex.Client.Theme
         [SerializeField, Min(0f)] private float shipSwayPitch = 1.2f;
         [Tooltip("Vaisseaux au repos : durée d'un balancement complet, en secondes.")]
         [SerializeField, Min(0.1f)] private float shipSwaySeconds = 3.4f;
+        [Tooltip("Matériau des effets lumineux provisoires (tirs, réacteurs, explosions) : additif, sans lumière, teinté par chaque effet. Au-dessus du seuil du Bloom, il rayonne. Vide : les effets restent mats.")]
+        [SerializeField] private Material? glowMaterial;
         [Tooltip("Modèle du dé à 8 faces (ASSETS §2). Il porte huit repères vides Face_1 à Face_8, dont l'axe avant sort de la face. Vide : un octaèdre généré.")]
         [SerializeField] private GameObject? dieModel;
 
@@ -139,6 +141,21 @@ namespace Vortex.Client.Theme
 
         /// <summary>Duration of a full sway, in seconds.</summary>
         public float ShipSwaySeconds => shipSwaySeconds;
+
+        /// <summary>Material of the luminous placeholder effects, or null.</summary>
+        public Material? GlowMaterial => glowMaterial;
+
+        /// <summary>Sets the glow material when the theme has none (editor setup).</summary>
+        public bool AssignGlowIfMissing(Material material)
+        {
+            if (glowMaterial != null)
+            {
+                return false;
+            }
+
+            glowMaterial = material;
+            return true;
+        }
 
         /// <summary>The d8 model with its Face_1 to Face_8 markers, or null for the generated one.</summary>
         public GameObject? DieModel => dieModel;

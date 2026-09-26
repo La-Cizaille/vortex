@@ -7,7 +7,7 @@
     seat is a person's and the table is rendered on their turn, controls offered, after the market or (-Phase Market)
     during it; -Phase Aim shows an attack aimed at an opponent, with the engine's preview; -Phase Pause the pause menu;
     -Phase End the end of game panel (the game is played to its end); -Phase Log the open game log; -Phase Decision (with
-    -Human) the person's first decision, answered on the table; -TurnSeconds N times
+    -Human) the person's first decision, answered on the table; -Phase Effects the animations frozen mid-way (-EffectTime s after the shot); -TurnSeconds N times
     the turns (the timer shows on the person's turn). Menu: the home screen, or -Phase Local, Dev or
     Options. Gallery: every card and ship. A way
     to check a layout, a new illustration or a new model in context. The editor must be closed.
@@ -27,10 +27,12 @@ param(
     [ValidateRange(1, 30)]
     [int] $Round = 4,
     [switch] $Human,
-    [ValidateSet('Actions', 'Market', 'Aim', 'Pause', 'End', 'Log', 'Decision', 'Home', 'Local', 'Dev', 'Options')]
+    [ValidateSet('Actions', 'Market', 'Aim', 'Pause', 'End', 'Log', 'Decision', 'Effects', 'Home', 'Local', 'Dev', 'Options')]
     [string] $Phase = 'Actions',
     [ValidateRange(0, 600)]
-    [int] $TurnSeconds = 0
+    [int] $TurnSeconds = 0,
+    [ValidateRange(0.0, 5.0)]
+    [double] $EffectTime = 0.35
 )
 
 $ErrorActionPreference = 'Stop'
@@ -48,6 +50,7 @@ $env:VORTEX_ROUND = "$Round"
 $env:VORTEX_HUMAN = if ($Human) { '1' } else { '0' }
 $env:VORTEX_PHASE = $Phase.ToLowerInvariant()
 $env:VORTEX_TURN_SECONDS = "$TurnSeconds"
+$env:VORTEX_EFFECT_TIME = $EffectTime.ToString([System.Globalization.CultureInfo]::InvariantCulture)
 $log = Join-Path $env:TEMP "vortex-unity-capture.log"
 $code = Invoke-VortexUnityMethod -Method "Vortex.Editor.SceneCapture.$Scene" -LogFile $log
 if ($code -ne 0 -or -not (Test-Path $target)) {

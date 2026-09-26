@@ -39,9 +39,12 @@ namespace Vortex.Client.Presentation
 
             Color hull = stage.Theme != null ? stage.Theme.Seat(gameEvent.Player) : Color.grey;
             float scale = ship.lossyScale.x;
-            PlaceholderEffect effect = PlaceholderEffect.Create("Explosion", at, seconds / speed)
-                .Add(PrimitiveType.Sphere, new Color(1f, 0.85f, 0.5f), Vector3.zero, Quaternion.identity, Vector3.one * 2.2f * scale, Vector3.zero)
-                .Add(PrimitiveType.Sphere, new Color(1f, 0.45f, 0.15f), Vector3.zero, Quaternion.identity, Vector3.one * 1.5f * scale, Vector3.up * 0.4f * speed);
+            PlaceholderEffect effect = PlaceholderEffect.Create("Explosion", at, seconds / speed, stage.Theme != null ? stage.Theme.GlowMaterial : null)
+                .Add(new PlaceholderEffect.PieceSpec(PrimitiveType.Sphere, new Color(3f, 2.4f, 1.5f), Vector3.zero, Quaternion.identity, Vector3.one * 1.3f * scale)
+                { Duration = 0.3f / speed, Rise = 0.15f, Glow = true })
+                .Add(new PlaceholderEffect.PieceSpec(PrimitiveType.Sphere, new Color(2.2f, 0.9f, 0.25f), Vector3.zero, Quaternion.identity, Vector3.one * 1f * scale)
+                { Velocity = Vector3.up * 0.4f * speed, Glow = true })
+                .AddRing(new Color(2.5f, 1.2f, 0.4f), 24, 3f * scale, 0.08f * scale, 0.7f / speed);
             for (int i = 0; i < debris; i++)
             {
                 // Cosmetic scatter only, never a game value.

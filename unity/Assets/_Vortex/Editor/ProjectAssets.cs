@@ -111,7 +111,8 @@ namespace Vortex.Editor
         private static void EnsureAnimations()
         {
             FeedbackProfile profile = AssetDatabase.LoadAssetAtPath<FeedbackProfile>(ProfilePath);
-            bool changed = Animation<BeamFeedback>(profile, "Beam", GameEventType.AttackResolved);
+            bool changed = Animation<AimFeedback>(profile, "Aim", GameEventType.AttackDeclared);
+            changed |= Animation<LaserFeedback>(profile, "Laser", GameEventType.AttackResolved);
             changed |= Animation<KnockbackFeedback>(profile, "Knockback", GameEventType.HpLost);
             changed |= Animation<ThrusterFeedback>(profile, "Thrusters", GameEventType.TechnologyActivated);
             changed |= Animation<ExplosionFeedback>(profile, "Explosion", GameEventType.PlayerEliminated);

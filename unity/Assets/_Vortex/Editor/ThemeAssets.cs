@@ -69,6 +69,7 @@ namespace Vortex.Editor
             EnsureFolder(ArtImportRules.ShipsFolder, "Modèles des vaisseaux (.fbx), exportés depuis art-src/ships avec tools/blender/export_unity.py, puis associés à un siège dans Theme/ShipCatalog. Voir docs/ASSETS.md.");
             EnsureFolder(ArtImportRules.IconsFolder, "Icônes (PNG transparents) : actions d'équipage, icônes du texte des cartes, technologies, jetons. Noms et tailles : docs/ASSETS.md.");
             Ensure<ThemeSettings>(ThemePath);
+            EnsureGlow();
             Ensure<CardArtCatalog>(CardArtPath);
             Ensure<ShipCatalog>(ShipsPath);
             Ensure<IconCatalog>(IconsPath);
@@ -271,6 +272,36 @@ namespace Vortex.Editor
             PrefabUtility.SaveAsPrefabAsset(root, CardPrefabPath);
             Object.DestroyImmediate(root);
             Debug.Log("Created " + CardPrefabPath);
+        }
+
+        /// <summary>The additive, unlit material of the luminous placeholder effects (ANIMATIONS.md §5).</summary>
+        public const string GlowMaterialPath = "Assets/_Vortex/Theme/Materials/Glow.mat";
+
+        // Additive and unlit: each effect tints it with a bright (HDR) colour through a property block, so that the Bloom
+        // makes it shine, without a material per effect. It goes to the theme only when the theme has none.
+        private static void EnsureGlow()
+        {
+            Material glow = AssetDatabase.LoadAssetAtPath<Material>(GlowMaterialPath);
+            if (glow == null)
+            {
+                glow = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+                glow.SetFloat("_Surface", 1f);
+                glow.SetFloat("_Blend", 2f);
+                glow.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.One);
+                glow.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.One);
+                glow.SetFloat("_ZWrite", 0f);
+                glow.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+                glow.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                glow.SetColor("_BaseColor", Color.white);
+                ProjectAssets.Create(glow, GlowMaterialPath);
+            }
+
+            ThemeSettings theme = AssetDatabase.LoadAssetAtPath<ThemeSettings>(ThemePath);
+            if (theme != null && theme.AssignGlowIfMissing(glow))
+            {
+                EditorUtility.SetDirty(theme);
+                AssetDatabase.SaveAssetIfDirty(theme);
+            }
         }
 
         // Unlit materials: the card reads the same whatever the lighting of the scene. The designer can switch them to

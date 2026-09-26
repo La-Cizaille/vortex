@@ -54,12 +54,13 @@ namespace Vortex.Client.Presentation
             }
             else
             {
-                PlaceholderEffect effect = PlaceholderEffect.Create("Étincelles", hull, 0.4f / speed);
-                for (int i = 0; i < 6; i++)
+                PlaceholderEffect effect = PlaceholderEffect.Create("Étincelles", hull, 0.45f / speed, stage.Theme != null ? stage.Theme.GlowMaterial : null);
+                for (int i = 0; i < 8; i++)
                 {
                     // Cosmetic scatter only, never a game value.
-                    Vector3 direction = (away + Random.insideUnitSphere * 0.8f).normalized;
-                    effect.Add(PrimitiveType.Sphere, new Color(1f, 0.75f, 0.3f), Vector3.zero, Quaternion.identity, Vector3.one * 0.07f, direction * 2.5f * speed);
+                    Vector3 direction = (away + (Random.insideUnitSphere * 0.9f)).normalized;
+                    effect.Add(new PlaceholderEffect.PieceSpec(PrimitiveType.Sphere, new Color(4f, 2.4f, 0.8f), Vector3.zero, Quaternion.identity, Vector3.one * 0.08f)
+                    { Velocity = direction * 3f * speed, Rise = 0.1f, Glow = true });
                 }
             }
 

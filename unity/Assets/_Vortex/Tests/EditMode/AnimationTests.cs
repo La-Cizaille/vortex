@@ -40,10 +40,10 @@ namespace Vortex.Tests.EditMode
         [Test]
         public void A_ship_sways_under_its_root_and_a_push_goes_out_then_back()
         {
+            // A model with its mesh on its own root, like an imported single-mesh model (third playtest: nothing moved).
             Transform ship = Ship("Vaisseau", Vector3.zero, out ShipMotion motion);
-            Transform body = ship.Find(ShipMotion.BodyName);
-            Assert.That(body, Is.Not.Null);
-            Assert.That(ship.GetComponentsInChildren<MeshRenderer>().All(r => r.transform.IsChildOf(body)), Is.True, "The parts move under the body.");
+            Transform body = motion.Body;
+            Assert.That(body.GetComponent<MeshRenderer>(), Is.Not.Null);
 
             motion.Tick(0.8f);
             Assert.That(body.localPosition.y, Is.Not.EqualTo(0f), "It sways.");
@@ -62,19 +62,26 @@ namespace Vortex.Tests.EditMode
         }
 
         [Test]
-        public void An_attack_draws_a_beam_to_the_target_and_the_attacker_recoils()
+        public void The_attacker_turns_to_its_target_then_fires_a_bolt_recoils_and_turns_back()
         {
-            Transform attacker = Ship("Attaquant", new Vector3(0f, 0f, -5f), out ShipMotion recoiling);
-            Transform target = Ship("Cible", new Vector3(0f, 0f, 5f), out ShipMotion _);
-            var stage = new Stage(attacker, target, recoiling);
-            float wait = ScriptableObject.CreateInstance<BeamFeedback>().Play(new GameEvent { Type = GameEventType.AttackResolved, Player = 0, Other = 1, Value = 8 }, stage);
+            // The attacker faces the middle of the table (+z); its target is to its right.
+            Transform attacker = Ship("Attaquant", new Vector3(0f, 0f, -5f), out ShipMotion aiming);
+            Transform target = Ship("Cible", new Vector3(8f, 0f, -5f), out ShipMotion _);
+            var stage = new Stage(attacker, target, aiming);
 
-            PlaceholderEffect beam = Object.FindObjectsByType<PlaceholderEffect>().Single();
-            Assert.That((beam.name, beam.PieceCount), Is.EqualTo(("Rayon", 1)));
-            Assert.That(beam.transform.position.z, Is.EqualTo(0f).Within(1f), "Between the two ships.");
-            recoiling.Tick(0.06f);
-            Assert.That(recoiling.PushOffset.z, Is.LessThan(0f), "The attacker recoils, away from its target.");
-            Assert.That(wait, Is.GreaterThan(0f));
+            ScriptableObject.CreateInstance<AimFeedback>().Play(new GameEvent { Type = GameEventType.AttackDeclared, Player = 0, Other = 1 }, stage);
+            aiming.Tick(1f);
+            Assert.That(aiming.Yaw, Is.EqualTo(90f).Within(2f), "Nose towards the target before the shot.");
+
+            float wait = ScriptableObject.CreateInstance<LaserFeedback>().Play(new GameEvent { Type = GameEventType.AttackResolved, Player = 0, Other = 1, Value = 8 }, stage);
+            PlaceholderEffect bolt = Object.FindObjectsByType<PlaceholderEffect>().Single();
+            Assert.That((bolt.name, bolt.PieceCount), Is.EqualTo(("Tir laser", 3)), "Muzzle flash, bolt, impact.");
+            Assert.That(wait, Is.GreaterThan(0.3f), "The damage waits for the impact.");
+
+            aiming.Tick(0.2f);
+            Assert.That(aiming.PushOffset.x, Is.LessThan(0f), "The attacker recoils, away from its target.");
+            aiming.Tick(wait + 2f);
+            Assert.That(aiming.Yaw, Is.EqualTo(0f).Within(0.5f), "Back to its place after the shot.");
         }
 
         [Test]
@@ -109,13 +116,13 @@ namespace Vortex.Tests.EditMode
             var combo = new GameEvent { Type = GameEventType.TechnologyActivated, Player = 0, Value = (int)TechColor.Red };
 
             thrusters.Play(combo, new Stage(ship, null, motion));
-            Assert.That(Object.FindObjectsByType<PlaceholderEffect>().Length, Is.EqualTo(1), "Without markers, one flame behind the ship.");
+            Assert.That(Object.FindObjectsByType<PlaceholderEffect>().Length, Is.EqualTo(2), "The pulse, and without markers one jet behind the ship.");
             CleanUpEffects();
 
             Marker(ship, "Reacteur_Gauche");
             Marker(ship, "Reacteur_Droit");
             thrusters.Play(combo, new Stage(ship, null, motion));
-            Assert.That(Object.FindObjectsByType<PlaceholderEffect>().Length, Is.EqualTo(2), "One flame per engine.");
+            Assert.That(Object.FindObjectsByType<PlaceholderEffect>().Length, Is.EqualTo(3), "The pulse and one jet per engine.");
         }
 
         [Test]
@@ -162,7 +169,8 @@ namespace Vortex.Tests.EditMode
         public void The_profile_plays_the_first_animations()
         {
             var profile = AssetDatabase.LoadAssetAtPath<FeedbackProfile>(ProjectAssets.ProfilePath);
-            Assert.That(profile.For(GameEventType.AttackResolved), Is.InstanceOf<BeamFeedback>());
+            Assert.That(profile.For(GameEventType.AttackDeclared), Is.InstanceOf<AimFeedback>());
+            Assert.That(profile.For(GameEventType.AttackResolved), Is.InstanceOf<LaserFeedback>());
             Assert.That(profile.For(GameEventType.HpLost), Is.InstanceOf<KnockbackFeedback>());
             Assert.That(profile.For(GameEventType.TechnologyActivated), Is.InstanceOf<ThrusterFeedback>());
             Assert.That(profile.For(GameEventType.PlayerEliminated), Is.InstanceOf<ExplosionFeedback>());
@@ -177,7 +185,7 @@ namespace Vortex.Tests.EditMode
         }
 
         private static void Marker(Transform ship, string name) =>
-            new GameObject(name).transform.SetParent(ship.Find(ShipMotion.BodyName), false);
+            new GameObject(name).transform.SetParent(ship.GetComponent<ShipMotion>().Body, false);
 
         private Transform Ship(string name, Vector3 position, out ShipMotion motion)
         {
@@ -185,8 +193,10 @@ namespace Vortex.Tests.EditMode
             _created.Add(root);
             root.transform.position = position;
             root.transform.rotation = Quaternion.LookRotation(position.sqrMagnitude > 0f ? -position.normalized : Vector3.forward);
-            PlaceholderShip.Build(root.transform, Color.cyan);
-            motion = ShipMotion.Attach(root.transform, 0.05f, 2f, 1f, 3f, 0f);
+            GameObject model = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            Object.DestroyImmediate(model.GetComponent<Collider>());
+            model.transform.SetParent(root.transform, false);
+            motion = ShipMotion.Attach(root.transform, model.transform, 0.05f, 2f, 1f, 3f, 0f);
             return root.transform;
         }
 

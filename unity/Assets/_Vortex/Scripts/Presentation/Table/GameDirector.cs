@@ -676,19 +676,24 @@ namespace Vortex.Client.Presentation
 
         private Transform SpawnShip(int seat, Vector3 position, Vector3 facing)
         {
-            GameObject ship = ships.Spawn(seat, shipRow, theme.Seat(seat));
-            ship.transform.position = position;
+            // A still root the table places (the panel follows it), and the model under it, which moves (ANIMATIONS.md
+            // §2): a model may carry its mesh on its own root, which must move too.
+            var root = new GameObject("Siège " + (seat + 1).ToString(CultureInfo.InvariantCulture)).transform;
+            root.SetParent(shipRow, false);
+            root.position = position;
             Vector3 direction = facing - position;
             direction.y = 0f;
             if (direction.sqrMagnitude > 0.001f)
             {
-                ship.transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
+                root.rotation = Quaternion.LookRotation(direction, Vector3.up);
             }
 
-            // Each ship sways on its own rhythm (ANIMATIONS.md §2): the phase follows the seat.
-            ShipMotion.Attach(ship.transform, theme.ShipSwayHeight, theme.ShipSwayRoll, theme.ShipSwayPitch, theme.ShipSwaySeconds, seat * 0.37f);
-            _ships[seat] = ship.transform;
-            return ship.transform;
+            GameObject ship = ships.Spawn(seat, root, theme.Seat(seat));
+
+            // Each ship sways on its own rhythm: the phase follows the seat.
+            ShipMotion.Attach(root, ship.transform, theme.ShipSwayHeight, theme.ShipSwayRoll, theme.ShipSwayPitch, theme.ShipSwaySeconds, seat * 0.37f);
+            _ships[seat] = root;
+            return root;
         }
 
         private void Clear()
